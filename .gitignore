@@ -1,0 +1,20 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/shelf
+
+# Sensitive or high-churn files
+.idea/**/dataSources/
+.idea/**/dataSources.local.xml
+
+# Editor-based Rest Client
+.idea/httpRequests
+
+# Dependency directories
+node_modules/
