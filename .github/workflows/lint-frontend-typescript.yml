@@ -25,4 +25,4 @@ jobs:
         continue-on-error: true
 
       - name: Run ESLint
-        run: cd web && npm run lint:typescript
+        run: cd web && npm run lint
