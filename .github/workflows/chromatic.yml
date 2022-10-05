@@ -20,8 +20,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
       - name: Install dependencies
         working-directory: ./web
-        # TODO: remove when react-dates is replaced
-        run: npm ci --legacy-peer-dep
+        run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{secrets.AUTH_TOKEN_GITHUB_PACKAGES}}
         # 👇 Adds Chromatic as a step in the workflow
