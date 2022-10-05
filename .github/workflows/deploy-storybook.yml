@@ -1,24 +1,79 @@
-name: Build and Deploy
-on:
-  push:
-#    paths: ["stories/**", "src/components/**"] # Trigger the action only when files change in the folders defined here
+name: CI
+on: [push]
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
+      - name: Begin CI...
+        uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - name: Install and Build 🔧
-        run: | # Install npm packages and build the Storybook files
-          npm install
-          npm run build-storybook
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@3.6.2
+
+      - name: Use Node 16
+        uses: actions/setup-node@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: main # The branch the action should deploy to.
-          FOLDER: docs-build # The folder that the build-storybook script generates files.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
-          TARGET_FOLDER: docs # The folder that we serve our Storybook files from
+          node-version: 16.x
+
+      - name: Install dependencies
+        working-directory: ./web
+        run: npm i
+
+      - name: Lint
+        working-directory: ./web
+        run: npm run lint
+
+      - name: Test
+        working-directory: ./web
+        run: npm run test --ci --coverage --maxWorkers=2
+
+      - name: Build
+        working-directory: ./web
+        if: github.ref == 'refs/heads/master'
+        run: npm run build
+
+      - name: Release
+        working-directory: ./web
+        if: github.ref == 'refs/heads/master'
+        run: npx semantic-release
+        env:
+          GH_TOKEN: ${{secrets.STEP_ENABLEMENT_SERVICE_PAT}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_AUTH_TOKEN_LINZJS}}
+
+  publish-vNext-npm:
+    if: startsWith(github.ref, 'refs/heads/vNext') || startsWith(github.ref, 'refs/heads/beta')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{secrets.STEP_ENABLEMENT_SERVICE_PAT}}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm version prerelease -m "%s [skip ci]" && git push
+        env:
+          GIT_AUTHOR_EMAIL: STEPEnablementService@linz.govt.nz
+          GIT_AUTHOR_NAME: STEP Enablement Service
+          GIT_COMMITTER_EMAIL: STEPEnablementService@linz.govt.nz
+          GIT_COMMITTER_NAME: STEP Enablement Service
+      - run: npm publish --access public --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN_LINZJS}}
+
+  publish-storybook:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm i
+      - run: npm run deploy-storybook -- --ci
+        env:
+          GH_TOKEN: github-actions:${{secrets.GITHUB_TOKEN}}
