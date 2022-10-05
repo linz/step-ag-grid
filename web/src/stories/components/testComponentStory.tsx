@@ -1,4 +1,4 @@
-import { TestComponent } from "../components/testComponent";
+import { TestComponent } from "../../components/testComponent";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 
 import React from "react";
@@ -8,8 +8,8 @@ export default {
     component: TestComponent,
 } as ComponentMeta<typeof TestComponent>;
 
-const TestComponentStory: ComponentStory<typeof TestComponent> = () => (
+const TestComponentStories: ComponentStory<typeof TestComponent> = () => (
     <TestComponent height={100} width={100} text={"hello world"} textColor={"red"} backgroundColor={"black"}/>
 );
 
-export const ThreeNodes = TestComponentStory.bind({});
+export const TestComponentStory = TestComponentStories.bind({});
