@@ -13,7 +13,6 @@ module.exports = {
         "@storybook/addon-essentials",
     ],
     webpackFinal: async (config) => {
-        console.log(config);
         // Handling scss files when used within components consumed by a story
         config.module.rules.push({
             test: /\.scss$/,
