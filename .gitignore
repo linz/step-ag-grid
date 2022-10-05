@@ -13,6 +13,15 @@
 .idea/**/dataSources/
 .idea/**/dataSources.local.xml
 
+# ignore package.json in the root, but not in the web folder
+/package.json
+/package-lock.json
+!/web/package.json
+!/web/package-lock.json
+
+# ignore storybook static folder
+/web/storybook-static
+
 # Editor-based Rest Client
 .idea/httpRequests
 

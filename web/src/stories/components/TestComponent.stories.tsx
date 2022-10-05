@@ -1,10 +1,10 @@
-import { TestComponent } from "../../components/testComponent";
+import { TestComponent } from "../../components/TestComponent";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 
 import React from "react";
 
 export default {
-    title: "Components/TestComponentStory",
+    title: "Components/TestComponentStories",
     component: TestComponent,
 } as ComponentMeta<typeof TestComponent>;
 
