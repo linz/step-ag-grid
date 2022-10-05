@@ -28,7 +28,7 @@
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public --no-manager-cache",
     "deploy-storybook": "npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",
-    "chromatic": "chromatic --exit-zero-on-changes",
+    "chromatic": "chromatic --exit-zero-on-changes"
   },
   "eslintConfig": {
     "extends": [
