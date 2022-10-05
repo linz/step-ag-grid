@@ -42,6 +42,8 @@
     ]
   },
   "devDependencies": {
+    "@storybook/cli": "^6.5.12",
+    "@storybook/react": "^6.5.12",
     "chromatic": "^6.10.1"
   }
 }
