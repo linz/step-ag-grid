@@ -1,0 +1,28 @@
+name: Lint Frontend Typescript
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Code
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install NPM packages
+        run: cd web && npm i
+        continue-on-error: true
+
+      - name: Run ESLint
+        run: cd web && npm run lint
