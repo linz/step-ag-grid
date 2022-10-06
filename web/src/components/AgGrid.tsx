@@ -1,21 +1,10 @@
 import "./AgGridStyles.scss";
 
 import clsx from "clsx";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
-import {
-  CellEvent,
-  GridReadyEvent,
-  SelectionChangedEvent,
-} from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
 import { AgGridContext } from "../contexts/AgGridContext";
@@ -57,28 +46,23 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
    * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
    * This passes the event to the checkbox when you click anywhere in the cell.
    */
-  const clickSelectorCheckboxWhenContainingCellClicked = useCallback(
-    ({ event }: CellClickedEvent) => {
-      if (!event) return;
-      const input = (event.target as Element).querySelector("input");
-      input?.dispatchEvent(event);
-    },
-    []
-  );
+  const clickSelectorCheckboxWhenContainingCellClicked = useCallback(({ event }: CellClickedEvent) => {
+    if (!event) return;
+    const input = (event.target as Element).querySelector("input");
+    input?.dispatchEvent(event);
+  }, []);
 
   /**
    * Ensure external selected items list is in sync with panel.
    */
-  const synchroniseExternalStateToGridSelection = ({
-    api,
-  }: SelectionChangedEvent) => {
+  const synchroniseExternalStateToGridSelection = ({ api }: SelectionChangedEvent) => {
+    api.refreshHeader();
+
     const selectedRows = api.getSelectedRows();
     // We don't want to update selected Items if it hasn't changed to prevent excess renders
     if (
       params.externalSelectedItems.length != selectedRows.length ||
-      isNotEmpty(
-        xorBy(selectedRows, params.externalSelectedItems, (row) => row.id)
-      )
+      isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
     ) {
       params.setExternalSelectedItems([...selectedRows]);
     }
@@ -91,19 +75,12 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
     if (!gridReady()) return;
 
-    const selectedIds = params.externalSelectedItems.map(
-      (row) => row.id
-    ) as number[];
+    const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
     const lastNewId = last(difference(selectedIds, lastSelectedIds.current));
     if (lastNewId != null) ensureRowVisible(lastNewId);
     lastSelectedIds.current = selectedIds;
     selectRowsById(selectedIds);
-  }, [
-    params.externalSelectedItems,
-    ensureRowVisible,
-    gridReady,
-    selectRowsById,
-  ]);
+  }, [params.externalSelectedItems, ensureRowVisible, gridReady, selectRowsById]);
 
   /**
    * Synchronise quick filter to grid
@@ -143,7 +120,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       },
       ...(params.columnDefs as ColDef[]),
     ],
-    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs]
+    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs],
   );
 
   const onGridReady = useCallback(
@@ -153,21 +130,14 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       synchroniseExternallySelectedItemsToGrid();
       updateQuickFilter();
     },
-    [
-      params,
-      setGridApi,
-      synchroniseExternallySelectedItemsToGrid,
-      updateQuickFilter,
-    ]
+    [params, setGridApi, synchroniseExternallySelectedItemsToGrid, updateQuickFilter],
   );
 
   const noRowsOverlayComponent = useCallback(
     () => (
-      <span className="ag-overlay-no-rows-center">
-        {params.noRowsOverlayText ?? "There are currently no rows"}
-      </span>
+      <span className="ag-overlay-no-rows-center">{params.noRowsOverlayText ?? "There are currently no rows"}</span>
     ),
-    [params.noRowsOverlayText]
+    [params.noRowsOverlayText],
   );
 
   const sizeColumnsToFit = useCallback((event: AgGridEvent) => {
@@ -202,7 +172,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         });
       }
     },
-    [gridContext]
+    [gridContext],
   );
 
   const onCellEditingStopped = useCallback(
@@ -210,18 +180,13 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       gridContext.selectedRow = undefined;
       refreshSelectedRows(event);
     },
-    [gridContext, refreshSelectedRows]
+    [gridContext, refreshSelectedRows],
   );
 
   return (
     <div
       data-testid={params.dataTestId}
-      className={clsx(
-        "ag-grid-grid",
-        "ag-grid-grid--editing",
-        "ag-theme-alpine",
-        staleGrid && "aggrid-sortIsStale"
-      )}
+      className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
       onContextMenu={(event) => {
         // we don't want context menu to bubble outside of container
         event.preventDefault();

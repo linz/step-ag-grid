@@ -41,7 +41,6 @@ module.exports = {
     "testing-library/prefer-query-by-disappearance": "off",
     "testing-library/no-debugging-utils": "warn",
     "testing-library/render-result-naming-convention": "off",
-    "react-hooks/exhaustive-deps": "off",
 
     // customized rules
     "react/no-unescaped-entities": ["error", { forbid: [">", '"', "}"] }], // ' is ok, don't want to escape this
@@ -55,6 +54,12 @@ module.exports = {
     "jest/expect-expect": "off", // sometimes the assertions are in other functions called from a test
 
     "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        additionalHooks: "(useWorkflowEffect|useWorkflowSidePanelHook)",
+      },
+    ],
   },
   overrides: [
     {
@@ -72,14 +77,8 @@ module.exports = {
         "@typescript-eslint/no-unnecessary-type-constraint": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-empty-function": [
-          "warn",
-          { allow: ["arrowFunctions"] },
-        ],
-        "@typescript-eslint/no-unused-vars": [
-          "warn",
-          { argsIgnorePattern: "^_" },
-        ], // prepend var with _ (e.g.. _myVar) to ignore this pattern
+        "@typescript-eslint/no-empty-function": ["warn", { allow: ["arrowFunctions"] }],
+        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }], // prepend var with _ (e.g.. _myVar) to ignore this pattern
         "@typescript-eslint/no-use-before-define": "off", // We will want to use before define to keep exports at the top
         "@typescript-eslint/ban-ts-comment": "off", // We use explicit overrides
         "@typescript-eslint/naming-convention": "off", // React's convention is to use CamelCase for component file names
@@ -89,7 +88,6 @@ module.exports = {
       files: ["*.test.js", "*.test.ts", "*.test.tsx", "scripts/*"],
       rules: {
         "no-console": "off",
-        "@typescript-eslint/no-non-null-assertion": "off", // a null-exception in a test is fine, it's a fail
       },
     },
   ],
