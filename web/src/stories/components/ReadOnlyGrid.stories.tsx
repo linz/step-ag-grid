@@ -12,7 +12,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 500, height: 400, display: "flex" }}>
+      <div style={{ width: 600, height: 400, display: "flex" }}>
         <AgGridContextProvider>
           <Story />
         </AgGridContextProvider>
@@ -23,8 +23,9 @@ export default {
 
 interface ITestRow {
   id: number;
-  name: string;
+  position: string;
   age: number;
+  desc: string;
 }
 
 const Template: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
@@ -44,32 +45,63 @@ ReadOnlyGrid.args = {
     {
       colId: "id",
       field: "id",
-      headerName: "Id.",
+      headerName: "Id",
       initialWidth: 65,
-      maxWidth: 85,
+      maxWidth: 150,
       suppressSizeToFit: true,
       sortable: true,
+      resizable: true,
+      editable: true,
+      cellEditor: "agTextCellEditor",
     },
     {
-      colId: "name",
-      field: "name",
-      headerName: "Name",
+      colId: "position",
+      field: "position",
+      headerName: "Position",
       initialWidth: 65,
-      maxWidth: 85,
+      maxWidth: 150,
       sortable: true,
+      resizable: true,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {
+        values: [
+          "Architect",
+          "Developer",
+          "Product Owner",
+          "Scrum Master",
+          "Tester",
+          "(other)",
+        ],
+      },
     },
     {
       colId: "age",
       field: "age",
       headerName: "Age",
       initialWidth: 65,
-      maxWidth: 85,
+      maxWidth: 150,
       sortable: true,
+      resizable: true,
+    },
+    {
+      colId: "desc",
+      field: "desc",
+      headerName: "Description",
+      initialWidth: 150,
+      maxWidth: 200,
+      suppressSizeToFit: true,
+      sortable: true,
+      resizable: true,
+      editable: true,
+      cellEditor: "agLargeTextCellEditor",
+      autoHeight: true,
+      wrapText: true,
     },
   ],
 
   rowData: [
-    { id: 1000, name: "Tester", age: 30 },
-    { id: 1001, name: "Developer", age: 12 },
+    { id: 1000, position: "Tester", age: 30, desc: "Tests application" },
+    { id: 1001, position: "Developer", age: 12, desc: "Develops application" },
   ] as ITestRow[],
 };
