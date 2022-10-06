@@ -72,7 +72,7 @@ ReadOnlyGrid.args = {
   ],
 
   rowData: [
-    { id: 1000, name: "Tester 1", age: 30 },
-    { id: 1001, name: "Tester 2", age: 40 },
+    { id: 1000, name: "Tester", age: 30 },
+    { id: 1001, name: "Developer", age: 12 },
   ] as ITestRow[],
 };
