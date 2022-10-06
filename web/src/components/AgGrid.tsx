@@ -1,17 +1,27 @@
 import "./AgGridStyles.scss";
 
 import clsx from "clsx";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { AgGridContext } from "../contexts/AgGridContext";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AgGridReact } from "ag-grid-react";
-import { CellClickedEvent, ColDef } from "ag-grid-community";
-import { GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
+import {
+  CellEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import {usePostSortRowsHook} from "./PostSortRowHook";
-import { defaultAgGridProps } from "./AgGridUtils";
-import { AgGridSelectHeader } from "./AgGridSelectHeader";
 import { difference, last, xorBy } from "lodash-es";
+import { AgGridContext } from "../contexts/AgGridContext";
+import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
+import { AgGridSelectHeader } from "./AgGridSelectHeader";
 
 export interface AgGridProps {
   dataTestId?: string;
@@ -30,11 +40,12 @@ export interface AgGridProps {
  */
 export const AgGrid = (params: AgGridProps): JSX.Element => {
   const {
+    gridContext,
     gridReady,
     setGridApi,
     setQuickFilter,
     ensureRowVisible,
-    setSelectedRowIds,
+    selectRowsById,
     ensureSelectedRowIsVisible,
   } = useContext(AgGridContext);
 
@@ -46,21 +57,28 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
    * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
    * This passes the event to the checkbox when you click anywhere in the cell.
    */
-  const clickSelectorCheckboxWhenContainingCellClicked = useCallback(({ event }: CellClickedEvent) => {
-    if (!event) return;
-    const input = (event.target as Element).querySelector("input");
-    input?.dispatchEvent(event);
-  }, []);
+  const clickSelectorCheckboxWhenContainingCellClicked = useCallback(
+    ({ event }: CellClickedEvent) => {
+      if (!event) return;
+      const input = (event.target as Element).querySelector("input");
+      input?.dispatchEvent(event);
+    },
+    []
+  );
 
   /**
    * Ensure external selected items list is in sync with panel.
    */
-  const synchroniseExternalStateToGridSelection = ({ api }: SelectionChangedEvent) => {
+  const synchroniseExternalStateToGridSelection = ({
+    api,
+  }: SelectionChangedEvent) => {
     const selectedRows = api.getSelectedRows();
     // We don't want to update selected Items if it hasn't changed to prevent excess renders
     if (
       params.externalSelectedItems.length != selectedRows.length ||
-      isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
+      isNotEmpty(
+        xorBy(selectedRows, params.externalSelectedItems, (row) => row.id)
+      )
     ) {
       params.setExternalSelectedItems([...selectedRows]);
     }
@@ -73,12 +91,19 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
     if (!gridReady()) return;
 
-    const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
+    const selectedIds = params.externalSelectedItems.map(
+      (row) => row.id
+    ) as number[];
     const lastNewId = last(difference(selectedIds, lastSelectedIds.current));
     if (lastNewId != null) ensureRowVisible(lastNewId);
     lastSelectedIds.current = selectedIds;
-    setSelectedRowIds(selectedIds);
-  }, [params.externalSelectedItems, ensureRowVisible, gridReady, setSelectedRowIds]);
+    selectRowsById(selectedIds);
+  }, [
+    params.externalSelectedItems,
+    ensureRowVisible,
+    gridReady,
+    selectRowsById,
+  ]);
 
   /**
    * Synchronise quick filter to grid
@@ -104,7 +129,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
   }, [synchroniseExternallySelectedItemsToGrid]);
 
   const columnDefs = useMemo(
-    () => [
+    (): GridOptions["columnDefs"] => [
       {
         colId: "selection",
         editable: false,
@@ -118,7 +143,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       },
       ...(params.columnDefs as ColDef[]),
     ],
-    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs],
+    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs]
   );
 
   const onGridReady = useCallback(
@@ -128,22 +153,75 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       synchroniseExternallySelectedItemsToGrid();
       updateQuickFilter();
     },
-    [params, setGridApi, synchroniseExternallySelectedItemsToGrid, updateQuickFilter],
+    [
+      params,
+      setGridApi,
+      synchroniseExternallySelectedItemsToGrid,
+      updateQuickFilter,
+    ]
   );
 
   const noRowsOverlayComponent = useCallback(
     () => (
-      <span className="ag-overlay-no-rows-center">{params.noRowsOverlayText ?? "There are currently no rows"}</span>
+      <span className="ag-overlay-no-rows-center">
+        {params.noRowsOverlayText ?? "There are currently no rows"}
+      </span>
     ),
-    [params.noRowsOverlayText],
+    [params.noRowsOverlayText]
   );
 
-  const defaultProps = useMemo(() => defaultAgGridProps(), []);
+  const sizeColumnsToFit = useCallback((event: AgGridEvent) => {
+    // @ts-ignore (gridBodyCtrl is private)
+    if (event.api.gridBodyCtrl == undefined) {
+      return;
+      // this is here because ag grid was throwing api undefined error when closing POPPED OUT panel
+    }
+    event.api.sizeColumnsToFit();
+  }, []);
+
+  const refreshSelectedRows = useCallback((event: CellEvent): void => {
+    // Force-refresh all selected rows to re-run class function, to update selection highlighting
+    event.api.refreshCells({
+      force: true,
+      rowNodes: event.api.getSelectedNodes(),
+    });
+  }, []);
+
+  const startCellEditing = useCallback(
+    (event: CellEvent) => {
+      gridContext.selectedRow = event.node.data;
+      if (!event.node.isSelected()) {
+        // MATT Note this causes race condition issues with getting selection form AgGrid context
+        event.api.deselectAll();
+        event.node.setSelected(true);
+      }
+      if (event.rowIndex !== null) {
+        event.api.startEditingCell({
+          rowIndex: event.rowIndex,
+          colKey: event.column.getColId(),
+        });
+      }
+    },
+    [gridContext]
+  );
+
+  const onCellEditingStopped = useCallback(
+    (event: CellEvent) => {
+      gridContext.selectedRow = undefined;
+      refreshSelectedRows(event);
+    },
+    [gridContext, refreshSelectedRows]
+  );
 
   return (
     <div
       data-testid={params.dataTestId}
-      className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
+      className={clsx(
+        "ag-grid-grid",
+        "ag-grid-grid--editing",
+        "ag-theme-alpine",
+        staleGrid && "aggrid-sortIsStale"
+      )}
       onContextMenu={(event) => {
         // we don't want context menu to bubble outside of container
         event.preventDefault();
@@ -151,14 +229,18 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       }}
     >
       <AgGridReact
-        {...defaultProps}
-        onCellClicked={() => {
-          /* override old aggrid default */
-        }}
-        onCellDoubleClicked={(event) => {
-          if (event.column.getColId() === "selection") return;
-          defaultProps.onCellContextMenu(event);
-        }}
+        context={gridContext}
+        getRowId={(params) => `${params.data.id}`}
+        suppressRowClickSelection={true}
+        rowSelection={"multiple"}
+        suppressBrowserResizeObserver={true}
+        colResizeDefault={"shift"}
+        onFirstDataRendered={sizeColumnsToFit}
+        onGridSizeChanged={sizeColumnsToFit}
+        onCellDoubleClicked={startCellEditing}
+        onCellContextMenu={startCellEditing}
+        onCellEditingStarted={refreshSelectedRows}
+        onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
         defaultColDef={params.defaultColDef}
         rowData={params.rowData}
@@ -167,7 +249,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onSortChanged={ensureSelectedRowIsVisible}
         postSortRows={postSortRows}
         onSelectionChanged={synchroniseExternalStateToGridSelection}
-        suppressBrowserResizeObserver={true}
       />
     </div>
   );

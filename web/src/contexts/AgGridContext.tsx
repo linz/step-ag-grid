@@ -1,26 +1,32 @@
 import { createContext } from "react";
 import { GridApi } from "ag-grid-community";
 
-export type AgGridContextType = {
+export interface GridContext {
+  selectedRow: any | undefined;
+}
+
+export interface AgGridContextType {
+  gridContext: GridContext;
   gridReady: () => boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
-  selectRows: (rowIds?: number[]) => void;
   editingCells: () => boolean;
+  getSelectedRow: () => any | undefined;
   getSelectedRows: <T extends unknown>() => T[];
   getSelectedRowIds: () => number[];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  selectRowsWithFlash: (rowIds?: number[]) => void;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  setSelectedRowIds: (ids: number[]) => void;
+  selectRowsById: (rowIds?: number[]) => void;
+  selectRowsByIdWithFlash: (rowIds?: number[]) => void;
   flashRows: (rowIds?: number[]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   ensureRowVisible: (id: number) => void;
   ensureSelectedRowIsVisible: () => void;
   stopEditing: () => void;
-};
+}
 
 export const AgGridContext = createContext<AgGridContextType>({
+  gridContext: {} as GridContext,
   gridReady: () => {
     console.error("no context provider for gridReady");
     return false;
@@ -31,8 +37,12 @@ export const AgGridContext = createContext<AgGridContextType>({
   setQuickFilter: () => {
     console.error("no context provider for setQuickFilter");
   },
-  selectRows: () => {
+  selectRowsById: () => {
     console.error("no context provider for selectRows");
+  },
+  getSelectedRow: () => {
+    console.error("no context provider for getSelectedRowId");
+    return undefined;
   },
   getSelectedRows: <T extends unknown>(): T[] => {
     console.error("no context provider for getSelectedRows");
@@ -45,14 +55,11 @@ export const AgGridContext = createContext<AgGridContextType>({
   selectRowsDiff: async () => {
     console.error("no context provider for selectRowsDiff");
   },
-  selectRowsWithFlash: () => {
+  selectRowsByIdWithFlash: () => {
     console.error("no context provider for selectRowsWithFlash");
   },
   selectRowsWithFlashDiff: async () => {
     console.error("no context provider for selectRowsWithFlashDiff");
-  },
-  setSelectedRowIds: () => {
-    console.error("no context provider for setSelectedRowIds");
   },
   flashRows: () => {
     console.error("no context provider for flashRows");
