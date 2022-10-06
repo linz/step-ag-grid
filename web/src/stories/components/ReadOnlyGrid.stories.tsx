@@ -1,4 +1,7 @@
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import {
+  ComponentMeta,
+  ComponentStory,
+} from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useState } from "react";
@@ -68,5 +71,8 @@ ReadOnlyGrid.args = {
     },
   ],
 
-  rowData: [{ id: 1000, name: "Tester", age: 30 }] as ITestRow[],
+  rowData: [
+    { id: 1000, name: "Tester 1", age: 30 },
+    { id: 1001, name: "Tester 2", age: 40 },
+  ] as ITestRow[],
 };
