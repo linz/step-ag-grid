@@ -65,7 +65,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN_LINZJS}}
 
   publish-storybook:
-#    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -74,6 +74,8 @@ jobs:
         with:
           node-version: 16
       - run: npm i
+        working-directory: ./web
       - run: npm run deploy-storybook -- --ci
+        working-directory: ./web
         env:
           GH_TOKEN: github-actions:${{secrets.GITHUB_TOKEN}}
