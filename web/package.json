@@ -26,7 +26,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public --no-manager-cache",
+    "build-storybook": "build-storybook -s public",
     "deploy-storybook": "npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",
     "chromatic": "chromatic --exit-zero-on-changes"
   },

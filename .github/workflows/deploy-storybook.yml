@@ -32,6 +32,11 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: npm run build
 
+      - name: Build Storybook
+        working-directory: ./web
+        if: github.ref == 'refs/heads/master'
+        run: npm run build-storybook
+
       - name: Release
         working-directory: ./web
         if: github.ref == 'refs/heads/master'
