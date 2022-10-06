@@ -56,8 +56,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
    * Ensure external selected items list is in sync with panel.
    */
   const synchroniseExternalStateToGridSelection = ({ api }: SelectionChangedEvent) => {
-    api.refreshHeader();
-
     const selectedRows = api.getSelectedRows();
     // We don't want to update selected Items if it hasn't changed to prevent excess renders
     if (
