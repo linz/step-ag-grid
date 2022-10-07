@@ -3,8 +3,12 @@ import "@szhsin/react-menu/dist/index.css";
 import { MenuItem } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopout } from "./GridPopout";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
+import { LuiMiniSpinner } from "@linzjs/lui";
+
+const MenuSeparatorValue = {};
+export const MenuSeparator = <T extends unknown>() => MenuSeparatorValue as any as T;
 
 export interface BaseRow {
   id: string | number;
@@ -23,7 +27,12 @@ export interface SelectOption<ValueType> {
 export interface GridDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
   onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => void;
-  options: SelectOption<ValueType>[] | ValueType[];
+  options:
+    | SelectOption<ValueType>[]
+    | ValueType[]
+    | ((
+        selectedRows: RowType[],
+      ) => Promise<SelectOption<ValueType>[] | ValueType[]> | (SelectOption<ValueType>[] | ValueType[]));
 }
 
 export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
@@ -42,6 +51,7 @@ export const GridDropDown = <RowType extends BaseRow, ValueType>(
 export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
   const colDef = props.colDef as GridDropDownColDef<RowType, ValueType>;
+  const [options, setOptions] = useState<SelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
     (value: any) => {
@@ -67,22 +77,40 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
     [api, colDef, data],
   );
 
-  const options = colDef.cellEditorParams?.options?.map((item) => {
-    if (item == null || typeof item !== "object") {
-      item = { value: item as ValueType } as SelectOption<ValueType>;
-    }
-    return item;
-  }) as any as SelectOption<ValueType>[];
+  useEffect(() => {
+    (async () => {
+      let optionsConf = colDef.cellEditorParams?.options ?? [];
+
+      if (typeof optionsConf == "function") {
+        optionsConf = await optionsConf(api.getSelectedRows());
+      }
+
+      const optionsList = optionsConf?.map((item) => {
+        if (item == null || typeof item !== "object") {
+          item = { value: item as ValueType } as SelectOption<ValueType>;
+        }
+        return item;
+      }) as any as SelectOption<ValueType>[];
+
+      setOptions(optionsList);
+    })();
+  }, [api, colDef.cellEditorParams?.options]);
 
   const children = (
     <>
-      {options.map((item) => {
-        return (
-          <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
-            {item.label ?? item.value == null ? `<${item.value}>` : `${item.value}`}
-          </MenuItem>
-        );
-      })}
+      {options ? (
+        options.map((item) =>
+          item === MenuSeparatorValue ? (
+            <hr />
+          ) : (
+            <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
+              {item.label ?? item.value == null ? `<${item.value}>` : `${item.value}`}
+            </MenuItem>
+          ),
+        )
+      ) : (
+        <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />
+      )}
     </>
   );
   return GridPopout({ ...props, children });

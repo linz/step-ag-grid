@@ -1,8 +1,8 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
-import { useMemo, useState } from "react";
-import { GridDropDown } from "../../components/GridDropDown";
+import { useCallback, useMemo, useState } from "react";
+import { GridDropDown, MenuSeparator, SelectOption } from "../../components/GridDropDown";
 
 export default {
   title: "Components / Grids",
@@ -32,6 +32,28 @@ interface ITestRow {
 
 const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
+
+  const optionsFn = useCallback((selectedRows: ITestRow[]) => {
+    // eslint-disable-next-line no-console
+    console.log("optionsFn selected rows", selectedRows);
+    return new Promise<(string | null)[]>((resolve) => {
+      setTimeout(
+        () =>
+          resolve([
+            null,
+            "Architect",
+            "Developer",
+            "Product Owner",
+            "Scrum Master",
+            "Tester",
+            MenuSeparator<string>(),
+            "(other)",
+          ]),
+        1000,
+      );
+    });
+  }, []);
+
   const columnDefs = useMemo(
     () => [
       {
@@ -66,6 +88,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
               label: <span style={{ border: "2px dashed blue" }}>One</span>,
             },
             { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
+            MenuSeparator<SelectOption<string>>(),
             { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
           ],
         },
@@ -84,8 +107,22 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           },
         },
       }),
+      GridDropDown<ITestRow, ITestRow["position"]>({
+        field: "position",
+        initialWidth: 65,
+        maxWidth: 150,
+        headerName: "options Fn",
+        cellEditorParams: {
+          options: optionsFn,
+          onSelectedItem: (selectedItem) => {
+            // eslint-disable-next-line no-console
+            console.log({ selectedItem });
+            alert(`Item selected, check console.log for info`);
+          },
+        },
+      }),
     ],
-    [],
+    [optionsFn],
   );
 
   const rowData = useMemo(
