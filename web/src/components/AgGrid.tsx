@@ -159,9 +159,8 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     (event: CellEvent) => {
       gridContext.selectedRow = event.node.data;
       if (!event.node.isSelected()) {
-        // MATT Note this causes race condition issues with getting selection form AgGrid context
-        event.api.deselectAll();
-        event.node.setSelected(true);
+        // MATT Note this causes race condition issues with getting selection from AgGrid context
+        event.node.setSelected(true, true);
       }
       if (event.rowIndex !== null) {
         event.api.startEditingCell({
@@ -201,7 +200,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onFirstDataRendered={sizeColumnsToFit}
         onGridSizeChanged={sizeColumnsToFit}
         onCellDoubleClicked={startCellEditing}
-        onCellContextMenu={startCellEditing}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}

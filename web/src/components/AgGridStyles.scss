@@ -61,6 +61,16 @@
           borders-secondary: false,
   ));
 
+  // Fix that when you click below checkbox it doesn't process a click
+  .ag-cell[col-id="selection"] {
+    display: flex;
+  }
+
+  // Fix that when you click below checkbox it doesn't process a click
+  .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) {
+    height: auto;
+  }
+
   .ag-row:last-of-type {
     border-bottom: none;
   }
@@ -82,12 +92,13 @@
   .ag-cell {
     padding-left: 7px;
     padding-right: 4px;
+    display: flex;
+    align-items: center;
   }
 
   .ag-cell-more {
     padding: 0;
     display: flex;
-    align-items: center;
     justify-content: center;
   }
 
@@ -95,9 +106,11 @@
     word-break: break-word;
   }
 
-  .ag-cell-popup-editing, .ag-selected-for-edit {
+  .ag-cell-popup-editing, .ag-selected-for-edit, .ag-cell-inline-editing {
     background: rgba(72, 160, 244, 0.2);
-    outline: 3px solid #48a0f4;
+    // These are important, it needs to override ag-grid to work
+    border: 3px solid #48a0f4 !important;
+    border-right: 3px solid #48a0f4 !important;
   }
 
   .ag-row .ag-cell-data-changed {
