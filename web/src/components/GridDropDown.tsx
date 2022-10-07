@@ -6,43 +6,49 @@ import { GridPopout } from "./GridPopout";
 import { useCallback } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 
-export interface GridDropDownSelectedItem {
-  selectedRows: any[];
-  value: any;
+export interface BaseRow {
+  id: string | number;
 }
 
-export interface SelectOption {
-  value: any;
+export interface GridDropDownSelectedItem<RowType, ValueType> {
+  selectedRows: RowType[];
+  value: ValueType;
+}
+
+export interface SelectOption<ValueType> {
+  value: ValueType;
   label?: JSX.Element | string;
 }
 
-export interface GridDropDownProps {
+export interface GridDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
-  onSelectedItem?: (props: GridDropDownSelectedItem) => void;
-  options: SelectOption[] | any[];
+  onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => void;
+  options: SelectOption<ValueType>[] | ValueType[];
 }
 
-export interface GridDropDownColDef extends ColDef {
-  cellEditorParams?: GridDropDownProps;
+export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
+  cellEditorParams?: GridDropDownProps<RowType, ValueType>;
 }
 
-export const GridDropDown = (props: GridDropDownColDef): ColDef => ({
+export const GridDropDown = <RowType extends BaseRow, ValueType>(
+  props: GridDropDownColDef<RowType, ValueType>,
+): ColDef => ({
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
   cellEditor: GridDropDownComp,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-export const GridDropDownComp = (props: ICellEditorParams) => {
+export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
-  const colDef = props.colDef as GridDropDownColDef;
+  const colDef = props.colDef as GridDropDownColDef<RowType, ValueType>;
 
   const selectItemHandler = useCallback(
     (value: any) => {
-      let selectedRows = api.getSelectedRows();
+      let selectedRows = api.getSelectedRows() as RowType[];
       if (!colDef.cellEditorParams?.multiEdit) {
         // You can't use data as it could be an orphaned reference due to updates
-        selectedRows = selectedRows.filter((row) => row.id == data.id);
+        selectedRows = selectedRows.filter((row) => row.id === data.id);
       }
 
       if (colDef.cellEditorParams?.onSelectedItem) {
@@ -55,22 +61,25 @@ export const GridDropDownComp = (props: ICellEditorParams) => {
         return;
       }
       selectedRows.forEach((row) => {
-        row[field] = value;
+        row[field as keyof RowType] = value;
       });
-      api.refreshCells();
     },
     [api, colDef, data],
   );
 
+  const options = colDef.cellEditorParams?.options?.map((item) => {
+    if (item == null || typeof item !== "object") {
+      item = { value: item as ValueType } as SelectOption<ValueType>;
+    }
+    return item;
+  }) as any as SelectOption<ValueType>[];
+
   const children = (
     <>
-      {colDef.cellEditorParams?.options.map((item) => {
-        if (typeof item !== "object") {
-          item = { value: item };
-        }
+      {options.map((item) => {
         return (
-          <MenuItem key={item.value} value={item.value} onClick={() => selectItemHandler(item.value)}>
-            {item.label ?? item.value}
+          <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
+            {item.label ?? `${item.value}`}
           </MenuItem>
         );
       })}
