@@ -2,7 +2,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useCallback, useMemo, useState } from "react";
-import { GridDropDown, MenuSeparator, SelectOption } from "../../components/GridDropDown";
+import { GridDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridDropDown";
 
 export default {
   title: "Components / Grids",
@@ -46,7 +46,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             "Product Owner",
             "Scrum Master",
             "Tester",
-            MenuSeparator<string>(),
+            MenuSeparatorString,
             "(other)",
           ]),
         1000,
@@ -73,7 +73,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
         maxWidth: 150,
         headerName: "Position",
         cellEditorParams: {
-          options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+          options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
         },
       }),
       GridDropDown<ITestRow, ITestRow["dd"]>({
@@ -88,7 +88,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
               label: <span style={{ border: "2px dashed blue" }}>One</span>,
             },
             { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
-            MenuSeparator<SelectOption<string>>(),
+            MenuSeparator,
             { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
           ],
         },
@@ -114,11 +114,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
         headerName: "options Fn",
         cellEditorParams: {
           options: optionsFn,
-          onSelectedItem: (selectedItem) => {
-            // eslint-disable-next-line no-console
-            console.log({ selectedItem });
-            alert(`Item selected, check console.log for info`);
-          },
         },
       }),
     ],

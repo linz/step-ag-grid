@@ -7,9 +7,6 @@ import { useCallback, useEffect, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { LuiMiniSpinner } from "@linzjs/lui";
 
-const MenuSeparatorValue = {};
-export const MenuSeparator = <T extends unknown>() => MenuSeparatorValue as any as T;
-
 export interface BaseRow {
   id: string | number;
 }
@@ -19,20 +16,22 @@ export interface GridDropDownSelectedItem<RowType, ValueType> {
   value: ValueType;
 }
 
-export interface SelectOption<ValueType> {
+interface FinalSelectOption<ValueType> {
   value: ValueType;
   label?: JSX.Element | string;
 }
+
+export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
+export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
+
+export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
   onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => void;
   options:
     | SelectOption<ValueType>[]
-    | ValueType[]
-    | ((
-        selectedRows: RowType[],
-      ) => Promise<SelectOption<ValueType>[] | ValueType[]> | (SelectOption<ValueType>[] | ValueType[]));
+    | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
 export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
@@ -51,7 +50,7 @@ export const GridDropDown = <RowType extends BaseRow, ValueType>(
 export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
   const colDef = props.colDef as GridDropDownColDef<RowType, ValueType>;
-  const [options, setOptions] = useState<SelectOption<ValueType>[]>();
+  const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
     (value: any) => {
@@ -86,11 +85,11 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
       }
 
       const optionsList = optionsConf?.map((item) => {
-        if (item == null || typeof item !== "object") {
-          item = { value: item as ValueType } as SelectOption<ValueType>;
+        if (item == null || typeof item == "string" || typeof item == "number") {
+          item = { value: item as ValueType } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as SelectOption<ValueType>[];
+      }) as any as FinalSelectOption<ValueType>[];
 
       setOptions(optionsList);
     })();
@@ -100,7 +99,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
     <>
       {options ? (
         options.map((item) =>
-          item === MenuSeparatorValue ? (
+          item.value === MenuSeparatorString ? (
             <hr />
           ) : (
             <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
