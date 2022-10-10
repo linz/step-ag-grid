@@ -13,9 +13,7 @@ interface AgGridContextProps {
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const AgGridContextProvider = (
-  props: AgGridContextProps
-): ReactElement => {
+export const AgGridContextProvider = (props: AgGridContextProps): ReactElement => {
   const gridApiRef = useRef<GridApi>();
   const gridContext = useRef<GridContext>({ selectedRow: undefined });
   const idsBeforeUpdate = useRef<number[]>([]);
@@ -42,7 +40,7 @@ export const AgGridContextProvider = (
    */
   const gridApiOp = <T extends unknown, R extends unknown>(
     hasApiFn: (gridApi: GridApi) => T,
-    noApiFn?: () => R
+    noApiFn?: () => R,
   ): T | R => {
     if (!noApiFn) {
       noApiFn = (() => {}) as () => R;
@@ -70,7 +68,7 @@ export const AgGridContextProvider = (
         gridApi.forEachNode((node) => result.push(node.data.id));
         return result;
       },
-      () => result
+      () => result,
     );
   };
 
@@ -91,7 +89,7 @@ export const AgGridContextProvider = (
         difference(_getAllRowIds(), idsBeforeUpdate.current)
           .map((rowId) => gridApi.getRowNode("" + rowId)) //
           .filter((r) => r) as RowNode[],
-      () => []
+      () => [],
     );
   };
 
@@ -107,7 +105,7 @@ export const AgGridContextProvider = (
         rowIds
           .map((rowId) => gridApi.getRowNode("" + rowId)) //
           .filter((r) => r) as RowNode[],
-      () => [] as RowNode[]
+      () => [] as RowNode[],
     );
   };
 
@@ -123,28 +121,22 @@ export const AgGridContextProvider = (
     rowIds: number[] | undefined,
     select: boolean,
     flash: boolean,
-    retryCount = 5 // We retry for approximately 5x200ms=1s
+    retryCount = 5, // We retry for approximately 5x200ms=1s
   ) => {
     return gridApiOp((gridApi) => {
       const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
-      const gridRowIdsNotUpdatedYet =
-        rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
+      const gridRowIdsNotUpdatedYet = rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
       const gridRowIdsNotChangedYet = !rowIds && isEmpty(rowNodes); // rowIds are from beforeUpdate
-      const gridHasNotUpdated =
-        gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
+      const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
       // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
       if (gridHasNotUpdated && retryCount > 0) {
-        setTimeout(
-          () =>
-            _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1),
-          250
-        );
+        setTimeout(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
         return;
       }
 
       const rowsThatNeedSelecting = sortBy(
         rowNodes.filter((node) => !node.isSelected()),
-        (node) => node.data.id
+        (node) => node.data.id,
       );
       const firstNode = rowsThatNeedSelecting[0];
       firstNode && gridApi.ensureNodeVisible(firstNode);
@@ -170,12 +162,9 @@ export const AgGridContextProvider = (
     });
   };
 
-  const selectRowsById = (rowIds?: number[]) =>
-    _selectRowsWithOptionalFlash(rowIds, true, false);
-  const selectRowsByIdWithFlash = (rowIds?: number[]) =>
-    _selectRowsWithOptionalFlash(rowIds, true, true);
-  const flashRows = (rowIds?: number[]) =>
-    _selectRowsWithOptionalFlash(rowIds, false, true);
+  const selectRowsById = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false);
+  const selectRowsByIdWithFlash = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true);
+  const flashRows = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true);
 
   const selectRowsDiff = async (fn: () => Promise<any>) => {
     beforeUpdate();
@@ -198,20 +187,18 @@ export const AgGridContextProvider = (
   const getSelectedRows = <T extends unknown>(): T[] => {
     return gridApiOp(
       (gridApi) => gridApi.getSelectedRows(),
-      () => []
+      () => [],
     );
   };
 
-  const getSelectedRowIds = (): number[] =>
-    getSelectedRows().map((row) => (row as any).id as number);
+  const getSelectedRowIds = (): number[] => getSelectedRows().map((row) => (row as any).id as number);
 
-  const getSelectedRow = <T extends unknown>(): T | undefined =>
-    gridContext.current.selectedRow;
+  const getSelectedRow = <T extends unknown>(): T | undefined => gridContext.current.selectedRow;
 
   const editingCells = (): boolean => {
     return gridApiOp(
       (gridApi) => isNotEmpty(gridApi.getEditingCells()),
-      () => false
+      () => false,
     );
   };
 

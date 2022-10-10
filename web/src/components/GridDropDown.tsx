@@ -84,6 +84,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
     (async () => {
       let optionsConf = cellEditorParams?.options ?? [];
 
+      console.log("eval opts", api.getSelectedRows());
       if (typeof optionsConf == "function") {
         await modifyUpdating(
           field,
@@ -105,7 +106,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
 
       setOptions(optionsList);
     })();
-  }, [api, cellEditorParams?.options]);
+  }, [api, cellEditorParams?.options, field, modifyUpdating]);
 
   const children = (
     <>
