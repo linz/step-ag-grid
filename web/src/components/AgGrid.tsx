@@ -3,7 +3,7 @@ import "./AgGridStyles.scss";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
+import { AgGridEvent, CellClickedEvent, ColDef, ICellRendererParams } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
@@ -23,6 +23,10 @@ export interface AgGridProps {
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
 }
+
+export const GenericCellRenderer = (props: ICellRendererParams): JSX.Element => {
+  return <span title={props.value}>{props.value}</span>;
+};
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
@@ -203,7 +207,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
-        defaultColDef={params.defaultColDef}
+        defaultColDef={{ cellRenderer: GenericCellRenderer, cellStyle: { display: "flex" }, ...params.defaultColDef }}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}

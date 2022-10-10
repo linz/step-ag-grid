@@ -1,25 +1,15 @@
 import "@szhsin/react-menu/dist/index.css";
 
-import { ControlledMenu } from "@szhsin/react-menu";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { ControlledMenu, MenuItem } from "@szhsin/react-menu";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AgGridContext } from "../contexts/AgGridContext";
-import { ICellEditorParams, ICellRendererParams } from "ag-grid-community";
+import { ICellEditorParams } from "ag-grid-community";
 
 export interface GridPopoutParams extends ICellEditorParams {
   multiUpdate?: boolean;
+  canClose?: () => boolean;
   children: JSX.Element;
 }
-
-export const GridCell = ({ api, value }: ICellRendererParams) => {
-  const cellEditingStarted = useCallback(() => {}, []);
-
-  useEffect(() => {
-    api.addEventListener("cellEditingStarted", cellEditingStarted);
-    return () => api.removeEventListener("cellEditingStarted", cellEditingStarted);
-  }, [api, cellEditingStarted]);
-
-  return value;
-};
 
 export const GridPopout = (props: GridPopoutParams) => {
   const { children, eGridCell } = props;
@@ -43,9 +33,11 @@ export const GridPopout = (props: GridPopoutParams) => {
           portal={true}
           unmountOnClose={true}
           anchorRef={anchorRef}
-          onClose={(x) => {
-            setOpen(false);
-            stopEditing();
+          onClose={(event) => {
+            if (event.reason == "cancel" || !props.canClose || props.canClose()) {
+              setOpen(false);
+              stopEditing();
+            }
           }}
         >
           {children}

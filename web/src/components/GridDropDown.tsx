@@ -49,36 +49,32 @@ export const GridDropDown = <RowType extends BaseRow, ValueType>(
 
 export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
-  const colDef = props.colDef as GridDropDownColDef<RowType, ValueType>;
+  const { field, cellEditorParams } = props.colDef as GridDropDownColDef<RowType, ValueType>;
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
     (value: any) => {
       let selectedRows = api.getSelectedRows() as RowType[];
-      if (!colDef.cellEditorParams?.multiEdit) {
+      if (!cellEditorParams?.multiEdit) {
         // You can't use data as it could be an orphaned reference due to updates
         selectedRows = selectedRows.filter((row) => row.id === data.id);
       }
 
-      if (colDef.cellEditorParams?.onSelectedItem) {
-        colDef.cellEditorParams.onSelectedItem({ selectedRows, value });
+      if (cellEditorParams?.onSelectedItem) {
+        cellEditorParams.onSelectedItem({ selectedRows, value });
         return;
       }
-      const field = colDef.field;
-      if (!field) {
-        console.error("Cannot update cell as field is not defined in colDef: ", colDef);
-        return;
-      }
+
       selectedRows.forEach((row) => {
         row[field as keyof RowType] = value;
       });
     },
-    [api, colDef, data],
+    [api, cellEditorParams, data.id, field],
   );
 
   useEffect(() => {
     (async () => {
-      let optionsConf = colDef.cellEditorParams?.options ?? [];
+      let optionsConf = cellEditorParams?.options ?? [];
 
       if (typeof optionsConf == "function") {
         optionsConf = await optionsConf(api.getSelectedRows());
@@ -93,7 +89,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
 
       setOptions(optionsList);
     })();
-  }, [api, colDef.cellEditorParams?.options]);
+  }, [api, cellEditorParams?.options]);
 
   const children = (
     <>
@@ -103,7 +99,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
             <hr />
           ) : (
             <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
-              {item.label ?? item.value == null ? `<${item.value}>` : `${item.value}`}
+              {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
             </MenuItem>
           ),
         )
