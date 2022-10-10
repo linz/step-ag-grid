@@ -41,7 +41,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
       suppressSizeToFit: true,
       sortable: true,
       resizable: true,
-      editable: true,
       cellEditor: "agTextCellEditor",
     },
     {

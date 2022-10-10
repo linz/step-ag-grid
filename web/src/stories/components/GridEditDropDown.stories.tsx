@@ -3,6 +3,7 @@ import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useCallback, useMemo, useState } from "react";
 import { GridDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridDropDown";
+import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 
 export default {
   title: "Components / Grids",
@@ -14,9 +15,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <AgGridContextProvider>
-          <Story />
-        </AgGridContextProvider>
+        <UpdatingContextProvider>
+          <AgGridContextProvider>
+            <Story />
+          </AgGridContextProvider>
+        </UpdatingContextProvider>
       </div>
     ),
   ],
@@ -25,9 +28,8 @@ export default {
 interface ITestRow {
   id: number;
   position: string | null;
-  age: number;
-  desc: string;
-  dd: string;
+  position2: string | null;
+  position3: string | null;
 }
 
 const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
@@ -76,8 +78,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
         },
       }),
-      GridDropDown<ITestRow, ITestRow["dd"]>({
-        field: "dd",
+      GridDropDown<ITestRow, ITestRow["position2"]>({
+        field: "position2",
         maxWidth: 100,
         headerName: "Multi-edit",
         cellEditorParams: {
@@ -93,17 +95,18 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           ],
         },
       }),
-      GridDropDown<ITestRow, ITestRow["position"]>({
-        field: "position",
+      GridDropDown<ITestRow, ITestRow["position3"]>({
+        field: "position3",
         initialWidth: 65,
         maxWidth: 150,
         headerName: "Custom callback",
         cellEditorParams: {
+          multiEdit: true,
           options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-          onSelectedItem: (selectedItem) => {
-            // eslint-disable-next-line no-console
-            console.log({ selectedItem });
-            alert(`Item selected, check console.log for info`);
+          onSelectedItem: async (selectedItem) => {
+            await new Promise<(string | null)[]>((resolve) => {
+              setTimeout(resolve, 2000);
+            });
           },
         },
       }),
@@ -123,8 +126,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, position: "Tester", dd: "1" },
-        { id: 1001, position: "Developer", dd: "2" },
+        { id: 1000, position: "Tester", position2: "Tester", position3: "Tester" },
+        { id: 1001, position: "Developer", position2: "Developer", position3: "Developer" },
       ] as ITestRow[],
     [],
   );
