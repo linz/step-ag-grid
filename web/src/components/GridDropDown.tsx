@@ -2,7 +2,7 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
+import { GridPopout } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { LuiMiniSpinner } from "@linzjs/lui";
@@ -110,7 +110,7 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
       setOptions(optionsList);
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams?.options, field, modifyUpdating, options]);
+  }, [api, cellEditorParams?.options, field, modifyUpdating]);
 
   const children = (
     <>
@@ -131,5 +131,5 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
       )}
     </>
   );
-  return GridPopoutComponent(props, { children });
+  return GridPopout({ ...props, children });
 };

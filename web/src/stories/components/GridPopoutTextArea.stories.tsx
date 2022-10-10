@@ -1,6 +1,3 @@
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
@@ -54,7 +51,6 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       field: "desc",
       headerName: "Popout Text Area",
       maxWidth: 120,
-      cellEditorParams: {},
     }),
     GridPopoutTextArea<ITestRow, ITestRow["desc"]>({
       field: "desc",

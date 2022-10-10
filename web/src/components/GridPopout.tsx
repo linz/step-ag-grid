@@ -1,18 +1,18 @@
 import "@szhsin/react-menu/dist/index.css";
 
-import { ControlledMenu } from "@szhsin/react-menu";
+import { ControlledMenu, MenuItem } from "@szhsin/react-menu";
 import { useContext, useEffect, useRef, useState } from "react";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { ICellEditorParams } from "ag-grid-community";
 
-export interface GridPopoutCellEditorParams {
+export interface GridPopoutParams extends ICellEditorParams {
+  multiUpdate?: boolean;
   canClose?: () => boolean;
   children: JSX.Element;
 }
 
-export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopoutCellEditorParams) => {
-  const { eGridCell } = props;
-  const { children, canClose } = params;
+export const GridPopout = (props: GridPopoutParams) => {
+  const { children, eGridCell } = props;
   const { stopEditing } = useContext(AgGridContext);
   const anchorRef = useRef(eGridCell);
   anchorRef.current = eGridCell;
@@ -33,9 +33,8 @@ export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopout
           portal={true}
           unmountOnClose={true}
           anchorRef={anchorRef}
-          menuClassName={"lui-menu"}
           onClose={(event) => {
-            if (event.reason == "cancel" || !canClose || canClose()) {
+            if (event.reason == "cancel" || !props.canClose || props.canClose()) {
               setOpen(false);
               stopEditing();
             }

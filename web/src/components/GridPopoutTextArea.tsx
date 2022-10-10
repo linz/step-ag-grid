@@ -1,7 +1,7 @@
 import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
+import { GridPopout } from "./GridPopout";
 import { useCallback, useState } from "react";
 import { BaseRow } from "./GridDropDown";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
@@ -12,7 +12,7 @@ export interface GridPopoutMessageProps<RowType> {
 }
 
 export interface GridPopoutMessageColDef<RowType> extends ColDef {
-  cellEditorParams: GridPopoutMessageProps<RowType>;
+  cellEditorParams?: GridPopoutMessageProps<RowType>;
 }
 
 export const GridPopoutTextArea = <RowType extends BaseRow, ValueType>(
@@ -24,15 +24,9 @@ export const GridPopoutTextArea = <RowType extends BaseRow, ValueType>(
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GridPopoutICellEditorParams<RowType> extends ICellEditorParams {
-  colDef: {
-    cellEditorParams: GridPopoutMessageProps<RowType>;
-  } & ColDef;
-}
-
-export const GridPopoutTextAreaComp = <RowType extends BaseRow>(props: GridPopoutICellEditorParams<RowType>) => {
+export const GridPopoutTextAreaComp = <RowType extends BaseRow>(props: ICellEditorParams) => {
   const { data, api } = props;
-  const { field, cellEditorParams } = props.colDef;
+  const { field, cellEditorParams } = props.colDef as GridPopoutMessageColDef<RowType>;
   const [value, setValue] = useState<string>(props.data[field as keyof RowType]);
 
   const defaultSave = useCallback(
@@ -63,5 +57,5 @@ export const GridPopoutTextAreaComp = <RowType extends BaseRow>(props: GridPopou
       </textarea>
     </div>
   );
-  return GridPopoutComponent(props, { children, canClose: () => defaultSave(value) });
+  return GridPopout({ ...props, children, canClose: () => defaultSave(value) });
 };
