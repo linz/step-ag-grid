@@ -1,11 +1,12 @@
 import "@szhsin/react-menu/dist/index.css";
 
-import { MenuItem } from "@szhsin/react-menu";
+import { MenuItem, MenuDivider } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopout } from "./GridPopout";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { LuiMiniSpinner } from "@linzjs/lui";
+import { UpdatingContext } from "../contexts/UpdatingContext";
 
 export interface BaseRow {
   id: string | number;
@@ -28,7 +29,7 @@ export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
-  onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => void;
+  onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
@@ -49,11 +50,15 @@ export const GridDropDown = <RowType extends BaseRow, ValueType>(
 
 export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
-  const { field, cellEditorParams } = props.colDef as GridDropDownColDef<RowType, ValueType>;
+  const { cellEditorParams } = props.colDef as GridDropDownColDef<RowType, ValueType>;
+  const field = props.colDef.field ?? "";
+
+  const { modifyUpdating } = useContext(UpdatingContext);
+  const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
-    (value: any) => {
+    async (value: any) => {
       let selectedRows = api.getSelectedRows() as RowType[];
       if (!cellEditorParams?.multiEdit) {
         // You can't use data as it could be an orphaned reference due to updates
@@ -61,7 +66,11 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
       }
 
       if (cellEditorParams?.onSelectedItem) {
-        cellEditorParams.onSelectedItem({ selectedRows, value });
+        await modifyUpdating(
+          field,
+          selectedRows.map((data) => data.id),
+          () => cellEditorParams.onSelectedItem && cellEditorParams.onSelectedItem({ selectedRows, value }),
+        );
         return;
       }
 
@@ -69,18 +78,29 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
         row[field as keyof RowType] = value;
       });
     },
-    [api, cellEditorParams, data.id, field],
+    [api, cellEditorParams, data.id, field, modifyUpdating],
   );
 
   useEffect(() => {
     (async () => {
+      if (options || optionsInitialising.current) return;
+
+      optionsInitialising.current = true;
       let optionsConf = cellEditorParams?.options ?? [];
 
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(api.getSelectedRows());
+        await modifyUpdating(
+          field,
+          api.getSelectedRows().map((data) => data.id),
+          async () => {
+            if (typeof optionsConf == "function") {
+              optionsConf = await optionsConf(api.getSelectedRows());
+            }
+          },
+        );
       }
 
-      const optionsList = optionsConf?.map((item) => {
+      const optionsList = (optionsConf as SelectOption<ValueType>[])?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType } as FinalSelectOption<ValueType>;
         }
@@ -88,15 +108,16 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
       }) as any as FinalSelectOption<ValueType>[];
 
       setOptions(optionsList);
+      optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams?.options]);
+  }, [api, cellEditorParams?.options, field, modifyUpdating]);
 
   const children = (
     <>
       {options ? (
         options.map((item) =>
           item.value === MenuSeparatorString ? (
-            <hr />
+            <MenuDivider />
           ) : (
             <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
@@ -104,7 +125,9 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
           ),
         )
       ) : (
-        <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />
+        <div style={{ padding: "4px 10px" }}>
+          <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />
+        </div>
       )}
     </>
   );

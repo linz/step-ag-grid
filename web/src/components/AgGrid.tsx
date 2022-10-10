@@ -11,6 +11,8 @@ import { AgGridContext } from "../contexts/AgGridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { AgGridSelectHeader } from "./AgGridSelectHeader";
+import { LuiMiniSpinner } from "@linzjs/lui";
+import { UpdatingContext } from "../contexts/UpdatingContext";
 
 export interface AgGridProps {
   dataTestId?: string;
@@ -24,8 +26,26 @@ export interface AgGridProps {
   noRowsOverlayText?: string;
 }
 
+export const LoadableCell = (props: {
+  isLoading: boolean;
+  dataTestId?: string;
+  children: JSX.Element;
+}): JSX.Element => {
+  // console.log(`Rendering LoadableCell - loading: ${isLoading}`);
+  if (props.isLoading) {
+    return <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />;
+  }
+  // only add test id into ONE of the columns in a grid. this way each row will have one unique id :)
+  return <div data-testid={props.dataTestId}>{props.children}</div>;
+};
+
 export const GenericCellRenderer = (props: ICellRendererParams): JSX.Element => {
-  return <span title={props.value}>{props.value}</span>;
+  const { checkUpdating } = useContext(UpdatingContext);
+  return (
+    <LoadableCell isLoading={checkUpdating(props.colDef?.field ?? "", props.data.id)}>
+      <span title={props.value}>{props.value}</span>
+    </LoadableCell>
+  );
 };
 
 /**
@@ -195,7 +215,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       }}
     >
       <AgGridReact
-        context={gridContext}
         getRowId={(params) => `${params.data.id}`}
         suppressRowClickSelection={true}
         rowSelection={"multiple"}
@@ -203,11 +222,12 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         colResizeDefault={"shift"}
         onFirstDataRendered={sizeColumnsToFit}
         onGridSizeChanged={sizeColumnsToFit}
+        suppressClickEdit={true}
         onCellDoubleClicked={startCellEditing}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
-        defaultColDef={{ cellRenderer: GenericCellRenderer, cellStyle: { display: "flex" }, ...params.defaultColDef }}
+        defaultColDef={{ cellRenderer: GenericCellRenderer, ...params.defaultColDef }}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}

@@ -3,8 +3,7 @@ import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
 import { GridPopoutTextArea } from "../../components/GridPopoutTextArea";
-import { Simulate } from "react-dom/test-utils";
-import select = Simulate.select;
+import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 
 export default {
   title: "Components / Grids",
@@ -16,9 +15,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <AgGridContextProvider>
-          <Story />
-        </AgGridContextProvider>
+        <UpdatingContextProvider>
+          <AgGridContextProvider>
+            <Story />
+          </AgGridContextProvider>
+        </UpdatingContextProvider>
       </div>
     ),
   ],
