@@ -1,9 +1,13 @@
+import "@linzjs/lui/dist/scss/base.scss";
+import "@linzjs/lui/dist/fonts";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useCallback, useMemo, useState } from "react";
 import { GridDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+import { ColDef } from "ag-grid-community";
 
 export default {
   title: "Components / Grids",
@@ -57,69 +61,70 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
   }, []);
 
   const columnDefs = useMemo(
-    () => [
-      {
-        field: "id",
-        headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 150,
-        suppressSizeToFit: true,
-        sortable: true,
-        resizable: true,
-        editable: true,
-        cellEditor: "agTextCellEditor",
-      },
-      GridDropDown<ITestRow, ITestRow["position"]>({
-        field: "position",
-        initialWidth: 65,
-        maxWidth: 150,
-        headerName: "Position",
-        cellEditorParams: {
-          options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+    () =>
+      [
+        {
+          field: "id",
+          headerName: "Id",
+          initialWidth: 65,
+          maxWidth: 150,
+          suppressSizeToFit: true,
+          sortable: true,
+          resizable: true,
+          editable: true,
+          cellEditor: "agTextCellEditor",
         },
-      }),
-      GridDropDown<ITestRow, ITestRow["position2"]>({
-        field: "position2",
-        maxWidth: 100,
-        headerName: "Multi-edit",
-        cellEditorParams: {
-          multiEdit: true,
-          options: [
-            {
-              value: "1",
-              label: <span style={{ border: "2px dashed blue" }}>One</span>,
-            },
-            { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
-            MenuSeparator,
-            { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
-          ],
-        },
-      }),
-      GridDropDown<ITestRow, ITestRow["position3"]>({
-        field: "position3",
-        initialWidth: 65,
-        maxWidth: 150,
-        headerName: "Custom callback",
-        cellEditorParams: {
-          multiEdit: true,
-          options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-          onSelectedItem: async (selectedItem) => {
-            await new Promise<(string | null)[]>((resolve) => {
-              setTimeout(resolve, 2000);
-            });
+        GridDropDown<ITestRow, ITestRow["position"]>({
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Position",
+          cellEditorParams: {
+            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
           },
-        },
-      }),
-      GridDropDown<ITestRow, ITestRow["position"]>({
-        field: "position",
-        initialWidth: 65,
-        maxWidth: 150,
-        headerName: "options Fn",
-        cellEditorParams: {
-          options: optionsFn,
-        },
-      }),
-    ],
+        }),
+        GridDropDown<ITestRow, ITestRow["position2"]>({
+          field: "position2",
+          maxWidth: 100,
+          headerName: "Multi-edit",
+          cellEditorParams: {
+            multiEdit: true,
+            options: [
+              {
+                value: "1",
+                label: <span style={{ border: "2px dashed blue" }}>One</span>,
+              },
+              { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
+              MenuSeparator,
+              { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
+            ],
+          },
+        }),
+        GridDropDown<ITestRow, ITestRow["position3"]>({
+          field: "position3",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Custom callback",
+          cellEditorParams: {
+            multiEdit: true,
+            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+            onSelectedItem: async (selectedItem) => {
+              await new Promise<(string | null)[]>((resolve) => {
+                setTimeout(resolve, 2000);
+              });
+            },
+          },
+        }),
+        GridDropDown<ITestRow, ITestRow["position"]>({
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "options Fn",
+          cellEditorParams: {
+            options: optionsFn,
+          },
+        }),
+      ] as ColDef[],
     [optionsFn],
   );
 
