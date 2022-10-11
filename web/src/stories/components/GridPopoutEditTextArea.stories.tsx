@@ -58,7 +58,10 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       cellEditorParams: {
         multiEdit: true,
         onSave: (selectedItems, value) => {
-          if (value.length > 32) return false;
+          if (value.length > 32) {
+            alert("Text is longer than 32 characters");
+            return false;
+          }
           selectedItems.forEach((item) => (item.desc = value));
           return true;
         },
