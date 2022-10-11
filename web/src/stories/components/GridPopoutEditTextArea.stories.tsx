@@ -1,8 +1,11 @@
+import "@linzjs/lui/dist/scss/base.scss";
+import "@linzjs/lui/dist/fonts";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
-import { GridPopoutTextArea } from "../../components/GridPopoutTextArea";
+import { GridPopoutEditTextArea } from "../../components/GridPopoutEditTextArea";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 
 export default {
@@ -40,26 +43,25 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       field: "id",
       headerName: "Id",
       initialWidth: 65,
-      maxWidth: 150,
-      suppressSizeToFit: true,
-      sortable: true,
-      resizable: true,
-      editable: true,
-      cellEditor: "agTextCellEditor",
+      maxWidth: 85,
     },
-    GridPopoutTextArea<ITestRow, ITestRow["desc"]>({
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
       field: "desc",
       headerName: "Popout Text Area",
-      maxWidth: 120,
+      maxWidth: 140,
+      cellEditorParams: {},
     }),
-    GridPopoutTextArea<ITestRow, ITestRow["desc"]>({
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
       field: "desc",
       headerName: "Popout Text Area Custom Save",
-      maxWidth: 120,
+      maxWidth: 220,
       cellEditorParams: {
         multiEdit: true,
         onSave: (selectedItems, value) => {
-          if (value.length > 32) return false;
+          if (value.length > 32) {
+            alert("Text is longer than 32 characters");
+            return false;
+          }
           selectedItems.forEach((item) => (item.desc = value));
           return true;
         },
