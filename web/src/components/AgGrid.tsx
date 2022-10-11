@@ -152,6 +152,8 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       force: true,
       rowNodes: event.api.getSelectedNodes(),
     });
+    const cell = event.api.getFocusedCell();
+    cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
   }, []);
 
   const startCellEditing = useCallback((event: CellEvent) => {

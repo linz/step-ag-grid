@@ -3,7 +3,7 @@ import "@szhsin/react-menu/dist/index.css";
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
@@ -62,7 +62,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   const { cellEditorParams } = props.colDef;
   const field = props.colDef.field ?? "";
 
-  const { updatingCells } = useContext(AgGridContext);
+  const { updatingCells, stopEditing } = useContext(AgGridContext);
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -123,7 +123,24 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         })
         .filter((r) => r !== undefined),
     );
-  }, [filter, options]);
+  }, [cellEditorParams.filtered, filter, options]);
+
+  const onFilterKeyDown = useCallback(
+    async (e: KeyboardEvent<Element>) => {
+      if (!options) return;
+      if (e.key == "Enter" || e.key == "Tab") {
+        const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
+        if (activeOptions.length == 1) {
+          await selectItemHandler(activeOptions[0].value);
+          stopEditing();
+        } else {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    },
+    [filteredValues, options, selectItemHandler, stopEditing],
+  );
 
   const children = (
     <ComponentLoadingWrapper loading={!options}>
@@ -134,6 +151,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
               {({ ref }: any) => (
                 <div style={{ display: "flex", width: "100%" }}>
                   <input
+                    autoFocus
                     className={"free-text-input"}
                     style={{ border: "0px" }}
                     ref={ref}
@@ -142,6 +160,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
                     data-testid={"filteredMenu-free-text-input"}
                     defaultValue={""}
                     onChange={(e) => setFilter(e.target.value.toLowerCase())}
+                    onKeyDown={(e) => onFilterKeyDown(e)}
                   />
                 </div>
               )}
