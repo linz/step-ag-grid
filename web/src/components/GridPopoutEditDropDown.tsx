@@ -109,7 +109,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   }, [api, cellEditorParams?.options, field, options]);
 
   useEffect(() => {
-    if (options == null) return;
+    if (!cellEditorParams.showFilter || options == null) return;
     setFilteredValues(
       options
         .map((option) => {
