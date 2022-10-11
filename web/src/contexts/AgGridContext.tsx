@@ -1,17 +1,11 @@
 import { createContext } from "react";
-import { GridApi } from "ag-grid-community";
-
-export interface GridContext {
-  selectedRow: any | undefined;
-}
+import { GridApi, ICellEditorParams } from "ag-grid-community";
 
 export interface AgGridContextType {
-  gridContext: GridContext;
   gridReady: () => boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
-  getSelectedRow: () => any | undefined;
   getSelectedRows: <T extends unknown>() => T[];
   getSelectedRowIds: () => number[];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
@@ -23,10 +17,14 @@ export interface AgGridContextType {
   ensureRowVisible: (id: number) => void;
   ensureSelectedRowIsVisible: () => void;
   stopEditing: () => void;
+  updatingCells: (
+    props: ICellEditorParams,
+    fnUpdate: (selectedRows: any[]) => Promise<boolean>,
+    setSaving?: (saving: boolean) => void,
+  ) => Promise<boolean>;
 }
 
 export const AgGridContext = createContext<AgGridContextType>({
-  gridContext: {} as GridContext,
   gridReady: () => {
     console.error("no context provider for gridReady");
     return false;
@@ -39,10 +37,6 @@ export const AgGridContext = createContext<AgGridContextType>({
   },
   selectRowsById: () => {
     console.error("no context provider for selectRows");
-  },
-  getSelectedRow: () => {
-    console.error("no context provider for getSelectedRowId");
-    return undefined;
   },
   getSelectedRows: <T extends unknown>(): T[] => {
     console.error("no context provider for getSelectedRows");
@@ -79,5 +73,9 @@ export const AgGridContext = createContext<AgGridContextType>({
   },
   stopEditing: () => {
     console.error("no context provider for stopEditing");
+  },
+  updatingCells: async () => {
+    console.error("no context provider for modifyUpdating");
+    return false;
   },
 });

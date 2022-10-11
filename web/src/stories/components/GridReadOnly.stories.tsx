@@ -7,6 +7,7 @@ import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
 import { GridPopoutMessage } from "../../components/GridPopoutMessage";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -68,11 +69,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
       headerName: "Popout message",
       maxWidth: 120,
       cellEditorParams: {
-        message: async (data) =>
+        message: async (data) => {
           // Just doing a timeout here to demonstrate deferred loading
-          new Promise((resolve) => {
-            setTimeout(() => resolve(<span>This cell contains the value: {JSON.stringify(data.dd)}</span>), 1000);
-          }),
+          await wait(1000);
+          return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
+        },
       },
     }),
   ];

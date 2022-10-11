@@ -6,7 +6,7 @@ import { AgGridContext } from "../contexts/AgGridContext";
 import { ICellEditorParams } from "ag-grid-community";
 
 export interface GridPopoutCellEditorParams {
-  canClose?: () => boolean;
+  canClose?: () => Promise<boolean> | boolean;
   children: JSX.Element;
 }
 
@@ -35,10 +35,12 @@ export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopout
           anchorRef={anchorRef}
           menuClassName={"lui-menu"}
           onClose={(event) => {
-            if (event.reason == "cancel" || !canClose || canClose()) {
-              setOpen(false);
-              stopEditing();
-            }
+            (async () => {
+              if (event.reason == "cancel" || !canClose || (await canClose())) {
+                setOpen(false);
+                stopEditing();
+              }
+            })().then();
           }}
         >
           {children}

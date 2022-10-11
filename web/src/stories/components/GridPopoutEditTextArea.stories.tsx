@@ -7,6 +7,7 @@ import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
 import { GridPopoutEditTextArea } from "../../components/GridPopoutEditTextArea";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -30,10 +31,8 @@ export default {
 
 interface ITestRow {
   id: number;
-  position: string;
-  age: number;
-  desc: string;
-  dd: string;
+  desc1: string;
+  desc2: string;
 }
 
 const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
@@ -45,24 +44,25 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       initialWidth: 65,
       maxWidth: 85,
     },
-    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
-      field: "desc",
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc1"]>({
+      field: "desc1",
       headerName: "Popout Text Area",
       maxWidth: 140,
       cellEditorParams: {},
     }),
-    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
-      field: "desc",
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc1"]>({
+      field: "desc2",
       headerName: "Popout Text Area Custom Save",
       maxWidth: 220,
       cellEditorParams: {
         multiEdit: true,
-        onSave: (selectedItems, value) => {
+        onSave: async (selectedItems, value) => {
+          await wait(2000);
           if (value.length > 32) {
             alert("Text is longer than 32 characters");
             return false;
           }
-          selectedItems.forEach((item) => (item.desc = value));
+          selectedItems.forEach((item) => (item.desc2 = value));
           return true;
         },
       },
@@ -72,8 +72,8 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, position: "Tester", age: 30, desc: "Tests application" },
-        { id: 1001, position: "Developer", age: 12, desc: "Develops application" },
+        { id: 1000, desc1: "Tester", desc2: "Hello" },
+        { id: 1001, desc1: "Developer", desc2: "Goodbye" },
       ] as ITestRow[],
     [],
   );

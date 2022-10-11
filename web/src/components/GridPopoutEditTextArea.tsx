@@ -2,66 +2,69 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
+import { AgGridContext } from "../contexts/AgGridContext";
 
 export interface GridPopoutEditTextAreaProps<RowType> {
   multiEdit?: boolean;
-  onSave?: (selectRows: RowType[], value: string) => boolean;
+  onSave?: (selectRows: RowType[], value: string) => Promise<boolean> | boolean;
 }
 
 export interface GridPopoutEditTextAreaColDef<RowType> extends ColDef {
   cellEditorParams: GridPopoutEditTextAreaProps<RowType>;
 }
 
+/**
+ * For editing a text area.
+ */
 export const GridPopoutEditTextArea = <RowType extends BaseAgGridRow, ValueType>(
   props: GridPopoutEditTextAreaColDef<RowType>,
 ): ColDef => ({
   ...props,
-  editable: props.editable !== undefined ? props.editable : true,
+  editable: props.editable ?? true,
   cellEditor: GridPopoutEditTextAreaComp,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GridPopoutICellEditorParams<RowType> extends ICellEditorParams {
+interface GridPopoutICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
+  data: RowType;
   colDef: {
+    field: string | undefined;
     cellEditorParams: GridPopoutEditTextAreaProps<RowType>;
-  } & ColDef;
+  };
 }
 
 const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPopoutICellEditorParams<RowType>) => {
-  const { data, api } = props;
-  const { field, cellEditorParams } = props.colDef;
-  const [value, setValue] = useState<string>(props.data[field as keyof RowType]);
+  const { cellEditorParams } = props.colDef;
+  const field = props.colDef.field ?? "";
 
-  const defaultSave = useCallback(
-    (value: string): boolean => {
-      let selectedRows = api.getSelectedRows() as RowType[];
-      if (!cellEditorParams?.multiEdit) {
-        // You can't use data as it could be an orphaned reference due to updates
-        selectedRows = selectedRows.filter((row) => row.id === data.id);
-      }
+  const { updatingCells } = useContext(AgGridContext);
 
-      if (cellEditorParams?.onSave) {
-        return cellEditorParams.onSave(selectedRows, value);
-      }
+  const [value, setValue] = useState<string>(props.data[field as keyof RowType] as string);
+  const [saving, setSaving] = useState(false);
 
-      selectedRows.forEach((row) => {
-        row[field as keyof RowType] = value as any;
-      });
-
-      return true;
-    },
-    [api, cellEditorParams, data.id, field],
+  const updateValue = useCallback(
+    async (value: string): Promise<boolean> =>
+      await updatingCells(
+        props,
+        async (selectedRows) => {
+          if (cellEditorParams?.onSave) {
+            return cellEditorParams.onSave(selectedRows, value);
+          }
+          selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+          return true;
+        },
+        setSaving,
+      ),
+    [cellEditorParams, field, props, updatingCells],
   );
 
   const children = (
     <div>
-      <textarea cols={40} rows={5} onChange={(e) => setValue(e.target.value)}>
-        {value}
-      </textarea>
+      <textarea cols={40} rows={5} onChange={(e) => setValue(e.target.value)} disabled={saving} defaultValue={value} />
     </div>
   );
-  return GridPopoutComponent(props, { children, canClose: () => defaultSave(value) });
+  return GridPopoutComponent(props, { children, canClose: () => updateValue(value) });
 };

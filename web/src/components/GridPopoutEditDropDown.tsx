@@ -5,10 +5,9 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { LuiMiniSpinner } from "@linzjs/lui";
-import { UpdatingContext } from "../contexts/UpdatingContext";
 import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
+import { AgGridContext } from "../contexts/AgGridContext";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
@@ -46,39 +45,39 @@ export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(props: ICellEditorParams) => {
-  const { data, api } = props;
-  const { cellEditorParams } = props.colDef as GridDropDownColDef<RowType, ValueType>;
+interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow, ValueType> extends ICellEditorParams {
+  data: RowType;
+  colDef: {
+    field: string | undefined;
+    cellEditorParams: GridPopoutEditDropDownProps<RowType, ValueType>;
+  };
+}
+
+export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(
+  props: GridPopoutEditDropDownICellEditorParams<RowType, ValueType>,
+) => {
+  const { api } = props;
+  const { cellEditorParams } = props.colDef;
   const field = props.colDef.field ?? "";
 
-  const { modifyUpdating } = useContext(UpdatingContext);
+  const { updatingCells } = useContext(AgGridContext);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
-    async (value: any) => {
-      let selectedRows = api.getSelectedRows() as RowType[];
-      if (!cellEditorParams?.multiEdit) {
-        // You can't use data as it could be an orphaned reference due to updates
-        selectedRows = selectedRows.filter((row) => row.id === data.id);
-      }
-
-      if (cellEditorParams?.onSelectedItem) {
-        await modifyUpdating(
-          field,
-          selectedRows.map((data) => data.id),
-          () => cellEditorParams.onSelectedItem && cellEditorParams.onSelectedItem({ selectedRows, value }),
-        );
-        return;
-      }
-
-      selectedRows.forEach((row) => {
-        row[field as keyof RowType] = value;
-      });
-    },
-    [api, cellEditorParams, data.id, field, modifyUpdating],
+    async (value: ValueType): Promise<boolean> =>
+      await updatingCells(props, async (selectedRows) => {
+        if (cellEditorParams?.onSelectedItem) {
+          await cellEditorParams.onSelectedItem({ selectedRows, value });
+        } else {
+          selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+        }
+        return true;
+      }),
+    [cellEditorParams, field, props, updatingCells],
   );
 
+  // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
@@ -99,7 +98,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       setOptions(optionsList);
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams?.options, field, modifyUpdating, options]);
+  }, [api, cellEditorParams?.options, field, options]);
 
   const children = (
     <ComponentLoadingWrapper loading={!options}>
