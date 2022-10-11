@@ -156,21 +156,31 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
   }, []);
 
-  const startCellEditing = useCallback((event: CellEvent) => {
-    if (!event.node.isSelected()) {
-      event.node.setSelected(true, true);
-    }
-    // Cell already being edited, so don't re-edit until finished
-    if (checkUpdating([event.colDef.field ?? ""], event.data.id)) {
-      return;
-    }
-    if (event.rowIndex !== null) {
-      event.api.startEditingCell({
-        rowIndex: event.rowIndex,
-        colKey: event.column.getColId(),
-      });
-    }
-  }, []);
+  const startCellEditing = useCallback(
+    (event: CellEvent) => {
+      if (!event.node.isSelected()) {
+        event.node.setSelected(true, true);
+      }
+      // Cell already being edited, so don't re-edit until finished
+      if (checkUpdating([event.colDef.field ?? ""], event.data.id)) {
+        return;
+      }
+      if (event.rowIndex !== null) {
+        event.api.startEditingCell({
+          rowIndex: event.rowIndex,
+          colKey: event.column.getColId(),
+        });
+      }
+    },
+    [checkUpdating],
+  );
+
+  const onCellKeyDown = useCallback(
+    (e: CellEvent) => {
+      if ((e.event as KeyboardEvent).key === "Enter") startCellEditing(e);
+    },
+    [startCellEditing],
+  );
 
   const onCellEditingStopped = useCallback(
     (event: CellEvent) => {
@@ -203,6 +213,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onFirstDataRendered={sizeColumnsToFit}
         onGridSizeChanged={sizeColumnsToFit}
         suppressClickEdit={true}
+        onCellKeyDown={onCellKeyDown}
         onCellDoubleClicked={startCellEditing}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}

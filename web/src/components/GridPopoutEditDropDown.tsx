@@ -179,7 +179,13 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
               value={item.value}
               onClick={() => selectItemHandler(item.value)}
               onKeyDown={(e) => {
-                if (e.key === "Tab") selectItemHandler(item.value).then();
+                if (e.key === "Tab") {
+                  selectItemHandler(item.value).then(() => {
+                    stopEditing();
+                  });
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
               }}
             >
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
