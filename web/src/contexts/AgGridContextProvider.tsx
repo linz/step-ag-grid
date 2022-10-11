@@ -227,7 +227,6 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
     setSaving?: (saving: boolean) => void,
   ): Promise<boolean> => {
     setSaving && setSaving(true);
-
     const { data, api } = props;
     const { cellEditorParams } = props.colDef;
     const field = props.colDef.field ?? "";

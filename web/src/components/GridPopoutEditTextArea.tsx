@@ -49,6 +49,8 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
 
   const updateValue = useCallback(
     async (value: string): Promise<boolean> => {
+      if (saving) return false;
+
       // Nothing changed
       if (value === initialValue.current) return true;
       return await updatingCells(
@@ -58,15 +60,16 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
           if (hasChanged) {
             if (cellEditorParams?.onSave) {
               return cellEditorParams.onSave(selectedRows, value);
+            } else {
+              selectedRows.forEach((row) => (row[field as keyof RowType] = value));
             }
-            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
           return true;
         },
         setSaving,
       );
     },
-    [cellEditorParams, field, props, updatingCells],
+    [cellEditorParams, field, props, saving, updatingCells],
   );
 
   const children = (
