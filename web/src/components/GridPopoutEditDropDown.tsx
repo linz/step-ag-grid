@@ -26,7 +26,8 @@ export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridPopoutEditDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
-  showFilter?: boolean;
+  filtered?: boolean;
+  filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
@@ -109,7 +110,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   }, [api, cellEditorParams?.options, field, options]);
 
   useEffect(() => {
-    if (!cellEditorParams.showFilter || options == null) return;
+    if (!cellEditorParams.filtered || options == null) return;
     setFilteredValues(
       options
         .map((option) => {
@@ -127,7 +128,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   const children = (
     <ComponentLoadingWrapper loading={!options}>
       <>
-        {options && cellEditorParams.showFilter && (
+        {options && cellEditorParams.filtered && (
           <>
             <FocusableItem className={"filter-item"}>
               {({ ref }: any) => (
@@ -137,7 +138,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
                     style={{ border: "0px" }}
                     ref={ref}
                     type="text"
-                    placeholder={"Placeholder"}
+                    placeholder={cellEditorParams.filterPlaceholder ?? "Placeholder"}
                     data-testid={"filteredMenu-free-text-input"}
                     defaultValue={""}
                     onChange={(e) => setFilter(e.target.value.toLowerCase())}

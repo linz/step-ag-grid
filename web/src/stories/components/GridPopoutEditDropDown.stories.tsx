@@ -118,7 +118,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "Filtered",
           cellEditorParams: {
             multiEdit: true,
-            showFilter: true,
+            filtered: true,
+            filterPlaceholder: "Filter this",
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
           },
         }),
