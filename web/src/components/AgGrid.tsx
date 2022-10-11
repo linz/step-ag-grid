@@ -186,11 +186,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     <div
       data-testid={params.dataTestId}
       className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
-      onContextMenu={(event) => {
-        // we don't want context menu to bubble outside of container
-        event.preventDefault();
-        return false;
-      }}
     >
       <AgGridReact
         getRowId={(params) => `${params.data.id}`}
