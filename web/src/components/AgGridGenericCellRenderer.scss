@@ -1,0 +1,15 @@
+@use '~@linzjs/lui/dist/scss/Core' as lui;
+
+.AgGridGenericCellRenderer-icon {
+  margin-right: 4px;
+}
+
+.AgGridGenericCellRenderer-ic_infoIcon {
+  @extend .AgGridGenericCellRenderer-icon;
+  fill: lui.$info;
+}
+
+.AgGridGenericCellRenderer-ic_warningIcon {
+  @extend .AgGridGenericCellRenderer-icon;
+  fill: lui.$warning;
+}

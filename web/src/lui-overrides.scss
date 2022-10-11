@@ -1,0 +1,156 @@
+/**
+ * Lui Table additions, to be brought into Lui
+ */
+
+.lui-base-table.lui-table-bold-headings th {
+  font-weight: 600;
+}
+
+.lui-base-table.lui-table-nowrap-headings th {
+  white-space: nowrap;
+}
+
+.lui-base-table.lui-compact-table th,
+.lui-base-table.lui-compact-table td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-size: 0.875rem;
+}
+
+.lui-base-table.lui-compact-table th.lui-table-heading-dark,
+.lui-base-table.lui-compact-table td.lui-table-heading-dark {
+  background-color: #55504b; /* $grey-60 */
+  color: white;
+}
+
+.lui-base-table.lui-table-no-top-line thead {
+  border-top: none;
+}
+
+/**
+ * Lui Button additions, to be brought into Lui
+ */
+
+.lui-button.lui-button-toolbar,
+a.lui-button.lui-button-toolbar {
+  border-color: transparent;
+  padding: 4px;
+  line-height: 12px;
+  margin: 2px;
+}
+
+.lui-compact-table .lui-bearing-input-wrapper .lui-bearing-display {
+  line-height: 25px !important;
+}
+
+/* Until LUI fix comes (For different font weights) */
+input,
+select .survey-information {
+  font-weight: 400 !important;
+}
+
+.table-select input {
+  line-height: 25px !important;
+}
+
+.lui-standard-form .lui-compact-table .lui-input-error input {
+  border-left-width: 28px !important;
+}
+
+.lui-standard-form .lui-compact-table .lui-input-error .lui-form-status-icon {
+  font-size: 1rem;
+}
+
+/* To be replaced by Darrell's changes */
+.lui-standard-form .temporary-tighter-form-style label {
+  margin-top: 20px !important;
+}
+
+/** Survey map header */
+.lui-header.lui-header-white::after {
+  height: 2px;
+  background: linear-gradient(270deg, #bbb 1%, #ccc 100%);
+}
+
+/** Context Menu for the tables */
+.edit-cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border: none;
+  text-align: left;
+}
+
+/** Free text input */
+
+.lui-menu .filter-item {
+  padding: 0 0 2px 0.5rem;
+  vertical-align: center;
+}
+
+.lui-menu .filter-item .icon {
+  vertical-align: center;
+  padding: 0 0.5rem 0 0;
+  color: rgba(0, 113, 152, 1);
+}
+
+.lui-menu .filtered-item {
+  padding: 2px 1rem;
+}
+
+.lui-menu .filtered-div {
+  margin: 0;
+  margin-top: 0.2rem;
+}
+
+.lui-menu .filtered-header {
+  padding: 6px 1rem 2px 1rem;
+  text-transform: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.lui-menu .free-text-input {
+  border: transparent;
+  outline: transparent;
+  line-height: 33px;
+  width: 100%;
+}
+
+.lui-menu .free-text-input:hover {
+  border: transparent;
+  outline: transparent;
+}
+
+.lui-menu textarea.free-text-input {
+  font-weight: 400;
+  line-height: 1.5;
+  width: 300px;
+  height: 150px;
+  resize: none;
+}
+
+/* Bounding box in a popout - any menus will be placed in the space of this div */
+div.menu-bounding-box {
+  position: absolute;
+  height: 100%;
+  width: 95%;
+  z-index: -9999;
+}
+
+.lui-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lui-button.lui-button-lg.lui-button-icon .LuiIcon.LuiIcon--sm {
+  margin-bottom: 0;
+}
+
+.lui-button.lui-button-med.lui-button-icon .LuiIcon.LuiIcon--md {
+  margin-bottom: -1px;
+}
+
