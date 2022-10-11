@@ -43,45 +43,36 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
       field: "id",
       headerName: "Id",
       initialWidth: 65,
-      maxWidth: 150,
-      suppressSizeToFit: true,
-      sortable: true,
-      resizable: true,
+      maxWidth: 85,
     },
     {
       field: "position",
       headerName: "Position",
       initialWidth: 65,
       maxWidth: 150,
-      sortable: true,
-      resizable: true,
-      cellEditorParams: {
-        values: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-      },
     },
     {
       field: "age",
       headerName: "Age",
       initialWidth: 65,
       maxWidth: 85,
-      sortable: true,
-      resizable: true,
     },
     {
       field: "desc",
       headerName: "Description",
       initialWidth: 150,
       maxWidth: 200,
-      sortable: true,
-      resizable: true,
-      wrapText: true,
     },
     GridPopoutMessage<ITestRow>({
       field: "dd",
       headerName: "Popout message",
       maxWidth: 120,
       cellEditorParams: {
-        message: (data) => <span>This cell contains the value: {JSON.stringify(data.dd)}</span>,
+        message: async (data) =>
+          // Just doing a timeout here to demonstrate deferred loading
+          new Promise((resolve) => {
+            setTimeout(() => resolve(<span>This cell contains the value: {JSON.stringify(data.dd)}</span>), 1000);
+          }),
       },
     }),
   ];

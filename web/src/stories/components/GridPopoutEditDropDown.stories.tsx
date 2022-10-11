@@ -5,7 +5,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useCallback, useMemo, useState } from "react";
-import { GridDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridDropDown";
+import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridPopoutEditDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 
@@ -74,7 +74,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           editable: true,
           cellEditor: "agTextCellEditor",
         },
-        GridDropDown<ITestRow, ITestRow["position"]>({
+        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
@@ -83,7 +83,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
           },
         }),
-        GridDropDown<ITestRow, ITestRow["position2"]>({
+        GridPopoutEditDropDown<ITestRow, ITestRow["position2"]>({
           field: "position2",
           maxWidth: 100,
           headerName: "Multi-edit",
@@ -100,7 +100,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             ],
           },
         }),
-        GridDropDown<ITestRow, ITestRow["position3"]>({
+        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
           field: "position3",
           initialWidth: 65,
           maxWidth: 150,
@@ -115,7 +115,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             },
           },
         }),
-        GridDropDown<ITestRow, ITestRow["position"]>({
+        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,
           maxWidth: 150,

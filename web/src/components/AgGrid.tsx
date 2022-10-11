@@ -3,7 +3,7 @@ import "./AgGridStyles.scss";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AgGridEvent, CellClickedEvent, ColDef, ICellRendererParams } from "ag-grid-community";
+import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
@@ -11,9 +11,11 @@ import { AgGridContext } from "../contexts/AgGridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { AgGridSelectHeader } from "./AgGridSelectHeader";
-import { LuiMiniSpinner } from "@linzjs/lui";
-import { UpdatingContext } from "../contexts/UpdatingContext";
+import { AgGridGenericCellRenderer } from "./AgGridGenericCellRenderer";
 
+export interface BaseAgGridRow {
+  id: string | number;
+}
 export interface AgGridProps {
   dataTestId?: string;
   quickFilterValue?: string;
@@ -25,28 +27,6 @@ export interface AgGridProps {
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
 }
-
-export const LoadableCell = (props: {
-  isLoading: boolean;
-  dataTestId?: string;
-  children: JSX.Element;
-}): JSX.Element => {
-  // console.log(`Rendering LoadableCell - loading: ${isLoading}`);
-  if (props.isLoading) {
-    return <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />;
-  }
-  // only add test id into ONE of the columns in a grid. this way each row will have one unique id :)
-  return <div data-testid={props.dataTestId}>{props.children}</div>;
-};
-
-export const GenericCellRenderer = (props: ICellRendererParams): JSX.Element => {
-  const { checkUpdating } = useContext(UpdatingContext);
-  return (
-    <LoadableCell isLoading={checkUpdating(props.colDef?.field ?? "", props.data.id)}>
-      <span title={props.value}>{props.value}</span>
-    </LoadableCell>
-  );
-};
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
@@ -204,6 +184,16 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     [gridContext, refreshSelectedRows],
   );
 
+  const defaultColDef = useMemo(
+    () => ({
+      cellRenderer: AgGridGenericCellRenderer,
+      sortable: true,
+      resizable: true,
+      ...params.defaultColDef,
+    }),
+    [params.defaultColDef],
+  );
+
   return (
     <div
       data-testid={params.dataTestId}
@@ -227,7 +217,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
-        defaultColDef={{ cellRenderer: GenericCellRenderer, ...params.defaultColDef }}
+        defaultColDef={defaultColDef}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}

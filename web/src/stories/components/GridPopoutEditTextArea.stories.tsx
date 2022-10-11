@@ -5,7 +5,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
-import { GridPopoutTextArea } from "../../components/GridPopoutTextArea";
+import { GridPopoutEditTextArea } from "../../components/GridPopoutEditTextArea";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 
 export default {
@@ -43,23 +43,18 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       field: "id",
       headerName: "Id",
       initialWidth: 65,
-      maxWidth: 150,
-      suppressSizeToFit: true,
-      sortable: true,
-      resizable: true,
-      editable: true,
-      cellEditor: "agTextCellEditor",
+      maxWidth: 85,
     },
-    GridPopoutTextArea<ITestRow, ITestRow["desc"]>({
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
       field: "desc",
       headerName: "Popout Text Area",
-      maxWidth: 120,
+      maxWidth: 140,
       cellEditorParams: {},
     }),
-    GridPopoutTextArea<ITestRow, ITestRow["desc"]>({
+    GridPopoutEditTextArea<ITestRow, ITestRow["desc"]>({
       field: "desc",
       headerName: "Popout Text Area Custom Save",
-      maxWidth: 120,
+      maxWidth: 220,
       cellEditorParams: {
         multiEdit: true,
         onSave: (selectedItems, value) => {

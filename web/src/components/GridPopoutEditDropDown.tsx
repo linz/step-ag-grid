@@ -7,12 +7,10 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { LuiMiniSpinner } from "@linzjs/lui";
 import { UpdatingContext } from "../contexts/UpdatingContext";
+import { BaseAgGridRow } from "./AgGrid";
+import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 
-export interface BaseRow {
-  id: string | number;
-}
-
-export interface GridDropDownSelectedItem<RowType, ValueType> {
+export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
   value: ValueType;
 }
@@ -27,28 +25,28 @@ export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridDropDownProps<RowType, ValueType> {
+export interface GridPopoutEditDropDownProps<RowType, ValueType> {
   multiEdit?: boolean;
-  onSelectedItem?: (props: GridDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
+  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
 export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
-  cellEditorParams?: GridDropDownProps<RowType, ValueType>;
+  cellEditorParams?: GridPopoutEditDropDownProps<RowType, ValueType>;
 }
 
-export const GridDropDown = <RowType extends BaseRow, ValueType>(
+export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>(
   props: GridDropDownColDef<RowType, ValueType>,
 ): ColDef => ({
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
-  cellEditor: GridDropDownComp,
+  cellEditor: GridPopoutEditDropDownComp,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICellEditorParams) => {
+export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(props: ICellEditorParams) => {
   const { data, api } = props;
   const { cellEditorParams } = props.colDef as GridDropDownColDef<RowType, ValueType>;
   const field = props.colDef.field ?? "";
@@ -82,25 +80,16 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
   );
 
   useEffect(() => {
+    if (options || optionsInitialising.current) return;
+    optionsInitialising.current = true;
+    let optionsConf = cellEditorParams?.options ?? [];
+
     (async () => {
-      if (options || optionsInitialising.current) return;
-
-      optionsInitialising.current = true;
-      let optionsConf = cellEditorParams?.options ?? [];
-
       if (typeof optionsConf == "function") {
-        await modifyUpdating(
-          field,
-          api.getSelectedRows().map((data) => data.id),
-          async () => {
-            if (typeof optionsConf == "function") {
-              optionsConf = await optionsConf(api.getSelectedRows());
-            }
-          },
-        );
+        optionsConf = await optionsConf(api.getSelectedRows());
       }
 
-      const optionsList = (optionsConf as SelectOption<ValueType>[])?.map((item) => {
+      const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType } as FinalSelectOption<ValueType>;
         }
@@ -113,9 +102,9 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
   }, [api, cellEditorParams?.options, field, modifyUpdating, options]);
 
   const children = (
-    <>
-      {options ? (
-        options.map((item) =>
+    <ComponentLoadingWrapper loading={!options}>
+      <>
+        {options?.map((item) =>
           item.value === MenuSeparatorString ? (
             <MenuDivider />
           ) : (
@@ -123,13 +112,9 @@ export const GridDropDownComp = <RowType extends BaseRow, ValueType>(props: ICel
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
             </MenuItem>
           ),
-        )
-      ) : (
-        <div style={{ padding: "4px 10px" }}>
-          <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />
-        </div>
-      )}
-    </>
+        )}
+      </>
+    </ComponentLoadingWrapper>
   );
   return GridPopoutComponent(props, { children });
 };
