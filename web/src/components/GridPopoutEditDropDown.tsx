@@ -106,9 +106,9 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   const children = (
     <ComponentLoadingWrapper loading={!options}>
       <>
-        {options?.map((item) =>
+        {options?.map((item, index) =>
           item.value === MenuSeparatorString ? (
-            <MenuDivider />
+            <MenuDivider key={`${index}`} />
           ) : (
             <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
