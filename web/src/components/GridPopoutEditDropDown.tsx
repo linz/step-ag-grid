@@ -126,7 +126,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   }, [cellEditorParams.filtered, filter, options]);
 
   const onFilterKeyDown = useCallback(
-    async (e: KeyboardEvent<Element>) => {
+    async (e: KeyboardEvent) => {
       if (!options) return;
       if (e.key == "Enter" || e.key == "Tab") {
         const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
@@ -174,7 +174,14 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
           ) : filteredValues.includes(item.value) ? (
             <></>
           ) : (
-            <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
+            <MenuItem
+              key={`${item.value}`}
+              value={item.value}
+              onClick={() => selectItemHandler(item.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Tab") selectItemHandler(item.value).then();
+              }}
+            >
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
             </MenuItem>
           ),
