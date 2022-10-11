@@ -32,15 +32,8 @@ export interface AgGridProps {
  * Wrapper for AgGrid to add commonly used functionality.
  */
 export const AgGrid = (params: AgGridProps): JSX.Element => {
-  const {
-    gridContext,
-    gridReady,
-    setGridApi,
-    setQuickFilter,
-    ensureRowVisible,
-    selectRowsById,
-    ensureSelectedRowIsVisible,
-  } = useContext(AgGridContext);
+  const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
+    useContext(AgGridContext);
 
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
@@ -159,29 +152,24 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     });
   }, []);
 
-  const startCellEditing = useCallback(
-    (event: CellEvent) => {
-      gridContext.selectedRow = event.node.data;
-      if (!event.node.isSelected()) {
-        // MATT Note this causes race condition issues with getting selection from AgGrid context
-        event.node.setSelected(true, true);
-      }
-      if (event.rowIndex !== null) {
-        event.api.startEditingCell({
-          rowIndex: event.rowIndex,
-          colKey: event.column.getColId(),
-        });
-      }
-    },
-    [gridContext],
-  );
+  const startCellEditing = useCallback((event: CellEvent) => {
+    if (!event.node.isSelected()) {
+      // MATT Note this causes race condition issues with getting selection from AgGrid context
+      event.node.setSelected(true, true);
+    }
+    if (event.rowIndex !== null) {
+      event.api.startEditingCell({
+        rowIndex: event.rowIndex,
+        colKey: event.column.getColId(),
+      });
+    }
+  }, []);
 
   const onCellEditingStopped = useCallback(
     (event: CellEvent) => {
-      gridContext.selectedRow = undefined;
       refreshSelectedRows(event);
     },
-    [gridContext, refreshSelectedRows],
+    [refreshSelectedRows],
   );
 
   const defaultColDef = useMemo(

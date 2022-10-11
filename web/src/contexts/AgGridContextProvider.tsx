@@ -1,8 +1,9 @@
-import { ReactElement, ReactNode, useRef } from "react";
-import { GridApi, RowNode } from "ag-grid-community";
-import { AgGridContext, GridContext } from "./AgGridContext";
-import { difference, isEmpty, last, sortBy } from "lodash-es";
+import { ReactElement, ReactNode, useContext, useRef } from "react";
+import { GridApi, ICellEditorParams, RowNode } from "ag-grid-community";
+import { AgGridContext } from "./AgGridContext";
+import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty } from "../utils/util";
+import { UpdatingContext } from "./UpdatingContext";
 
 interface AgGridContextProps {
   children: ReactNode;
@@ -14,8 +15,8 @@ interface AgGridContextProps {
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
 export const AgGridContextProvider = (props: AgGridContextProps): ReactElement => {
+  const { modifyUpdating } = useContext(UpdatingContext);
   const gridApiRef = useRef<GridApi>();
-  const gridContext = useRef<GridContext>({ selectedRow: undefined });
   const idsBeforeUpdate = useRef<number[]>([]);
 
   /**
@@ -130,7 +131,7 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
       const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
       // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
       if (gridHasNotUpdated && retryCount > 0) {
-        setTimeout(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
+        delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
         return;
       }
 
@@ -151,7 +152,7 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
         });
       }
       if (flash) {
-        setTimeout(() => {
+        delay(() => {
           try {
             gridApi.flashCells({ rowNodes });
           } catch {
@@ -193,8 +194,6 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
 
   const getSelectedRowIds = (): number[] => getSelectedRows().map((row) => (row as any).id as number);
 
-  const getSelectedRow = <T extends unknown>(): T | undefined => gridContext.current.selectedRow;
-
   const editingCells = (): boolean => {
     return gridApiOp(
       (gridApi) => isNotEmpty(gridApi.getEditingCells()),
@@ -222,10 +221,42 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
 
   const stopEditing = (): void => gridApiOp((gridApi) => gridApi.stopEditing());
 
+  const updatingCells = async (
+    props: ICellEditorParams,
+    fnUpdate: (selectedRows: any[]) => Promise<boolean>,
+    setSaving?: (saving: boolean) => void,
+  ): Promise<boolean> => {
+    setSaving && setSaving(true);
+
+    const { data, api } = props;
+    const { cellEditorParams } = props.colDef;
+    const field = props.colDef.field ?? "";
+    let selectedRows = api.getSelectedRows();
+    if (!cellEditorParams?.multiEdit) {
+      // You can't use data as it could be an orphaned reference due to updates
+      selectedRows = selectedRows.filter((row) => row.id === data.id);
+    }
+
+    let ok = false;
+    await modifyUpdating(
+      field,
+      selectedRows.map((data) => data.id),
+      async () => {
+        ok = await fnUpdate(selectedRows);
+      },
+    );
+    if (ok) {
+      // async processes need to refresh their own rows
+      api.refreshCells({ rowNodes: api.getSelectedNodes() });
+    }
+
+    setSaving && setSaving(false);
+    return ok;
+  };
+
   return (
     <AgGridContext.Provider
       value={{
-        gridContext: gridContext.current,
         gridReady,
         setGridApi,
         setQuickFilter,
@@ -235,13 +266,13 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
         selectRowsWithFlashDiff,
         flashRows,
         flashRowsDiff,
-        getSelectedRow,
         getSelectedRows,
         getSelectedRowIds,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,
         stopEditing,
+        updatingCells,
       }}
     >
       {props.children}

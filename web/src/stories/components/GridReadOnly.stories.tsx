@@ -1,5 +1,6 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
+import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
@@ -7,6 +8,8 @@ import { AgGrid, AgGridProps } from "../../components/AgGrid";
 import { useMemo, useState } from "react";
 import { GridPopoutMessage } from "../../components/GridPopoutMessage";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+import { wait } from "../../utils/util";
+import { ICellRendererParams } from "ag-grid-community";
 
 export default {
   title: "Components / Grids",
@@ -50,6 +53,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
       headerName: "Position",
       initialWidth: 65,
       maxWidth: 150,
+      cellRendererParams: {
+        warning: (props: ICellRendererParams) => (props.value == "Tester" ? "Testers are testing" : ""),
+        info: (props: ICellRendererParams) => (props.value == "Developer" ? "Developers are awesome" : ""),
+      },
     },
     {
       field: "age",
@@ -68,11 +75,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
       headerName: "Popout message",
       maxWidth: 120,
       cellEditorParams: {
-        message: async (data) =>
+        message: async (data) => {
           // Just doing a timeout here to demonstrate deferred loading
-          new Promise((resolve) => {
-            setTimeout(() => resolve(<span>This cell contains the value: {JSON.stringify(data.dd)}</span>), 1000);
-          }),
+          await wait(1000);
+          return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
+        },
       },
     }),
   ];

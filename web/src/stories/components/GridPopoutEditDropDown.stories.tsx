@@ -1,5 +1,6 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
+import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
@@ -8,6 +9,7 @@ import { useCallback, useMemo, useState } from "react";
 import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridPopoutEditDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -39,25 +41,11 @@ interface ITestRow {
 const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
-  const optionsFn = useCallback((selectedRows: ITestRow[]) => {
+  const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
     // eslint-disable-next-line no-console
     console.log("optionsFn selected rows", selectedRows);
-    return new Promise<(string | null)[]>((resolve) => {
-      setTimeout(
-        () =>
-          resolve([
-            null,
-            "Architect",
-            "Developer",
-            "Product Owner",
-            "Scrum Master",
-            "Tester",
-            MenuSeparatorString,
-            "(other)",
-          ]),
-        1000,
-      );
-    });
+    await wait(1000);
+    return [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparatorString, "(other)"];
   }, []);
 
   const columnDefs = useMemo(
@@ -108,10 +96,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           cellEditorParams: {
             multiEdit: true,
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-            onSelectedItem: async (selectedItem) => {
-              await new Promise<(string | null)[]>((resolve) => {
-                setTimeout(resolve, 2000);
-              });
+            onSelectedItem: async (selected) => {
+              await wait(2000);
+              selected.selectedRows.forEach((row) => (row.position3 = selected.value));
             },
           },
         }),
@@ -124,6 +111,18 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             options: optionsFn,
           },
         }),
+        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
+          field: "position3",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Filtered",
+          cellEditorParams: {
+            multiEdit: true,
+            filtered: true,
+            filterPlaceholder: "Filter this",
+            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+          },
+        }),
       ] as ColDef[],
     [optionsFn],
   );
@@ -131,8 +130,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, position: "Tester", position2: "Tester", position3: "Tester" },
-        { id: 1001, position: "Developer", position2: "Developer", position3: "Developer" },
+        { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
+        { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
       ] as ITestRow[],
     [],
   );

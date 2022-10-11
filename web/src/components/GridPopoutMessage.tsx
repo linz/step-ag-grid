@@ -24,7 +24,7 @@ interface GridPopoutICellEditorParams<RowType> extends ICellEditorParams {
   data: RowType;
   colDef: {
     cellEditorParams: GridPopoutCellEditorParams<RowType>;
-  } & ColDef;
+  };
 }
 
 /**
