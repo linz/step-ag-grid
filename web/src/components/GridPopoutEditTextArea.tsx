@@ -1,4 +1,4 @@
-import "@szhsin/react-menu/dist/index.css";
+import "./GridPopoutEditTextArea.scss";
 
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
@@ -6,6 +6,7 @@ import { useCallback, useContext, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { AgGridContext } from "../contexts/AgGridContext";
+import { FocusableItem } from "@szhsin/react-menu";
 
 export interface GridPopoutEditTextAreaProps<RowType> {
   multiEdit?: boolean;
@@ -48,6 +49,8 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
 
   const updateValue = useCallback(
     async (value: string): Promise<boolean> => {
+      if (saving) return false;
+
       // Nothing changed
       if (value === initialValue.current) return true;
       return await updatingCells(
@@ -57,21 +60,33 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
           if (hasChanged) {
             if (cellEditorParams?.onSave) {
               return cellEditorParams.onSave(selectedRows, value);
+            } else {
+              selectedRows.forEach((row) => (row[field as keyof RowType] = value));
             }
-            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
           return true;
         },
         setSaving,
       );
     },
-    [cellEditorParams, field, props, updatingCells],
+    [cellEditorParams, field, props, saving, updatingCells],
   );
 
   const children = (
-    <div>
-      <textarea cols={40} rows={5} onChange={(e) => setValue(e.target.value)} disabled={saving} defaultValue={value} />
-    </div>
+    <FocusableItem className={"FreeTextInput LuiDeprecatedForms"}>
+      {({ ref }: any) => (
+        <textarea
+          ref={ref}
+          autoFocus
+          maxLength={10000}
+          spellCheck={true}
+          className={"FreeTextInput-text-input"}
+          onChange={(e) => setValue(e.target.value)}
+          disabled={saving}
+          defaultValue={value}
+        />
+      )}
+    </FocusableItem>
   );
   return GridPopoutComponent(props, { children, canClose: () => updateValue(value) });
 };

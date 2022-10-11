@@ -12,6 +12,7 @@ import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { AgGridSelectHeader } from "./AgGridSelectHeader";
 import { AgGridGenericCellRenderer } from "./AgGridGenericCellRenderer";
+import { UpdatingContext } from "../contexts/UpdatingContext";
 
 export interface BaseAgGridRow {
   id: string | number;
@@ -34,6 +35,7 @@ export interface AgGridProps {
 export const AgGrid = (params: AgGridProps): JSX.Element => {
   const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
     useContext(AgGridContext);
+  const { checkUpdating } = useContext(UpdatingContext);
 
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
@@ -150,12 +152,17 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
       force: true,
       rowNodes: event.api.getSelectedNodes(),
     });
+    const cell = event.api.getFocusedCell();
+    cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
   }, []);
 
   const startCellEditing = useCallback((event: CellEvent) => {
     if (!event.node.isSelected()) {
-      // MATT Note this causes race condition issues with getting selection from AgGrid context
       event.node.setSelected(true, true);
+    }
+    // Cell already being edited, so don't re-edit until finished
+    if (checkUpdating([event.colDef.field ?? ""], event.data.id)) {
+      return;
     }
     if (event.rowIndex !== null) {
       event.api.startEditingCell({
@@ -186,11 +193,6 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     <div
       data-testid={params.dataTestId}
       className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
-      onContextMenu={(event) => {
-        // we don't want context menu to bubble outside of container
-        event.preventDefault();
-        return false;
-      }}
     >
       <AgGridReact
         getRowId={(params) => `${params.data.id}`}
