@@ -2,7 +2,7 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { AgGridContext } from "../contexts/AgGridContext";
@@ -42,12 +42,15 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
 
   const { updatingCells } = useContext(AgGridContext);
 
-  const [value, setValue] = useState<string>(props.data[field as keyof RowType] as string);
+  const initialValue = useRef(props.data[field as keyof RowType] as string);
+  const [value, setValue] = useState(initialValue.current);
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
-    async (value: string): Promise<boolean> =>
-      await updatingCells(
+    async (value: string): Promise<boolean> => {
+      // Nothing changed
+      if (value === initialValue.current) return true;
+      return await updatingCells(
         props,
         async (selectedRows) => {
           if (cellEditorParams?.onSave) {
@@ -57,7 +60,8 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
           return true;
         },
         setSaving,
-      ),
+      );
+    },
     [cellEditorParams, field, props, updatingCells],
   );
 

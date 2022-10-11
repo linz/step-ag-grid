@@ -61,19 +61,22 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   const field = props.colDef.field ?? "";
 
   const { updatingCells } = useContext(AgGridContext);
+  const initialValue = useRef(props.data[field as keyof RowType] as ValueType);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
 
   const selectItemHandler = useCallback(
-    async (value: ValueType): Promise<boolean> =>
-      await updatingCells(props, async (selectedRows) => {
+    async (value: ValueType): Promise<boolean> => {
+      if (value === initialValue.current) return true; // Nothing changed
+      return await updatingCells(props, async (selectedRows) => {
         if (cellEditorParams?.onSelectedItem) {
           await cellEditorParams.onSelectedItem({ selectedRows, value });
         } else {
           selectedRows.forEach((row) => (row[field as keyof RowType] = value));
         }
         return true;
-      }),
+      });
+    },
     [cellEditorParams, field, props, updatingCells],
   );
 
