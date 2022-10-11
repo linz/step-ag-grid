@@ -1,5 +1,6 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
+import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
@@ -9,7 +10,6 @@ import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../.
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
-import { defer, delay } from "lodash-es";
 
 export default {
   title: "Components / Grids",
@@ -109,6 +109,17 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "options Fn",
           cellEditorParams: {
             options: optionsFn,
+          },
+        }),
+        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
+          field: "position3",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Filtered",
+          cellEditorParams: {
+            multiEdit: true,
+            showFilter: true,
+            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
           },
         }),
       ] as ColDef[],

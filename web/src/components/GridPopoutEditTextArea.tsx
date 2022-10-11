@@ -53,10 +53,13 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
       return await updatingCells(
         props,
         async (selectedRows) => {
-          if (cellEditorParams?.onSave) {
-            return cellEditorParams.onSave(selectedRows, value);
+          const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
+          if (hasChanged) {
+            if (cellEditorParams?.onSave) {
+              return cellEditorParams.onSave(selectedRows, value);
+            }
+            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
-          selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           return true;
         },
         setSaving,
