@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode, useContext, useRef } from "react";
-import { GridApi, ICellEditorParams, RowNode } from "ag-grid-community";
+import { GridApi, RowNode } from "ag-grid-community";
 import { AgGridContext } from "./AgGridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty } from "../utils/util";
@@ -222,37 +222,36 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
   const stopEditing = (): void => gridApiOp((gridApi) => gridApi.stopEditing());
 
   const updatingCells = async (
-    props: ICellEditorParams,
+    props: { data: any; multiEdit?: boolean; field: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
   ): Promise<boolean> => {
     setSaving && setSaving(true);
-    const { data, api } = props;
-    const { cellEditorParams } = props.colDef;
-    const field = props.colDef.field ?? "";
-    let selectedRows = api.getSelectedRows();
-    if (!cellEditorParams?.multiEdit) {
-      // You can't use data as it could be an orphaned reference due to updates
-      selectedRows = selectedRows.filter((row) => row.id === data.id);
-    }
 
-    let ok = false;
-    await modifyUpdating(
-      field,
-      selectedRows.map((data) => data.id),
-      async () => {
-        ok = await fnUpdate(selectedRows);
-      },
-    );
-    if (ok) {
-      // async processes need to refresh their own rows
-      api.refreshCells({ rowNodes: api.getSelectedNodes() });
-      const cell = api.getFocusedCell();
-      cell && api.setFocusedCell(cell.rowIndex, cell.column);
-    }
+    return await gridApiOp(async (gridApi) => {
+      let selectedRows = gridApi.getSelectedRows();
+      if (!props.multiEdit) {
+        // You can't use data as it could be an orphaned reference due to updates
+        selectedRows = selectedRows.filter((row) => row.id === props.data.id);
+      }
 
-    setSaving && setSaving(false);
-    return ok;
+      let ok = false;
+      await modifyUpdating(
+        props.field,
+        selectedRows.map((data) => data.id),
+        async () => {
+          ok = await fnUpdate(selectedRows);
+        },
+      );
+      if (ok) {
+        // async processes need to refresh their own rows
+        gridApi.refreshCells({ rowNodes: gridApi.getSelectedNodes(), force: true });
+        const cell = gridApi.getFocusedCell();
+        cell && gridApi.setFocusedCell(cell.rowIndex, cell.column);
+      }
+      setSaving && setSaving(false);
+      return ok;
+    });
   };
 
   return (

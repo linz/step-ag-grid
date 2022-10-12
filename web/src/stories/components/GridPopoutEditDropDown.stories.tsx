@@ -55,12 +55,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           field: "id",
           headerName: "Id",
           initialWidth: 65,
-          maxWidth: 150,
-          suppressSizeToFit: true,
-          sortable: true,
-          resizable: true,
-          editable: true,
-          cellEditor: "agTextCellEditor",
+          maxWidth: 85,
         },
         GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
           field: "position",
@@ -69,6 +64,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "Position",
           cellEditorParams: {
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+            multiEdit: false,
           },
         }),
         GridPopoutEditDropDown<ITestRow, ITestRow["position2"]>({
@@ -109,6 +105,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "options Fn",
           cellEditorParams: {
             options: optionsFn,
+            multiEdit: false,
           },
         }),
         GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({

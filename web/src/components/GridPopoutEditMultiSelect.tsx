@@ -3,21 +3,18 @@ import "@szhsin/react-menu/dist/index.css";
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { delay } from "lodash-es";
-
-export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
-  selectedRows: RowType[];
-  value: ValueType;
-}
+import { LuiCheckboxInput } from "@linzjs/lui";
 
 interface FinalSelectOption<ValueType> {
   value: ValueType;
   label?: JSX.Element | string;
+  subComponent?: (props: any, ref: any) => any;
 }
 
 export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
@@ -25,67 +22,75 @@ export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridPopoutEditDropDownProps<RowType, ValueType> {
+export interface MultiSelectResult<RowType> {
+  selectedRows: RowType[];
+  values: Record<string, any>;
+}
+
+export interface GridPopoutEditMultiSelectProps<RowType, ValueType> {
   multiEdit: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
-  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
+  onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
 export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
-  cellEditorParams?: GridPopoutEditDropDownProps<RowType, ValueType>;
+  cellEditorParams?: GridPopoutEditMultiSelectProps<RowType, ValueType>;
 }
 
-export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>(
+export const GridPopoutEditMultiSelect = <RowType extends BaseAgGridRow, ValueType>(
   props: GridDropDownColDef<RowType, ValueType>,
 ): ColDef => ({
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
-  cellEditor: GridPopoutEditDropDownComp,
+  cellEditor: GridPopoutEditMultiSelectComp,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow, ValueType> extends ICellEditorParams {
+interface GridPopoutEditMultiSelectICellEditorParams<RowType extends BaseAgGridRow, ValueType>
+  extends ICellEditorParams {
   data: RowType;
   colDef: {
     field: string;
-    cellEditorParams: GridPopoutEditDropDownProps<RowType, ValueType>;
+    cellEditorParams: GridPopoutEditMultiSelectProps<RowType, ValueType>;
   };
 }
 
-export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridPopoutEditDropDownICellEditorParams<RowType, ValueType>,
+export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, ValueType>(
+  props: GridPopoutEditMultiSelectICellEditorParams<RowType, ValueType>,
 ) => {
   const { api, data } = props;
   const { cellEditorParams, field } = props.colDef;
   const { multiEdit } = cellEditorParams;
 
-  const { updatingCells, stopEditing } = useContext(AgGridContext);
+  const { updatingCells } = useContext(AgGridContext);
 
+  const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
+  const subSelectedValues = useRef<Record<string, any>>({});
+  const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
-  const selectItemHandler = useCallback(
-    async (value: ValueType): Promise<boolean> => {
-      return await updatingCells({ data, field, multiEdit }, async (selectedRows) => {
-        const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
-        if (hasChanged) {
-          if (cellEditorParams?.onSelectedItem) {
-            await cellEditorParams.onSelectedItem({ selectedRows, value });
-          } else {
-            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
-          }
-        }
-        return true;
-      });
-    },
-    [cellEditorParams, data, field, multiEdit, updatingCells],
-  );
+  const onSave = useCallback(async (): Promise<boolean> => {
+    const values: Record<string, any> = {};
+    selectedValues.forEach((value) => {
+      values[value] = subSelectedValues.current[value] ?? true;
+    });
+
+    return await updatingCells(
+      { data, field, multiEdit },
+      async (selectedRows) => {
+        if (!cellEditorParams.onSave) return true;
+        return cellEditorParams.onSave({ selectedRows, values });
+      },
+      setSaving,
+    );
+  }, [cellEditorParams, data, field, multiEdit, selectedValues, updatingCells]);
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -132,25 +137,8 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
     );
   }, [cellEditorParams.filtered, filter, options]);
 
-  const onFilterKeyDown = useCallback(
-    async (e: KeyboardEvent) => {
-      if (!options) return;
-      if (e.key == "Enter" || e.key == "Tab") {
-        const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
-        if (activeOptions.length == 1) {
-          await selectItemHandler(activeOptions[0].value);
-          stopEditing();
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }
-    },
-    [filteredValues, options, selectItemHandler, stopEditing],
-  );
-
   const children = (
-    <ComponentLoadingWrapper loading={!options}>
+    <ComponentLoadingWrapper loading={!options} saving={saving}>
       <>
         {options && cellEditorParams.filtered && (
           <>
@@ -167,7 +155,6 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
                     data-testid={"filteredMenu-free-text-input"}
                     defaultValue={""}
                     onChange={(e) => setFilter(e.target.value.toLowerCase())}
-                    onKeyDown={(e) => onFilterKeyDown(e)}
                   />
                 </div>
               )}
@@ -179,26 +166,47 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : filteredValues.includes(item.value) ? null : (
-            <MenuItem
-              key={`${item.value}`}
-              value={item.value}
-              onClick={() => selectItemHandler(item.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Tab") {
-                  selectItemHandler(item.value).then(() => {
-                    stopEditing();
-                  });
-                  e.preventDefault();
-                  e.stopPropagation();
+            <>
+              <MenuItem
+                key={`${item.value}`}
+                onClick={(e) => {
+                  e.keepOpen = true;
+                  // onSelectMenuOption(itemIndex, e.value);
+                  return false;
+                }}
+              >
+                <LuiCheckboxInput
+                  isChecked={selectedValues.includes(item.value)}
+                  value={`${item.value}`}
+                  label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedValues([...selectedValues, item.value as string]);
+                    } else {
+                      setSelectedValues(selectedValues.filter((value) => value != item.value));
+                    }
+                  }}
+                />
+              </MenuItem>
+              <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                {(ref) =>
+                  selectedValues.includes(item.value) &&
+                  item.subComponent &&
+                  item.subComponent(
+                    {
+                      setValue: (value: any) => {
+                        subSelectedValues.current[item.value as string] = value;
+                      },
+                    },
+                    ref,
+                  )
                 }
-              }}
-            >
-              {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-            </MenuItem>
+              </FocusableItem>
+            </>
           ),
         )}
       </>
     </ComponentLoadingWrapper>
   );
-  return GridPopoutComponent(props, { children });
+  return GridPopoutComponent(props, { children, canClose: () => onSave() });
 };
