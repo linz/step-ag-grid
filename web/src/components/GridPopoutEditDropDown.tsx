@@ -114,7 +114,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       }
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams?.options, field, options]);
+  }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, options]);
 
   useEffect(() => {
     if (!cellEditorParams.filtered || options == null) return;

@@ -5,13 +5,13 @@ import "../../lui-overrides.scss";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { AgGrid, AgGridProps } from "../../components/AgGrid";
-import { useCallback, useMemo, useState } from "react";
-import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridPopoutEditDropDown";
+import { useMemo, useState } from "react";
+import { MenuSeparator } from "../../components/GridPopoutEditDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridPopoutEditMultiSelect, MultiSelectResult } from "../../components/GridPopoutEditMultiSelect";
-import { GridSubComponentTextArea, GridSubComponentTextAreaProps } from "../../components/GridSubComponentTextArea";
+import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
 
 export default {
   title: "Components / Grids",
@@ -43,12 +43,12 @@ interface ITestRow {
 const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
-  const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
+  /*const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
     // eslint-disable-next-line no-console
     console.log("optionsFn selected rows", selectedRows);
     await wait(1000);
     return [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparatorString, "(other)"];
-  }, []);
+  }, []);*/
 
   const columnDefs = useMemo(
     () =>
@@ -82,6 +82,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGri
               },
             ],
             onSave: async (result: MultiSelectResult<ITestRow>) => {
+              // eslint-disable-next-line no-console
               console.log(result);
               await wait(1000);
               return true;

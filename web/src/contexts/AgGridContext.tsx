@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { GridApi, ICellEditorParams } from "ag-grid-community";
+import { GridApi } from "ag-grid-community";
 
 export interface AgGridContextType {
   gridReady: () => boolean;
