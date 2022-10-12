@@ -8,6 +8,7 @@ import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
+import { delay } from "lodash-es";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
@@ -104,7 +105,13 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         return item;
       }) as any as FinalSelectOption<ValueType>[];
 
-      setOptions(optionsList);
+      if (cellEditorParams.filtered) {
+        // This is needed otherwise when filter input is rendered and sets autofocus
+        // the mouse up of the double click edit triggers the cell to cancel editing
+        delay(() => setOptions(optionsList), 100);
+      } else {
+        setOptions(optionsList);
+      }
       optionsInitialising.current = false;
     })();
   }, [api, cellEditorParams?.options, field, options]);
@@ -171,9 +178,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         {options?.map((item, index) =>
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
-          ) : filteredValues.includes(item.value) ? (
-            <></>
-          ) : (
+          ) : filteredValues.includes(item.value) ? null : (
             <MenuItem
               key={`${item.value}`}
               value={item.value}
