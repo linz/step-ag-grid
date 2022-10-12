@@ -175,6 +175,15 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
     [checkUpdating],
   );
 
+  const singleClickEdit = useCallback(
+    (event: CellEvent) => {
+      if (event.colDef?.cellRendererParams?.singleClickEdit) {
+        startCellEditing(event);
+      }
+    },
+    [startCellEditing],
+  );
+
   const onCellKeyDown = useCallback(
     (e: CellEvent) => {
       if ((e.event as KeyboardEvent).key === "Enter") startCellEditing(e);
@@ -214,6 +223,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         onGridSizeChanged={sizeColumnsToFit}
         suppressClickEdit={true}
         onCellKeyDown={onCellKeyDown}
+        onCellClicked={singleClickEdit}
         onCellDoubleClicked={startCellEditing}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}

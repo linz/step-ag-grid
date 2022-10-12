@@ -10,6 +10,7 @@ import { GridPopoutMessage } from "../../components/GridPopoutMessage";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
+import { GridPopoutMenu } from "../../components/GridPopoutMenu";
 
 export default {
   title: "Components / Grids",
@@ -41,48 +42,80 @@ interface ITestRow {
 
 const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = [
-    {
-      field: "id",
-      headerName: "Id",
-      initialWidth: 65,
-      maxWidth: 85,
-    },
-    {
-      field: "position",
-      headerName: "Position",
-      initialWidth: 65,
-      maxWidth: 150,
-      cellRendererParams: {
-        warning: (props: ICellRendererParams) => (props.value == "Tester" ? "Testers are testing" : ""),
-        info: (props: ICellRendererParams) => (props.value == "Developer" ? "Developers are awesome" : ""),
+  const columnDefs = useMemo(
+    () => [
+      {
+        field: "id",
+        headerName: "Id",
+        initialWidth: 65,
+        maxWidth: 85,
       },
-    },
-    {
-      field: "age",
-      headerName: "Age",
-      initialWidth: 65,
-      maxWidth: 85,
-    },
-    {
-      field: "desc",
-      headerName: "Description",
-      initialWidth: 150,
-      maxWidth: 200,
-    },
-    GridPopoutMessage<ITestRow>({
-      field: "dd",
-      headerName: "Popout message",
-      maxWidth: 120,
-      cellEditorParams: {
-        message: async (data) => {
-          // Just doing a timeout here to demonstrate deferred loading
-          await wait(1000);
-          return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
+      {
+        field: "position",
+        headerName: "Position",
+        initialWidth: 65,
+        maxWidth: 150,
+        cellRendererParams: {
+          warning: (props: ICellRendererParams) => (props.value == "Tester" ? "Testers are testing" : ""),
+          info: (props: ICellRendererParams) => (props.value == "Developer" ? "Developers are awesome" : ""),
         },
       },
-    }),
-  ];
+      {
+        field: "age",
+        headerName: "Age",
+        initialWidth: 65,
+        maxWidth: 85,
+      },
+      {
+        field: "desc",
+        headerName: "Description",
+        initialWidth: 150,
+        maxWidth: 200,
+      },
+      GridPopoutMessage<ITestRow>({
+        field: "dd",
+        headerName: "Popout message",
+        maxWidth: 120,
+        cellEditorParams: {
+          message: async (data) => {
+            // Just doing a timeout here to demonstrate deferred loading
+            await wait(1000);
+            return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
+          },
+        },
+      }),
+      GridPopoutMenu<ITestRow>({
+        field: "menu",
+        headerName: "Menu",
+        cellEditorParams: {
+          options: async () => {
+            await wait(1000);
+            return [
+              {
+                label: "Single edit",
+                action: async (selectedRows) => {
+                  alert(`Single-edit: ${selectedRows.length} rows`);
+                  await wait(500);
+                  return true;
+                },
+                multiEdit: false,
+              },
+              {
+                label: "Multi-edit",
+                action: async (selectedRows) => {
+                  alert(`Multi-edit: ${selectedRows.length} rows`);
+                  await wait(500);
+                  return true;
+                },
+                multiEdit: true,
+              },
+            ];
+          },
+        },
+      }),
+    ],
+    [],
+  );
 
   const rowData = useMemo(
     () =>

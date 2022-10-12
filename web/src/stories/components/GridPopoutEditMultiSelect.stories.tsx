@@ -65,6 +65,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGri
           maxWidth: 150,
           headerName: "Position",
           cellEditorParams: {
+            multiEdit: false,
             filtered: true,
             filterPlaceholder: "Filter position",
             options: [

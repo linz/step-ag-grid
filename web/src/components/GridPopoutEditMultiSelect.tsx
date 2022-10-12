@@ -28,7 +28,7 @@ export interface MultiSelectResult<RowType> {
 }
 
 export interface GridPopoutEditMultiSelectProps<RowType, ValueType> {
-  multiEdit?: boolean;
+  multiEdit: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
@@ -54,7 +54,7 @@ interface GridPopoutEditMultiSelectICellEditorParams<RowType extends BaseAgGridR
   extends ICellEditorParams {
   data: RowType;
   colDef: {
-    field: string | undefined;
+    field: string;
     cellEditorParams: GridPopoutEditMultiSelectProps<RowType, ValueType>;
   };
 }
@@ -62,9 +62,9 @@ interface GridPopoutEditMultiSelectICellEditorParams<RowType extends BaseAgGridR
 export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, ValueType>(
   props: GridPopoutEditMultiSelectICellEditorParams<RowType, ValueType>,
 ) => {
-  const { api } = props;
-  const { cellEditorParams } = props.colDef;
-  const field = props.colDef.field ?? "";
+  const { api, data } = props;
+  const { cellEditorParams, field } = props.colDef;
+  const { multiEdit } = cellEditorParams;
 
   const { updatingCells } = useContext(AgGridContext);
 
@@ -83,14 +83,14 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
     });
 
     return await updatingCells(
-      props,
+      { data, field, multiEdit },
       async (selectedRows) => {
         if (!cellEditorParams.onSave) return true;
         return cellEditorParams.onSave({ selectedRows, values });
       },
       setSaving,
     );
-  }, [cellEditorParams, props, selectedValues, updatingCells]);
+  }, [cellEditorParams, data, field, multiEdit, selectedValues, updatingCells]);
 
   // Load up options list if it's async function
   useEffect(() => {

@@ -10,7 +10,7 @@ import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 
 export interface GridPopoutEditTextAreaProps<RowType> {
-  multiEdit?: boolean;
+  multiEdit: boolean;
   onSave?: (selectRows: RowType[], value: string) => Promise<boolean> | boolean;
 }
 
@@ -33,14 +33,16 @@ export const GridPopoutEditTextArea = <RowType extends BaseAgGridRow, ValueType>
 interface GridPopoutICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
   data: RowType;
   colDef: {
-    field: string | undefined;
+    field: string;
     cellEditorParams: GridPopoutEditTextAreaProps<RowType>;
   };
 }
 
 const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPopoutICellEditorParams<RowType>) => {
+  const { data } = props;
   const { cellEditorParams } = props.colDef;
-  const field = props.colDef.field ?? "";
+  const { multiEdit } = cellEditorParams;
+  const field = props.colDef.field;
 
   const { updatingCells } = useContext(AgGridContext);
 
@@ -55,7 +57,7 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
       // Nothing changed
       if (value === initialValue.current) return true;
       return await updatingCells(
-        props,
+        { data, multiEdit, field },
         async (selectedRows) => {
           const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
           if (hasChanged) {
@@ -70,7 +72,7 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
         setSaving,
       );
     },
-    [cellEditorParams, field, props, saving, updatingCells],
+    [cellEditorParams, data, field, multiEdit, saving, updatingCells],
   );
 
   const children = (

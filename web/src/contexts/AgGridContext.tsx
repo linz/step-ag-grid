@@ -18,7 +18,7 @@ export interface AgGridContextType {
   ensureSelectedRowIsVisible: () => void;
   stopEditing: () => void;
   updatingCells: (
-    props: ICellEditorParams,
+    props: { data: any; multiEdit?: boolean; field: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
   ) => Promise<boolean>;
