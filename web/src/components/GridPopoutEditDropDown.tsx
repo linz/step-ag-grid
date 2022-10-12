@@ -26,7 +26,7 @@ export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridPopoutEditDropDownProps<RowType, ValueType> {
-  multiEdit?: boolean;
+  multiEdit: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -51,7 +51,7 @@ export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>
 interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow, ValueType> extends ICellEditorParams {
   data: RowType;
   colDef: {
-    field: string | undefined;
+    field: string;
     cellEditorParams: GridPopoutEditDropDownProps<RowType, ValueType>;
   };
 }
@@ -59,9 +59,9 @@ interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow,
 export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(
   props: GridPopoutEditDropDownICellEditorParams<RowType, ValueType>,
 ) => {
-  const { api } = props;
-  const { cellEditorParams } = props.colDef;
-  const field = props.colDef.field ?? "";
+  const { api, data } = props;
+  const { cellEditorParams, field } = props.colDef;
+  const { multiEdit } = cellEditorParams;
 
   const { updatingCells, stopEditing } = useContext(AgGridContext);
 
@@ -72,7 +72,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
 
   const selectItemHandler = useCallback(
     async (value: ValueType): Promise<boolean> => {
-      return await updatingCells(props, async (selectedRows) => {
+      return await updatingCells({ data, field, multiEdit }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
           if (cellEditorParams?.onSelectedItem) {
@@ -84,7 +84,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         return true;
       });
     },
-    [cellEditorParams, field, props, updatingCells],
+    [cellEditorParams, data, field, multiEdit, updatingCells],
   );
 
   // Load up options list if it's async function

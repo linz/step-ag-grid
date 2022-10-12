@@ -5,9 +5,13 @@ export const AgGridLoadableCell = (props: {
   dataTestId?: string;
   children: JSX.Element;
 }): JSX.Element => {
-  // console.log(`Rendering LoadableCell - loading: ${isLoading}`);
+  // console.log(`Rendering LoadableCell - loading: ${props.isLoading}`);
   if (props.isLoading) {
-    return <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading" }} />;
+    return (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <LuiMiniSpinner size={22} divProps={{ role: "status", "aria-label": "Loading", style: { marginBottom: 4 } }} />
+      </div>
+    );
   }
   // only add test id into ONE of the columns in a grid. this way each row will have one unique id :)
   return (

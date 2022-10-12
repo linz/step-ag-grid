@@ -95,7 +95,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
                 label: "Single edit",
                 action: async (selectedRows) => {
                   alert(`Single-edit: ${selectedRows.length} rows`);
-                  await wait(500);
+                  await wait(1500);
                   return true;
                 },
                 multiEdit: false,
@@ -104,7 +104,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
                 label: "Multi-edit",
                 action: async (selectedRows) => {
                   alert(`Multi-edit: ${selectedRows.length} rows`);
-                  await wait(500);
+                  await wait(1500);
                   return true;
                 },
                 multiEdit: true,

@@ -2,7 +2,7 @@ import "./GridPopoutMenu.scss";
 import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider } from "@szhsin/react-menu";
-import { ColDef, ICellEditorParams } from "ag-grid-community";
+import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
@@ -10,6 +10,8 @@ import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiIcon } from "@linzjs/lui";
 import { AgGridContext } from "../contexts/AgGridContext";
+import { UpdatingContext } from "../contexts/UpdatingContext";
+import { AgGridLoadableCell } from "./AgGridLoadableCell";
 
 export const MenuSeparator = Object.freeze({ __isMenuSeparator__: true });
 
@@ -35,7 +37,7 @@ export const GridPopoutMenu = <RowType extends BaseAgGridRow>(props: GridDropDow
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
   maxWidth: 64,
-  cellRenderer: GridPopoutCellRender,
+  cellRenderer: GridPopoutCellRenderer,
   cellRendererParams: {
     singleClickEdit: true,
   },
@@ -51,8 +53,14 @@ interface GridPopoutMenuICellEditorParams<RowType extends BaseAgGridRow> extends
   };
 }
 
-export const GridPopoutCellRender = () => {
-  return <LuiIcon name={"ic_more_vert"} alt={"More actions"} size={"md"} className={"GridPopoutMenu-burger"} />;
+export const GridPopoutCellRenderer = (props: ICellRendererParams) => {
+  const { checkUpdating } = useContext(UpdatingContext);
+  const isLoading = checkUpdating(props.colDef?.field ?? "", props.data.id);
+  return (
+    <AgGridLoadableCell isLoading={isLoading}>
+      <LuiIcon name={"ic_more_vert"} alt={"More actions"} size={"md"} className={"GridPopoutMenu-burger"} />
+    </AgGridLoadableCell>
+  );
 };
 
 /**

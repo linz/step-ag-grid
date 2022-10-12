@@ -64,6 +64,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "Position",
           cellEditorParams: {
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+            multiEdit: false,
           },
         }),
         GridPopoutEditDropDown<ITestRow, ITestRow["position2"]>({
@@ -104,6 +105,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "options Fn",
           cellEditorParams: {
             options: optionsFn,
+            multiEdit: false,
           },
         }),
         GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({

@@ -49,7 +49,9 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
       field: "desc1",
       headerName: "Popout Text Area",
       maxWidth: 140,
-      cellEditorParams: {},
+      cellEditorParams: {
+        multiEdit: false,
+      },
     }),
     GridPopoutEditTextArea<ITestRow, ITestRow["desc1"]>({
       field: "desc2",
