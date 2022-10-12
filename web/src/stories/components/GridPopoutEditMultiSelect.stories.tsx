@@ -10,6 +10,8 @@ import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../.
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
+import { GridPopoutEditMultiSelect, MultiSelectResult } from "../../components/GridPopoutEditMultiSelect";
+import { GridSubComponentTextArea, GridSubComponentTextAreaProps } from "../../components/GridSubComponentTextArea";
 
 export default {
   title: "Components / Grids",
@@ -38,7 +40,7 @@ interface ITestRow {
   position3: string | null;
 }
 
-const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
@@ -57,69 +59,36 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           initialWidth: 65,
           maxWidth: 85,
         },
-        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
+        GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Position",
           cellEditorParams: {
-            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-          },
-        }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position2"]>({
-          field: "position2",
-          maxWidth: 100,
-          headerName: "Multi-edit",
-          cellEditorParams: {
-            multiEdit: true,
+            filtered: true,
+            filterPlaceholder: "Filter position",
             options: [
-              {
-                value: "1",
-                label: <span style={{ border: "2px dashed blue" }}>One</span>,
-              },
-              { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
+              { value: "a", label: "Architect" },
+              { value: "b", label: "Developer" },
+              { value: "c", label: "Product Owner" },
+              { value: "d", label: "Scrum Master" },
+              { value: "e", label: "Tester" },
               MenuSeparator,
-              { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
+              {
+                value: "f",
+                label: "Other",
+                subComponent: (props) => <GridSubComponentTextArea {...props} />,
+              },
             ],
-          },
-        }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
-          field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Custom callback",
-          cellEditorParams: {
-            multiEdit: true,
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-            onSelectedItem: async (selected) => {
-              await wait(2000);
-              selected.selectedRows.forEach((row) => (row.position3 = selected.value));
+            onSave: async (result: MultiSelectResult<ITestRow>) => {
+              console.log(result);
+              await wait(1000);
+              return true;
             },
           },
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
-          field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "options Fn",
-          cellEditorParams: {
-            options: optionsFn,
-          },
-        }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
-          field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Filtered",
-          cellEditorParams: {
-            multiEdit: true,
-            filtered: true,
-            filterPlaceholder: "Filter this",
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-          },
-        }),
       ] as ColDef[],
-    [optionsFn],
+    [],
   );
 
   const rowData = useMemo(
@@ -142,4 +111,4 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
   );
 };
 
-export const EditDropdown = GridEditDropDownTemplate.bind({});
+export const EditMultiSelect = GridEditMultiSelectTemplate.bind({});

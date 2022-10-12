@@ -84,45 +84,11 @@ select .survey-information {
 
 /** Free text input */
 
-.lui-menu .filter-item {
-  padding: 0 0 2px 0.5rem;
-  vertical-align: center;
-}
-
-.lui-menu .filter-item .icon {
-  vertical-align: center;
-  padding: 0 0.5rem 0 0;
-  color: rgba(0, 113, 152, 1);
-}
-
-.lui-menu .filtered-item {
-  padding: 2px 1rem;
-}
-
-.lui-menu .filtered-div {
-  margin: 0;
-  margin-top: 0.2rem;
-}
-
-.lui-menu .filtered-header {
-  padding: 6px 1rem 2px 1rem;
-  text-transform: none;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #212529;
-}
-
 .lui-menu .free-text-input {
   border: transparent;
   outline: transparent;
   line-height: 33px;
-  width: 100%;
-  padding-left: 15.5px;
-}
-
-.lui-menu .free-text-input:hover {
-  border: transparent;
-  outline: transparent;
+  padding-left: 4px;
 }
 
 .lui-menu textarea.free-text-input {
@@ -131,6 +97,15 @@ select .survey-information {
   width: 300px;
   height: 150px;
   resize: none;
+  border: 0.06rem solid #beb9b4;
+}
+
+.LuiCheckboxInput:focus {
+  border: 1px solid black;
+}
+
+.LuiCheckboxInput-group:focus {
+  border: 1px solid black;
 }
 
 /* Bounding box in a popout - any menus will be placed in the space of this div */
@@ -155,3 +130,34 @@ div.menu-bounding-box {
   margin-bottom: -1px;
 }
 
+.lui-menu {
+  /**
+   * Scrollbar (Only Chrome)
+   */
+  ::-webkit-scrollbar {
+    width: 20px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+  }
+
+  .szh-menu__item {
+    padding: 2px 1rem;
+  }
+
+  .LuiCheckboxInput {
+    margin-bottom: 0;
+  }
+}

@@ -7,6 +7,7 @@ import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseAgGridRow } from "./AgGrid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
+import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 
 export interface GridPopoutEditTextAreaProps<RowType> {
   multiEdit?: boolean;
@@ -73,20 +74,21 @@ const GridPopoutEditTextAreaComp = <RowType extends BaseAgGridRow>(props: GridPo
   );
 
   const children = (
-    <FocusableItem className={"FreeTextInput LuiDeprecatedForms"}>
-      {({ ref }: any) => (
-        <textarea
-          ref={ref}
-          autoFocus
-          maxLength={10000}
-          spellCheck={true}
-          className={"FreeTextInput-text-input"}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={saving}
-          defaultValue={value}
-        />
-      )}
-    </FocusableItem>
+    <ComponentLoadingWrapper saving={saving}>
+      <FocusableItem className={"free-FreeTextInput LuiDeprecatedForms"}>
+        {({ ref }: any) => (
+          <textarea
+            ref={ref}
+            autoFocus
+            maxLength={10000}
+            spellCheck={true}
+            className={"free-text-input"}
+            onChange={(e) => setValue(e.target.value)}
+            defaultValue={value}
+          />
+        )}
+      </FocusableItem>
+    </ComponentLoadingWrapper>
   );
   return GridPopoutComponent(props, { children, canClose: () => updateValue(value) });
 };
