@@ -7,10 +7,10 @@ import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutEditGenericInput } from "../../components/GridPopoutEditGenericInput";
-import { isFloat, wait } from "../../utils/util";
+import { wait } from "../../utils/util";
 import { convertDDToDMS } from "../../utils/bearing";
+import { ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 export default {
@@ -46,7 +46,7 @@ const bearingValueFormatter = (params: ValueFormatterParams): string => {
   return convertDDToDMS(value);
 };
 
-const bearingNumberFormatter = (params: ValueFormatterParams): JSX.Element | string => {
+const bearingNumberFormatter = (params: ValueFormatterParams): string => {
   const value = params.value;
   if (value == null) {
     return "-";
@@ -59,10 +59,17 @@ const bearingNumberParser = (value: string): number | null => {
   return parseFloat(value);
 };
 
+const validMaskForDmsBearing = /^(\d+)?(\.[0-5](\d([0-5](\d(\d+)?)?)?)?)?$/;
 const bearingStringValidator = (value: string): string | undefined => {
   value = value.trim();
   if (value === "") return undefined;
-  if (!isFloat(value)) return "Bearing format is invalid";
+  const match = value.match(validMaskForDmsBearing);
+  if (!match) return "Bearing must be a positive number in D.MMSSS format";
+  const decimalPart = match[2];
+  if (match[2].length > 6) {
+    return "Bearing has a maximum of 5 decimal places";
+  }
+
   const bearing = parseFloat(value);
   if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
 };
@@ -107,7 +114,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
         },
         cellEditorParams: {
           formatter: bearingNumberFormatter,
-          placeHolder: "Enter Bearing",
+          placeHolder: "Enter bearing correction...",
           parser: bearingNumberParser,
           validator: bearingStringValidator,
           multiEdit: true,
@@ -127,7 +134,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
     () =>
       [
         { id: 1000, bearing: 1.234 },
-        { id: 1001, bearing: 1.566 },
+        { id: 1001, bearing: 1.565 },
         { id: 1002, bearing: null },
       ] as ITestRow[],
     [],
