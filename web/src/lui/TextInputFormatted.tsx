@@ -1,4 +1,4 @@
-import "./LuiTextInputFormatted.scss";
+import "./TextInputFormatted.scss";
 
 import { ChangeEventHandler, DetailedHTMLProps, InputHTMLAttributes } from "react";
 
@@ -19,7 +19,7 @@ export interface LuiTextInputProps {
   formatted: string;
 }
 
-export const LuiTextInput = (props: LuiTextInputProps): JSX.Element => {
+export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
   return (
     <div className={clsx("LuiTextInput", props.error && "hasError", props.warning && "hasWarning", props.className)}>
       <span className="LuiTextInput-inputWrapper">

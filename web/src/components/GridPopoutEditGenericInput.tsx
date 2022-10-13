@@ -10,13 +10,13 @@ import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { LuiTextInput } from "../lui/LuiTextInput";
+import { TextInputFormatted } from "../lui/TextInputFormatted";
 
-export interface GridPopoutEditBearingCellEditorProps<RowType> {
+export interface GridPopoutEditGenericInputCellEditorProps<RowType> {
   placeHolder: string;
-  parser: (value: string) => number | null;
-  validator: (value: string) => string | undefined;
-  formatter: (props: ValueFormatterParams) => string;
+  parser?: (value: string) => number | null;
+  validator?: (value: string) => string | undefined;
+  formatter?: (props: ValueFormatterParams) => string;
   multiEdit: boolean;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean> | boolean;
 }
@@ -26,8 +26,9 @@ export interface GridPopoutEditCellRendererProps<RowType> {
   info?: (props: ICellRendererParams) => string | boolean;
 }
 
-export interface GridPopoutEditBearingColDef<RowType> extends ColDef {
-  cellEditorParams: GridPopoutEditBearingCellEditorProps<RowType>;
+export interface GridPopoutEditGenericInputColDef<RowType> extends ColDef {
+  field: string;
+  cellEditorParams: GridPopoutEditGenericInputCellEditorProps<RowType>;
   cellRendererParams: GridPopoutEditCellRendererProps<RowType>;
 }
 
@@ -35,7 +36,7 @@ export interface GridPopoutEditBearingColDef<RowType> extends ColDef {
  * For editing a text area.
  */
 export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridPopoutEditBearingColDef<RowType>,
+  props: GridPopoutEditGenericInputColDef<RowType>,
 ): ColDef => ({
   ...props,
   cellRenderer: GridGenericCellRendererComponent,
@@ -43,23 +44,24 @@ export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueT
     ...props.cellRendererParams,
   },
   editable: props.editable ?? true,
-  cellEditor: GridPopoutEditBearingComp,
+  cellEditor: GridPopoutEditGenericInputComp,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
 interface GridPopoutICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
   data: RowType;
-  colDef: {
-    field: string;
-    cellRendererParams: GridPopoutEditCellRendererProps<RowType>;
-    cellEditorParams: GridPopoutEditBearingCellEditorProps<RowType>;
-  };
+  colDef: GridPopoutEditGenericInputColDef<RowType>;
 }
 
-const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPopoutICellEditorParams<RowType>) => {
+export const GridPopoutEditGenericInputComp = <RowType extends BaseAgGridRow>(
+  props: GridPopoutICellEditorParams<RowType>,
+) => {
   const { data } = props;
   const { cellEditorParams } = props.colDef;
   const { multiEdit } = cellEditorParams;
+  const validator = cellEditorParams.validator ?? (() => "No validator");
+  const parser = cellEditorParams.parser ?? (() => null);
+  const formatter = cellEditorParams.formatter ?? (() => "[Missing formatter]");
   const field = props.colDef.field;
 
   const { updatingCells } = useContext(AgGridContext);
@@ -75,7 +77,7 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
     async (value: string): Promise<boolean> => {
       if (saving) return false;
 
-      if (cellEditorParams.validator(value)) {
+      if (validator(value)) {
         // If we don't reselect the input the escape handler no longer works to cancel
         (document.querySelectorAll(".GridPopoutEditGenericInput input")[0] as HTMLElement)?.focus();
         return false;
@@ -86,7 +88,7 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
         async (selectedRows) => {
           const hasChanged = selectedRows.some((row) => sanitiseValue(row[field as keyof RowType]) !== value);
           if (hasChanged) {
-            const newValue = cellEditorParams.parser(value);
+            const newValue = parser(value);
             if (cellEditorParams?.onSave) {
               return cellEditorParams.onSave(selectedRows, newValue);
             } else {
@@ -104,8 +106,8 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
     <ComponentLoadingWrapper saving={saving}>
       <FocusableItem className={"free-FreeTextInput"}>
         {({ ref }: any) => (
-          <div ref={ref} className={"GridPopoutEditBearing"}>
-            <LuiTextInput
+          <div ref={ref} className={"GridPopoutEditGenericInput"}>
+            <TextInputFormatted
               value={value ?? ""}
               onChange={(e) => {
                 setValue(e.target.value.trim());
@@ -124,14 +126,14 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
                 },
               }}
               formatted={
-                cellEditorParams.validator(value)
+                validator(value)
                   ? "?"
-                  : cellEditorParams.formatter({
+                  : formatter({
                       ...props,
-                      value: cellEditorParams.parser(value),
+                      value: parser(value),
                     } as ValueFormatterParams)
               }
-              error={cellEditorParams.validator(value)}
+              error={validator(value)}
             />
           </div>
         )}
