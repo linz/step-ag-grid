@@ -179,20 +179,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : filteredValues.includes(item.value) ? null : (
-            <MenuItem
-              key={`${item.value}`}
-              value={item.value}
-              onClick={() => selectItemHandler(item.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Tab") {
-                  selectItemHandler(item.value).then(() => {
-                    stopEditing();
-                  });
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }}
-            >
+            <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
               {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
             </MenuItem>
           ),

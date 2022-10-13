@@ -3,7 +3,7 @@ import { LuiMiniSpinner } from "@linzjs/lui";
 export const AgGridLoadableCell = (props: {
   isLoading: boolean;
   dataTestId?: string;
-  children: JSX.Element;
+  children: JSX.Element | string;
 }): JSX.Element => {
   // console.log(`Rendering LoadableCell - loading: ${props.isLoading}`);
   if (props.isLoading) {
