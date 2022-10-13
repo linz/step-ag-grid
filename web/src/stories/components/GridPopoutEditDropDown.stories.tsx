@@ -4,7 +4,7 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { AgGrid, AgGridProps } from "../../components/AgGrid";
+import { Grid, AgGridProps } from "../../components/Grid";
 import { useCallback, useMemo, useState } from "react";
 import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridPopoutEditDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
@@ -13,7 +13,7 @@ import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
-  component: AgGrid,
+  component: Grid,
   args: {
     externalSelectedItems: [],
     setExternalSelectedItems: () => {},
@@ -29,7 +29,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof AgGrid>;
+} as ComponentMeta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -38,7 +38,7 @@ interface ITestRow {
   position3: string | null;
 }
 
-const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
@@ -118,6 +118,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
             filterPlaceholder: "Search me...",
             options: optionsFn,
             optionsRequestCancel: () => {
+              // TODO wrap options in an abortable request
               // When performing rest requests call the abort controller,
               // otherwise you'll get multiple requests coming back in different order
               // eslint-disable-next-line no-console
@@ -152,7 +153,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
   );
 
   return (
-    <AgGrid
+    <Grid
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}

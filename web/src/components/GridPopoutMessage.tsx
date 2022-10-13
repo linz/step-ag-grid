@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
+import { GenericCellRendererParams } from "./GridGenericCellRenderer";
 
 export interface GridPopoutCellEditorParams<RowType> {
   message: (data: RowType) => Promise<JSX.Element> | JSX.Element;
@@ -23,6 +24,7 @@ export const GridPopoutMessage = <RowType extends unknown>(props: GridPopoutMess
 interface GridPopoutICellEditorParams<RowType> extends ICellEditorParams {
   data: RowType;
   colDef: {
+    cellRenderParams: GenericCellRendererParams;
     cellEditorParams: GridPopoutCellEditorParams<RowType>;
   };
 }

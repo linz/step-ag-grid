@@ -4,7 +4,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./AgGrid";
+import { BaseAgGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";

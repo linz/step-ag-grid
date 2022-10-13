@@ -4,17 +4,18 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { AgGrid, AgGridProps } from "../../components/AgGrid";
+import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { GridPopoutMessage } from "../../components/GridPopoutMessage";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
+import { GenericCell } from "../../components/GridGenericCellRenderer";
 
 export default {
   title: "Components / Grids",
-  component: AgGrid,
+  component: Grid,
   args: {
     externalSelectedItems: [],
     setExternalSelectedItems: () => {},
@@ -30,7 +31,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof AgGrid>;
+} as ComponentMeta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -40,38 +41,38 @@ interface ITestRow {
   dd: string;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      {
+      GenericCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
-      },
-      {
+      }),
+      GenericCell({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: (props: ICellRendererParams) => (props.value == "Tester" ? "Testers are testing" : ""),
-          info: (props: ICellRendererParams) => (props.value == "Developer" ? "Developers are awesome" : ""),
+          warning: (props: ICellRendererParams) => props.value === "Tester" && "Testers are testing",
+          info: (props: ICellRendererParams) => props.value === "Developer" && "Developers are awesome",
         },
-      },
-      {
+      }),
+      GenericCell({
         field: "age",
         headerName: "Age",
         initialWidth: 65,
         maxWidth: 85,
-      },
-      {
+      }),
+      GenericCell({
         field: "desc",
         headerName: "Description",
         initialWidth: 150,
         maxWidth: 200,
-      },
+      }),
       GridPopoutMessage<ITestRow>({
         field: "dd",
         headerName: "Popout message",
@@ -79,7 +80,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
         cellEditorParams: {
           message: async (data) => {
             // Just doing a timeout here to demonstrate deferred loading
-            await wait(1000);
+            await wait(500);
             return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
           },
         },
@@ -89,7 +90,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
         headerName: "Menu",
         cellEditorParams: {
           options: async () => {
-            await wait(1000);
+            // Just doing a timeout here to demonstrate deferred loading
+            await wait(500);
             return [
               {
                 label: "Single edit",
@@ -127,7 +129,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
   );
 
   return (
-    <AgGrid
+    <Grid
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}

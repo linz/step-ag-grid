@@ -4,7 +4,7 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { AgGrid, AgGridProps } from "../../components/AgGrid";
+import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ICellRendererParams } from "ag-grid-community";
@@ -15,7 +15,7 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 
 export default {
   title: "Components / Grids",
-  component: AgGrid,
+  component: Grid,
   args: {
     externalSelectedItems: [],
     setExternalSelectedItems: () => {},
@@ -31,7 +31,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof AgGrid>;
+} as ComponentMeta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -67,7 +67,7 @@ const bearingStringValidator = (value: string): string | undefined => {
   if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
 };
 
-const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
@@ -134,7 +134,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
   );
 
   return (
-    <AgGrid
+    <Grid
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}

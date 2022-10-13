@@ -1,6 +1,6 @@
 import { LuiMiniSpinner } from "@linzjs/lui";
 
-export const AgGridLoadableCell = (props: {
+export const GridLoadableCell = (props: {
   isLoading: boolean;
   dataTestId?: string;
   children: JSX.Element | string;

@@ -5,7 +5,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./AgGrid";
+import { BaseAgGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { delay } from "lodash-es";

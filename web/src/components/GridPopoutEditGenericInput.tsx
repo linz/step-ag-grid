@@ -4,12 +4,12 @@ import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-communit
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./AgGrid";
+import { BaseAgGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiTextInput } from "@linzjs/lui";
-import { AgGridGenericCellRenderer } from "./AgGridGenericCellRenderer";
+import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import clsx from "clsx";
 
@@ -39,7 +39,7 @@ export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueT
   props: GridPopoutEditBearingColDef<RowType>,
 ): ColDef => ({
   ...props,
-  cellRenderer: AgGridGenericCellRenderer,
+  cellRenderer: GridGenericCellRendererComponent,
   cellRendererParams: {
     ...props.cellRendererParams,
   },
@@ -106,28 +106,30 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
       <FocusableItem className={"free-FreeTextInput"}>
         {({ ref }: any) => (
           <div ref={ref} style={{ display: "flex", flexDirection: "row" }} className={"GridPopoutEditBearing"}>
-            <LuiTextInput
-              label={"Bearing correction"}
-              value={value ?? ""}
-              onChange={(e) => {
-                setValue(e.target.value.trim());
-              }}
-              inputProps={{
-                autoFocus: true,
-                placeholder: cellEditorParams.placeHolder,
-                disabled: false,
-                maxLength: 16,
-                onKeyDown: async (e) => {
-                  if (e.key === "Enter") {
-                    if (await updateValue(value)) {
-                      props.api.stopEditing();
+            <div style={{ width: 200 }}>
+              <LuiTextInput
+                label={"Bearing correction"}
+                value={value ?? ""}
+                onChange={(e) => {
+                  setValue(e.target.value.trim());
+                }}
+                inputProps={{
+                  autoFocus: true,
+                  placeholder: cellEditorParams.placeHolder,
+                  disabled: false,
+                  maxLength: 16,
+                  onKeyDown: async (e) => {
+                    if (e.key === "Enter") {
+                      if (await updateValue(value)) {
+                        props.api.stopEditing();
+                      }
                     }
-                  }
-                },
-              }}
-              error={cellEditorParams.validator(value)}
-            />
-            <div className={clsx("LuiTextInput")} style={{ marginLeft: 10 }}>
+                  },
+                }}
+                error={cellEditorParams.validator(value)}
+              />
+            </div>
+            <div className={clsx("LuiTextInput")} style={{ marginLeft: 10, width: 200 }}>
               <label className={"LuiTextInput-label"}>
                 <span className={"LuiTextInput-label-text"}>Formatted</span>
                 <span className="LuiTextInput-inputWrapper" style={{ marginTop: 12, marginBottom: 12 }}>

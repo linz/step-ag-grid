@@ -4,7 +4,7 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { AgGrid, AgGridProps } from "../../components/AgGrid";
+import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { GridPopoutEditTextArea } from "../../components/GridPopoutEditTextArea";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
@@ -12,7 +12,7 @@ import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
-  component: AgGrid,
+  component: Grid,
   args: {
     externalSelectedItems: [],
     setExternalSelectedItems: () => {},
@@ -28,7 +28,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof AgGrid>;
+} as ComponentMeta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -36,7 +36,7 @@ interface ITestRow {
   desc2: string;
 }
 
-const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridPopoutTextAreaTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = [
     {
@@ -82,7 +82,7 @@ const GridPopoutTextAreaTemplate: ComponentStory<typeof AgGrid> = (props: AgGrid
   );
 
   return (
-    <AgGrid
+    <Grid
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}

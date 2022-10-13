@@ -1,4 +1,4 @@
-import "./AgGridStyles.scss";
+import "./GridStyles.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -10,8 +10,8 @@ import { difference, last, xorBy } from "lodash-es";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
-import { AgGridSelectHeader } from "./AgGridSelectHeader";
-import { AgGridGenericCellRenderer } from "./AgGridGenericCellRenderer";
+import { GridSelectHeader } from "./GridSelectHeader";
+import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 
 export interface BaseAgGridRow {
@@ -32,7 +32,7 @@ export interface AgGridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const AgGrid = (params: AgGridProps): JSX.Element => {
+export const Grid = (params: AgGridProps): JSX.Element => {
   const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
     useContext(AgGridContext);
   const { checkUpdating } = useContext(UpdatingContext);
@@ -112,7 +112,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
         maxWidth: 35,
         suppressSizeToFit: true,
         checkboxSelection: true,
-        headerComponent: AgGridSelectHeader,
+        headerComponent: GridSelectHeader,
         onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
       },
       ...(params.columnDefs as ColDef[]),
@@ -200,7 +200,7 @@ export const AgGrid = (params: AgGridProps): JSX.Element => {
 
   const defaultColDef = useMemo(
     () => ({
-      cellRenderer: AgGridGenericCellRenderer,
+      cellRenderer: GridGenericCellRendererComponent,
       sortable: true,
       resizable: true,
       ...params.defaultColDef,

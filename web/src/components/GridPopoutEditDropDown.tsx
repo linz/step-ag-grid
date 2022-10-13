@@ -5,7 +5,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./AgGrid";
+import { BaseAgGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { delay } from "lodash-es";
@@ -116,7 +116,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       }
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, options]);
+  }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, filter, options]);
 
   // Local filtering
   useEffect(() => {
@@ -137,11 +137,11 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
     }
   }, [cellEditorParams.filtered, filter, options]);
 
-  const researchOnFilterChange = useCallback(
-    debounce(() => {
+  const researchOnFilterChange = debounce(
+    useCallback(() => {
       setOptions(null);
-    }, 500),
-    [],
+    }, []),
+    500,
   );
 
   const previousFilter = useRef<string>(filter);
@@ -153,7 +153,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       cellEditorParams?.optionsRequestCancel && cellEditorParams.optionsRequestCancel();
       researchOnFilterChange().then();
     }
-  }, [cellEditorParams.filtered, filter, researchOnFilterChange]);
+  }, [cellEditorParams, cellEditorParams.filtered, filter, researchOnFilterChange]);
 
   const onFilterKeyDown = useCallback(
     async (e: KeyboardEvent) => {
