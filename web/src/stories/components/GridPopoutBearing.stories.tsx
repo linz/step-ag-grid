@@ -38,7 +38,15 @@ interface ITestRow {
   bearing: number | null;
 }
 
-const bearingNumberFormatter = (params: ValueFormatterParams): string => {
+const bearingValueFormatter = (params: ValueFormatterParams): string => {
+  const value = params.value;
+  if (value == null) {
+    return "-";
+  }
+  return convertDDToDMS(value);
+};
+
+const bearingNumberFormatter = (params: ValueFormatterParams): JSX.Element | string => {
   const value = params.value;
   if (value == null) {
     return "-";
@@ -74,12 +82,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
         headerName: "Bearing",
         initialWidth: 65,
         maxWidth: 150,
+        valueFormatter: bearingValueFormatter,
         cellRendererParams: {
-          formatter: bearingNumberFormatter,
           warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
           info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
         },
         cellEditorParams: {
+          formatter: bearingNumberFormatter,
           placeHolder: "Enter Bearing",
           parser: bearingNumberParser,
           validator: bearingStringValidator,
@@ -91,12 +100,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
         headerName: "Bearing callback",
         initialWidth: 65,
         maxWidth: 150,
+        valueFormatter: bearingValueFormatter,
         cellRendererParams: {
-          formatter: bearingNumberFormatter,
           warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
           info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
         },
         cellEditorParams: {
+          formatter: bearingNumberFormatter,
           placeHolder: "Enter Bearing",
           parser: bearingNumberParser,
           validator: bearingStringValidator,

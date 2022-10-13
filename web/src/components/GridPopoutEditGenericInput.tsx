@@ -11,11 +11,13 @@ import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiTextInput } from "@linzjs/lui";
 import { AgGridGenericCellRenderer } from "./AgGridGenericCellRenderer";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import clsx from "clsx";
 
 export interface GridPopoutEditBearingCellEditorProps<RowType> {
   placeHolder: string;
   parser: (value: string) => number | null;
   validator: (value: string) => string | undefined;
+  formatter: (props: ValueFormatterParams) => JSX.Element | string;
   multiEdit: boolean;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean> | boolean;
 }
@@ -23,7 +25,6 @@ export interface GridPopoutEditBearingCellEditorProps<RowType> {
 export interface GridPopoutEditCellRendererProps<RowType> {
   warning?: (props: ICellRendererParams) => string | boolean;
   info?: (props: ICellRendererParams) => string | boolean;
-  formatter: (props: ValueFormatterParams) => string;
 }
 
 export interface GridPopoutEditBearingColDef<RowType> extends ColDef {
@@ -39,7 +40,6 @@ export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueT
 ): ColDef => ({
   ...props,
   cellRenderer: AgGridGenericCellRenderer,
-  valueFormatter: props.cellRendererParams.formatter,
   cellRendererParams: {
     ...props.cellRendererParams,
   },
@@ -59,7 +59,7 @@ interface GridPopoutICellEditorParams<RowType extends BaseAgGridRow> extends ICe
 
 const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPopoutICellEditorParams<RowType>) => {
   const { data } = props;
-  const { cellRendererParams, cellEditorParams } = props.colDef;
+  const { cellEditorParams } = props.colDef;
   const { multiEdit } = cellEditorParams;
   const field = props.colDef.field;
 
@@ -127,20 +127,19 @@ const GridPopoutEditBearingComp = <RowType extends BaseAgGridRow>(props: GridPop
               }}
               error={cellEditorParams.validator(value)}
             />
-            <LuiTextInput
-              label={"Formatted"}
-              value={
-                cellEditorParams.validator(value)
-                  ? "?"
-                  : cellRendererParams.formatter({
-                      ...props,
-                      value: cellEditorParams.parser(value),
-                    } as ValueFormatterParams)
-              }
-              inputProps={{
-                disabled: true,
-              }}
-            />
+            <div className={clsx("LuiTextInput")} style={{ marginLeft: 10 }}>
+              <label className={"LuiTextInput-label"}>
+                <span className={"LuiTextInput-label-text"}>Formatted</span>
+                <span className="LuiTextInput-inputWrapper" style={{ marginTop: 12, marginBottom: 12 }}>
+                  {cellEditorParams.validator(value)
+                    ? "?"
+                    : cellEditorParams.formatter({
+                        ...props,
+                        value: cellEditorParams.parser(value),
+                      } as ValueFormatterParams)}
+                </span>
+              </label>
+            </div>
           </div>
         )}
       </FocusableItem>
