@@ -245,9 +245,12 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
       );
       if (ok) {
         // async processes need to refresh their own rows
-        gridApi.refreshCells({ rowNodes: gridApi.getSelectedNodes(), force: true });
+        // TODO add column
+        gridApi.refreshCells({ rowNodes: selectedRows, force: true });
         const cell = gridApi.getFocusedCell();
-        cell && gridApi.setFocusedCell(cell.rowIndex, cell.column);
+        if (cell && gridApi.getFocusedCell() == null) {
+          gridApi.setFocusedCell(cell.rowIndex, cell.column);
+        }
       }
       setSaving && setSaving(false);
       return ok;
