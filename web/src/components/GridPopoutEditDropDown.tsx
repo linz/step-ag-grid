@@ -9,6 +9,7 @@ import { BaseAgGridRow } from "./AgGrid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { delay } from "lodash-es";
+import debounce from "debounce-promise";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
@@ -27,12 +28,13 @@ export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridPopoutEditDropDownProps<RowType, ValueType> {
   multiEdit: boolean;
-  filtered?: boolean;
+  filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
-    | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+    | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+  optionsRequestCancel?: () => void;
 }
 
 export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
@@ -68,7 +70,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
-  const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
+  const [options, setOptions] = useState<FinalSelectOption<ValueType>[] | null>(null);
 
   const selectItemHandler = useCallback(
     async (value: ValueType): Promise<boolean> => {
@@ -95,7 +97,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(api.getSelectedRows());
+        optionsConf = await optionsConf(api.getSelectedRows(), filter);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -116,21 +118,42 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
     })();
   }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, options]);
 
+  // Local filtering
   useEffect(() => {
-    if (!cellEditorParams.filtered || options == null) return;
-    setFilteredValues(
-      options
-        .map((option) => {
-          if (option.label != null && typeof option.label !== "string") {
-            console.error("Cannot filter non-string labels", option);
-            return undefined;
-          }
-          const str = (option.label as string) || "";
-          return str.toLowerCase().indexOf(filter) === -1 ? option.value : undefined;
-        })
-        .filter((r) => r !== undefined),
-    );
+    if (cellEditorParams.filtered == "local") {
+      if (options == null) return;
+      setFilteredValues(
+        options
+          .map((option) => {
+            if (option.label != null && typeof option.label !== "string") {
+              console.error("Cannot filter non-string labels", option);
+              return undefined;
+            }
+            const str = (option.label as string) || "";
+            return str.toLowerCase().indexOf(filter) === -1 ? option.value : undefined;
+          })
+          .filter((r) => r !== undefined),
+      );
+    }
   }, [cellEditorParams.filtered, filter, options]);
+
+  const researchOnFilterChange = useCallback(
+    debounce(() => {
+      setOptions(null);
+    }, 500),
+    [],
+  );
+
+  const previousFilter = useRef<string>(filter);
+
+  // Reload filtering
+  useEffect(() => {
+    if (previousFilter.current != filter && cellEditorParams.filtered == "reload") {
+      previousFilter.current = filter;
+      cellEditorParams?.optionsRequestCancel && cellEditorParams.optionsRequestCancel();
+      researchOnFilterChange().then();
+    }
+  }, [cellEditorParams.filtered, filter, researchOnFilterChange]);
 
   const onFilterKeyDown = useCallback(
     async (e: KeyboardEvent) => {
@@ -150,42 +173,45 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
   );
 
   const children = (
-    <ComponentLoadingWrapper loading={!options}>
-      <>
-        {options && cellEditorParams.filtered && (
-          <>
-            <FocusableItem className={"filter-item"}>
-              {({ ref }: any) => (
-                <div style={{ display: "flex", width: "100%" }}>
-                  <input
-                    autoFocus
-                    className={"free-text-input"}
-                    style={{ border: "0px" }}
-                    ref={ref}
-                    type="text"
-                    placeholder={cellEditorParams.filterPlaceholder ?? "Placeholder"}
-                    data-testid={"filteredMenu-free-text-input"}
-                    defaultValue={""}
-                    onChange={(e) => setFilter(e.target.value.toLowerCase())}
-                    onKeyDown={(e) => onFilterKeyDown(e)}
-                  />
-                </div>
-              )}
-            </FocusableItem>
-            <MenuDivider key={`$$divider_filter`} />
-          </>
-        )}
-        {options?.map((item, index) =>
-          item.value === MenuSeparatorString ? (
-            <MenuDivider key={`$$divider_${index}`} />
-          ) : filteredValues.includes(item.value) ? null : (
-            <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
-              {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-            </MenuItem>
-          ),
-        )}
-      </>
-    </ComponentLoadingWrapper>
+    <>
+      {cellEditorParams.filtered && (
+        <>
+          <FocusableItem className={"filter-item"}>
+            {({ ref }: any) => (
+              <div style={{ display: "flex", width: "100%" }}>
+                <input
+                  autoFocus
+                  className={"free-text-input"}
+                  style={{ border: "0px" }}
+                  ref={ref}
+                  type="text"
+                  placeholder={cellEditorParams.filterPlaceholder ?? "Placeholder"}
+                  data-testid={"filteredMenu-free-text-input"}
+                  defaultValue={filter}
+                  onChange={(e) => setFilter(e.target.value.toLowerCase())}
+                  onKeyDown={(e) => onFilterKeyDown(e)}
+                />
+              </div>
+            )}
+          </FocusableItem>
+          <MenuDivider key={`$$divider_filter`} />
+        </>
+      )}
+      <ComponentLoadingWrapper loading={!options}>
+        <>
+          {options && options.length == filteredValues?.length && <MenuItem>[Empty]</MenuItem>}
+          {options?.map((item, index) =>
+            item.value === MenuSeparatorString ? (
+              <MenuDivider key={`$$divider_${index}`} />
+            ) : filteredValues.includes(item.value) ? null : (
+              <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
+                {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+              </MenuItem>
+            ),
+          )}
+        </>
+      </ComponentLoadingWrapper>
+    </>
   );
   return GridPopoutComponent(props, { children });
 };

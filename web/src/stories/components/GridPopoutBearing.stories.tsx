@@ -55,6 +55,8 @@ const bearingStringValidator = (value: string): string | undefined => {
   value = value.trim();
   if (value === "") return undefined;
   if (!isFloat(value)) return "Bearing format is invalid";
+  const bearing = parseFloat(value);
+  if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
 };
 
 const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
@@ -81,7 +83,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps)
           placeHolder: "Enter Bearing",
           parser: bearingNumberParser,
           validator: bearingStringValidator,
-          multiEdit: true,
+          multiEdit: false,
         },
       }),
       GridPopoutEditGenericInput<ITestRow, number | null>({

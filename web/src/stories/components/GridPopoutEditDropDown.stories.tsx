@@ -41,11 +41,21 @@ interface ITestRow {
 const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
-  const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
+  const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
     // eslint-disable-next-line no-console
-    console.log("optionsFn selected rows", selectedRows);
+    console.log("optionsFn selected rows", selectedRows, filter);
+    filter = filter?.toLowerCase();
     await wait(1000);
-    return [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparatorString, "(other)"];
+    return [
+      null,
+      "Architect",
+      "Developer",
+      "Product Owner",
+      "Scrum Master",
+      "Tester",
+      MenuSeparatorString,
+      "(other)",
+    ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
   }, []);
 
   const columnDefs = useMemo(
@@ -102,9 +112,17 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
-          headerName: "options Fn",
+          headerName: "Options Fn",
           cellEditorParams: {
+            filtered: "reload",
+            filterPlaceholder: "Search me...",
             options: optionsFn,
+            optionsRequestCancel: () => {
+              // When performing rest requests call the abort controller,
+              // otherwise you'll get multiple requests coming back in different order
+              // eslint-disable-next-line no-console
+              console.log("optionsRequestCancelled");
+            },
             multiEdit: false,
           },
         }),
@@ -115,7 +133,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof AgGrid> = (props: AgGridPr
           headerName: "Filtered",
           cellEditorParams: {
             multiEdit: true,
-            filtered: true,
+            filtered: "local",
             filterPlaceholder: "Filter this",
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
           },
