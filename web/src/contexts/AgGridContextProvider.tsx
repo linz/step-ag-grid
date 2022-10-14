@@ -245,12 +245,14 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
       );
       if (ok) {
         // async processes need to refresh their own rows
-        // TODO add column
+        // TODO add column to refreshCells
         gridApi.refreshCells({ rowNodes: selectedRows, force: true });
         const cell = gridApi.getFocusedCell();
         if (cell && gridApi.getFocusedCell() == null) {
           gridApi.setFocusedCell(cell.rowIndex, cell.column);
         }
+        // This is needed to trigger postSortRowsHook
+        gridApi.refreshClientSideRowModel();
       }
       setSaving && setSaving(false);
       return ok;
