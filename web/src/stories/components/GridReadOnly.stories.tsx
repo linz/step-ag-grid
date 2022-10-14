@@ -6,12 +6,13 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
 import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { GridPopoutMessage } from "../../components/GridPopoutMessage";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
 import { GenericCell } from "../../components/GridGenericCellRenderer";
+import { FormMessage } from "./FormMessage";
+import { GenericCellEditor } from "../../components/GenericCellEditor";
 
 export default {
   title: "Components / Grids",
@@ -73,16 +74,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopoutMessage<ITestRow>({
+      GenericCellEditor({
         field: "dd",
         headerName: "Popout message",
-        maxWidth: 120,
+        maxWidth: 140,
         cellEditorParams: {
-          message: async (data) => {
-            // Just doing a timeout here to demonstrate deferred loading
-            await wait(500);
-            return <span>This cell contains the value: {JSON.stringify(data.dd)}</span>;
-          },
+          form: FormMessage,
+          multiEdit: false,
         },
       }),
       GridPopoutMenu<ITestRow>({
