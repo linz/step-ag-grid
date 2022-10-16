@@ -46,6 +46,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: AgGri
         maxWidth: 140,
         cellEditorParams: {
           form: FormTest,
+          formProps: {},
           multiEdit: false,
         },
       }),

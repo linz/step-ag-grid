@@ -1,9 +1,9 @@
 import "./FormTest.scss";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { FormProps } from "../../components/GenericCellEditor";
+import { CellEditorContext } from "../../contexts/CellEditorContext";
 
 export interface IFormTestRow {
   id: number;
@@ -13,21 +13,26 @@ export interface IFormTestRow {
   plan: string;
 }
 
-export const FormTest = (props: FormProps): JSX.Element => {
+export const FormTest = (): JSX.Element => {
+  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
+  saveRef.current = useCallback(async (): Promise<boolean> => {
+    return true;
+  }, []);
+
   const [nameType, setNameType] = useState("IS");
   const [numba, setNumba] = useState("IX");
   const [plan, setPlan] = useState("DP XXXX");
 
-  props.saveRef.current = useCallback(
+  saveRef.current = useCallback(
     async (selectedRows: IFormTestRow[]): Promise<boolean> => {
       // eslint-disable-next-line no-console
       console.log("onSave", selectedRows, nameType, numba, plan);
       // If not valid return false
-      props.data.name = "XXX";
+      cellEditorParamsRef.current.data.name = "XXX";
       await wait(1000);
       return true;
     },
-    [nameType, numba, plan],
+    [cellEditorParamsRef, nameType, numba, plan],
   );
 
   return (

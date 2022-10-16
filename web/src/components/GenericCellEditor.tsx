@@ -1,60 +1,71 @@
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { BaseAgGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
+import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
+import { CellEditorContextProvider } from "../contexts/CellEditorContextProvider";
+import { CellEditorContext } from "../contexts/CellEditorContext";
 
-export type FormProps = { saveRef: Record<string, any> } & ICellEditorParams;
-
-export interface GenericCellEditorProps<RowType> {
+export interface GenericCellEditorParams<FormProps extends Record<string, any>> {
   multiEdit: boolean;
   form: (props: FormProps) => JSX.Element;
+  formProps: FormProps;
 }
 
-export interface GenericCellEditorColDef<RowType> extends ColDef {
+export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
   field: string;
-  cellEditorParams: GenericCellEditorProps<RowType>;
+  cellEditorParams: GenericCellEditorParams<FormProps>;
+  cellRendererParams?: GenericCellRendererParams;
 }
 
 /**
  * For editing a text area.
  */
-export const GenericCellEditor = <RowType extends BaseAgGridRow, ValueType>(
-  props: GenericCellEditorColDef<RowType>,
+export const GenericCellEditor = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+  props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => ({
   ...props,
   editable: props.editable ?? true,
+  cellRenderer: GridGenericCellRendererComponent,
   cellEditor: GenericCellEditorComponent,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GenericCellEditorICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
+interface GenericCellEditorICellEditorParams<RowType extends BaseAgGridRow, FormProps extends Record<string, any>>
+  extends ICellEditorParams {
   data: RowType;
-  colDef: GenericCellEditorColDef<RowType>;
+  colDef: GenericCellEditorColDef<RowType, FormProps>;
 }
 
-export const GenericCellEditorComponent = <RowType extends BaseAgGridRow>(
-  props: GenericCellEditorICellEditorParams<RowType>,
+export const GenericCellEditorComponent = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+  props: GenericCellEditorICellEditorParams<RowType, FormProps>,
+) => (
+  <CellEditorContextProvider>
+    <GenericCellEditorComponent2 {...props} />
+  </CellEditorContextProvider>
+);
+
+export const GenericCellEditorComponent2 = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+  props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
+  const { updatingCells } = useContext(AgGridContext);
+  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
+
+  cellEditorParamsRef.current = props;
+
   const { data } = props;
   const { cellEditorParams } = props.colDef;
   const { multiEdit } = cellEditorParams;
   const field = props.colDef.field ?? "";
 
-  const { updatingCells } = useContext(AgGridContext);
   const [saving, setSaving] = useState(false);
-
-  const saveRef = useRef(async (selectedRows: RowType[]) => {
-    console.error("Form is missing saveRef, cannot save");
-    return false;
-  });
 
   const updateValue = useCallback(async (): Promise<boolean> => {
     if (saving) return false;
-
     return await updatingCells(
       { data, multiEdit, field },
       async (selectedRows) => {
@@ -62,11 +73,13 @@ export const GenericCellEditorComponent = <RowType extends BaseAgGridRow>(
       },
       setSaving,
     );
-  }, [data, field, multiEdit, saving, updatingCells]);
+  }, [data, field, multiEdit, saveRef, saving, updatingCells]);
 
   const children = (
     <ComponentLoadingWrapper saving={saving}>
-      <FocusableItem>{({ ref }: any) => <cellEditorParams.form {...props} saveRef={saveRef} />}</FocusableItem>
+      <FocusableItem>
+        {({ ref }: any) => <cellEditorParams.form {...props.colDef.cellEditorParams.formProps} />}
+      </FocusableItem>
     </ComponentLoadingWrapper>
   );
   return GridPopoutComponent(props, { children, canClose: () => updateValue() });

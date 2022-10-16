@@ -78,8 +78,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
         field: "dd",
         headerName: "Popout message",
         maxWidth: 140,
+        cellRendererParams: {
+          info: () => "I do popups",
+        },
         cellEditorParams: {
           form: FormMessage,
+          formProps: {
+            a: "x",
+          },
           multiEdit: false,
         },
       }),
