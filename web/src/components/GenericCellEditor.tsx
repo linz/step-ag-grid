@@ -66,13 +66,7 @@ export const GenericCellEditorComponent2 = <RowType extends BaseAgGridRow, FormP
 
   const updateValue = useCallback(async (): Promise<boolean> => {
     if (saving) return false;
-    return await updatingCells(
-      { data, multiEdit, field },
-      async (selectedRows) => {
-        return saveRef.current(selectedRows);
-      },
-      setSaving,
-    );
+    return await updatingCells({ data, multiEdit, field }, saveRef.current, setSaving);
   }, [data, field, multiEdit, saveRef, saving, updatingCells]);
 
   const children = (
@@ -82,5 +76,5 @@ export const GenericCellEditorComponent2 = <RowType extends BaseAgGridRow, FormP
       </FocusableItem>
     </ComponentLoadingWrapper>
   );
-  return GridPopoutComponent(props, { children, canClose: () => updateValue() });
+  return GridPopoutComponent(props, { children, canClose: updateValue });
 };
