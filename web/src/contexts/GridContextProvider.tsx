@@ -14,7 +14,7 @@ interface AgGridContextProps {
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const AgGridContextProvider = (props: AgGridContextProps): ReactElement => {
+export const GridContextProvider = (props: AgGridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(UpdatingContext);
   const gridApiRef = useRef<GridApi>();
   const idsBeforeUpdate = useRef<number[]>([]);

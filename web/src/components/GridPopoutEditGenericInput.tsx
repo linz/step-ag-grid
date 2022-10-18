@@ -4,7 +4,7 @@ import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-communit
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
+import { BaseGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
@@ -35,7 +35,7 @@ export interface GridPopoutEditGenericInputColDef<RowType> extends ColDef {
 /**
  * For editing a text area.
  */
-export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueType>(
+export const GridPopoutEditGenericInput = <RowType extends BaseGridRow, ValueType>(
   props: GridPopoutEditGenericInputColDef<RowType>,
 ): ColDef => ({
   ...props,
@@ -48,12 +48,12 @@ export const GridPopoutEditGenericInput = <RowType extends BaseAgGridRow, ValueT
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GridPopoutICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
+interface GridPopoutICellEditorParams<RowType extends BaseGridRow> extends ICellEditorParams {
   data: RowType;
   colDef: GridPopoutEditGenericInputColDef<RowType>;
 }
 
-export const GridPopoutEditGenericInputComp = <RowType extends BaseAgGridRow>(
+export const GridPopoutEditGenericInputComp = <RowType extends BaseGridRow>(
   props: GridPopoutICellEditorParams<RowType>,
 ) => {
   const { data } = props;

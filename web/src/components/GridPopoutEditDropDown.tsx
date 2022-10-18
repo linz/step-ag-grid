@@ -5,7 +5,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
+import { BaseGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { delay } from "lodash-es";
@@ -41,7 +41,7 @@ export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
   cellEditorParams?: GridPopoutEditDropDownProps<RowType, ValueType>;
 }
 
-export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>(
+export const GridPopoutEditDropDown = <RowType extends BaseGridRow, ValueType>(
   props: GridDropDownColDef<RowType, ValueType>,
 ): ColDef => ({
   ...props,
@@ -50,7 +50,7 @@ export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow, ValueType> extends ICellEditorParams {
+interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseGridRow, ValueType> extends ICellEditorParams {
   data: RowType;
   colDef: {
     field: string;
@@ -58,7 +58,7 @@ interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow,
   };
 }
 
-export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(
+export const GridPopoutEditDropDownComp = <RowType extends BaseGridRow, ValueType>(
   props: GridPopoutEditDropDownICellEditorParams<RowType, ValueType>,
 ) => {
   const { api, data } = props;

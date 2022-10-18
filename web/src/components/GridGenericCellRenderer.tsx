@@ -10,9 +10,11 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 /**
  * Generic read only cell.
  */
-export const GenericCell = (props: GenericCellRendererColDef): ColDef => ({
+export const GridGenericCell = (props: GenericCellRendererColDef | undefined): ColDef => ({
+  sortable: true,
+  resizable: true,
+  cellRenderer: props?.cellRenderer ?? GridGenericCellRendererComponent,
   ...props,
-  cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
 });
 
 interface GenericCellComponentParams extends ICellRendererParams {
@@ -20,7 +22,6 @@ interface GenericCellComponentParams extends ICellRendererParams {
 }
 
 export interface GenericCellRendererColDef extends ColDef {
-  field: string;
   cellRendererParams?: GenericCellRendererParams;
 }
 
@@ -29,6 +30,7 @@ export interface GenericCellRendererParams {
   info?: (props: ICellRendererParams) => string | boolean | undefined;
 }
 
+// TODO unexport
 export const GridGenericCellRendererComponent = (props: GenericCellComponentParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 

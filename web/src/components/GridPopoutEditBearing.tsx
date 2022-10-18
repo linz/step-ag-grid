@@ -2,7 +2,7 @@ import "./GridPopoutEditGenericInput.scss";
 
 import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
+import { BaseGridRow } from "./Grid";
 import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoutEditGenericInputColDef, GridPopoutEditGenericInputComp } from "./GridPopoutEditGenericInput";
@@ -47,7 +47,7 @@ const bearingStringValidator = (value: string): string | undefined => {
 /**
  * For editing a text area.
  */
-export const GridPopoutEditBearing = <RowType extends BaseAgGridRow, ValueType>(
+export const GridPopoutEditBearing = <RowType extends BaseGridRow, ValueType>(
   props: GridPopoutEditGenericInputColDef<RowType>,
 ): ColDef => ({
   ...props,

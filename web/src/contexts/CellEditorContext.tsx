@@ -1,6 +1,6 @@
 import { createContext, MutableRefObject, useRef } from "react";
 import { ICellEditorParams } from "ag-grid-community";
-import { BaseAgGridRow } from "../components/Grid";
+import { BaseGridRow } from "../components/Grid";
 
 export type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 

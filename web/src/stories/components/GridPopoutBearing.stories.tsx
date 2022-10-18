@@ -3,8 +3,8 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { Grid, AgGridProps } from "../../components/Grid";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
@@ -22,9 +22,9 @@ export default {
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
         <UpdatingContextProvider>
-          <AgGridContextProvider>
+          <GridContextProvider>
             <Story />
-          </AgGridContextProvider>
+          </GridContextProvider>
         </UpdatingContextProvider>
       </div>
     ),
@@ -36,7 +36,7 @@ interface ITestRow {
   bearing: number | null;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
+const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [

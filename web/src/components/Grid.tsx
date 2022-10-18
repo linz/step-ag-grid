@@ -11,13 +11,13 @@ import { AgGridContext } from "../contexts/AgGridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { GridSelectHeader } from "./GridSelectHeader";
-import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { UpdatingContext } from "../contexts/UpdatingContext";
+import { GridGenericCell } from "./GridGenericCellRenderer";
 
-export interface BaseAgGridRow {
+export interface BaseGridRow {
   id: string | number;
 }
-export interface AgGridProps {
+export interface GridProps {
   dataTestId?: string;
   quickFilterValue?: string;
   externalSelectedItems: any[];
@@ -32,7 +32,7 @@ export interface AgGridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = (params: AgGridProps): JSX.Element => {
+export const Grid = (params: GridProps): JSX.Element => {
   const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
     useContext(AgGridContext);
   const { checkUpdating } = useContext(UpdatingContext);
@@ -198,15 +198,7 @@ export const Grid = (params: AgGridProps): JSX.Element => {
     [refreshSelectedRows],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      cellRenderer: GridGenericCellRendererComponent,
-      sortable: true,
-      resizable: true,
-      ...params.defaultColDef,
-    }),
-    [params.defaultColDef],
-  );
+  const defaultColDef = useMemo(() => GridGenericCell(params.defaultColDef), [params.defaultColDef]);
 
   return (
     <div

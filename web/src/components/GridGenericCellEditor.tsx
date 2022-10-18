@@ -1,7 +1,7 @@
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useState } from "react";
-import { BaseAgGridRow } from "./Grid";
+import { BaseGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
@@ -25,7 +25,7 @@ export interface GenericCellEditorColDef<RowType, FormProps extends Record<strin
 /**
  * For editing a text area.
  */
-export const GenericCellEditor = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+export const GridGenericCellEditor = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => ({
   ...props,
@@ -35,13 +35,13 @@ export const GenericCellEditor = <RowType extends BaseAgGridRow, FormProps exten
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
 
-interface GenericCellEditorICellEditorParams<RowType extends BaseAgGridRow, FormProps extends Record<string, any>>
+interface GenericCellEditorICellEditorParams<RowType extends BaseGridRow, FormProps extends Record<string, any>>
   extends ICellEditorParams {
   data: RowType;
   colDef: GenericCellEditorColDef<RowType, FormProps>;
 }
 
-export const GenericCellEditorComponent = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => (
   <CellEditorContextProvider>
@@ -49,7 +49,7 @@ export const GenericCellEditorComponent = <RowType extends BaseAgGridRow, FormPr
   </CellEditorContextProvider>
 );
 
-export const GenericCellEditorComponent2 = <RowType extends BaseAgGridRow, FormProps extends Record<string, any>>(
+export const GenericCellEditorComponent2 = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
   const { updatingCells } = useContext(AgGridContext);

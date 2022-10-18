@@ -6,7 +6,7 @@ import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-communit
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
+import { BaseGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiIcon } from "@linzjs/lui";
 import { AgGridContext } from "../contexts/AgGridContext";
@@ -29,7 +29,7 @@ export interface MenuOption<RowType> {
 /**
  * Popout burger menu
  */
-export const GridPopoutMenu = <RowType extends BaseAgGridRow>(props: GridDropDownColDef<RowType>): ColDef => ({
+export const GridPopoutMenu = <RowType extends BaseGridRow>(props: GridDropDownColDef<RowType>): ColDef => ({
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
   maxWidth: 64,
@@ -51,7 +51,7 @@ export interface GridDropDownColDef<RowType> extends ColDef {
   cellEditorParams?: GridPopoutMenuProps<RowType>;
 }
 
-interface GridPopoutMenuICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
+interface GridPopoutMenuICellEditorParams<RowType extends BaseGridRow> extends ICellEditorParams {
   data: RowType;
   colDef: GridDropDownColDef<RowType>;
 }
@@ -70,7 +70,7 @@ export const GridPopoutCellRenderer = (props: ICellRendererParams) => {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridPopoutMenuComponent = <RowType extends BaseAgGridRow>(
+export const GridPopoutMenuComponent = <RowType extends BaseGridRow>(
   props: GridPopoutMenuICellEditorParams<RowType>,
 ) => {
   const { api, data } = props;
