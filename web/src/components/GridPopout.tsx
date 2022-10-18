@@ -43,7 +43,7 @@ export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopout
             })().then();
           }}
         >
-          {children}
+          <div id={"temp2"}>{children}</div>
         </ControlledMenu>
       )}
     </>

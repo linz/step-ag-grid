@@ -4,7 +4,7 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { AgGrid, AgGridProps } from "../../components/AgGrid";
+import { Grid, AgGridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { MenuSeparator } from "../../components/GridPopoutEditDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
@@ -15,7 +15,7 @@ import { GridSubComponentTextArea } from "../../components/GridSubComponentTextA
 
 export default {
   title: "Components / Grids",
-  component: AgGrid,
+  component: Grid,
   args: {
     externalSelectedItems: [],
     setExternalSelectedItems: () => {},
@@ -31,7 +31,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof AgGrid>;
+} as ComponentMeta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -40,7 +40,7 @@ interface ITestRow {
   position3: string | null;
 }
 
-const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGridProps) => {
+const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   /*const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
@@ -103,7 +103,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof AgGrid> = (props: AgGri
   );
 
   return (
-    <AgGrid
+    <Grid
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}

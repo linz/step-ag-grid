@@ -11,7 +11,7 @@ export const ComponentLoadingWrapper = (props: {
   return props.loading ? (
     <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading", style: { padding: 16 } }} />
   ) : (
-    <div style={{ maxHeight: 400, overflowY: "scroll", pointerEvents: props.saving ? "none" : "inherit" }}>
+    <div style={{ maxHeight: 400, overflowY: "auto", pointerEvents: props.saving ? "none" : "inherit" }}>
       {props.saving && (
         <div
           style={{

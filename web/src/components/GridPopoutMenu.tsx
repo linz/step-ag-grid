@@ -6,13 +6,14 @@ import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-communit
 import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./AgGrid";
+import { BaseAgGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiIcon } from "@linzjs/lui";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { UpdatingContext } from "../contexts/UpdatingContext";
-import { AgGridLoadableCell } from "./AgGridLoadableCell";
+import { GridLoadableCell } from "./GridLoadableCell";
 
+/** Menu configuration types **/
 export const MenuSeparator = Object.freeze({ __isMenuSeparator__: true });
 
 interface MenuSeparatorType {
@@ -25,41 +26,43 @@ export interface MenuOption<RowType> {
   multiEdit: boolean;
 }
 
-export interface GridPopoutMenuProps<RowType> {
-  options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
-}
-
-export interface GridDropDownColDef<RowType> extends ColDef {
-  cellEditorParams?: GridPopoutMenuProps<RowType>;
-}
-
+/**
+ * Popout burger menu
+ */
 export const GridPopoutMenu = <RowType extends BaseAgGridRow>(props: GridDropDownColDef<RowType>): ColDef => ({
   ...props,
   editable: props.editable !== undefined ? props.editable : true,
   maxWidth: 64,
   cellRenderer: GridPopoutCellRenderer,
   cellRendererParams: {
+    // Menus open on single click, this parameter is picked up in Grid.tsx
     singleClickEdit: true,
   },
-  cellEditor: GridPopoutMenuComp,
+  cellEditor: GridPopoutMenuComponent,
   cellClass: GenericMultiEditCellClass,
 });
 
+export interface GridPopoutMenuProps<RowType> {
+  options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
+}
+
+export interface GridDropDownColDef<RowType> extends ColDef {
+  field: string;
+  cellEditorParams?: GridPopoutMenuProps<RowType>;
+}
+
 interface GridPopoutMenuICellEditorParams<RowType extends BaseAgGridRow> extends ICellEditorParams {
   data: RowType;
-  colDef: {
-    field: string;
-    cellEditorParams: GridPopoutMenuProps<RowType>;
-  };
+  colDef: GridDropDownColDef<RowType>;
 }
 
 export const GridPopoutCellRenderer = (props: ICellRendererParams) => {
   const { checkUpdating } = useContext(UpdatingContext);
   const isLoading = checkUpdating(props.colDef?.field ?? "", props.data.id);
   return (
-    <AgGridLoadableCell isLoading={isLoading}>
+    <GridLoadableCell isLoading={isLoading}>
       <LuiIcon name={"ic_more_vert"} alt={"More actions"} size={"md"} className={"GridPopoutMenu-burger"} />
-    </AgGridLoadableCell>
+    </GridLoadableCell>
   );
 };
 
@@ -67,7 +70,9 @@ export const GridPopoutCellRenderer = (props: ICellRendererParams) => {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridPopoutMenuComp = <RowType extends BaseAgGridRow>(props: GridPopoutMenuICellEditorParams<RowType>) => {
+export const GridPopoutMenuComponent = <RowType extends BaseAgGridRow>(
+  props: GridPopoutMenuICellEditorParams<RowType>,
+) => {
   const { api, data } = props;
   const { cellEditorParams } = props.colDef;
   const field = props.colDef.field ?? "";

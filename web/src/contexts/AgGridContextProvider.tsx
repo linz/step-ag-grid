@@ -240,14 +240,20 @@ export const AgGridContextProvider = (props: AgGridContextProps): ReactElement =
         props.field,
         selectedRows.map((data) => data.id),
         async () => {
+          // Need to refresh to get spinners to work on all rows
+          gridApi.refreshCells({ rowNodes: selectedRows, force: true });
           ok = await fnUpdate(selectedRows);
         },
       );
       if (ok) {
         // async processes need to refresh their own rows
-        gridApi.refreshCells({ rowNodes: gridApi.getSelectedNodes(), force: true });
+        gridApi.refreshCells({ rowNodes: selectedRows, force: true });
         const cell = gridApi.getFocusedCell();
-        cell && gridApi.setFocusedCell(cell.rowIndex, cell.column);
+        if (cell && gridApi.getFocusedCell() == null) {
+          gridApi.setFocusedCell(cell.rowIndex, cell.column);
+        }
+        // This is needed to trigger postSortRowsHook
+        gridApi.refreshClientSideRowModel();
       }
       setSaving && setSaving(false);
       return ok;
