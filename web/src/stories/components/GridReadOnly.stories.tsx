@@ -79,6 +79,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Popout message",
         maxWidth: 140,
         cellRendererParams: {
+          singleClickEdit: true,
           info: () => "I do popups",
         },
         cellEditorParams: {
@@ -116,6 +117,16 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                 multiEdit: true,
               },
             ];
+          },
+        },
+      }),
+      GridPopoutMenu<ITestRow>({
+        field: "menu",
+        headerName: "Menu disabled",
+        editable: false,
+        cellEditorParams: {
+          options: async () => {
+            return [];
           },
         },
       }),

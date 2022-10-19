@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
 import { GridGenericCellEditorFormContextParams } from "../../components/GridGenericCellEditor";
-import { BaseGridRow } from "../../components/Grid";
 
 export interface IFormTestRow {
   id: number;

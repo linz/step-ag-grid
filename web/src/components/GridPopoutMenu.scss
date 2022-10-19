@@ -3,3 +3,7 @@
 .GridPopoutMenu-burger svg {
   fill: lui.$sea;
 }
+
+.GridPopoutMenu-burgerDisabled svg {
+  fill: lui.$disabled-color;
+}

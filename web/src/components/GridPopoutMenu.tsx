@@ -31,7 +31,7 @@ export interface MenuOption<RowType> {
  */
 export const GridPopoutMenu = <RowType extends BaseGridRow>(props: GridDropDownColDef<RowType>): ColDef => ({
   ...props,
-  editable: props.editable !== undefined ? props.editable : true,
+  editable: props.editable != null ? props.editable : true,
   maxWidth: 64,
   cellRenderer: GridPopoutCellRenderer,
   cellRendererParams: {
@@ -59,9 +59,16 @@ interface GridPopoutMenuICellEditorParams<RowType extends BaseGridRow> extends I
 export const GridPopoutCellRenderer = (props: ICellRendererParams) => {
   const { checkUpdating } = useContext(UpdatingContext);
   const isLoading = checkUpdating(props.colDef?.field ?? "", props.data.id);
+  const disabled = !props.colDef?.editable;
+
   return (
     <GridLoadableCell isLoading={isLoading}>
-      <LuiIcon name={"ic_more_vert"} alt={"More actions"} size={"md"} className={"GridPopoutMenu-burger"} />
+      <LuiIcon
+        name={"ic_more_vert"}
+        alt={"More actions"}
+        size={"md"}
+        className={disabled ? `GridPopoutMenu-burgerDisabled` : `GridPopoutMenu-burger`}
+      />
     </GridLoadableCell>
   );
 };

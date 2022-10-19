@@ -26,11 +26,11 @@ export interface GenericCellRendererColDef extends ColDef {
 }
 
 export interface GenericCellRendererParams {
+  singleClickEdit?: boolean;
   warning?: (props: ICellRendererParams) => string | boolean | undefined;
   info?: (props: ICellRendererParams) => string | boolean | undefined;
 }
 
-// TODO unexport
 export const GridGenericCellRendererComponent = (props: GenericCellComponentParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 
