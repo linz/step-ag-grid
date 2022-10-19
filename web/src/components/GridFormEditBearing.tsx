@@ -1,29 +1,39 @@
 import "./GridFormEditBearing.scss";
 
 import { useCallback, useState } from "react";
-import { wait } from "../utils/util";
 import { BaseGridRow } from "./Grid";
 import { TextInputFormatted } from "../lui/TextInputFormatted";
 import { GridGenericCellEditorFormContextParams } from "./GridGenericCellEditor";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../utils/bearing";
 
-export interface GridFormEditBearingProps {
+export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
   placeHolder: string;
+  onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = (props: GridFormEditBearingProps): JSX.Element => {
+export const GridFormEditBearing = <RowType extends BaseGridRow>(
+  props: GridFormEditBearingProps<RowType>,
+): JSX.Element => {
   const { saveRef, cellEditorParamsRef, triggerSave } = props as any as GridGenericCellEditorFormContextParams;
   const cellEditorParams = cellEditorParamsRef.current;
-  const field = cellEditorParams.colDef.field ?? "fieldNotDefinedInColDef";
+  const field = cellEditorParams.colDef.field;
   saveRef.current = async (): Promise<boolean> => true;
 
   const [value, setValue] = useState<string>(cellEditorParams.value == null ? "" : `${cellEditorParams.value}`);
 
   saveRef.current = useCallback(
-    async (selectedRows: BaseGridRow[]): Promise<boolean> => {
+    async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
-      selectedRows.forEach((row) => ((row as Record<string, any>)[field] = value == "" ? null : parseFloat(value)));
-      await wait(1000);
+      const parsedValue = bearingNumberParser(value);
+      if (props.onSave) {
+        await props.onSave(selectedRows, parsedValue);
+      } else {
+        if (field == null) {
+          console.error("field is not defined in ColDef");
+        } else {
+          selectedRows.forEach((row) => ((row as Record<string, any>)[field] = parsedValue));
+        }
+      }
       return true;
     },
     [value, field],

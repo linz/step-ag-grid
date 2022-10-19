@@ -7,11 +7,8 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { ICellRendererParams } from "ag-grid-community";
-import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
-import { GridFormEditBearing } from "../../components/GridFormEditBearing";
-import { GridGenericCellRendererComponent } from "../../components/GridGenericCellRenderer";
-import { bearingValueFormatter } from "../../utils/bearing";
+import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -35,7 +32,8 @@ export default {
 
 interface ITestRow {
   id: number;
-  bearing: number | null;
+  bearing1: number | null;
+  bearing2: number | null;
 }
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
@@ -48,45 +46,36 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       },
-      GridGenericCellEditor({
-        field: "bearing",
+      GridPopoutEditBearing<ITestRow>({
+        field: "bearing1",
         headerName: "Bearing GCE",
-        initialWidth: 65,
-        maxWidth: 150,
-        valueFormatter: bearingValueFormatter,
-        cellRenderer: GridGenericCellRendererComponent,
         cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
-          info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
+          warning: (props) => props.data.id == 1002 && "Testers are testing",
+          info: (props) => props.data.id == 1001 && "Developers are developing",
         },
         cellEditorParams: {
           multiEdit: false,
-          form: GridFormEditBearing,
           formProps: {
             placeHolder: "Enter Bearing",
           },
         },
       }),
-      /*GridPopoutEditBearing<ITestRow, number | null>({
-        field: "bearing",
-        headerName: "Bearing callback",
-        initialWidth: 65,
-        maxWidth: 150,
-        cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
-          info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
-        },
+      GridPopoutEditBearing<ITestRow>({
+        field: "bearing2",
+        headerName: "Bearing onSave",
+        cellRendererParams: {},
         cellEditorParams: {
-          placeHolder: "Enter bearing correction...",
           multiEdit: true,
-          onSave: async (selectedRows, value) => {
-            await wait(1000);
-            // eslint-disable-next-line no-console
-            console.log({ selectedRows, value });
-            return true;
+          formProps: {
+            placeHolder: "Enter Bearing",
+            onSave: async (selectedRows, value) => {
+              await wait(1000);
+              selectedRows.forEach((row) => (row["bearing2"] = value));
+              return true;
+            },
           },
         },
-      }),*/
+      }),
     ],
     [],
   );
@@ -94,9 +83,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, bearing: 1.234 },
-        { id: 1001, bearing: 1.565 },
-        { id: 1002, bearing: null },
+        { id: 1000, bearing1: 1.234, bearing2: 90 },
+        { id: 1001, bearing1: 1.565, bearing2: 240 },
+        { id: 1002, bearing1: null, bearing2: 355.1 },
       ] as ITestRow[],
     [],
   );
