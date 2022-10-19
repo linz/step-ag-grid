@@ -7,7 +7,7 @@ import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { GridSelectHeader } from "./GridSelectHeader";
@@ -34,7 +34,7 @@ export interface GridProps {
  */
 export const Grid = (params: GridProps): JSX.Element => {
   const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
-    useContext(AgGridContext);
+    useContext(GridContext);
   const { checkUpdating } = useContext(UpdatingContext);
 
   const lastSelectedIds = useRef<number[]>([]);

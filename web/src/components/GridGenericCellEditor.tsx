@@ -2,7 +2,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
 import { MutableRefObject, useCallback, useContext, useRef, useState } from "react";
 import { BaseGridRow } from "./Grid";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
@@ -50,7 +50,7 @@ export interface GridGenericCellEditorFormContextParams {
 export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
-  const { updatingCells } = useContext(AgGridContext);
+  const { updatingCells } = useContext(GridContext);
   const cellEditorParamsRef = useRef<ICellEditorParams>({} as ICellEditorParams);
   const saveRef = useRef<SaveFn>(async () => {
     return false;

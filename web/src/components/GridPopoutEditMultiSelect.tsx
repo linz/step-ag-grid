@@ -7,7 +7,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 
@@ -65,7 +65,7 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseGridRow, Value
   const { cellEditorParams, field } = props.colDef;
   const { multiEdit } = cellEditorParams;
 
-  const { updatingCells } = useContext(AgGridContext);
+  const { updatingCells } = useContext(GridContext);
 
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("");

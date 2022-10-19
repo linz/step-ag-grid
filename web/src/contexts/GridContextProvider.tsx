@@ -1,11 +1,11 @@
 import { ReactElement, ReactNode, useContext, useRef } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
-import { AgGridContext } from "./AgGridContext";
+import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty } from "../utils/util";
 import { UpdatingContext } from "./UpdatingContext";
 
-interface AgGridContextProps {
+interface GridContextProps {
   children: ReactNode;
 }
 
@@ -14,7 +14,7 @@ interface AgGridContextProps {
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = (props: AgGridContextProps): ReactElement => {
+export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(UpdatingContext);
   const gridApiRef = useRef<GridApi>();
   const idsBeforeUpdate = useRef<number[]>([]);
@@ -262,7 +262,7 @@ export const GridContextProvider = (props: AgGridContextProps): ReactElement => 
   };
 
   return (
-    <AgGridContext.Provider
+    <GridContext.Provider
       value={{
         gridReady,
         setGridApi,
@@ -283,6 +283,6 @@ export const GridContextProvider = (props: AgGridContextProps): ReactElement => 
       }}
     >
       {props.children}
-    </AgGridContext.Provider>
+    </GridContext.Provider>
   );
 };

@@ -7,11 +7,11 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
 import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
 import { GridFormEditBearing } from "../../components/GridFormEditBearing";
+import { GridGenericCellRendererComponent } from "../../components/GridGenericCellRenderer";
+import { bearingValueFormatter } from "../../utils/bearing";
 
 export default {
   title: "Components / Grids",
@@ -53,6 +53,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Bearing GCE",
         initialWidth: 65,
         maxWidth: 150,
+        valueFormatter: bearingValueFormatter,
+        cellRenderer: GridGenericCellRendererComponent,
         cellRendererParams: {
           warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
           info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",

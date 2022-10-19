@@ -9,7 +9,7 @@ import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { LuiIcon } from "@linzjs/lui";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 import { GridLoadableCell } from "./GridLoadableCell";
 
@@ -77,7 +77,7 @@ export const GridPopoutMenuComponent = <RowType extends BaseGridRow>(
   const { cellEditorParams } = props.colDef;
   const field = props.colDef.field ?? "";
 
-  const { updatingCells } = useContext(AgGridContext);
+  const { updatingCells } = useContext(GridContext);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MenuOption<RowType>[]>();
 

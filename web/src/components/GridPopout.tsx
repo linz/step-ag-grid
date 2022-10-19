@@ -2,7 +2,7 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { ControlledMenu } from "@szhsin/react-menu";
 import { useContext, useEffect, useRef, useState } from "react";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { ICellEditorParams } from "ag-grid-community";
 
 export interface GridPopoutCellEditorParams {
@@ -13,7 +13,7 @@ export interface GridPopoutCellEditorParams {
 export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopoutCellEditorParams) => {
   const { eGridCell } = props;
   const { children, canClose } = params;
-  const { stopEditing } = useContext(AgGridContext);
+  const { stopEditing } = useContext(GridContext);
   const anchorRef = useRef(eGridCell);
   anchorRef.current = eGridCell;
   const [isOpen, setOpen] = useState(false);

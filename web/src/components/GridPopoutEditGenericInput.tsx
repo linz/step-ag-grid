@@ -5,7 +5,7 @@ import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
@@ -64,7 +64,7 @@ export const GridPopoutEditGenericInputComp = <RowType extends BaseGridRow>(
   const formatter = cellEditorParams.formatter ?? (() => "[Missing formatter]");
   const field = props.colDef.field;
 
-  const { updatingCells } = useContext(AgGridContext);
+  const { updatingCells } = useContext(GridContext);
 
   const sanitiseValue = (v: number): string => {
     return v != null ? `${v}` : "";

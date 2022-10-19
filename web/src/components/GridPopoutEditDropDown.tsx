@@ -7,7 +7,7 @@ import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } f
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 
@@ -65,7 +65,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseGridRow, ValueTyp
   const { cellEditorParams, field } = props.colDef;
   const { multiEdit } = cellEditorParams;
 
-  const { updatingCells, stopEditing } = useContext(AgGridContext);
+  const { updatingCells, stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);

@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { GridApi } from "ag-grid-community";
 
-export interface AgGridContextType {
+export interface GridContextType {
   gridReady: () => boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
@@ -24,7 +24,7 @@ export interface AgGridContextType {
   ) => Promise<boolean>;
 }
 
-export const AgGridContext = createContext<AgGridContextType>({
+export const GridContext = createContext<GridContextType>({
   gridReady: () => {
     console.error("no context provider for gridReady");
     return false;
