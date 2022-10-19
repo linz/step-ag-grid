@@ -12,6 +12,7 @@ import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridPopoutEditMultiSelect, MultiSelectResult } from "../../components/GridPopoutEditMultiSelect";
 import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
+import { GridGenericCell } from "../../components/GridGenericCellRenderer";
 
 export default {
   title: "Components / Grids",
@@ -53,12 +54,12 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   const columnDefs = useMemo(
     () =>
       [
-        {
+        GridGenericCell({
           field: "id",
           headerName: "Id",
           initialWidth: 65,
           maxWidth: 85,
-        },
+        }),
         GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,

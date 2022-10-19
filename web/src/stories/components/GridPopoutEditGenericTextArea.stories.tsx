@@ -9,7 +9,8 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
 import { IFormTestRow } from "./FormTest";
-import { FormTextArea } from "./FormTextArea";
+import { GridFormTextArea } from "../../components/GridFormTextArea";
+import { GridGenericCell } from "../../components/GridGenericCellRenderer";
 
 export default {
   title: "Components / Grids",
@@ -35,19 +36,24 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      {
+      GridGenericCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
-      },
+      }),
       GridGenericCellEditor({
         field: "name",
         headerName: "Popout Generic Edit",
         maxWidth: 140,
         cellEditorParams: {
-          form: FormTextArea,
-          formProps: {},
+          form: GridFormTextArea,
+          formProps: {
+            required: true,
+            maxlength: 32,
+            placeholder: "Enter some text...",
+            width: 260,
+          },
           multiEdit: true,
         },
       }),

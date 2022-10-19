@@ -10,6 +10,7 @@ import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../.
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
+import { GridGenericCell } from "../../components/GridGenericCellRenderer";
 
 export default {
   title: "Components / Grids",
@@ -61,12 +62,12 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
   const columnDefs = useMemo(
     () =>
       [
-        {
+        GridGenericCell({
           field: "id",
           headerName: "Id",
           initialWidth: 65,
           maxWidth: 85,
-        },
+        }),
         GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,
