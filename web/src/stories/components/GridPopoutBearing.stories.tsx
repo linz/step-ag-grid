@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
 import { wait } from "../../utils/util";
+import { GridGenericCell } from "../../components/GridGenericCellRenderer";
 
 export default {
   title: "Components / Grids",
@@ -40,12 +41,12 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      {
+      GridGenericCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
-      },
+      }),
       GridPopoutEditBearing<ITestRow>({
         field: "bearing1",
         headerName: "Bearing GCE",
