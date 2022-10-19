@@ -150,6 +150,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      quickFilter={true}
+      quickFilterPlaceholder={"Quick filter..."}
     />
   );
 };

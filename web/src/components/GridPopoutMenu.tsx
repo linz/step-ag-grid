@@ -32,6 +32,7 @@ export interface MenuOption<RowType> {
 export const GridPopoutMenu = <RowType extends BaseGridRow>(props: GridDropDownColDef<RowType>): ColDef => ({
   ...props,
   editable: props.editable != null ? props.editable : true,
+  sortable: false,
   maxWidth: 64,
   cellRenderer: GridPopoutCellRenderer,
   cellRendererParams: {

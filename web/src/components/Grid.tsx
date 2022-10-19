@@ -1,4 +1,4 @@
-import "./GridStyles.scss";
+import "./Grid.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -17,8 +17,11 @@ import { GridGenericCell } from "./GridGenericCellRenderer";
 export interface BaseGridRow {
   id: string | number;
 }
+
 export interface GridProps {
   dataTestId?: string;
+  quickFilter?: boolean;
+  quickFilterPlaceholder?: string;
   quickFilterValue?: string;
   externalSelectedItems: any[];
   setExternalSelectedItems: (items: any[]) => void;
@@ -37,6 +40,7 @@ export const Grid = (params: GridProps): JSX.Element => {
     useContext(GridContext);
   const { checkUpdating } = useContext(UpdatingContext);
 
+  const [internalQuickFilter, setInternalQuickFilter] = useState("");
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
@@ -84,9 +88,13 @@ export const Grid = (params: GridProps): JSX.Element => {
    */
   const updateQuickFilter = useCallback(() => {
     if (!gridReady()) return;
+    if (params.quickFilter) {
+      setQuickFilter(internalQuickFilter);
+      return;
+    }
     if (params.quickFilterValue == null) return;
     setQuickFilter(params.quickFilterValue);
-  }, [gridReady, params.quickFilterValue, setQuickFilter]);
+  }, [gridReady, internalQuickFilter, params.quickFilter, params.quickFilterValue, setQuickFilter]);
 
   /**
    * Synchronise quick filter to grid
@@ -205,6 +213,20 @@ export const Grid = (params: GridProps): JSX.Element => {
       data-testid={params.dataTestId}
       className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
     >
+      {params.quickFilter && (
+        <div className="Grid-quickFilter">
+          <input
+            aria-label="Search"
+            className="lui-margin-top-xxs lui-margin-bottom-xxs Grid-quickFilterBox"
+            type="text"
+            placeholder={params.quickFilterPlaceholder ?? "Search..."}
+            value={internalQuickFilter}
+            onChange={(event): void => {
+              setInternalQuickFilter(event.target.value);
+            }}
+          />
+        </div>
+      )}
       <AgGridReact
         getRowId={(params) => `${params.data.id}`}
         suppressRowClickSelection={true}
