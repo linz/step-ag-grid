@@ -1,9 +1,9 @@
 import "./FormTest.scss";
 
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { CellEditorContext } from "../../contexts/CellEditorContext";
+import { GridGenericCellEditorFormContextParams } from "../../components/GridGenericCellEditor";
 
 export interface IFormTestRow {
   id: number;
@@ -13,8 +13,8 @@ export interface IFormTestRow {
   plan: string;
 }
 
-export const FormTest = (): JSX.Element => {
-  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
+export const FormTest = (props: unknown): JSX.Element => {
+  const { saveRef, cellEditorParamsRef } = props as any as GridGenericCellEditorFormContextParams;
   saveRef.current = useCallback(async (): Promise<boolean> => {
     return true;
   }, []);

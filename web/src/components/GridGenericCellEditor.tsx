@@ -1,14 +1,14 @@
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useState } from "react";
+import { MutableRefObject, useCallback, useContext, useRef, useState } from "react";
 import { BaseGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
-import { CellEditorContextProvider } from "../contexts/CellEditorContextProvider";
-import { CellEditorContext } from "../contexts/CellEditorContext";
+
+type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
 export interface GenericCellEditorParams<FormProps extends Record<string, any>> {
   multiEdit: boolean;
@@ -41,19 +41,20 @@ interface GenericCellEditorICellEditorParams<RowType extends BaseGridRow, FormPr
   colDef: GenericCellEditorColDef<RowType, FormProps>;
 }
 
-export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
-  props: GenericCellEditorICellEditorParams<RowType, FormProps>,
-) => (
-  <CellEditorContextProvider>
-    <GenericCellEditorComponent2 {...props} />
-  </CellEditorContextProvider>
-);
+export interface GridGenericCellEditorFormContextParams {
+  cellEditorParamsRef: MutableRefObject<ICellEditorParams>;
+  saveRef: MutableRefObject<SaveFn>;
+  triggerSave: () => Promise<void>;
+}
 
-export const GenericCellEditorComponent2 = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
+export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
   const { updatingCells } = useContext(AgGridContext);
-  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
+  const cellEditorParamsRef = useRef<ICellEditorParams>({} as ICellEditorParams);
+  const saveRef = useRef<SaveFn>(async () => {
+    return false;
+  });
 
   cellEditorParamsRef.current = props;
 
@@ -72,7 +73,14 @@ export const GenericCellEditorComponent2 = <RowType extends BaseGridRow, FormPro
   const children = (
     <ComponentLoadingWrapper saving={saving}>
       <FocusableItem>
-        {({ ref }: any) => <cellEditorParams.form {...props.colDef.cellEditorParams.formProps} />}
+        {({ ref }: any) => (
+          <cellEditorParams.form
+            {...props.colDef.cellEditorParams.formProps}
+            saveRef={saveRef}
+            cellEditorParamsRef={cellEditorParamsRef}
+            triggerSave={updateValue}
+          />
+        )}
       </FocusableItem>
     </ComponentLoadingWrapper>
   );

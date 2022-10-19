@@ -10,6 +10,8 @@ import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider"
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
+import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
+import { GridFormEditBearing } from "../../components/GridFormEditBearing";
 
 export default {
   title: "Components / Grids",
@@ -46,9 +48,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       },
-      GridPopoutEditBearing({
+      GridGenericCellEditor({
         field: "bearing",
-        headerName: "Bearing",
+        headerName: "Bearing GCE",
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
@@ -56,11 +58,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
         },
         cellEditorParams: {
-          placeHolder: "Enter Bearing",
           multiEdit: false,
+          form: GridFormEditBearing,
+          formProps: {
+            placeHolder: "Enter Bearing",
+          },
         },
       }),
-      GridPopoutEditBearing<ITestRow, number | null>({
+      /*GridPopoutEditBearing<ITestRow, number | null>({
         field: "bearing",
         headerName: "Bearing callback",
         initialWidth: 65,
@@ -79,7 +84,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             return true;
           },
         },
-      }),
+      }),*/
     ],
     [],
   );

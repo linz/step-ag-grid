@@ -2,7 +2,7 @@ import "./GridPopoutEditGenericInput.scss";
 
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridPopoutComponent } from "./GridPopout";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
 import { AgGridContext } from "../contexts/AgGridContext";
@@ -59,8 +59,8 @@ export const GridPopoutEditGenericInputComp = <RowType extends BaseGridRow>(
   const { data } = props;
   const { cellEditorParams } = props.colDef;
   const { multiEdit } = cellEditorParams;
-  const validator = cellEditorParams.validator ?? (() => "No validator");
-  const parser = cellEditorParams.parser ?? (() => null);
+  const validator = useMemo(() => cellEditorParams.validator ?? (() => "No validator"), [cellEditorParams.validator]);
+  const parser = useMemo(() => cellEditorParams.parser ?? (() => null), [cellEditorParams.parser]);
   const formatter = cellEditorParams.formatter ?? (() => "[Missing formatter]");
   const field = props.colDef.field;
 
@@ -100,7 +100,7 @@ export const GridPopoutEditGenericInputComp = <RowType extends BaseGridRow>(
         setSaving,
       );
     },
-    [cellEditorParams, data, field, multiEdit, saving, updatingCells],
+    [cellEditorParams, data, field, multiEdit, parser, saving, updatingCells, validator],
   );
   const children = (
     <ComponentLoadingWrapper saving={saving}>

@@ -1,12 +1,12 @@
-import { useCallback, useContext } from "react";
-import { CellEditorContext } from "../../contexts/CellEditorContext";
+import { useCallback } from "react";
+import { GridGenericCellEditorFormContextParams } from "../../components/GridGenericCellEditor";
 
 export interface FormMessageProps {
   a: string;
 }
 
 export const FormMessage = (props: FormMessageProps): JSX.Element => {
-  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
+  const { saveRef, cellEditorParamsRef } = props as any as GridGenericCellEditorFormContextParams;
   saveRef.current = useCallback(async (): Promise<boolean> => {
     return true;
   }, []);

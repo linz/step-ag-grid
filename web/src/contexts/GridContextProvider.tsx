@@ -254,6 +254,7 @@ export const GridContextProvider = (props: AgGridContextProps): ReactElement => 
         }
         // This is needed to trigger postSortRowsHook
         gridApi.refreshClientSideRowModel();
+        stopEditing();
       }
       setSaving && setSaving(false);
       return ok;
