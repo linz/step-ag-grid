@@ -11,8 +11,9 @@ import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
 import { GridGenericCell } from "../../components/GridGenericCellRenderer";
-import { FormMessage } from "./FormMessage";
+import { GridFormMessage } from "../../components/GridFormMessage";
 import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
+import { GridPopupMessage } from "../../components/GridPopupMessage";
 
 export default {
   title: "Components / Grids",
@@ -74,21 +75,16 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridGenericCellEditor({
-        field: "dd",
+      GridPopupMessage<ITestRow>({
         headerName: "Popout message",
-        maxWidth: 140,
-        cellRendererParams: {
-          singleClickEdit: true,
-          info: () => "I do popups",
-        },
-        cellEditorParams: {
-          form: FormMessage,
-          formProps: {
-            a: "x",
+        cellRenderer: () => <>Click me!</>,
+        formProps: {
+          message: async (selectedRows: ITestRow[]) => {
+            await wait(1000);
+            return `There are ${selectedRows.length} row(s) selected`;
           },
-          multiEdit: false,
         },
+        multiEdit: false,
       }),
       GridPopoutMenu<ITestRow>({
         field: "menu",

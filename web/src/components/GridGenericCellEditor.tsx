@@ -17,7 +17,6 @@ export interface GenericCellEditorParams<FormProps extends Record<string, any>> 
 }
 
 export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
-  field: string;
   cellEditorParams: GenericCellEditorParams<FormProps>;
   cellRendererParams?: GenericCellRendererParams;
 }
@@ -28,9 +27,9 @@ export interface GenericCellEditorColDef<RowType, FormProps extends Record<strin
 export const GridGenericCellEditor = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => ({
+  cellRenderer: GridGenericCellRendererComponent,
   ...props,
   editable: props.editable ?? true,
-  cellRenderer: GridGenericCellRendererComponent,
   cellEditor: GenericCellEditorComponent,
   cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
 });
