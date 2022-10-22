@@ -11,9 +11,9 @@ import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
 import { GridGenericCell } from "../../components/GridGenericCellRenderer";
-import { GridFormMessage } from "../../components/GridFormMessage";
+import { GridFormMessage } from "../../components/gridForm/GridFormMessage";
 import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
-import { GridPopupMessage } from "../../components/GridPopupMessage";
+import { GridPopupMessage } from "../../components/gridPopoutEdit/GridPopupMessage";
 
 export default {
   title: "Components / Grids",

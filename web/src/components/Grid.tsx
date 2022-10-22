@@ -12,7 +12,6 @@ import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
 import { GridSelectHeader } from "./GridSelectHeader";
 import { UpdatingContext } from "../contexts/UpdatingContext";
-import { GridGenericCell } from "./GridGenericCellRenderer";
 
 export interface BaseGridRow {
   id: string | number;
@@ -183,7 +182,16 @@ export const Grid = (params: GridProps): JSX.Element => {
     [checkUpdating],
   );
 
-  const singleClickEdit = useCallback(
+  const onCellDoubleClick = useCallback(
+    (event: CellEvent) => {
+      if (!event.colDef?.cellRendererParams?.singleClickEdit) {
+        startCellEditing(event);
+      }
+    },
+    [startCellEditing],
+  );
+
+  const onCellClicked = useCallback(
     (event: CellEvent) => {
       if (event.colDef?.cellRendererParams?.singleClickEdit) {
         startCellEditing(event);
@@ -205,8 +213,6 @@ export const Grid = (params: GridProps): JSX.Element => {
     },
     [refreshSelectedRows],
   );
-
-  const defaultColDef = useMemo(() => GridGenericCell(params.defaultColDef), [params.defaultColDef]);
 
   return (
     <div
@@ -237,12 +243,11 @@ export const Grid = (params: GridProps): JSX.Element => {
         onGridSizeChanged={sizeColumnsToFit}
         suppressClickEdit={true}
         onCellKeyDown={onCellKeyDown}
-        onCellClicked={singleClickEdit}
-        onCellDoubleClicked={startCellEditing}
+        onCellClicked={onCellClicked}
+        onCellDoubleClicked={onCellDoubleClick}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}

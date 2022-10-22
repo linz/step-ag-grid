@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { wait } from "../utils/util";
-import { GridGenericCellEditorFormContextParams } from "./GridGenericCellEditor";
-import { TextAreaInput } from "../lui/TextArea";
+import { wait } from "../../utils/util";
+import { GridGenericCellEditorFormContextParams } from "../GridGenericCellEditor";
+import { TextAreaInput } from "../../lui/TextArea";
 
 interface FormTextAreaProps {
   placeholder?: string;

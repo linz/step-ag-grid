@@ -4,7 +4,7 @@ import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
 import { bearingValueFormatter } from "../utils/bearing";
 import { GridGenericCellEditor } from "./GridGenericCellEditor";
-import { GridFormEditBearing, GridFormEditBearingProps } from "./GridFormEditBearing";
+import { GridFormEditBearing, GridFormEditBearingProps } from "./gridForm/GridFormEditBearing";
 import { BaseGridRow } from "./Grid";
 
 interface ICellEditorParams<RowType extends BaseGridRow> {

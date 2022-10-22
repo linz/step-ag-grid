@@ -1,9 +1,9 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { GridGenericCellEditorFormContextParams } from "./GridGenericCellEditor";
+import { GridGenericCellEditorFormContextParams } from "../GridGenericCellEditor";
 import { ICellEditorParams } from "ag-grid-community";
-import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { BaseGridRow } from "./Grid";
-import { GridContext } from "../contexts/GridContext";
+import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
+import { BaseGridRow } from "../Grid";
+import { GridContext } from "../../contexts/GridContext";
 
 export interface GridFormMessageProps<RowType extends BaseGridRow> {
   message: (
@@ -25,7 +25,7 @@ export const GridFormMessage = <RowType extends BaseGridRow>(props: GridFormMess
     (async () => {
       setMessage(await props.message(getSelectedRows(), cellEditorParamsRef.current));
     })().then();
-  }, [cellEditorParamsRef, props]);
+  }, [cellEditorParamsRef, getSelectedRows, props]);
 
   return (
     <ComponentLoadingWrapper loading={message === null}>

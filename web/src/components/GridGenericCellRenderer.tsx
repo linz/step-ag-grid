@@ -11,7 +11,7 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
  * Generic read only cell.
  */
 export const GridGenericCell = (props: GenericCellRendererColDef | undefined): ColDef => ({
-  sortable: true,
+  sortable: !!(props?.field || props?.valueGetter),
   resizable: true,
   cellRenderer: props?.cellRenderer ?? GridGenericCellRendererComponent,
   ...props,

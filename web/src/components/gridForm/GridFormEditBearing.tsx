@@ -1,10 +1,10 @@
 import "./GridFormEditBearing.scss";
 
 import { useCallback, useState } from "react";
-import { BaseGridRow } from "./Grid";
-import { TextInputFormatted } from "../lui/TextInputFormatted";
-import { GridGenericCellEditorFormContextParams } from "./GridGenericCellEditor";
-import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../utils/bearing";
+import { BaseGridRow } from "../Grid";
+import { TextInputFormatted } from "../../lui/TextInputFormatted";
+import { GridGenericCellEditorFormContextParams } from "../GridGenericCellEditor";
+import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
 
 export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
   placeHolder: string;
