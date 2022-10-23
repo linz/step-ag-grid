@@ -9,9 +9,9 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutMenu } from "../../components/gridPopupEdit/GridPopoutMenu";
-import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
-import { GridPopoverMessage } from "../../components/gridPopupEdit/GridPopoverMessage";
+import { GridPopoutMenu } from "../../components/gridPopoverEdit/GridPopoutMenu";
+import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
+import { GridCell } from "../../components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -45,13 +45,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      GridGenericCell({
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridGenericCell({
+      GridCell({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
@@ -61,13 +61,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           info: (props: ICellRendererParams) => props.value === "Developer" && "Developers are awesome",
         },
       }),
-      GridGenericCell({
+      GridCell({
         field: "age",
         headerName: "Age",
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridGenericCell({
+      GridCell({
         field: "desc",
         headerName: "Description",
         initialWidth: 150,

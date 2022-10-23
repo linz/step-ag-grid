@@ -2,7 +2,7 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
+import { GridPopoverComponent } from "./gridPopoverEdit/GridPopover";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
@@ -213,5 +213,5 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseGridRow, ValueTyp
       </ComponentLoadingWrapper>
     </>
   );
-  return GridPopoutComponent(props, { children });
+  return GridPopoverComponent(props, { children });
 };

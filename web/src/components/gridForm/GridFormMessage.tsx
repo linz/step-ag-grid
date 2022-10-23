@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { GridGenericCellEditorFormContextParams } from "../GridGenericCellEditor";
+import { GridGenericCellEditorFormContextParams } from "../GridCell";
 import { ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { BaseGridRow } from "../Grid";

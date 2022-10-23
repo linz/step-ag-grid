@@ -1,7 +1,7 @@
 import { BaseGridRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
-import { GridGenericCellEditorFormContextParams } from "../GridGenericCellEditor";
+import { GridGenericCellEditorFormContextParams } from "../GridCell";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
 

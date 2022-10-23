@@ -7,16 +7,6 @@ import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 
-/**
- * Generic read only cell.
- */
-export const GridGenericCell = (props: GenericCellRendererColDef | undefined): ColDef => ({
-  sortable: !!(props?.field || props?.valueGetter),
-  resizable: true,
-  cellRenderer: props?.cellRenderer ?? GridGenericCellRendererComponent,
-  ...props,
-});
-
 interface GenericCellComponentParams extends ICellRendererParams {
   colDef: GenericCellRendererColDef;
 }

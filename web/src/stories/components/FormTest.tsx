@@ -3,7 +3,7 @@ import "./FormTest.scss";
 import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { GridGenericCellEditorFormContextParams } from "../../components/GridGenericCellEditor";
+import { GridGenericCellEditorFormContextParams } from "../../components/GridCell";
 
 export interface IFormTestRow {
   id: number;

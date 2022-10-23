@@ -1,17 +1,17 @@
 import { useCallback, useState } from "react";
 import { wait } from "../../utils/util";
 import { GridGenericCellEditorFormContextParams } from "../GridCell";
-import { TextAreaInput } from "../../lui/TextArea";
+import { TextInputFormatted } from "../../lui/TextInputFormatted";
 
-interface FormTextAreaProps {
+interface GridFormTextInputProps {
   placeholder?: string;
   required?: boolean;
   maxlength?: number;
   width?: string | number;
 }
 
-export const GridFormTextArea = (props: FormTextAreaProps): JSX.Element => {
-  const { saveRef, cellEditorParamsRef } = props as any as GridGenericCellEditorFormContextParams;
+export const GridFormTextInput = (props: GridFormTextInputProps): JSX.Element => {
+  const { saveRef, cellEditorParamsRef, triggerSave } = props as any as GridGenericCellEditorFormContextParams;
   saveRef.current = useCallback(async (): Promise<boolean> => {
     return true;
   }, []);
@@ -45,11 +45,20 @@ export const GridFormTextArea = (props: FormTextAreaProps): JSX.Element => {
 
   return (
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
-      <TextAreaInput
+      <TextInputFormatted
         value={text}
         onChange={(e) => setText(e.target.value)}
         error={invalid()}
-        inputProps={{ placeholder: props.placeholder }}
+        formatted={""}
+        inputProps={{
+          style: { width: "100%" },
+          placeholder: props.placeholder,
+          onKeyDown: async (e) => {
+            if (e.key === "Enter") {
+              triggerSave().then();
+            }
+          },
+        }}
       />
     </div>
   );

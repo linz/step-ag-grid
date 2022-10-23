@@ -7,10 +7,10 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
+import { GridCell } from "../../components/GridCell";
 import { IFormTestRow } from "./FormTest";
 import { GridFormTextArea } from "../../components/gridForm/GridFormTextArea";
-import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
+import { GridFormTextInput } from "../../components/gridForm/GridFormTextInput";
 
 export default {
   title: "Components / Grids",
@@ -36,15 +36,30 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      GridGenericCell({
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridGenericCellEditor({
+      GridCell({
         field: "name",
-        headerName: "Popout Generic Edit",
+        headerName: "Text input",
+        maxWidth: 140,
+        cellEditorParams: {
+          form: GridFormTextInput,
+          formProps: {
+            required: true,
+            maxlength: 12,
+            placeholder: "Enter some text...",
+            width: 240,
+          },
+          multiEdit: false,
+        },
+      }),
+      GridCell({
+        field: "name",
+        headerName: "Text area",
         maxWidth: 140,
         cellEditorParams: {
           form: GridFormTextArea,

@@ -7,9 +7,9 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GridPopoverEditBearing } from "../../components/gridPopupEdit/GridPopoverEditBearing";
+import { GridPopoverEditBearing } from "../../components/gridPopoverEdit/GridPopoverEditBearing";
 import { wait } from "../../utils/util";
-import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
+import { GridCell } from "../../components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -41,7 +41,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      GridGenericCell({
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,

@@ -1,18 +1,16 @@
-import "../GridPopoutEditGenericInput.scss";
-
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GenericCellRendererColDef, GridGenericCellRendererComponent } from "../gridRender/GridRenderGenericCell";
 import { bearingValueFormatter } from "../../utils/bearing";
-import { GridGenericCellEditor } from "../GridGenericCellEditor";
+import { GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { BaseGridRow } from "../Grid";
-import { GridPopupProps } from "./GridPopupProps";
+import { GridPopupProps } from "./GridPopover";
 
 export const GridPopoverEditBearing = <RowType extends BaseGridRow>(
   colDef: GenericCellRendererColDef,
   props: GridPopupProps<RowType, GridFormEditBearingProps<RowType>>,
 ) =>
-  GridGenericCellEditor({
+  GridCell({
     initialWidth: 65,
     maxWidth: 150,
     valueFormatter: bearingValueFormatter,

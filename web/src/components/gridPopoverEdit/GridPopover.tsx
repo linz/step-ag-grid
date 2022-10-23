@@ -2,15 +2,21 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { ControlledMenu } from "@szhsin/react-menu";
 import { useContext, useEffect, useRef, useState } from "react";
-import { GridContext } from "../contexts/GridContext";
+import { GridContext } from "../../contexts/GridContext";
 import { ICellEditorParams } from "ag-grid-community";
+import { BaseGridRow } from "../Grid";
 
 export interface GridPopoutCellEditorParams {
   canClose?: () => Promise<boolean> | boolean;
   children: JSX.Element;
 }
 
-export const GridPopoutComponent = (props: ICellEditorParams, params: GridPopoutCellEditorParams) => {
+export interface GridPopupProps<RowType extends BaseGridRow, GridFormProps> {
+  formProps: GridFormProps;
+  multiEdit: boolean;
+}
+
+export const GridPopoverComponent = (props: ICellEditorParams, params: GridPopoutCellEditorParams) => {
   const { eGridCell } = props;
   const { children, canClose } = params;
   const { stopEditing } = useContext(GridContext);

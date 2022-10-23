@@ -1,5 +1,5 @@
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
+import { GridPopoverComponent } from "./gridPopoverEdit/GridPopover";
 import { MutableRefObject, useCallback, useContext, useRef, useState } from "react";
 import { BaseGridRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
@@ -17,22 +17,32 @@ export interface GenericCellEditorParams<FormProps extends Record<string, any>> 
 }
 
 export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
-  cellEditorParams: GenericCellEditorParams<FormProps>;
+  cellEditorParams?: GenericCellEditorParams<FormProps>;
   cellRendererParams?: GenericCellRendererParams;
 }
 
 /**
  * For editing a text area.
  */
-export const GridGenericCellEditor = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
+export const GridCell = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
-): ColDef => ({
-  cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
-  ...props,
-  editable: props.editable ?? true,
-  cellEditor: GenericCellEditorComponent,
-  cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-});
+): ColDef =>
+  props.cellEditorParams
+    ? {
+        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
+        ...props,
+        editable: props.editable ?? true,
+        sortable: !!(props?.field || props?.valueGetter),
+        resizable: true,
+        cellEditor: GenericCellEditorComponent,
+        cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      }
+    : {
+        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
+        sortable: !!(props?.field || props?.valueGetter),
+        resizable: true,
+        ...props,
+      };
 
 interface GenericCellEditorICellEditorParams<RowType extends BaseGridRow, FormProps extends Record<string, any>>
   extends ICellEditorParams {
@@ -59,7 +69,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   const { data } = props;
   const { cellEditorParams } = props.colDef;
-  const { multiEdit } = cellEditorParams;
+  const multiEdit = cellEditorParams?.multiEdit ?? false;
   const field = props.colDef.field ?? "";
 
   const [saving, setSaving] = useState(false);
@@ -69,12 +79,14 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
     return await updatingCells({ data, multiEdit, field }, saveRef.current, setSaving);
   }, [data, field, multiEdit, saveRef, saving, updatingCells]);
 
+  if (cellEditorParams == null) return <></>;
+
   const children = (
     <ComponentLoadingWrapper saving={saving}>
       <FocusableItem>
         {({ ref }: any) => (
           <cellEditorParams.form
-            {...props.colDef.cellEditorParams.formProps}
+            {...cellEditorParams.formProps}
             saveRef={saveRef}
             cellEditorParamsRef={cellEditorParamsRef}
             triggerSave={updateValue}
@@ -83,5 +95,5 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
       </FocusableItem>
     </ComponentLoadingWrapper>
   );
-  return GridPopoutComponent(props, { children, canClose: updateValue });
+  return GridPopoverComponent(props, { children, canClose: updateValue });
 };
