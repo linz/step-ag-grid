@@ -2,12 +2,12 @@ import "./GridPopoutMenu.scss";
 import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef } from "ag-grid-community";
-import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseGridRow } from "./Grid";
-import { GridGenericCellEditor } from "./GridGenericCellEditor";
-import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "./gridForm/GridFormPopoutMenu";
-import { GridRenderPopoutMenuCell } from "./gridRender/GridRenderPopoutMenuCell";
-import { GridPopupProps } from "./gridPopupEdit/GridPopupProps";
+import { GenericMultiEditCellClass } from "../GenericCellClass";
+import { BaseGridRow } from "../Grid";
+import { GridGenericCellEditor } from "../GridGenericCellEditor";
+import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
+import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
+import { GridPopupProps } from "./GridPopupProps";
 
 /**
  * Popout burger menu

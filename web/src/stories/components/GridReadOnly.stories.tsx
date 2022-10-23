@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutMenu } from "../../components/GridPopoutMenu";
+import { GridPopoutMenu } from "../../components/gridPopupEdit/GridPopoutMenu";
 import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
 import { GridPopoverMessage } from "../../components/gridPopupEdit/GridPopoverMessage";
 

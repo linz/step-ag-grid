@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
  * If you have partial select then clicking the header checkbox will select all,
  * but we want to deselect all on partial select.
  */
-export const GridSelectHeader = ({ api }: IHeaderParams) => {
+export const GridHeaderSelect = ({ api }: IHeaderParams) => {
   // This is used to force an update on selection change
   const [updateCounter, setUpdateCounter] = useState(0);
   const selectedNodeCount = api.getSelectedRows().length;

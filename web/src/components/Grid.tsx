@@ -10,7 +10,7 @@ import { difference, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
-import { GridSelectHeader } from "./GridSelectHeader";
+import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 
 export interface BaseGridRow {
@@ -119,7 +119,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         maxWidth: 35,
         suppressSizeToFit: true,
         checkboxSelection: true,
-        headerComponent: GridSelectHeader,
+        headerComponent: GridHeaderSelect,
         onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
       },
       ...(params.columnDefs as ColDef[]),
