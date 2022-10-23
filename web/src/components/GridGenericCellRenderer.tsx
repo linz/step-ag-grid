@@ -48,7 +48,7 @@ export const GridGenericCellRendererComponent = (props: GenericCellComponentPara
   const formatted = formatter(props as ValueFormatterParams);
 
   return (
-    <GridLoadableCell isLoading={checkUpdating(props.colDef?.field ?? "", props.data.id)}>
+    <GridLoadableCell isLoading={checkUpdating(props.colDef?.field ?? props.colDef?.colId ?? "", props.data.id)}>
       <>
         {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
         {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}

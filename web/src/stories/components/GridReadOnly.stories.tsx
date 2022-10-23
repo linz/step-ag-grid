@@ -11,8 +11,6 @@ import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
 import { GridGenericCell } from "../../components/GridGenericCellRenderer";
-import { GridFormMessage } from "../../components/gridForm/GridFormMessage";
-import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
 import { GridPopupMessage } from "../../components/gridPopoutEdit/GridPopupMessage";
 
 export default {
@@ -75,57 +73,69 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopupMessage<ITestRow>({
-        headerName: "Popout message",
-        cellRenderer: () => <>Click me!</>,
-        formProps: {
-          message: async (selectedRows: ITestRow[]) => {
-            await wait(1000);
-            return `There are ${selectedRows.length} row(s) selected`;
-          },
+      GridPopupMessage<ITestRow>(
+        {
+          headerName: "Popout message",
+          cellRenderer: () => <>Click me!</>,
         },
-        multiEdit: false,
-      }),
-      GridPopoutMenu<ITestRow>({
-        field: "menu",
-        headerName: "Menu",
-        cellEditorParams: {
-          options: async () => {
-            // Just doing a timeout here to demonstrate deferred loading
-            await wait(500);
-            return [
-              {
-                label: "Single edit",
-                action: async (selectedRows) => {
-                  alert(`Single-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+        {
+          formProps: {
+            message: async (selectedRows: ITestRow[]) => {
+              await wait(1000);
+              return `There are ${selectedRows.length} row(s) selected`;
+            },
+          },
+          multiEdit: false,
+        },
+      ),
+      GridPopoutMenu<ITestRow>(
+        {
+          headerName: "Menu",
+        },
+        {
+          multiEdit: true, // TODO should be undefined
+          formProps: {
+            options: async () => {
+              // Just doing a timeout here to demonstrate deferred loading
+              await wait(500);
+              return [
+                {
+                  label: "Single edit",
+                  action: async (selectedRows) => {
+                    alert(`Single-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  multiEdit: false,
                 },
-                multiEdit: false,
-              },
-              {
-                label: "Multi-edit",
-                action: async (selectedRows) => {
-                  alert(`Multi-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+                {
+                  label: "Multi-edit",
+                  action: async (selectedRows) => {
+                    alert(`Multi-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  multiEdit: true,
                 },
-                multiEdit: true,
-              },
-            ];
+              ];
+            },
           },
         },
-      }),
-      GridPopoutMenu<ITestRow>({
-        field: "menu",
-        headerName: "Menu disabled",
-        editable: false,
-        cellEditorParams: {
-          options: async () => {
-            return [];
+      ),
+      GridPopoutMenu<ITestRow>(
+        {
+          headerName: "Menu disabled",
+          editable: false,
+        },
+        {
+          multiEdit: false, // TODO should be undefined
+          formProps: {
+            options: async () => {
+              return [];
+            },
           },
         },
-      }),
+      ),
     ],
     [],
   );
