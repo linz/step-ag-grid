@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { GridGenericCellEditor } from "../../components/GridGenericCellEditor";
 import { FormTest, IFormTestRow } from "./FormTest";
-import { GridGenericCell } from "../../components/GridGenericCellRenderer";
+import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
 
 export default {
   title: "Components / Grids",

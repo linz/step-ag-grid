@@ -10,8 +10,8 @@ import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider"
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoutMenu } from "../../components/GridPopoutMenu";
-import { GridGenericCell } from "../../components/GridGenericCellRenderer";
-import { GridPopupMessage } from "../../components/gridPopoutEdit/GridPopupMessage";
+import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
+import { GridPopoverMessage } from "../../components/gridPopupEdit/GridPopoverMessage";
 
 export default {
   title: "Components / Grids",
@@ -73,7 +73,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopupMessage<ITestRow>(
+      GridPopoverMessage<ITestRow>(
         {
           headerName: "Popout message",
           cellRenderer: () => <>Click me!</>,

@@ -8,7 +8,7 @@ import { BaseGridRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
+import { GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { TextInputFormatted } from "../lui/TextInputFormatted";
 

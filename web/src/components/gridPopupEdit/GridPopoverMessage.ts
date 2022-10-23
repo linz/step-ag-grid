@@ -1,16 +1,16 @@
 import { GridGenericCellEditor } from "../GridGenericCellEditor";
 import { GridFormMessage, GridFormMessageProps } from "../gridForm/GridFormMessage";
 import { BaseGridRow } from "../Grid";
-import { ColDef } from "ag-grid-community";
 import { GridPopupProps } from "./GridPopupProps";
+import { GenericCellRendererColDef } from "../gridRender/GridRenderGenericCell";
 
-export const GridPopupMessage = <RowType extends BaseGridRow>(
-  colDef: ColDef,
+export const GridPopoverMessage = <RowType extends BaseGridRow>(
+  colDef: GenericCellRendererColDef,
   props: GridPopupProps<RowType, GridFormMessageProps<RowType>>,
 ) => {
   return GridGenericCellEditor({
     maxWidth: 140,
-    ...props,
+    ...colDef,
     cellRendererParams: colDef.cellRendererParams ?? {
       singleClickEdit: true,
     },

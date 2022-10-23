@@ -12,7 +12,7 @@ import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridPopoutEditMultiSelect, MultiSelectResult } from "../../components/GridPopoutEditMultiSelect";
 import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
-import { GridGenericCell } from "../../components/GridGenericCellRenderer";
+import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
 
 export default {
   title: "Components / Grids",

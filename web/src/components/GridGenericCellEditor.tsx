@@ -6,7 +6,7 @@ import { GridContext } from "../contexts/GridContext";
 import { FocusableItem } from "@szhsin/react-menu";
 import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
+import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
@@ -27,7 +27,7 @@ export interface GenericCellEditorColDef<RowType, FormProps extends Record<strin
 export const GridGenericCellEditor = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => ({
-  cellRenderer: GridGenericCellRendererComponent,
+  cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
   ...props,
   editable: props.editable ?? true,
   cellEditor: GenericCellEditorComponent,

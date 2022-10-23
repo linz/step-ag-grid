@@ -7,9 +7,9 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
+import { GridPopoverEditBearing } from "../../components/gridPopupEdit/GridPopoverEditBearing";
 import { wait } from "../../utils/util";
-import { GridGenericCell } from "../../components/GridGenericCellRenderer";
+import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
 
 export default {
   title: "Components / Grids",
@@ -47,25 +47,28 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoutEditBearing<ITestRow>({
-        field: "bearing1",
-        headerName: "Bearing GCE",
-        cellRendererParams: {
-          warning: (props) => props.data.id == 1002 && "Testers are testing",
-          info: (props) => props.data.id == 1001 && "Developers are developing",
+      GridPopoverEditBearing<ITestRow>(
+        {
+          field: "bearing1",
+          headerName: "Bearing GCE",
+          cellRendererParams: {
+            warning: (props) => props.data.id == 1002 && "Testers are testing",
+            info: (props) => props.data.id == 1001 && "Developers are developing",
+          },
         },
-        cellEditorParams: {
+        {
           multiEdit: false,
           formProps: {
             placeHolder: "Enter Bearing",
           },
         },
-      }),
-      GridPopoutEditBearing<ITestRow>({
-        field: "bearing2",
-        headerName: "Bearing onSave",
-        cellRendererParams: {},
-        cellEditorParams: {
+      ),
+      GridPopoverEditBearing<ITestRow>(
+        {
+          field: "bearing2",
+          headerName: "Bearing onSave",
+        },
+        {
           multiEdit: true,
           formProps: {
             placeHolder: "Enter Bearing",
@@ -76,7 +79,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           },
         },
-      }),
+      ),
     ],
     [],
   );

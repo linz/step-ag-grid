@@ -1,9 +1,9 @@
-import "./GridGenericCellRenderer.scss";
+import "./GridRenderGenericCell.scss";
 
 import { useContext } from "react";
-import { UpdatingContext } from "../contexts/UpdatingContext";
-import { GridLoadableCell } from "./GridLoadableCell";
-import { GridIcon } from "./GridIcon";
+import { UpdatingContext } from "../../contexts/UpdatingContext";
+import { GridLoadableCell } from "../GridLoadableCell";
+import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 

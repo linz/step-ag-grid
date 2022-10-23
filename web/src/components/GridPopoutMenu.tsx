@@ -4,10 +4,10 @@ import "@szhsin/react-menu/dist/index.css";
 import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { BaseGridRow } from "./Grid";
-import { GridPopupProps } from "./gridPopoutEdit/GridPopupProps";
 import { GridGenericCellEditor } from "./GridGenericCellEditor";
 import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "./gridForm/GridFormPopoutMenu";
-import { GridPopoutMenuCellRenderer } from "./gridRender/GridPopoutMenuCellRenderer";
+import { GridRenderPopoutMenuCell } from "./gridRender/GridRenderPopoutMenuCell";
+import { GridPopupProps } from "./gridPopupEdit/GridPopupProps";
 
 /**
  * Popout burger menu
@@ -20,7 +20,7 @@ export const GridPopoutMenu = <RowType extends BaseGridRow>(
     ...colDef,
     editable: colDef.editable != null ? colDef.editable : true,
     maxWidth: 64,
-    cellRenderer: GridPopoutMenuCellRenderer,
+    cellRenderer: GridRenderPopoutMenuCell,
     cellRendererParams: {
       // Menus open on single click, this parameter is picked up in Grid.tsx
       singleClickEdit: true,

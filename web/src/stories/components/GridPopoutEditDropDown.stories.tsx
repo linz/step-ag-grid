@@ -10,7 +10,7 @@ import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../.
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
-import { GridGenericCell } from "../../components/GridGenericCellRenderer";
+import { GridGenericCell } from "../../components/gridRender/GridRenderGenericCell";
 
 export default {
   title: "Components / Grids",

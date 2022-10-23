@@ -4,7 +4,7 @@ import { UpdatingContext } from "../../contexts/UpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { LuiIcon } from "@linzjs/lui";
 
-export const GridPopoutMenuCellRenderer = (props: ICellRendererParams) => {
+export const GridRenderPopoutMenuCell = (props: ICellRendererParams) => {
   const { checkUpdating } = useContext(UpdatingContext);
   const isLoading = checkUpdating(props.colDef?.field ?? "", props.data.id);
   const disabled = !props.colDef?.editable;
