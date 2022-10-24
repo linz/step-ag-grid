@@ -1,11 +1,12 @@
 import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
-import { ControlledMenu, MenuCloseEvent } from "@szhsin/react-menu";
+import { ControlledMenu } from "@szhsin/react-menu";
+import { MyFormProps } from "./GridCell";
 
-export const useGridPopoutHook = (_props?: ICellEditorParams, save?: () => Promise<boolean> | boolean) => {
-  const props = _props as ICellEditorParams;
-  const { eGridCell } = props as ICellEditorParams;
+export const useGridPopoutHook = (props: MyFormProps, save?: () => Promise<boolean>) => {
+  const { cellEditorParams, saving, updateValue } = props;
+  const { eGridCell } = cellEditorParams as ICellEditorParams;
   const { stopEditing } = useContext(GridContext);
   const anchorRef = useRef(eGridCell);
   anchorRef.current = eGridCell;
@@ -15,23 +16,23 @@ export const useGridPopoutHook = (_props?: ICellEditorParams, save?: () => Promi
     setOpen(true);
   }, []);
 
-  const cellRenderer = props.column.getColDef().cellRenderer;
+  const cellRenderer = cellEditorParams.column.getColDef().cellRenderer;
 
   const triggerSave = useCallback(
-    async (event: MenuCloseEvent) => {
-      if (event.reason == "cancel" || !save || (await save())) {
+    async (reason?: string) => {
+      if (reason == "cancel" || !save || (await updateValue(save))) {
         setOpen(false);
         stopEditing();
       }
     },
-    [save, stopEditing],
+    [save, stopEditing, updateValue],
   );
 
   const popoutWrapper = useCallback(
     (children: JSX.Element) => {
       return (
         <>
-          {cellRenderer ? cellRenderer(props) : props.value}
+          {cellRenderer ? cellRenderer(cellEditorParams) : cellEditorParams.value}
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
@@ -39,18 +40,32 @@ export const useGridPopoutHook = (_props?: ICellEditorParams, save?: () => Promi
               unmountOnClose={true}
               anchorRef={anchorRef}
               menuClassName={"lui-menu"}
-              onClose={(event) => triggerSave(event).then()}
+              onClose={(event) => triggerSave(event.reason).then()}
             >
+              {saving && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: "rgba(64,64,64,0.1)",
+                    zIndex: 1000,
+                  }}
+                />
+              )}
               {children}
             </ControlledMenu>
           )}
         </>
       );
     },
-    [cellRenderer, isOpen, props, triggerSave],
+    [cellRenderer, cellEditorParams, isOpen, saving, triggerSave],
   );
 
   return {
     popoutWrapper,
+    triggerSave,
   };
 };

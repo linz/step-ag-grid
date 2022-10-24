@@ -17,7 +17,6 @@ export const GridFormTextInput = (props: MyFormProps) => {
   const { colDef } = cellEditorParams;
   const formProps = colDef.cellEditorParams as GridFormTextInputProps;
   const { getSelectedRows } = useContext(GridContext);
-  const field = colDef.field;
   const [text, setText] = useState(cellEditorParams.value);
 
   const invalid = useCallback(() => {
@@ -30,6 +29,7 @@ export const GridFormTextInput = (props: MyFormProps) => {
   }, [formProps.maxlength, formProps.required, text.length]);
 
   const save = useCallback(async (): Promise<boolean> => {
+    const field = colDef.field;
     if (field == null) {
       console.error("ColDef has no field set");
       return false;
@@ -39,8 +39,8 @@ export const GridFormTextInput = (props: MyFormProps) => {
     getSelectedRows<any>().forEach((row) => (row[field] = text));
     await wait(1000);
     return true;
-  }, [invalid, text, field]);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
+  }, [colDef.field, invalid, props, getSelectedRows, text]);
+  const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
@@ -52,7 +52,7 @@ export const GridFormTextInput = (props: MyFormProps) => {
         inputProps={{
           style: { width: "100%" },
           placeholder: formProps.placeholder,
-          onKeyDown: async (e) => e.key === "Enter" && save().then(),
+          onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
         }}
       />
     </div>,

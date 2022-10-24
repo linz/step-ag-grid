@@ -40,12 +40,10 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
   const { getSelectedRows } = useContext(GridContext);
 
   const { cellEditorParams } = props;
-  const { data, colDef } = cellEditorParams;
+  const { colDef } = cellEditorParams;
   const formProps: GridFormMultiSelectProps<RowType, ValueType> = colDef.cellEditorParams;
   const field = colDef.field ?? colDef.colId ?? "";
   const { multiEdit } = colDef.cellEditorParams;
-
-  const { updatingCells } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -59,9 +57,12 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
     selectedValues.forEach((value) => {
       values[value] = subSelectedValues.current[value] ?? true;
     });
+    if (formProps.onSave) {
+      return await formProps.onSave({ selectedRows: getSelectedRows(), values: selectedValues });
+    }
     return true;
-  }, [cellEditorParams, data, field, multiEdit, selectedValues, updatingCells]);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
+  }, [formProps, getSelectedRows, selectedValues]);
+  const { popoutWrapper } = useGridPopoutHook(props, save);
 
   // Load up options list if it's async function
   useEffect(() => {

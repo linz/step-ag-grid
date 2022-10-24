@@ -245,9 +245,11 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
           ok = await fnUpdate(selectedRows);
         },
       );
+
+      // async processes need to refresh their own rows
+      gridApi.refreshCells({ rowNodes: selectedRows, force: true });
+
       if (ok) {
-        // async processes need to refresh their own rows
-        gridApi.refreshCells({ rowNodes: selectedRows, force: true });
         const cell = gridApi.getFocusedCell();
         if (cell && gridApi.getFocusedCell() == null) {
           gridApi.setFocusedCell(cell.rowIndex, cell.column);

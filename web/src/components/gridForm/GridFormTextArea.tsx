@@ -35,12 +35,11 @@ export const GridFormTextArea = (props: MyFormProps) => {
       return false;
     }
     if (invalid()) return false;
-
     getSelectedRows<any>().forEach((row) => (row[field] = text));
-    await wait(1000);
+    await wait(5000);
     return true;
-  }, [invalid, text, field]);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
+  }, [field, invalid, getSelectedRows, text]);
+  const { popoutWrapper } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>

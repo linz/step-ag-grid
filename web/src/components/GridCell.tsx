@@ -10,6 +10,7 @@ type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 export interface MyFormProps {
   cellEditorParams: ICellEditorParams;
   updateValue: (saveFn: () => Promise<boolean>) => Promise<boolean>;
+  saving: boolean;
 }
 
 export interface GenericCellEditorParams {
@@ -80,5 +81,11 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   if (cellEditorParams == null) return <></>;
 
-  return <>{cellEditorParams.form && <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} />}</>;
+  return (
+    <>
+      {cellEditorParams.form && (
+        <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} saving={saving} />
+      )}
+    </>
+  );
 };
