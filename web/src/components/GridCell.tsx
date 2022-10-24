@@ -12,7 +12,7 @@ type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
 export interface GenericCellEditorParams<FormProps extends Record<string, any>> {
   multiEdit: boolean;
-  form: (props: FormProps) => JSX.Element;
+  form?: (props: FormProps) => JSX.Element;
   formProps: FormProps;
 }
 
@@ -26,8 +26,8 @@ export interface GenericCellEditorColDef<RowType, FormProps extends Record<strin
  */
 export const GridCell = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
-): ColDef =>
-  props.cellEditorParams
+): ColDef => {
+  return props.cellEditorParams
     ? {
         cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
         ...props,
@@ -43,6 +43,7 @@ export const GridCell = <RowType extends BaseGridRow, FormProps extends Record<s
         resizable: true,
         ...props,
       };
+};
 
 interface GenericCellEditorICellEditorParams<RowType extends BaseGridRow, FormProps extends Record<string, any>>
   extends ICellEditorParams {
@@ -64,7 +65,6 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const saveRef = useRef<SaveFn>(async () => {
     return false;
   });
-
   cellEditorParamsRef.current = props;
 
   const { data } = props;
@@ -84,14 +84,16 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const children = (
     <ComponentLoadingWrapper saving={saving}>
       <FocusableItem>
-        {({ ref }: any) => (
-          <cellEditorParams.form
-            {...cellEditorParams.formProps}
-            saveRef={saveRef}
-            cellEditorParamsRef={cellEditorParamsRef}
-            triggerSave={updateValue}
-          />
-        )}
+        {({ ref }: any) =>
+          cellEditorParams.form && (
+            <cellEditorParams.form
+              {...cellEditorParams.formProps}
+              saveRef={saveRef}
+              cellEditorParamsRef={cellEditorParamsRef}
+              triggerSave={updateValue}
+            />
+          )
+        }
       </FocusableItem>
     </ComponentLoadingWrapper>
   );

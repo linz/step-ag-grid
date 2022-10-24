@@ -6,13 +6,11 @@ import { GridLoadableCell } from "../GridLoadableCell";
 import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { GenericCellEditorParams } from "../GridCell";
 
-interface GenericCellComponentParams extends ICellRendererParams {
-  colDef: GenericCellRendererColDef;
-}
-
-export interface GenericCellRendererColDef extends ColDef {
+export interface GenericCellColDef<FormProps extends Record<string, any>> extends ColDef {
   cellRendererParams?: GenericCellRendererParams;
+  cellEditorParams?: GenericCellEditorParams<FormProps>;
 }
 
 export interface GenericCellRendererParams {
@@ -21,12 +19,13 @@ export interface GenericCellRendererParams {
   info?: (props: ICellRendererParams) => string | boolean | undefined;
 }
 
-export const GridGenericCellRendererComponent = (props: GenericCellComponentParams): JSX.Element => {
+export const GridGenericCellRendererComponent = (props: ICellRendererParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 
-  const warningFn = props.colDef?.cellRendererParams?.warning;
+  const cellRendererParams = props.colDef?.cellRendererParams as GenericCellRendererParams | undefined;
+  const warningFn = cellRendererParams?.warning;
   const warningText = warningFn ? warningFn(props) : undefined;
-  const infoFn = props.colDef?.cellRendererParams?.info;
+  const infoFn = cellRendererParams?.info;
   const infoText = infoFn ? infoFn(props) : undefined;
 
   const defaultFormatter = (props: ValueFormatterParams): string => props.value;

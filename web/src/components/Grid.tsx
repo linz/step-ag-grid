@@ -1,4 +1,5 @@
 import "./Grid.scss";
+import "./GridTheme.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -217,7 +218,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   return (
     <div
       data-testid={params.dataTestId}
-      className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
+      className={clsx("Grid-container", "ag-theme-alpine", staleGrid && "Grid-sortIsStale")}
     >
       {params.quickFilter && (
         <div className="Grid-quickFilter">

@@ -7,29 +7,28 @@ import { BaseGridRow } from "../Grid";
 import { GridCell } from "../GridCell";
 import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
-import { GridPopupProps } from "./GridPopover";
+import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
 /**
  * Popout burger menu
  */
 export const GridPopoutMenu = <RowType extends BaseGridRow>(
-  colDef: ColDef,
-  props: GridPopupProps<RowType, GridFormPopoutMenuProps<RowType>>,
+  colDef: GenericCellColDef<GridFormPopoutMenuProps<RowType>>,
 ): ColDef =>
   GridCell({
-    ...colDef,
-    editable: colDef.editable != null ? colDef.editable : true,
     maxWidth: 64,
+    editable: colDef.editable != null ? colDef.editable : true,
     cellRenderer: GridRenderPopoutMenuCell,
+    cellClass: GenericMultiEditCellClass,
+    ...colDef,
     cellRendererParams: {
       // Menus open on single click, this parameter is picked up in Grid.tsx
       singleClickEdit: true,
     },
-    cellEditorParams: {
-      ...colDef.cellEditorParams,
-      form: GridFormPopoutMenu,
-      formProps: props.formProps,
-      multiEdit: props.multiEdit,
-    },
-    cellClass: GenericMultiEditCellClass,
+    ...(colDef?.cellEditorParams && {
+      cellEditorParams: {
+        ...colDef.cellEditorParams,
+        form: GridFormPopoutMenu,
+      },
+    }),
   });

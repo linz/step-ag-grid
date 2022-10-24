@@ -47,28 +47,24 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverEditBearing<ITestRow>(
-        {
-          field: "bearing1",
-          headerName: "Bearing GCE",
-          cellRendererParams: {
-            warning: (props) => props.data.id == 1002 && "Testers are testing",
-            info: (props) => props.data.id == 1001 && "Developers are developing",
-          },
+      GridPopoverEditBearing<ITestRow>({
+        field: "bearing1",
+        headerName: "Bearing GCE",
+        cellRendererParams: {
+          warning: (props) => props.data.id == 1002 && "Testers are testing",
+          info: (props) => props.data.id == 1001 && "Developers are developing",
         },
-        {
+        cellEditorParams: {
           multiEdit: false,
           formProps: {
             placeHolder: "Enter Bearing",
           },
         },
-      ),
-      GridPopoverEditBearing<ITestRow>(
-        {
-          field: "bearing2",
-          headerName: "Bearing onSave",
-        },
-        {
+      }),
+      GridPopoverEditBearing<ITestRow>({
+        field: "bearing2",
+        headerName: "Bearing onSave",
+        cellEditorParams: {
           multiEdit: true,
           formProps: {
             placeHolder: "Enter Bearing",
@@ -79,7 +75,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           },
         },
-      ),
+      }),
     ],
     [],
   );

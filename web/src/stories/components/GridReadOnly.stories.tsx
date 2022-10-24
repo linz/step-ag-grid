@@ -73,12 +73,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopoverMessage<ITestRow>(
-        {
-          headerName: "Popout message",
-          cellRenderer: () => <>Click me!</>,
-        },
-        {
+      GridPopoverMessage<ITestRow>({
+        headerName: "Popout message",
+        cellRenderer: () => <>Click me!</>,
+        cellEditorParams: {
           formProps: {
             message: async (selectedRows: ITestRow[]) => {
               await wait(1000);
@@ -87,7 +85,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
           multiEdit: false,
         },
-      ),
+      }),
       GridPopoutMenu<ITestRow>(
         {
           headerName: "Menu",
