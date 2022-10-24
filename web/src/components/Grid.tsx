@@ -1,4 +1,5 @@
-import "./GridStyles.scss";
+import "./Grid.scss";
+import "./GridTheme.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -7,18 +8,20 @@ import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { GridContext } from "../contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowHook";
 import { isNotEmpty } from "../utils/util";
-import { GridSelectHeader } from "./GridSelectHeader";
-import { GridGenericCellRendererComponent } from "./GridGenericCellRenderer";
+import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 
-export interface BaseAgGridRow {
+export interface BaseGridRow {
   id: string | number;
 }
-export interface AgGridProps {
+
+export interface GridProps {
   dataTestId?: string;
+  quickFilter?: boolean;
+  quickFilterPlaceholder?: string;
   quickFilterValue?: string;
   externalSelectedItems: any[];
   setExternalSelectedItems: (items: any[]) => void;
@@ -32,11 +35,12 @@ export interface AgGridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = (params: AgGridProps): JSX.Element => {
+export const Grid = (params: GridProps): JSX.Element => {
   const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
-    useContext(AgGridContext);
+    useContext(GridContext);
   const { checkUpdating } = useContext(UpdatingContext);
 
+  const [internalQuickFilter, setInternalQuickFilter] = useState("");
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
@@ -84,9 +88,13 @@ export const Grid = (params: AgGridProps): JSX.Element => {
    */
   const updateQuickFilter = useCallback(() => {
     if (!gridReady()) return;
+    if (params.quickFilter) {
+      setQuickFilter(internalQuickFilter);
+      return;
+    }
     if (params.quickFilterValue == null) return;
     setQuickFilter(params.quickFilterValue);
-  }, [gridReady, params.quickFilterValue, setQuickFilter]);
+  }, [gridReady, internalQuickFilter, params.quickFilter, params.quickFilterValue, setQuickFilter]);
 
   /**
    * Synchronise quick filter to grid
@@ -112,7 +120,7 @@ export const Grid = (params: AgGridProps): JSX.Element => {
         maxWidth: 35,
         suppressSizeToFit: true,
         checkboxSelection: true,
-        headerComponent: GridSelectHeader,
+        headerComponent: GridHeaderSelect,
         onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
       },
       ...(params.columnDefs as ColDef[]),
@@ -175,7 +183,16 @@ export const Grid = (params: AgGridProps): JSX.Element => {
     [checkUpdating],
   );
 
-  const singleClickEdit = useCallback(
+  const onCellDoubleClick = useCallback(
+    (event: CellEvent) => {
+      if (!event.colDef?.cellRendererParams?.singleClickEdit) {
+        startCellEditing(event);
+      }
+    },
+    [startCellEditing],
+  );
+
+  const onCellClicked = useCallback(
     (event: CellEvent) => {
       if (event.colDef?.cellRendererParams?.singleClickEdit) {
         startCellEditing(event);
@@ -198,21 +215,25 @@ export const Grid = (params: AgGridProps): JSX.Element => {
     [refreshSelectedRows],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      cellRenderer: GridGenericCellRendererComponent,
-      sortable: true,
-      resizable: true,
-      ...params.defaultColDef,
-    }),
-    [params.defaultColDef],
-  );
-
   return (
     <div
       data-testid={params.dataTestId}
-      className={clsx("ag-grid-grid", "ag-grid-grid--editing", "ag-theme-alpine", staleGrid && "aggrid-sortIsStale")}
+      className={clsx("Grid-container", "ag-theme-alpine", staleGrid && "Grid-sortIsStale")}
     >
+      {params.quickFilter && (
+        <div className="Grid-quickFilter">
+          <input
+            aria-label="Search"
+            className="lui-margin-top-xxs lui-margin-bottom-xxs Grid-quickFilterBox"
+            type="text"
+            placeholder={params.quickFilterPlaceholder ?? "Search..."}
+            value={internalQuickFilter}
+            onChange={(event): void => {
+              setInternalQuickFilter(event.target.value);
+            }}
+          />
+        </div>
+      )}
       <AgGridReact
         getRowId={(params) => `${params.data.id}`}
         suppressRowClickSelection={true}
@@ -223,12 +244,11 @@ export const Grid = (params: AgGridProps): JSX.Element => {
         onGridSizeChanged={sizeColumnsToFit}
         suppressClickEdit={true}
         onCellKeyDown={onCellKeyDown}
-        onCellClicked={singleClickEdit}
-        onCellDoubleClicked={startCellEditing}
+        onCellClicked={onCellClicked}
+        onCellDoubleClicked={onCellDoubleClick}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
         columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}

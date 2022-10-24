@@ -3,16 +3,15 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { Grid, AgGridProps } from "../../components/Grid";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutMenu } from "../../components/GridPopoutMenu";
-import { GenericCell } from "../../components/GridGenericCellRenderer";
-import { FormMessage } from "./FormMessage";
-import { GenericCellEditor } from "../../components/GenericCellEditor";
+import { GridPopoutMenu } from "../../components/gridPopoverEdit/GridPopoutMenu";
+import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
+import { GridCell } from "../../components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -25,9 +24,9 @@ export default {
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
         <UpdatingContextProvider>
-          <AgGridContextProvider>
+          <GridContextProvider>
             <Story />
-          </AgGridContextProvider>
+          </GridContextProvider>
         </UpdatingContextProvider>
       </div>
     ),
@@ -42,17 +41,17 @@ interface ITestRow {
   dd: string;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
+const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      GenericCell({
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GenericCell({
+      GridCell({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
@@ -62,35 +61,30 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
           info: (props: ICellRendererParams) => props.value === "Developer" && "Developers are awesome",
         },
       }),
-      GenericCell({
+      GridCell({
         field: "age",
         headerName: "Age",
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GenericCell({
+      GridCell({
         field: "desc",
         headerName: "Description",
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GenericCellEditor({
-        field: "dd",
+      GridPopoverMessage<ITestRow>({
         headerName: "Popout message",
-        maxWidth: 140,
-        cellRendererParams: {
-          info: () => "I do popups",
-        },
+        cellRenderer: () => <>Click me!</>,
         cellEditorParams: {
-          form: FormMessage,
-          formProps: {
-            a: "x",
+          message: async (selectedRows: ITestRow[]) => {
+            await wait(1000);
+            return `There are ${selectedRows.length} row(s) selected`;
           },
           multiEdit: false,
         },
       }),
       GridPopoutMenu<ITestRow>({
-        field: "menu",
         headerName: "Menu",
         cellEditorParams: {
           options: async () => {
@@ -119,6 +113,15 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
           },
         },
       }),
+      GridPopoutMenu<ITestRow>({
+        headerName: "Menu disabled",
+        editable: false,
+        cellEditorParams: {
+          options: async () => {
+            return [];
+          },
+        },
+      }),
     ],
     [],
   );
@@ -139,6 +142,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      quickFilter={true}
+      quickFilterPlaceholder={"Quick filter..."}
     />
   );
 };

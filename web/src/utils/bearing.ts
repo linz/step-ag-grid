@@ -1,3 +1,33 @@
+import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+
+export const bearingValueFormatter = (params: ValueFormatterParams): string => {
+  const value = params.value;
+  if (value == null) {
+    return "-";
+  }
+  return convertDDToDMS(value);
+};
+
+export const bearingNumberParser = (value: string): number | null => {
+  if (value === "") return null;
+  return parseFloat(value);
+};
+
+const validMaskForDmsBearing = /^(\d+)?(\.([0-5](\d([0-5](\d(\d+)?)?)?)?)?)?$/;
+export const bearingStringValidator = (value: string): string | undefined => {
+  value = value.trim();
+  if (value === "") return undefined;
+  const match = value.match(validMaskForDmsBearing);
+  if (!match) return "Bearing must be a positive number in D.MMSSS format";
+  const decimalPart = match[3];
+  if (decimalPart != null && decimalPart.length > 5) {
+    return "Bearing has a maximum of 5 decimal places";
+  }
+
+  const bearing = parseFloat(value);
+  if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
+};
+
 // Decimal-ish degrees to Degrees Minutes Seconds converter
 export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, addTrailingZeros = true): string => {
   if (dd == null) return "–";

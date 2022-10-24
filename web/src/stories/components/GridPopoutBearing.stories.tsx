@@ -3,13 +3,13 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { Grid, AgGridProps } from "../../components/Grid";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+import { GridPopoverEditBearing } from "../../components/gridPopoverEdit/GridPopoverEditBearing";
 import { wait } from "../../utils/util";
-import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutEditBearing } from "../../components/GridPopoutEditBearing";
+import { GridCell } from "../../components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -22,9 +22,9 @@ export default {
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
         <UpdatingContextProvider>
-          <AgGridContextProvider>
+          <GridContextProvider>
             <Story />
-          </AgGridContextProvider>
+          </GridContextProvider>
         </UpdatingContextProvider>
       </div>
     ),
@@ -33,49 +33,41 @@ export default {
 
 interface ITestRow {
   id: number;
-  bearing: number | null;
+  bearing1: number | null;
+  bearing2: number | null;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
+const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      {
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
-      },
-      GridPopoutEditBearing({
-        field: "bearing",
-        headerName: "Bearing",
-        initialWidth: 65,
-        maxWidth: 150,
+      }),
+      GridPopoverEditBearing<ITestRow>({
+        field: "bearing1",
+        headerName: "Bearing GCE",
         cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
-          info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
+          warning: (props) => props.data.id == 1002 && "Testers are testing",
+          info: (props) => props.data.id == 1001 && "Developers are developing",
         },
         cellEditorParams: {
-          placeHolder: "Enter Bearing",
           multiEdit: false,
+          placeHolder: "Enter Bearing",
         },
       }),
-      GridPopoutEditBearing<ITestRow, number | null>({
-        field: "bearing",
-        headerName: "Bearing callback",
-        initialWidth: 65,
-        maxWidth: 150,
-        cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.data.id == 1002 && "Testers are testing",
-          info: (props: ICellRendererParams) => props.data.id == 1001 && "Developers are developing",
-        },
+      GridPopoverEditBearing<ITestRow>({
+        field: "bearing2",
+        headerName: "Bearing onSave",
         cellEditorParams: {
-          placeHolder: "Enter bearing correction...",
           multiEdit: true,
+          placeHolder: "Enter Bearing",
           onSave: async (selectedRows, value) => {
             await wait(1000);
-            // eslint-disable-next-line no-console
-            console.log({ selectedRows, value });
+            selectedRows.forEach((row) => (row["bearing2"] = value));
             return true;
           },
         },
@@ -87,9 +79,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) =
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, bearing: 1.234 },
-        { id: 1001, bearing: 1.565 },
-        { id: 1002, bearing: null },
+        { id: 1000, bearing1: 1.234, bearing2: 90 },
+        { id: 1001, bearing1: 1.565, bearing2: 240 },
+        { id: 1002, bearing1: null, bearing2: 355.1 },
       ] as ITestRow[],
     [],
   );

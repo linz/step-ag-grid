@@ -3,11 +3,11 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { AgGridContextProvider } from "../../contexts/AgGridContextProvider";
-import { Grid, AgGridProps } from "../../components/Grid";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GenericCellEditor } from "../../components/GenericCellEditor";
+import { GridCell } from "../../components/GridCell";
 import { FormTest, IFormTestRow } from "./FormTest";
 
 export default {
@@ -21,32 +21,31 @@ export default {
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
         <UpdatingContextProvider>
-          <AgGridContextProvider>
+          <GridContextProvider>
             <Story />
-          </AgGridContextProvider>
+          </GridContextProvider>
         </UpdatingContextProvider>
       </div>
     ),
   ],
 } as ComponentMeta<typeof Grid>;
 
-const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: AgGridProps) => {
+const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs = useMemo(
     () => [
-      {
+      GridCell({
         field: "id",
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
-      },
-      GenericCellEditor({
+      }),
+      GridCell({
         field: "name",
         headerName: "Popout Generic Edit",
         maxWidth: 140,
         cellEditorParams: {
           form: FormTest,
-          formProps: {},
           multiEdit: false,
         },
       }),

@@ -3,7 +3,9 @@ import "./FormTest.scss";
 import { useCallback, useContext, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { CellEditorContext } from "../../contexts/CellEditorContext";
+import { GridGenericCellEditorFormContextParams, MyFormProps } from "../../components/GridCell";
+import { useGridPopoutHook } from "../../components/GridPopoutHook";
+import { GridContext } from "../../contexts/GridContext";
 
 export interface IFormTestRow {
   id: number;
@@ -13,33 +15,31 @@ export interface IFormTestRow {
   plan: string;
 }
 
-export const FormTest = (): JSX.Element => {
-  const { saveRef, cellEditorParamsRef } = useContext(CellEditorContext);
-  saveRef.current = useCallback(async (): Promise<boolean> => {
+export const FormTest = (props: MyFormProps): JSX.Element => {
+  const { cellEditorParams } = props;
+  const { getSelectedRows } = useContext(GridContext);
+  const [v1, v2, ...v3] = cellEditorParams.value.split(" ");
+
+  const [nameType, setNameType] = useState(v1);
+  const [numba, setNumba] = useState(v2);
+  const [plan, setPlan] = useState(v3.join(" "));
+
+  const save = useCallback(async (): Promise<boolean> => {
+    const selectedRows = getSelectedRows();
+    // eslint-disable-next-line no-console
+    console.log("onSave", selectedRows, nameType, numba, plan);
+    // If not valid return false
+    cellEditorParams.data.name = [nameType, numba, plan].join(" ");
+    await wait(1000);
     return true;
-  }, []);
+  }, [cellEditorParams, nameType, numba, plan]);
+  const { popoutWrapper } = useGridPopoutHook(props, save);
 
-  const [nameType, setNameType] = useState("IS");
-  const [numba, setNumba] = useState("IX");
-  const [plan, setPlan] = useState("DP XXXX");
-
-  saveRef.current = useCallback(
-    async (selectedRows: IFormTestRow[]): Promise<boolean> => {
-      // eslint-disable-next-line no-console
-      console.log("onSave", selectedRows, nameType, numba, plan);
-      // If not valid return false
-      cellEditorParamsRef.current.data.name = "XXX";
-      await wait(1000);
-      return true;
-    },
-    [cellEditorParamsRef, nameType, numba, plan],
-  );
-
-  return (
+  return popoutWrapper(
     <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest"}>
       <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
       <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
       <LuiTextInput label={"Plan"} value={plan} onChange={(e) => setPlan(e.target.value)} />
-    </div>
+    </div>,
   );
 };

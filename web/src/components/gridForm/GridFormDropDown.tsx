@@ -1,15 +1,14 @@
 import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
-import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
-import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
-import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { BaseGridRow } from "../Grid";
+import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
+import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
+import { MyFormProps } from "../GridCell";
+import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
@@ -26,8 +25,7 @@ export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridPopoutEditDropDownProps<RowType, ValueType> {
-  multiEdit: boolean;
+export interface GridFormPopoutDropDownProps<RowType, ValueType> {
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -37,35 +35,17 @@ export interface GridPopoutEditDropDownProps<RowType, ValueType> {
   optionsRequestCancel?: () => void;
 }
 
-export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
-  cellEditorParams?: GridPopoutEditDropDownProps<RowType, ValueType>;
-}
+export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
+  const { getSelectedRows } = useContext(GridContext);
+  const { popoutWrapper } = useGridPopoutHook(props);
 
-export const GridPopoutEditDropDown = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridDropDownColDef<RowType, ValueType>,
-): ColDef => ({
-  ...props,
-  editable: props.editable !== undefined ? props.editable : true,
-  cellEditor: GridPopoutEditDropDownComp,
-  cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-});
+  const { cellEditorParams } = props;
+  const { data, colDef } = cellEditorParams;
+  const formProps: GridFormPopoutDropDownProps<RowType, ValueType> = colDef.cellEditorParams;
+  const field = colDef.field ?? colDef.colId ?? "";
+  const { multiEdit } = colDef.cellEditorParams;
 
-interface GridPopoutEditDropDownICellEditorParams<RowType extends BaseAgGridRow, ValueType> extends ICellEditorParams {
-  data: RowType;
-  colDef: {
-    field: string;
-    cellEditorParams: GridPopoutEditDropDownProps<RowType, ValueType>;
-  };
-}
-
-export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridPopoutEditDropDownICellEditorParams<RowType, ValueType>,
-) => {
-  const { api, data } = props;
-  const { cellEditorParams, field } = props.colDef;
-  const { multiEdit } = cellEditorParams;
-
-  const { updatingCells, stopEditing } = useContext(AgGridContext);
+  const { updatingCells, stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -77,8 +57,8 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       return await updatingCells({ data, field, multiEdit }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
-          if (cellEditorParams?.onSelectedItem) {
-            await cellEditorParams.onSelectedItem({ selectedRows, value });
+          if (formProps.onSelectedItem) {
+            await formProps.onSelectedItem({ selectedRows, value });
           } else {
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
@@ -86,18 +66,18 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         return true;
       });
     },
-    [cellEditorParams, data, field, multiEdit, updatingCells],
+    [data, field, formProps, multiEdit, updatingCells],
   );
 
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    let optionsConf = cellEditorParams?.options ?? [];
+    let optionsConf = formProps.options ?? [];
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(api.getSelectedRows(), filter);
+        optionsConf = await optionsConf(getSelectedRows(), filter);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -107,7 +87,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
         return item;
       }) as any as FinalSelectOption<ValueType>[];
 
-      if (cellEditorParams.filtered) {
+      if (formProps.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
         // the mouse up of the double click edit triggers the cell to cancel editing
         delay(() => setOptions(optionsList), 100);
@@ -116,11 +96,11 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
       }
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, filter, options]);
+  }, [filter, getSelectedRows, options, formProps.filtered, formProps.options]);
 
   // Local filtering
   useEffect(() => {
-    if (cellEditorParams.filtered == "local") {
+    if (formProps.filtered == "local") {
       if (options == null) return;
       setFilteredValues(
         options
@@ -135,7 +115,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
           .filter((r) => r !== undefined),
       );
     }
-  }, [cellEditorParams.filtered, filter, options]);
+  }, [formProps.filtered, filter, options]);
 
   const researchOnFilterChange = debounce(
     useCallback(() => {
@@ -148,12 +128,12 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
 
   // Reload filtering
   useEffect(() => {
-    if (previousFilter.current != filter && cellEditorParams.filtered == "reload") {
+    if (previousFilter.current != filter && formProps.filtered == "reload") {
       previousFilter.current = filter;
-      cellEditorParams?.optionsRequestCancel && cellEditorParams.optionsRequestCancel();
+      formProps.optionsRequestCancel && formProps.optionsRequestCancel();
       researchOnFilterChange().then();
     }
-  }, [cellEditorParams, cellEditorParams.filtered, filter, researchOnFilterChange]);
+  }, [filter, formProps, props, researchOnFilterChange]);
 
   const onFilterKeyDown = useCallback(
     async (e: KeyboardEvent) => {
@@ -172,11 +152,11 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
     [filteredValues, options, selectItemHandler, stopEditing],
   );
 
-  const children = (
+  return popoutWrapper(
     <>
-      {cellEditorParams.filtered && (
+      {formProps.filtered && (
         <>
-          <FocusableItem className={"filter-item"}>
+          <FocusableItem className={"filter-item"} index={-1}>
             {({ ref }: any) => (
               <div style={{ display: "flex", width: "100%" }}>
                 <input
@@ -185,7 +165,7 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
                   style={{ border: "0px" }}
                   ref={ref}
                   type="text"
-                  placeholder={cellEditorParams.filterPlaceholder ?? "Placeholder"}
+                  placeholder={formProps.filterPlaceholder ?? "Placeholder"}
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   onChange={(e) => setFilter(e.target.value.toLowerCase())}
@@ -211,7 +191,6 @@ export const GridPopoutEditDropDownComp = <RowType extends BaseAgGridRow, ValueT
           )}
         </>
       </ComponentLoadingWrapper>
-    </>
+    </>,
   );
-  return GridPopoutComponent(props, { children });
 };

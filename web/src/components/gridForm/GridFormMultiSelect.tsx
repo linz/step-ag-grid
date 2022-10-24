@@ -1,15 +1,14 @@
 import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
-import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoutComponent } from "./GridPopout";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { BaseAgGridRow } from "./Grid";
-import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
-import { AgGridContext } from "../contexts/AgGridContext";
+import { BaseGridRow } from "../Grid";
+import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
+import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
+import { MyFormProps } from "../GridCell";
+import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FinalSelectOption<ValueType> {
   value: ValueType;
@@ -27,7 +26,7 @@ export interface MultiSelectResult<RowType> {
   values: Record<string, any>;
 }
 
-export interface GridPopoutEditMultiSelectProps<RowType, ValueType> {
+export interface GridFormMultiSelectProps<RowType, ValueType> {
   multiEdit: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
@@ -37,38 +36,15 @@ export interface GridPopoutEditMultiSelectProps<RowType, ValueType> {
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
-export interface GridDropDownColDef<RowType, ValueType> extends ColDef {
-  cellEditorParams?: GridPopoutEditMultiSelectProps<RowType, ValueType>;
-}
+export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
+  const { getSelectedRows } = useContext(GridContext);
 
-export const GridPopoutEditMultiSelect = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridDropDownColDef<RowType, ValueType>,
-): ColDef => ({
-  ...props,
-  editable: props.editable !== undefined ? props.editable : true,
-  cellEditor: GridPopoutEditMultiSelectComp,
-  cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-});
+  const { cellEditorParams } = props;
+  const { colDef } = cellEditorParams;
+  const formProps: GridFormMultiSelectProps<RowType, ValueType> = colDef.cellEditorParams;
+  const field = colDef.field ?? colDef.colId ?? "";
+  const { multiEdit } = colDef.cellEditorParams;
 
-interface GridPopoutEditMultiSelectICellEditorParams<RowType extends BaseAgGridRow, ValueType>
-  extends ICellEditorParams {
-  data: RowType;
-  colDef: {
-    field: string;
-    cellEditorParams: GridPopoutEditMultiSelectProps<RowType, ValueType>;
-  };
-}
-
-export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, ValueType>(
-  props: GridPopoutEditMultiSelectICellEditorParams<RowType, ValueType>,
-) => {
-  const { api, data } = props;
-  const { cellEditorParams, field } = props.colDef;
-  const { multiEdit } = cellEditorParams;
-
-  const { updatingCells } = useContext(AgGridContext);
-
-  const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
@@ -76,31 +52,30 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
-  const onSave = useCallback(async (): Promise<boolean> => {
-    const values: Record<string, any> = {};
-    selectedValues.forEach((value) => {
-      values[value] = subSelectedValues.current[value] ?? true;
-    });
-
-    return await updatingCells(
-      { data, field, multiEdit },
-      async (selectedRows) => {
-        if (!cellEditorParams.onSave) return true;
-        return cellEditorParams.onSave({ selectedRows, values });
-      },
-      setSaving,
-    );
-  }, [cellEditorParams, data, field, multiEdit, selectedValues, updatingCells]);
+  const save = useCallback(
+    async (selectedRows: RowType[]): Promise<boolean> => {
+      const values: Record<string, any> = {};
+      selectedValues.forEach((value) => {
+        values[value] = subSelectedValues.current[value] ?? true;
+      });
+      if (formProps.onSave) {
+        return await formProps.onSave({ selectedRows, values: selectedValues });
+      }
+      return true;
+    },
+    [formProps, selectedValues],
+  );
+  const { popoutWrapper } = useGridPopoutHook(props, save);
 
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    let optionsConf = cellEditorParams?.options ?? [];
+    let optionsConf = formProps.options ?? [];
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(api.getSelectedRows());
+        optionsConf = await optionsConf(getSelectedRows());
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -110,7 +85,7 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
         return item;
       }) as any as FinalSelectOption<ValueType>[];
 
-      if (cellEditorParams.filtered) {
+      if (formProps.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
         // the mouse up of the double click edit triggers the cell to cancel editing
         delay(() => setOptions(optionsList), 100);
@@ -119,10 +94,10 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
       }
       optionsInitialising.current = false;
     })();
-  }, [api, cellEditorParams.filtered, cellEditorParams?.options, field, options]);
+  }, [formProps.filtered, formProps.options, field, options, getSelectedRows]);
 
   useEffect(() => {
-    if (!cellEditorParams.filtered || options == null) return;
+    if (!formProps.filtered || options == null) return;
     setFilteredValues(
       options
         .map((option) => {
@@ -135,12 +110,12 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
         })
         .filter((r) => r !== undefined),
     );
-  }, [cellEditorParams.filtered, filter, options]);
+  }, [formProps.filtered, filter, options]);
 
-  const children = (
-    <ComponentLoadingWrapper loading={!options} saving={saving}>
+  return popoutWrapper(
+    <ComponentLoadingWrapper loading={!options}>
       <>
-        {options && cellEditorParams.filtered && (
+        {options && formProps.filtered && (
           <>
             <FocusableItem className={"filter-item"}>
               {({ ref }: any) => (
@@ -151,7 +126,7 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
                     style={{ border: "0px" }}
                     ref={ref}
                     type="text"
-                    placeholder={cellEditorParams.filterPlaceholder ?? "Placeholder"}
+                    placeholder={formProps.filterPlaceholder ?? "Placeholder"}
                     data-testid={"filteredMenu-free-text-input"}
                     defaultValue={""}
                     onChange={(e) => setFilter(e.target.value.toLowerCase())}
@@ -206,7 +181,6 @@ export const GridPopoutEditMultiSelectComp = <RowType extends BaseAgGridRow, Val
           ),
         )}
       </>
-    </ComponentLoadingWrapper>
+    </ComponentLoadingWrapper>,
   );
-  return GridPopoutComponent(props, { children, canClose: () => onSave() });
 };
