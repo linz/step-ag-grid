@@ -2,7 +2,6 @@ import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GenericCellColDef, GridGenericCellRendererComponent } from "../gridRender/GridRenderGenericCell";
 import { GridCell } from "../GridCell";
 import { BaseGridRow } from "../Grid";
-import { GridFormDropDown, GridFormPopoutDropDownProps } from "../gridForm/GridFormDropDown";
 import { GridFormMultiSelect, GridFormMultiSelectProps } from "../gridForm/GridFormMultiSelect";
 
 export const GridPopoutEditMultiSelect = <RowType extends BaseGridRow, ValueType>(

@@ -19,7 +19,7 @@ export const GridFormMessage = <RowType extends BaseGridRow>(props: MyFormProps)
   const { getSelectedRows } = useContext(GridContext);
 
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams);
+  const { popoutWrapper } = useGridPopoutHook(props);
 
   useEffect(() => {
     (async () => {

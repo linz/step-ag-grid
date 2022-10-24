@@ -45,13 +45,6 @@ interface ITestRow {
 const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
-  /*const optionsFn = useCallback(async (selectedRows: ITestRow[]) => {
-    // eslint-disable-next-line no-console
-    console.log("optionsFn selected rows", selectedRows);
-    await wait(1000);
-    return [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparatorString, "(other)"];
-  }, []);*/
-
   const columnDefs = useMemo(
     () =>
       [

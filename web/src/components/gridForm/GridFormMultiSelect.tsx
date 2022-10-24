@@ -52,16 +52,19 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
-  const save = useCallback(async (): Promise<boolean> => {
-    const values: Record<string, any> = {};
-    selectedValues.forEach((value) => {
-      values[value] = subSelectedValues.current[value] ?? true;
-    });
-    if (formProps.onSave) {
-      return await formProps.onSave({ selectedRows: getSelectedRows(), values: selectedValues });
-    }
-    return true;
-  }, [formProps, getSelectedRows, selectedValues]);
+  const save = useCallback(
+    async (selectedRows: RowType[]): Promise<boolean> => {
+      const values: Record<string, any> = {};
+      selectedValues.forEach((value) => {
+        values[value] = subSelectedValues.current[value] ?? true;
+      });
+      if (formProps.onSave) {
+        return await formProps.onSave({ selectedRows, values: selectedValues });
+      }
+      return true;
+    },
+    [formProps, selectedValues],
+  );
   const { popoutWrapper } = useGridPopoutHook(props, save);
 
   // Load up options list if it's async function

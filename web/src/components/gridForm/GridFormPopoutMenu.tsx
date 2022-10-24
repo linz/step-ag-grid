@@ -28,7 +28,7 @@ export interface MenuOption<RowType> {
  * you need a useMemo around your columnDefs
  */
 export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: MyFormProps) => {
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams);
+  const { popoutWrapper } = useGridPopoutHook(props);
   const { colDef } = props.cellEditorParams;
   const formProps: GridFormPopoutMenuProps<RowType> = colDef.cellEditorParams;
   const { getSelectedRows } = useContext(GridContext);

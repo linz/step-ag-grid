@@ -33,7 +33,7 @@ export const FormTest = (props: MyFormProps): JSX.Element => {
     await wait(1000);
     return true;
   }, [cellEditorParams, nameType, numba, plan]);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
+  const { popoutWrapper } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
     <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest"}>

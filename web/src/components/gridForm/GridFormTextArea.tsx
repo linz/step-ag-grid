@@ -1,8 +1,7 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { wait } from "../../utils/util";
 import { MyFormProps } from "../GridCell";
 import { TextAreaInput } from "../../lui/TextArea";
-import { GridContext } from "../../contexts/GridContext";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FormTextAreaProps {
@@ -16,7 +15,6 @@ export const GridFormTextArea = (props: MyFormProps) => {
   const { cellEditorParams } = props;
   const { colDef } = cellEditorParams;
   const formProps = colDef.cellEditorParams as FormTextAreaProps;
-  const { getSelectedRows } = useContext(GridContext);
   const field = colDef.field;
   const [text, setText] = useState(cellEditorParams.value);
 
@@ -29,16 +27,19 @@ export const GridFormTextArea = (props: MyFormProps) => {
     }
   }, [formProps.maxlength, formProps.required, text.length]);
 
-  const save = useCallback(async (): Promise<boolean> => {
-    if (field == null) {
-      console.error("ColDef has no field set");
-      return false;
-    }
-    if (invalid()) return false;
-    getSelectedRows<any>().forEach((row) => (row[field] = text));
-    await wait(5000);
-    return true;
-  }, [field, invalid, getSelectedRows, text]);
+  const save = useCallback(
+    async (selectedRows: any[]): Promise<boolean> => {
+      if (field == null) {
+        console.error("ColDef has no field set");
+        return false;
+      }
+      if (invalid()) return false;
+      selectedRows.forEach((row) => (row[field] = text));
+      await wait(5000);
+      return true;
+    },
+    [field, invalid, text],
+  );
   const { popoutWrapper } = useGridPopoutHook(props, save);
 
   return popoutWrapper(

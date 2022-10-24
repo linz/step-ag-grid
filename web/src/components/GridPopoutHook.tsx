@@ -4,7 +4,7 @@ import { GridContext } from "../contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
 import { MyFormProps } from "./GridCell";
 
-export const useGridPopoutHook = (props: MyFormProps, save?: () => Promise<boolean>) => {
+export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
   const { cellEditorParams, saving, updateValue } = props;
   const { eGridCell } = cellEditorParams as ICellEditorParams;
   const { stopEditing } = useContext(GridContext);

@@ -1,7 +1,6 @@
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 export const bearingValueFormatter = (params: ValueFormatterParams): string => {
-  console.log({ v: params.value });
   const value = params.value;
   if (value == null) {
     return "-";

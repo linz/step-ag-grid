@@ -37,7 +37,7 @@ export interface GridFormPopoutDropDownProps<RowType, ValueType> {
 
 export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
   const { getSelectedRows } = useContext(GridContext);
-  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams);
+  const { popoutWrapper } = useGridPopoutHook(props);
 
   const { cellEditorParams } = props;
   const { data, colDef } = cellEditorParams;
@@ -133,7 +133,7 @@ export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: 
       formProps.optionsRequestCancel && formProps.optionsRequestCancel();
       researchOnFilterChange().then();
     }
-  }, [filter, props, researchOnFilterChange]);
+  }, [filter, formProps, props, researchOnFilterChange]);
 
   const onFilterKeyDown = useCallback(
     async (e: KeyboardEvent) => {

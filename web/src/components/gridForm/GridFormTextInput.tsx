@@ -1,8 +1,7 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { wait } from "../../utils/util";
 import { MyFormProps } from "../GridCell";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { GridContext } from "../../contexts/GridContext";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface GridFormTextInputProps {
@@ -16,7 +15,6 @@ export const GridFormTextInput = (props: MyFormProps) => {
   const { cellEditorParams } = props;
   const { colDef } = cellEditorParams;
   const formProps = colDef.cellEditorParams as GridFormTextInputProps;
-  const { getSelectedRows } = useContext(GridContext);
   const [text, setText] = useState(cellEditorParams.value);
 
   const invalid = useCallback(() => {
@@ -28,18 +26,21 @@ export const GridFormTextInput = (props: MyFormProps) => {
     }
   }, [formProps.maxlength, formProps.required, text.length]);
 
-  const save = useCallback(async (): Promise<boolean> => {
-    const field = colDef.field;
-    if (field == null) {
-      console.error("ColDef has no field set");
-      return false;
-    }
-    if (invalid()) return false;
+  const save = useCallback(
+    async (selectedRows: any[]): Promise<boolean> => {
+      const field = colDef.field;
+      if (field == null) {
+        console.error("ColDef has no field set");
+        return false;
+      }
+      if (invalid()) return false;
 
-    getSelectedRows<any>().forEach((row) => (row[field] = text));
-    await wait(1000);
-    return true;
-  }, [colDef.field, invalid, props, getSelectedRows, text]);
+      selectedRows.forEach((row) => (row[field] = text));
+      await wait(1000);
+      return true;
+    },
+    [colDef.field, invalid, text],
+  );
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 
   return popoutWrapper(

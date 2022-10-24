@@ -9,7 +9,7 @@ type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
 export interface MyFormProps {
   cellEditorParams: ICellEditorParams;
-  updateValue: (saveFn: () => Promise<boolean>) => Promise<boolean>;
+  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
   saving: boolean;
 }
 
@@ -72,7 +72,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
-    async (saveFn: () => Promise<boolean>): Promise<boolean> => {
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
       if (saving) return false;
       return await updatingCells({ data, multiEdit, field }, saveFn, setSaving);
     },
