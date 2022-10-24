@@ -86,12 +86,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           multiEdit: false,
         },
       }),
-      GridPopoutMenu<ITestRow>(
-        {
-          headerName: "Menu",
-        },
-        {
-          multiEdit: true, // TODO should be undefined
+      GridPopoutMenu<ITestRow>({
+        headerName: "Menu",
+        cellEditorParams: {
           formProps: {
             options: async () => {
               // Just doing a timeout here to demonstrate deferred loading
@@ -119,21 +116,18 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           },
         },
-      ),
-      GridPopoutMenu<ITestRow>(
-        {
-          headerName: "Menu disabled",
-          editable: false,
-        },
-        {
-          multiEdit: false, // TODO should be undefined
+      }),
+      GridPopoutMenu<ITestRow>({
+        headerName: "Menu disabled",
+        editable: false,
+        cellEditorParams: {
           formProps: {
             options: async () => {
               return [];
             },
           },
         },
-      ),
+      }),
     ],
     [],
   );

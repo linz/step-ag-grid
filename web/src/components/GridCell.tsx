@@ -11,7 +11,7 @@ import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./g
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
 export interface GenericCellEditorParams<FormProps extends Record<string, any>> {
-  multiEdit: boolean;
+  multiEdit?: boolean;
   form?: (props: FormProps) => JSX.Element;
   formProps: FormProps;
 }
