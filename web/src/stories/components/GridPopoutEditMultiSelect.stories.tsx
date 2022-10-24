@@ -10,9 +10,10 @@ import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
-import { GridPopoutEditMultiSelect, MultiSelectResult } from "../../components/GridPopoutEditMultiSelect";
+import { MultiSelectResult } from "../../components/gridForm/GridFormMultiSelect";
 import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
 import { GridCell } from "../../components/GridCell";
+import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
 
 export default {
   title: "Components / Grids",
