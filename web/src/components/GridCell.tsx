@@ -1,23 +1,24 @@
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridPopoverComponent } from "./gridPopoverEdit/GridPopover";
-import { MutableRefObject, useCallback, useContext, useRef, useState } from "react";
+import { MutableRefObject, useCallback, useContext, useState } from "react";
 import { BaseGridRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
-import { FocusableItem } from "@szhsin/react-menu";
-import { ComponentLoadingWrapper } from "./ComponentLoadingWrapper";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
-export interface GenericCellEditorParams<FormProps extends Record<string, any>> {
+export interface MyFormProps {
+  cellEditorParams: ICellEditorParams;
+  updateValue: (saveFn: () => Promise<boolean>) => Promise<boolean>;
+}
+
+export interface GenericCellEditorParams {
   multiEdit?: boolean;
-  form?: (props: FormProps) => JSX.Element;
-  formProps: FormProps;
+  form?: (props: MyFormProps) => JSX.Element;
 }
 
 export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
-  cellEditorParams?: GenericCellEditorParams<FormProps>;
+  cellEditorParams?: GenericCellEditorParams & FormProps;
   cellRendererParams?: GenericCellRendererParams;
 }
 
@@ -61,11 +62,6 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
   const { updatingCells } = useContext(GridContext);
-  const cellEditorParamsRef = useRef<ICellEditorParams>({} as ICellEditorParams);
-  const saveRef = useRef<SaveFn>(async () => {
-    return false;
-  });
-  cellEditorParamsRef.current = props;
 
   const { data } = props;
   const { cellEditorParams } = props.colDef;
@@ -74,28 +70,15 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   const [saving, setSaving] = useState(false);
 
-  const updateValue = useCallback(async (): Promise<boolean> => {
-    if (saving) return false;
-    return await updatingCells({ data, multiEdit, field }, saveRef.current, setSaving);
-  }, [data, field, multiEdit, saveRef, saving, updatingCells]);
+  const updateValue = useCallback(
+    async (saveFn: () => Promise<boolean>): Promise<boolean> => {
+      if (saving) return false;
+      return await updatingCells({ data, multiEdit, field }, saveFn, setSaving);
+    },
+    [data, field, multiEdit, saving, updatingCells],
+  );
 
   if (cellEditorParams == null) return <></>;
 
-  const children = (
-    <ComponentLoadingWrapper saving={saving}>
-      <FocusableItem>
-        {({ ref }: any) =>
-          cellEditorParams.form && (
-            <cellEditorParams.form
-              {...cellEditorParams.formProps}
-              saveRef={saveRef}
-              cellEditorParamsRef={cellEditorParamsRef}
-              triggerSave={updateValue}
-            />
-          )
-        }
-      </FocusableItem>
-    </ComponentLoadingWrapper>
-  );
-  return GridPopoverComponent(props, { children, canClose: updateValue });
+  return <>{cellEditorParams.form && <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} />}</>;
 };

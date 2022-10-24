@@ -77,11 +77,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Popout message",
         cellRenderer: () => <>Click me!</>,
         cellEditorParams: {
-          formProps: {
-            message: async (selectedRows: ITestRow[]) => {
-              await wait(1000);
-              return `There are ${selectedRows.length} row(s) selected`;
-            },
+          message: async (selectedRows: ITestRow[]) => {
+            await wait(1000);
+            return `There are ${selectedRows.length} row(s) selected`;
           },
           multiEdit: false,
         },
@@ -89,31 +87,29 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridPopoutMenu<ITestRow>({
         headerName: "Menu",
         cellEditorParams: {
-          formProps: {
-            options: async () => {
-              // Just doing a timeout here to demonstrate deferred loading
-              await wait(500);
-              return [
-                {
-                  label: "Single edit",
-                  action: async (selectedRows) => {
-                    alert(`Single-edit: ${selectedRows.length} rows`);
-                    await wait(1500);
-                    return true;
-                  },
-                  multiEdit: false,
+          options: async () => {
+            // Just doing a timeout here to demonstrate deferred loading
+            await wait(500);
+            return [
+              {
+                label: "Single edit",
+                action: async (selectedRows) => {
+                  alert(`Single-edit: ${selectedRows.length} rows`);
+                  await wait(1500);
+                  return true;
                 },
-                {
-                  label: "Multi-edit",
-                  action: async (selectedRows) => {
-                    alert(`Multi-edit: ${selectedRows.length} rows`);
-                    await wait(1500);
-                    return true;
-                  },
-                  multiEdit: true,
+                multiEdit: false,
+              },
+              {
+                label: "Multi-edit",
+                action: async (selectedRows) => {
+                  alert(`Multi-edit: ${selectedRows.length} rows`);
+                  await wait(1500);
+                  return true;
                 },
-              ];
-            },
+                multiEdit: true,
+              },
+            ];
           },
         },
       }),
@@ -121,10 +117,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Menu disabled",
         editable: false,
         cellEditorParams: {
-          formProps: {
-            options: async () => {
-              return [];
-            },
+          options: async () => {
+            return [];
           },
         },
       }),

@@ -1,7 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { wait } from "../../utils/util";
-import { GridGenericCellEditorFormContextParams } from "../GridCell";
+import { MyFormProps } from "../GridCell";
 import { TextAreaInput } from "../../lui/TextArea";
+import { GridContext } from "../../contexts/GridContext";
+import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FormTextAreaProps {
   placeholder?: string;
@@ -10,47 +12,44 @@ interface FormTextAreaProps {
   width?: string | number;
 }
 
-export const GridFormTextArea = (props: FormTextAreaProps): JSX.Element => {
-  const { saveRef, cellEditorParamsRef } = props as any as GridGenericCellEditorFormContextParams;
-  saveRef.current = useCallback(async (): Promise<boolean> => {
-    return true;
-  }, []);
-
-  const field = cellEditorParamsRef.current.colDef.field;
-  const [text, setText] = useState(cellEditorParamsRef.current.value);
+export const GridFormTextArea = (props: MyFormProps) => {
+  const { cellEditorParams } = props;
+  const { colDef } = cellEditorParams;
+  const formProps = colDef.cellEditorParams as FormTextAreaProps;
+  const { getSelectedRows } = useContext(GridContext);
+  const field = colDef.field;
+  const [text, setText] = useState(cellEditorParams.value);
 
   const invalid = useCallback(() => {
-    if (props.required && text.length == 0) {
+    if (formProps.required && text.length == 0) {
       return `Some text is required`;
     }
-    if (props.maxlength && text.length > props.maxlength) {
-      return `Text must be no longer than ${props.maxlength} characters`;
+    if (formProps.maxlength && text.length > formProps.maxlength) {
+      return `Text must be no longer than ${formProps.maxlength} characters`;
     }
-  }, [props.maxlength, props.required, text.length]);
+  }, [formProps.maxlength, formProps.required, text.length]);
 
-  saveRef.current = useCallback(
-    async (selectedRows: Record<string, any>[]): Promise<boolean> => {
-      if (field == null) {
-        console.error("ColDef has no field set");
-        return false;
-      }
-      if (invalid()) return false;
+  const save = useCallback(async (): Promise<boolean> => {
+    if (field == null) {
+      console.error("ColDef has no field set");
+      return false;
+    }
+    if (invalid()) return false;
 
-      selectedRows.forEach((row) => (row[field] = text));
-      await wait(1000);
-      return true;
-    },
-    [invalid, text, field],
-  );
+    getSelectedRows<any>().forEach((row) => (row[field] = text));
+    await wait(1000);
+    return true;
+  }, [invalid, text, field]);
+  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
 
-  return (
-    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
+  return popoutWrapper(
+    <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
       <TextAreaInput
         value={text}
         onChange={(e) => setText(e.target.value)}
         error={invalid()}
-        inputProps={{ placeholder: props.placeholder }}
+        inputProps={{ placeholder: formProps.placeholder }}
       />
-    </div>
+    </div>,
   );
 };

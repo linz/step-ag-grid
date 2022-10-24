@@ -48,12 +48,10 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         maxWidth: 140,
         cellEditorParams: {
           form: GridFormTextInput,
-          formProps: {
-            required: true,
-            maxlength: 12,
-            placeholder: "Enter some text...",
-            width: 240,
-          },
+          required: true,
+          maxlength: 12,
+          placeholder: "Enter some text...",
+          width: 240,
           multiEdit: false,
         },
       }),
@@ -63,12 +61,10 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         maxWidth: 140,
         cellEditorParams: {
           form: GridFormTextArea,
-          formProps: {
-            required: true,
-            maxlength: 32,
-            placeholder: "Enter some text...",
-            width: 260,
-          },
+          required: true,
+          maxlength: 32,
+          placeholder: "Enter some text...",
+          width: 260,
           multiEdit: true,
         },
       }),

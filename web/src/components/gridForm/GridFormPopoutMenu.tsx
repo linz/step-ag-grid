@@ -1,9 +1,10 @@
 import { BaseGridRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
-import { GridGenericCellEditorFormContextParams } from "../GridCell";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
+import { MyFormProps } from "../GridCell";
+import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridFormPopoutMenuProps<RowType> {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
@@ -26,15 +27,14 @@ export interface MenuOption<RowType> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormPopoutMenuProps<RowType>) => {
+export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: MyFormProps) => {
+  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams);
+  const { colDef } = props.cellEditorParams;
+  const formProps: GridFormPopoutMenuProps<RowType> = colDef.cellEditorParams;
   const { getSelectedRows } = useContext(GridContext);
-  const { saveRef, cellEditorParamsRef } = props as any as GridGenericCellEditorFormContextParams;
-  saveRef.current = useCallback(async (): Promise<boolean> => {
-    return true;
-  }, []);
 
-  const cellEditorParams = cellEditorParamsRef.current;
-  const { data, colDef } = cellEditorParams;
+  const { cellEditorParams } = props;
+  const { data } = cellEditorParams;
   const field = colDef.field ?? colDef.colId ?? "";
 
   const { updatingCells } = useContext(GridContext);
@@ -45,7 +45,7 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    const optionsConf = props.options ?? [];
+    const optionsConf = formProps.options ?? [];
 
     (async () => {
       if (typeof optionsConf == "function") {
@@ -56,7 +56,7 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
 
       optionsInitialising.current = false;
     })();
-  }, [getSelectedRows, options, props.options]);
+  }, [getSelectedRows, options, formProps.options]);
 
   const actionClick = useCallback(
     async (menuOption: MenuOption<any>) => {
@@ -73,7 +73,7 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
     (menuOption) => menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit,
   );
 
-  return (
+  return popoutWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions}>
       <>
         {options?.map((item, index) =>
@@ -81,7 +81,6 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
             <MenuItem
-              index={index}
               key={`${item.label}`}
               onClick={() => actionClick(item)}
               disabled={!filteredOptions?.includes(item)}
@@ -91,6 +90,6 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
           ),
         )}
       </>
-    </ComponentLoadingWrapper>
+    </ComponentLoadingWrapper>,
   );
 };

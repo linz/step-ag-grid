@@ -1,45 +1,46 @@
 import "./GridFormEditBearing.scss";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { BaseGridRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { GridGenericCellEditorFormContextParams } from "../GridCell";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
+import { GridContext } from "../../contexts/GridContext";
+import { MyFormProps } from "../GridCell";
+import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
   placeHolder: string;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends BaseGridRow>(
-  props: GridFormEditBearingProps<RowType>,
-): JSX.Element => {
-  const { saveRef, cellEditorParamsRef, triggerSave } = props as any as GridGenericCellEditorFormContextParams;
-  const cellEditorParams = cellEditorParamsRef.current;
-  const field = cellEditorParams.colDef.field;
-  saveRef.current = async (): Promise<boolean> => true;
+export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormProps) => {
+  const { colDef } = props.cellEditorParams;
+  const formProps: GridFormEditBearingProps<RowType> = colDef.cellEditorParams.formProps;
+  const { getSelectedRows } = useContext(GridContext);
+  const field = colDef.field;
+  const [value, setValue] = useState<string>(
+    props.cellEditorParams?.value == null ? "" : `${props.cellEditorParams.value}`,
+  );
 
-  const [value, setValue] = useState<string>(cellEditorParams.value == null ? "" : `${cellEditorParams.value}`);
-
-  saveRef.current = useCallback(
-    async (selectedRows: RowType[]): Promise<boolean> => {
+  const save = useCallback(async (): Promise<boolean> => {
+    return await props.updateValue(async () => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
-      if (props.onSave) {
-        await props.onSave(selectedRows, parsedValue);
+      if (formProps.onSave) {
+        return await formProps.onSave(getSelectedRows(), parsedValue);
       } else {
         if (field == null) {
           console.error("field is not defined in ColDef");
         } else {
-          selectedRows.forEach((row) => ((row as Record<string, any>)[field] = parsedValue));
+          getSelectedRows().forEach((row) => ((row as Record<string, any>)[field] = parsedValue));
         }
       }
       return true;
-    },
-    [value, field],
-  );
+    });
+  }, [field, formProps, getSelectedRows, props, value]);
+  const { popoutWrapper } = useGridPopoutHook(props.cellEditorParams, save);
 
-  return (
+  return popoutWrapper(
     <div className={"GridFormEditBearing-input"}>
       <TextInputFormatted
         value={value ?? ""}
@@ -48,14 +49,14 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(
         }}
         inputProps={{
           autoFocus: true,
-          placeholder: props.placeHolder,
+          placeholder: formProps.placeHolder,
           disabled: false,
           maxLength: 16,
-          onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
+          onKeyDown: async (e) => e.key === "Enter" && save().then(),
         }}
         formatted={bearingStringValidator(value) ? "?" : convertDDToDMS(bearingNumberParser(value))}
         error={bearingStringValidator(value)}
       />
-    </div>
+    </div>,
   );
 };

@@ -10,7 +10,7 @@ import { GenericCellEditorParams } from "../GridCell";
 
 export interface GenericCellColDef<FormProps extends Record<string, any>> extends ColDef {
   cellRendererParams?: GenericCellRendererParams;
-  cellEditorParams?: GenericCellEditorParams<FormProps>;
+  cellEditorParams?: GenericCellEditorParams & FormProps;
 }
 
 export interface GenericCellRendererParams {

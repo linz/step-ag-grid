@@ -56,9 +56,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         },
         cellEditorParams: {
           multiEdit: false,
-          formProps: {
-            placeHolder: "Enter Bearing",
-          },
+          placeHolder: "Enter Bearing",
         },
       }),
       GridPopoverEditBearing<ITestRow>({
@@ -66,13 +64,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Bearing onSave",
         cellEditorParams: {
           multiEdit: true,
-          formProps: {
-            placeHolder: "Enter Bearing",
-            onSave: async (selectedRows, value) => {
-              await wait(1000);
-              selectedRows.forEach((row) => (row["bearing2"] = value));
-              return true;
-            },
+          placeHolder: "Enter Bearing",
+          onSave: async (selectedRows, value) => {
+            await wait(1000);
+            selectedRows.forEach((row) => (row["bearing2"] = value));
+            return true;
           },
         },
       }),

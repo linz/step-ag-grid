@@ -6,11 +6,18 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useCallback, useMemo, useState } from "react";
-import { GridPopoutEditDropDown, MenuSeparator, MenuSeparatorString } from "../../components/GridPopoutEditDropDown";
+import {
+  GridFormDropDown,
+  GridFormPopoutDropDownProps,
+  MenuSeparator,
+  MenuSeparatorString,
+} from "../../components/gridForm/GridFormDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridCell } from "../../components/GridCell";
+import { GridFormPopoutMenuProps } from "../../components/gridForm/GridFormPopoutMenu";
+import { GridPopoutEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {
   title: "Components / Grids",
@@ -68,12 +75,13 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           initialWidth: 65,
           maxWidth: 85,
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
+        GridCell<ITestRow, GridFormPopoutDropDownProps<ITestRow, ITestRow["position"]>>({
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Position",
           cellEditorParams: {
+            form: GridFormDropDown,
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
             multiEdit: false,
           },

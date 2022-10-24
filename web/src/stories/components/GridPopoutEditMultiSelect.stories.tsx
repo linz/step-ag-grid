@@ -6,7 +6,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { MenuSeparator } from "../../components/GridPopoutEditDropDown";
+import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
