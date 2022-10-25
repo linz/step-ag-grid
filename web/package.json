@@ -1,5 +1,6 @@
 {
-  "name": "step-ag-grid-web",
+  "name": "@linzjs/step-ag-grid",
+  "repository": "github:linz/step-ag-grid.git",
   "version": "0.1.0",
   "private": true,
   "resolutions": {

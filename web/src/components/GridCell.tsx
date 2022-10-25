@@ -1,9 +1,11 @@
-import { MutableRefObject, useCallback, useContext, useState } from "react";
+import { MutableRefObject, useCallback, useContext, useMemo, useState } from "react";
 import { BaseGridRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
+import { GridFormEditBearing } from "./gridForm/GridFormEditBearing";
+import ReactDOM from "react-dom";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
@@ -65,7 +67,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 ) => {
   const { updatingCells } = useContext(GridContext);
 
-  const { data } = props;
+  const { colDef, data } = props;
   const { cellEditorParams } = props.colDef;
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   const field = props.colDef.field ?? "";
@@ -73,8 +75,9 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
-    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> =>
-      !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving)),
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
+      return !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving));
+    },
     [data, field, multiEdit, saving, updatingCells],
   );
 
@@ -82,10 +85,11 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
-    <>
-      {cellEditorParams.form && (
-        <cellEditorParams.form key={`${saving}`} cellEditorParams={props} updateValue={updateValue} saving={saving} />
+    <div>
+      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
+      {cellEditorParams?.form && (
+        <GridFormEditBearing cellEditorParams={props} updateValue={updateValue} saving={saving} />
       )}
-    </>
+    </div>
   );
 };

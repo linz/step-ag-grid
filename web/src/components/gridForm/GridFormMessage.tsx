@@ -14,8 +14,7 @@ export interface GridFormMessageProps<RowType extends BaseGridRow> {
 }
 
 export const GridFormMessage = <RowType extends BaseGridRow>(props: MyFormProps) => {
-  const { colDef } = props.cellEditorParams;
-  const formProps: GridFormMessageProps<RowType> = colDef.cellEditorParams;
+  const formProps: GridFormMessageProps<RowType> = props.cellEditorParams.colDef.cellEditorParams;
   const { getSelectedRows } = useContext(GridContext);
 
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
