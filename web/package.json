@@ -13,14 +13,13 @@
     "lodash-es": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "5.0.1",
-    "uuid": "^9.0.0",
-    "web-vitals": "^2.1.4"
+    "react-scripts": "^5.0.1",
+    "uuid": "^9.0.0"
   },
   "scripts": {
-    "build": "react-scripts build",
-    "test": "react-scripts test --passWithNoTests",
-    "eject": "react-scripts eject",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --passWithNoTests",
+    "eject": "react-app-rewired eject",
     "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
@@ -76,6 +75,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-testing-library": "^5.3.1",
     "prettier": "^2.2.1",
+    "react-app-rewired": "^2.2.1",
     "sass": "^1.49.9",
     "sass-loader": "^10.3.1",
     "semantic-release": "^19.0.5",
