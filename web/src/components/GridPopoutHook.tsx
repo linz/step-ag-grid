@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
 import { MyFormProps } from "./GridCell";
+import { hasParentClass } from "../utils/util";
 
 export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
   const { cellEditorParams, saving, updateValue } = props;
@@ -27,6 +28,44 @@ export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[
     },
     [save, stopEditing, updateValue],
   );
+
+  const clickIsWithinMenu = useCallback((ev: MouseEvent) => {
+    return hasParentClass("szh-menu--state-open", ev.target as Node);
+  }, []);
+
+  const handleScreenMouseDown = useCallback(
+    (ev: MouseEvent) => {
+      if (!clickIsWithinMenu(ev)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        triggerSave().then();
+      }
+    },
+    [clickIsWithinMenu, triggerSave],
+  );
+
+  const handleScreenMouseEvent = useCallback(
+    (ev: MouseEvent) => {
+      if (!clickIsWithinMenu(ev)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    },
+    [clickIsWithinMenu],
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("mousedown", handleScreenMouseDown, true);
+      document.addEventListener("mouseup", handleScreenMouseEvent, true);
+      document.addEventListener("click", handleScreenMouseEvent, true);
+      return () => {
+        document.removeEventListener("mousedown", handleScreenMouseDown, true);
+        document.removeEventListener("mouseup", handleScreenMouseEvent, true);
+        document.removeEventListener("click", handleScreenMouseEvent, true);
+      };
+    }
+  }, [handleScreenMouseDown, handleScreenMouseEvent, isOpen]);
 
   const popoutWrapper = useCallback(
     (children: JSX.Element) => {
