@@ -18,6 +18,7 @@ export interface GenericCellEditorParams {
   form?: (props: MyFormProps) => JSX.Element;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
   cellEditorParams?: GenericCellEditorParams & FormProps;
   cellRendererParams?: GenericCellRendererParams;
