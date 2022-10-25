@@ -43,6 +43,8 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
   const { colDef } = cellEditorParams;
   const formProps: GridFormMultiSelectProps<RowType, ValueType> = colDef.cellEditorParams;
   const field = colDef.field ?? colDef.colId ?? "";
+  // implement multi-edit when needed
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { multiEdit } = colDef.cellEditorParams;
 
   const [filter, setFilter] = useState("");
