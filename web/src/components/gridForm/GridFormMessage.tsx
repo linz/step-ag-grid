@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { BaseGridRow } from "../Grid";
@@ -13,9 +13,8 @@ export interface GridFormMessageProps<RowType extends BaseGridRow> {
   ) => Promise<string | JSX.Element> | string | JSX.Element;
 }
 
-export const GridFormMessage = <RowType extends BaseGridRow>(props: MyFormProps) => {
-  const { colDef } = props.cellEditorParams;
-  const formProps: GridFormMessageProps<RowType> = colDef.cellEditorParams;
+export const GridFormMessage = <RowType extends BaseGridRow>(props: GridFormProps) => {
+  const formProps: GridFormMessageProps<RowType> = props.cellEditorParams.colDef.cellEditorParams;
   const { getSelectedRows } = useContext(GridContext);
 
   const [message, setMessage] = useState<string | JSX.Element | null>(null);

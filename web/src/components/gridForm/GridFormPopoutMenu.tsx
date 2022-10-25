@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridFormPopoutMenuProps<RowType> {
@@ -27,7 +27,7 @@ export interface MenuOption<RowType> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: MyFormProps) => {
+export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormProps) => {
   const { popoutWrapper } = useGridPopoutHook(props);
   const { colDef } = props.cellEditorParams;
   const formProps: GridFormPopoutMenuProps<RowType> = colDef.cellEditorParams;

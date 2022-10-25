@@ -7,7 +7,7 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FinalSelectOption<ValueType> {
@@ -36,13 +36,15 @@ export interface GridFormMultiSelectProps<RowType, ValueType> {
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
-export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
+export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: GridFormProps) => {
   const { getSelectedRows } = useContext(GridContext);
 
   const { cellEditorParams } = props;
   const { colDef } = cellEditorParams;
   const formProps: GridFormMultiSelectProps<RowType, ValueType> = colDef.cellEditorParams;
   const field = colDef.field ?? colDef.colId ?? "";
+  // implement multi-edit when needed
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { multiEdit } = colDef.cellEditorParams;
 
   const [filter, setFilter] = useState("");
@@ -163,20 +165,21 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
                   }}
                 />
               </MenuItem>
-              <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                {(ref) =>
-                  selectedValues.includes(item.value) &&
-                  item.subComponent &&
-                  item.subComponent(
-                    {
-                      setValue: (value: any) => {
-                        subSelectedValues.current[item.value as string] = value;
+              {selectedValues.includes(item.value) && item.subComponent && (
+                <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                  {(ref) =>
+                    item.subComponent &&
+                    item.subComponent(
+                      {
+                        setValue: (value: any) => {
+                          subSelectedValues.current[item.value as string] = value;
+                        },
                       },
-                    },
-                    ref,
-                  )
-                }
-              </FocusableItem>
+                      ref,
+                    )
+                  }
+                </FocusableItem>
+              )}
             </>
           ),
         )}

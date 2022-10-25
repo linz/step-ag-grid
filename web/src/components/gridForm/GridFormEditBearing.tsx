@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { BaseGridRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
@@ -12,18 +12,21 @@ export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormProps) => {
+export const GridFormEditBearing = <RowType extends BaseGridRow>(props: GridFormProps) => {
   const { colDef } = props.cellEditorParams;
   const formProps: GridFormEditBearingProps<RowType> = colDef.cellEditorParams;
   const field = colDef.field;
-  const [value, setValue] = useState<string>(
-    props.cellEditorParams?.value == null ? "" : `${props.cellEditorParams.value}`,
-  );
+  const originalValue = props.cellEditorParams?.value;
+  const [value, setValue] = useState<string>(`${originalValue ?? ""}`);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
+      // Value didn't change so don't save just cancel
+      if (parsedValue === originalValue) {
+        return true;
+      }
       if (formProps.onSave) {
         return await formProps.onSave(selectedRows, parsedValue);
       } else {
@@ -35,7 +38,7 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormPr
       }
       return true;
     },
-    [field, formProps, value],
+    [field, formProps, originalValue, value],
   );
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 

@@ -2,13 +2,14 @@ import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
-import { MyFormProps } from "./GridCell";
+import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "../utils/util";
 
-export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
+export const useGridPopoutHook = (props: GridFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
   const { cellEditorParams, saving, updateValue } = props;
   const { eGridCell } = cellEditorParams as ICellEditorParams;
   const { stopEditing } = useContext(GridContext);
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
   const anchorRef = useRef(eGridCell);
   anchorRef.current = eGridCell;
   const [isOpen, setOpen] = useState(false);
@@ -16,8 +17,6 @@ export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[
   useEffect(() => {
     setOpen(true);
   }, []);
-
-  const cellRenderer = cellEditorParams.column.getColDef().cellRenderer;
 
   const triggerSave = useCallback(
     async (reason?: string) => {
@@ -38,10 +37,14 @@ export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[
       if (!clickIsWithinMenu(ev)) {
         ev.preventDefault();
         ev.stopPropagation();
-        triggerSave().then();
+        // There's an issue in React17
+        // the cell doesn't refresh during update if save is invoked from a native event
+        // This doesn't happen in React18
+        // To work around it, I invoke the save by clicking on an invisible button in the dropdown
+        saveButtonRef.current?.click();
       }
     },
-    [clickIsWithinMenu, triggerSave],
+    [clickIsWithinMenu],
   );
 
   const handleScreenMouseEvent = useCallback(
@@ -71,7 +74,6 @@ export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[
     (children: JSX.Element) => {
       return (
         <>
-          {cellRenderer ? cellRenderer(cellEditorParams) : cellEditorParams.value}
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
@@ -95,12 +97,13 @@ export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[
                 />
               )}
               {children}
+              <button ref={saveButtonRef} onClick={() => triggerSave().then()} style={{ display: "none" }} />
             </ControlledMenu>
           )}
         </>
       );
     },
-    [cellRenderer, cellEditorParams, isOpen, saving, triggerSave],
+    [isOpen, saving, triggerSave],
   );
 
   return {

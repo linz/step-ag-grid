@@ -7,7 +7,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
-export interface MyFormProps {
+export interface GridFormProps {
   cellEditorParams: ICellEditorParams;
   updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
   saving: boolean;
@@ -15,7 +15,7 @@ export interface MyFormProps {
 
 export interface GenericCellEditorParams {
   multiEdit?: boolean;
-  form?: (props: MyFormProps) => JSX.Element;
+  form?: (props: GridFormProps) => JSX.Element;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,7 +65,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 ) => {
   const { updatingCells } = useContext(GridContext);
 
-  const { data } = props;
+  const { colDef, data } = props;
   const { cellEditorParams } = props.colDef;
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   const field = props.colDef.field ?? "";
@@ -73,8 +73,9 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
-    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> =>
-      !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving)),
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
+      return !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving));
+    },
     [data, field, multiEdit, saving, updatingCells],
   );
 
@@ -82,10 +83,11 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
-    <>
-      {cellEditorParams.form && (
-        <cellEditorParams.form key={`${saving}`} cellEditorParams={props} updateValue={updateValue} saving={saving} />
+    <div>
+      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
+      {cellEditorParams?.form && (
+        <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} saving={saving} />
       )}
-    </>
+    </div>
   );
 };

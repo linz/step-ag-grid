@@ -3,7 +3,7 @@ import "./FormTest.scss";
 import { useCallback, useContext, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { GridGenericCellEditorFormContextParams, MyFormProps } from "../../components/GridCell";
+import { GridFormProps } from "../../components/GridCell";
 import { useGridPopoutHook } from "../../components/GridPopoutHook";
 import { GridContext } from "../../contexts/GridContext";
 
@@ -15,7 +15,7 @@ export interface IFormTestRow {
   plan: string;
 }
 
-export const FormTest = (props: MyFormProps): JSX.Element => {
+export const FormTest = (props: GridFormProps): JSX.Element => {
   const { cellEditorParams } = props;
   const { getSelectedRows } = useContext(GridContext);
   const [v1, v2, ...v3] = cellEditorParams.value.split(" ");
@@ -32,7 +32,7 @@ export const FormTest = (props: MyFormProps): JSX.Element => {
     cellEditorParams.data.name = [nameType, numba, plan].join(" ");
     await wait(1000);
     return true;
-  }, [cellEditorParams, nameType, numba, plan]);
+  }, [cellEditorParams.data, getSelectedRows, nameType, numba, plan]);
   const { popoutWrapper } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
