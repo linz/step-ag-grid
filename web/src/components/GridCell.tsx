@@ -72,19 +72,18 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
-    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
-      if (saving) return false;
-      return await updatingCells({ data, multiEdit, field }, saveFn, setSaving);
-    },
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> =>
+      saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving)),
     [data, field, multiEdit, saving, updatingCells],
   );
 
   if (cellEditorParams == null) return <></>;
 
+  // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
     <>
       {cellEditorParams.form && (
-        <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} saving={saving} />
+        <cellEditorParams.form key={`${saving}`} cellEditorParams={props} updateValue={updateValue} saving={saving} />
       )}
     </>
   );
