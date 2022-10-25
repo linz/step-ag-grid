@@ -8,7 +8,7 @@ import { GridBaseRow } from "../Grid";
 export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormEditBearingProps<RowType>>,
 ) =>
-  GridCell({
+  GridCell<RowType, GridFormEditBearingProps<RowType>>({
     initialWidth: 65,
     maxWidth: 150,
     valueFormatter: bearingValueFormatter,

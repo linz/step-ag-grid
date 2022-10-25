@@ -6,7 +6,7 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 export const GridPopoverMessage = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormMessageProps<RowType>>,
 ) => {
-  return GridCell({
+  return GridCell<RowType, GridFormMessageProps<RowType>>({
     maxWidth: 140,
     ...colDef,
     cellRendererParams: colDef.cellRendererParams ?? {

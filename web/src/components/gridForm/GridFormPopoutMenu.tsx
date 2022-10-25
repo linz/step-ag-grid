@@ -3,10 +3,10 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> {
+export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
 }
 

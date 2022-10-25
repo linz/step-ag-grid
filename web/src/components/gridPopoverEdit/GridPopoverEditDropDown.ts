@@ -7,7 +7,7 @@ import { GridFormDropDown, GridFormPopoutDropDownProps } from "../gridForm/GridF
 export const GridPopoutEditDropDown = <RowType extends GridBaseRow, ValueType>(
   colDef: GenericCellColDef<RowType, GridFormPopoutDropDownProps<RowType, ValueType>>,
 ) =>
-  GridCell({
+  GridCell<RowType, GridFormPopoutDropDownProps<RowType, ValueType>>({
     initialWidth: 65,
     maxWidth: 150,
     cellRenderer: GridGenericCellRendererComponent,

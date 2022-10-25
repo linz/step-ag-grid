@@ -4,10 +4,10 @@ import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
+export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   placeHolder: string;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }

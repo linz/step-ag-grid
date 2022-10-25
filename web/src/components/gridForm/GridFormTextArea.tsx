@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { TextAreaInput } from "../../lui/TextArea";
 import { useGridPopoutHook } from "../GridPopoutHook";
 import { GridBaseRow } from "../Grid";
 
-export interface GridFormTextAreaProps<RowType> {
+export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   placeholder?: string;
   required?: boolean;
   maxlength?: number;

@@ -20,16 +20,18 @@ export interface GenericCellEditorParams<RowType extends GridBaseRow> {
   form?: (props: GridFormProps<RowType>) => JSX.Element;
 }
 
-export interface GenericCellEditorColDef<RowType extends GridBaseRow, FormProps extends Record<string, any>>
-  extends ColDef {
-  cellEditorParams?: GenericCellEditorParams<RowType> & FormProps;
+export interface GenericCellEditorColDef<
+  RowType extends GridBaseRow,
+  FormProps extends GenericCellEditorParams<RowType>,
+> extends ColDef {
+  cellEditorParams?: FormProps;
   cellRendererParams?: GenericCellRendererParams;
 }
 
 /**
  * For editing a text area.
  */
-export const GridCell = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
+export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericCellEditorParams<RowType>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
   return props.cellEditorParams
@@ -77,7 +79,7 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
     async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
       return !saving && (await updatingCells({ selectedRows, field }, saveFn, setSaving));
     },
-    [data, field, multiEdit, saving, updatingCells],
+    [field, saving, selectedRows, updatingCells],
   );
 
   if (cellEditorParams == null) return <></>;

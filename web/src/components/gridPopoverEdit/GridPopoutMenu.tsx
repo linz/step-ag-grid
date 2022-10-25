@@ -15,7 +15,7 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 export const GridPopoutMenu = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormPopoutMenuProps<RowType>>,
 ): ColDef =>
-  GridCell({
+  GridCell<RowType, GridFormPopoutMenuProps<RowType>>({
     maxWidth: 64,
     editable: colDef.editable != null ? colDef.editable : true,
     cellRenderer: GridRenderPopoutMenuCell,

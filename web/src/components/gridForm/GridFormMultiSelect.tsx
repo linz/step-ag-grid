@@ -6,7 +6,7 @@ import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FinalSelectOption<ValueType> {
@@ -25,8 +25,8 @@ export interface MultiSelectResult<RowType> {
   values: Record<string, any>;
 }
 
-export interface GridFormMultiSelectProps<RowType, ValueType> {
-  multiEdit: boolean;
+export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType>
+  extends GenericCellEditorParams<RowType> {
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;

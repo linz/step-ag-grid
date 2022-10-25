@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridBaseRow } from "../Grid";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormMessageProps<RowType extends GridBaseRow> {
+export interface GridFormMessageProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   message: (
     selectedRows: RowType[],
     cellEditorParams: ICellEditorParams,

@@ -7,7 +7,7 @@ import { GridFormMultiSelect, GridFormMultiSelectProps } from "../gridForm/GridF
 export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow, ValueType>(
   colDef: GenericCellColDef<RowType, GridFormMultiSelectProps<RowType, ValueType>>,
 ) =>
-  GridCell({
+  GridCell<RowType, GridFormMultiSelectProps<RowType, ValueType>>({
     initialWidth: 65,
     maxWidth: 150,
     cellRenderer: GridGenericCellRendererComponent,
