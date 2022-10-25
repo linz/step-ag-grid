@@ -56,7 +56,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         },
       }),
       GridCell({
-        field: "name",
+        field: "plan",
         headerName: "Text area",
         maxWidth: 140,
         cellEditorParams: {
