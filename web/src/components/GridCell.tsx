@@ -73,7 +73,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> =>
-      saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving)),
+      !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving)),
     [data, field, multiEdit, saving, updatingCells],
   );
 
