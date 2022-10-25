@@ -14,7 +14,7 @@ export interface GridFormTextInputProps<RowType> {
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
   const formProps = props.formProps as GridFormTextInputProps<RowType>;
-  const [value, setValue] = useState(props.value);
+  const [value, setValue] = useState(props.value ?? "");
 
   const invalid = useCallback(() => {
     if (formProps.required && value.length == 0) {
@@ -29,7 +29,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
     async (selectedRows: any[]): Promise<boolean> => {
       if (invalid()) return false;
 
-      if (props.value === value) return true;
+      if (props.value === (value ?? "")) return true;
 
       if (formProps.onSave) {
         return await formProps.onSave(selectedRows, value);
