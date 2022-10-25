@@ -1,10 +1,9 @@
 import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { BaseGridRow } from "../Grid";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { GridFormProps } from "../GridCell";
@@ -36,16 +35,8 @@ export interface GridFormMultiSelectProps<RowType, ValueType> {
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
-export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: GridFormProps) => {
-  const { getSelectedRows } = useContext(GridContext);
-
-  const { cellEditorParams } = props;
-  const { colDef } = cellEditorParams;
-  const formProps: GridFormMultiSelectProps<RowType, ValueType> = colDef.cellEditorParams;
-  const field = colDef.field ?? colDef.colId ?? "";
-  // implement multi-edit when needed
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { multiEdit } = colDef.cellEditorParams;
+export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
+  const formProps = props.formProps as GridFormMultiSelectProps<RowType, ValueType>;
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -77,7 +68,7 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(getSelectedRows());
+        optionsConf = await optionsConf(props.selectedRows);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -96,7 +87,7 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
       }
       optionsInitialising.current = false;
     })();
-  }, [formProps.filtered, formProps.options, field, options, getSelectedRows]);
+  }, [formProps.filtered, formProps.options, options, props.selectedRows]);
 
   useEffect(() => {
     if (!formProps.filtered || options == null) return;

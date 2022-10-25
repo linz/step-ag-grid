@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import { GridApi } from "ag-grid-community";
+import { GridBaseRow } from "../components/Grid";
 
 export interface GridContextType {
   gridReady: () => boolean;
@@ -18,7 +19,7 @@ export interface GridContextType {
   ensureSelectedRowIsVisible: () => void;
   stopEditing: () => void;
   updatingCells: (
-    props: { data: any; multiEdit?: boolean; field: string },
+    props: { selectedRows: GridBaseRow[]; field?: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
   ) => Promise<boolean>;

@@ -1,10 +1,10 @@
 import { GridCell } from "../GridCell";
 import { GridFormMessage, GridFormMessageProps } from "../gridForm/GridFormMessage";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
-export const GridPopoverMessage = <RowType extends BaseGridRow>(
-  colDef: GenericCellColDef<GridFormMessageProps<RowType>>,
+export const GridPopoverMessage = <RowType extends GridBaseRow>(
+  colDef: GenericCellColDef<RowType, GridFormMessageProps<RowType>>,
 ) => {
   return GridCell({
     maxWidth: 140,

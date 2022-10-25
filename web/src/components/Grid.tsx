@@ -14,7 +14,7 @@ import { isNotEmpty } from "../utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { UpdatingContext } from "../contexts/UpdatingContext";
 
-export interface BaseGridRow {
+export interface GridBaseRow {
   id: string | number;
 }
 

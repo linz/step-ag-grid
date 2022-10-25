@@ -7,10 +7,11 @@ import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GenericCellEditorParams } from "../GridCell";
+import { GridBaseRow } from "../Grid";
 
-export interface GenericCellColDef<FormProps extends Record<string, any>> extends ColDef {
+export interface GenericCellColDef<RowType extends GridBaseRow, FormProps extends Record<string, any>> extends ColDef {
   cellRendererParams?: GenericCellRendererParams;
-  cellEditorParams?: GenericCellEditorParams & FormProps;
+  cellEditorParams?: GenericCellEditorParams<RowType> & FormProps;
 }
 
 export interface GenericCellRendererParams {

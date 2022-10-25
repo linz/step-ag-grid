@@ -9,8 +9,9 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { GridCell } from "../../components/GridCell";
 import { IFormTestRow } from "./FormTest";
-import { GridFormTextArea } from "../../components/gridForm/GridFormTextArea";
-import { GridFormTextInput } from "../../components/gridForm/GridFormTextInput";
+import { GridFormTextArea, GridFormTextAreaProps } from "../../components/gridForm/GridFormTextArea";
+import { GridFormTextInput, GridFormTextInputProps } from "../../components/gridForm/GridFormTextInput";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -42,7 +43,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell({
+      GridCell<IFormTestRow, GridFormTextInputProps<IFormTestRow>>({
         field: "name",
         headerName: "Text input",
         maxWidth: 140,
@@ -53,9 +54,14 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           placeholder: "Enter some text...",
           width: 240,
           multiEdit: false,
+          onSave: async (selectedRows, value) => {
+            await wait(1000);
+            selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
+            return true;
+          },
         },
       }),
-      GridCell({
+      GridCell<IFormTestRow, GridFormTextAreaProps<IFormTestRow>>({
         field: "plan",
         headerName: "Text area",
         maxWidth: 140,
@@ -66,6 +72,11 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           placeholder: "Enter some text...",
           width: 260,
           multiEdit: true,
+          onSave: async (selectedRows, value) => {
+            await wait(1000);
+            selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
+            return true;
+          },
         },
       }),
     ],

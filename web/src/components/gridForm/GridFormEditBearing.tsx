@@ -1,35 +1,33 @@
 import "./GridFormEditBearing.scss";
 
 import { useCallback, useState } from "react";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
 import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
+export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
   placeHolder: string;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends BaseGridRow>(props: GridFormProps) => {
-  const { colDef } = props.cellEditorParams;
-  const formProps: GridFormEditBearingProps<RowType> = colDef.cellEditorParams;
-  const field = colDef.field;
-  const originalValue = props.cellEditorParams?.value;
-  const [value, setValue] = useState<string>(`${originalValue ?? ""}`);
+export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
+  const formProps = props.formProps as GridFormEditBearingProps<RowType>;
+  const [value, setValue] = useState<string>(`${props.value ?? ""}`);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
       // Value didn't change so don't save just cancel
-      if (parsedValue === originalValue) {
+      if (parsedValue === props.value) {
         return true;
       }
       if (formProps.onSave) {
         return await formProps.onSave(selectedRows, parsedValue);
       } else {
+        const field = props.field;
         if (field == null) {
           console.error("field is not defined in ColDef");
         } else {
@@ -38,7 +36,7 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(props: GridForm
       }
       return true;
     },
-    [field, formProps, originalValue, value],
+    [formProps, props.field, props.value, value],
   );
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 

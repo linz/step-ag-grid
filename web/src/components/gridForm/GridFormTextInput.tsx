@@ -1,53 +1,57 @@
 import { useCallback, useState } from "react";
-import { wait } from "../../utils/util";
 import { GridFormProps } from "../GridCell";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoutHook } from "../GridPopoutHook";
+import { GridBaseRow } from "../Grid";
 
-interface GridFormTextInputProps {
+export interface GridFormTextInputProps<RowType> {
   placeholder?: string;
   required?: boolean;
   maxlength?: number;
   width?: string | number;
+  onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextInput = (props: GridFormProps) => {
-  const { cellEditorParams } = props;
-  const { colDef } = cellEditorParams;
-  const formProps = colDef.cellEditorParams as GridFormTextInputProps;
-  const [text, setText] = useState(cellEditorParams.value);
+export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
+  const formProps = props.formProps as GridFormTextInputProps<RowType>;
+  const [value, setValue] = useState(props.value);
 
   const invalid = useCallback(() => {
-    if (formProps.required && text.length == 0) {
+    if (formProps.required && value.length == 0) {
       return `Some text is required`;
     }
-    if (formProps.maxlength && text.length > formProps.maxlength) {
+    if (formProps.maxlength && value.length > formProps.maxlength) {
       return `Text must be no longer than ${formProps.maxlength} characters`;
     }
-  }, [formProps.maxlength, formProps.required, text.length]);
+  }, [formProps.maxlength, formProps.required, value.length]);
 
   const save = useCallback(
     async (selectedRows: any[]): Promise<boolean> => {
-      const field = colDef.field;
+      if (invalid()) return false;
+
+      if (props.value === value) return true;
+
+      if (formProps.onSave) {
+        return await formProps.onSave(selectedRows, value);
+      }
+
+      const field = props.field;
       if (field == null) {
         console.error("ColDef has no field set");
         return false;
       }
-      if (invalid()) return false;
-
-      selectedRows.forEach((row) => (row[field] = text));
-      await wait(1000);
+      selectedRows.forEach((row) => (row[field] = value));
       return true;
     },
-    [colDef.field, invalid, text],
+    [invalid, props.value, props.field, value, formProps],
   );
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
       <TextInputFormatted
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         formatted={""}
         inputProps={{

@@ -1,30 +1,28 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GridFormProps } from "../GridCell";
 import { ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { BaseGridRow } from "../Grid";
-import { GridContext } from "../../contexts/GridContext";
+import { GridBaseRow } from "../Grid";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormMessageProps<RowType extends BaseGridRow> {
+export interface GridFormMessageProps<RowType extends GridBaseRow> {
   message: (
     selectedRows: RowType[],
     cellEditorParams: ICellEditorParams,
   ) => Promise<string | JSX.Element> | string | JSX.Element;
 }
 
-export const GridFormMessage = <RowType extends BaseGridRow>(props: GridFormProps) => {
-  const formProps: GridFormMessageProps<RowType> = props.cellEditorParams.colDef.cellEditorParams;
-  const { getSelectedRows } = useContext(GridContext);
+export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
+  const formProps = props.formProps as GridFormMessageProps<RowType>;
 
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
   const { popoutWrapper } = useGridPopoutHook(props);
 
   useEffect(() => {
     (async () => {
-      setMessage(await formProps.message(getSelectedRows(), props.cellEditorParams));
+      setMessage(await formProps.message(props.selectedRows, props.cellEditorParams));
     })().then();
-  }, [formProps, getSelectedRows, props]);
+  }, [formProps, props.selectedRows, props]);
 
   return popoutWrapper(
     <ComponentLoadingWrapper loading={message === null}>

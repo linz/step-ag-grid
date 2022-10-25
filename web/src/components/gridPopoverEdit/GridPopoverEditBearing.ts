@@ -3,10 +3,10 @@ import { GenericCellColDef, GridGenericCellRendererComponent } from "../gridRend
 import { bearingValueFormatter } from "../../utils/bearing";
 import { GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 
-export const GridPopoverEditBearing = <RowType extends BaseGridRow>(
-  colDef: GenericCellColDef<GridFormEditBearingProps<RowType>>,
+export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
+  colDef: GenericCellColDef<RowType, GridFormEditBearingProps<RowType>>,
 ) =>
   GridCell({
     initialWidth: 65,
