@@ -165,20 +165,21 @@ export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(prop
                   }}
                 />
               </MenuItem>
-              <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                {(ref) =>
-                  selectedValues.includes(item.value) &&
-                  item.subComponent &&
-                  item.subComponent(
-                    {
-                      setValue: (value: any) => {
-                        subSelectedValues.current[item.value as string] = value;
+              {selectedValues.includes(item.value) && item.subComponent && (
+                <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                  {(ref) =>
+                    item.subComponent &&
+                    item.subComponent(
+                      {
+                        setValue: (value: any) => {
+                          subSelectedValues.current[item.value as string] = value;
+                        },
                       },
-                    },
-                    ref,
-                  )
-                }
-              </FocusableItem>
+                      ref,
+                    )
+                  }
+                </FocusableItem>
+              )}
             </>
           ),
         )}
