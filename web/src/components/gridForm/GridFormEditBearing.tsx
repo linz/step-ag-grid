@@ -24,6 +24,10 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormPr
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
+      // Value didn't change so don't save just cancel
+      if (parsedValue === props.cellEditorParams?.value) {
+        return true;
+      }
       if (formProps.onSave) {
         return await formProps.onSave(selectedRows, parsedValue);
       } else {
