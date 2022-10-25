@@ -16,16 +16,15 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormPr
   const { colDef } = props.cellEditorParams;
   const formProps: GridFormEditBearingProps<RowType> = colDef.cellEditorParams;
   const field = colDef.field;
-  const [value, setValue] = useState<string>(
-    props.cellEditorParams?.value == null ? "" : `${props.cellEditorParams.value}`,
-  );
+  const originalValue = props.cellEditorParams?.value;
+  const [value, setValue] = useState<string>(`${originalValue ?? ""}`);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
       // Value didn't change so don't save just cancel
-      if (parsedValue === props.cellEditorParams?.value) {
+      if (parsedValue === originalValue) {
         return true;
       }
       if (formProps.onSave) {
@@ -39,7 +38,7 @@ export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormPr
       }
       return true;
     },
-    [field, formProps, value],
+    [field, formProps, originalValue, value],
   );
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 
