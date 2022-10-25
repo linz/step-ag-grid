@@ -4,7 +4,6 @@ import { GridContext } from "../contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
-import { GridFormEditBearing } from "./gridForm/GridFormEditBearing";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
@@ -87,7 +86,7 @@ export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProp
     <div>
       <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
       {cellEditorParams?.form && (
-        <GridFormEditBearing cellEditorParams={props} updateValue={updateValue} saving={saving} />
+        <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} saving={saving} />
       )}
     </div>
   );
