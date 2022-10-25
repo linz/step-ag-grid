@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { wait } from "../../utils/util";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { TextAreaInput } from "../../lui/TextArea";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
@@ -11,7 +11,7 @@ interface FormTextAreaProps {
   width?: string | number;
 }
 
-export const GridFormTextArea = (props: MyFormProps) => {
+export const GridFormTextArea = (props: GridFormProps) => {
   const { cellEditorParams } = props;
   const { colDef } = cellEditorParams;
   const formProps = colDef.cellEditorParams as FormTextAreaProps;

@@ -4,7 +4,6 @@ import { bearingValueFormatter } from "../../utils/bearing";
 import { GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { BaseGridRow } from "../Grid";
-import { GridPopupProps } from "./GridPopover";
 
 export const GridPopoverEditBearing = <RowType extends BaseGridRow>(
   colDef: GenericCellColDef<GridFormEditBearingProps<RowType>>,

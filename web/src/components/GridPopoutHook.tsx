@@ -2,10 +2,10 @@ import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
-import { MyFormProps } from "./GridCell";
+import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "../utils/util";
 
-export const useGridPopoutHook = (props: MyFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
+export const useGridPopoutHook = (props: GridFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
   const { cellEditorParams, saving, updateValue } = props;
   const { eGridCell } = cellEditorParams as ICellEditorParams;
   const { stopEditing } = useContext(GridContext);

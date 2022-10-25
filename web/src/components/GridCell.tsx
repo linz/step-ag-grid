@@ -7,7 +7,7 @@ import { ColDef, ICellEditorParams } from "ag-grid-community";
 
 type SaveFn = (selectedRows: any[]) => Promise<boolean>;
 
-export interface MyFormProps {
+export interface GridFormProps {
   cellEditorParams: ICellEditorParams;
   updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
   saving: boolean;
@@ -15,7 +15,7 @@ export interface MyFormProps {
 
 export interface GenericCellEditorParams {
   multiEdit?: boolean;
-  form?: (props: MyFormProps) => JSX.Element;
+  form?: (props: GridFormProps) => JSX.Element;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

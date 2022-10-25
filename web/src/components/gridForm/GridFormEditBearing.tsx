@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { BaseGridRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
@@ -12,7 +12,7 @@ export interface GridFormEditBearingProps<RowType extends BaseGridRow> {
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends BaseGridRow>(props: MyFormProps) => {
+export const GridFormEditBearing = <RowType extends BaseGridRow>(props: GridFormProps) => {
   const { colDef } = props.cellEditorParams;
   const formProps: GridFormEditBearingProps<RowType> = colDef.cellEditorParams;
   const field = colDef.field;

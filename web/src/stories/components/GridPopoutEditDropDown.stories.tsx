@@ -16,7 +16,6 @@ import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider"
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridCell } from "../../components/GridCell";
-import { GridFormPopoutMenuProps } from "../../components/gridForm/GridFormPopoutMenu";
 import { GridPopoutEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {

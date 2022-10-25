@@ -7,7 +7,7 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 interface FinalSelectOption<ValueType> {
@@ -36,7 +36,7 @@ export interface GridFormMultiSelectProps<RowType, ValueType> {
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
 }
 
-export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
+export const GridFormMultiSelect = <RowType extends BaseGridRow, ValueType>(props: GridFormProps) => {
   const { getSelectedRows } = useContext(GridContext);
 
   const { cellEditorParams } = props;

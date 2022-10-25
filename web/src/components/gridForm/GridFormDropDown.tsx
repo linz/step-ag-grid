@@ -7,7 +7,7 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
-import { MyFormProps } from "../GridCell";
+import { GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
@@ -35,7 +35,7 @@ export interface GridFormPopoutDropDownProps<RowType, ValueType> {
   optionsRequestCancel?: () => void;
 }
 
-export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: MyFormProps) => {
+export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: GridFormProps) => {
   const { getSelectedRows } = useContext(GridContext);
   const { popoutWrapper } = useGridPopoutHook(props);
 
