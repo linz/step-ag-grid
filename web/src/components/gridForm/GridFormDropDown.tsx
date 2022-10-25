@@ -50,6 +50,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
   const selectItemHandler = useCallback(
     async (value: ValueType): Promise<boolean> => {
       const field = props.field;
+      console.log("psr", [...props.selectedRows]);
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
@@ -62,7 +63,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         return true;
       });
     },
-    [formProps, props.selectedRows, updatingCells],
+    [formProps, props.field, props.selectedRows, updatingCells],
   );
 
   // Load up options list if it's async function
@@ -73,7 +74,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(getSelectedRows(), filter);
+        optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -92,7 +93,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
       }
       optionsInitialising.current = false;
     })();
-  }, [filter, getSelectedRows, options, formProps.filtered, formProps.options]);
+  }, [filter, options, formProps.filtered, formProps.options, props.selectedRows]);
 
   // Local filtering
   useEffect(() => {

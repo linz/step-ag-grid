@@ -71,7 +71,7 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
   const formProps = colDef.cellEditorParams ?? {};
   const value = colDef.cellEditorParams?.value;
   // TODO maybe useRef to make sure this doesn't change
-  const selectedRows = multiEdit ? [data] : getSelectedRows<RowType>();
+  const selectedRows = multiEdit ? getSelectedRows<RowType>() : [data];
 
   const [saving, setSaving] = useState(false);
 

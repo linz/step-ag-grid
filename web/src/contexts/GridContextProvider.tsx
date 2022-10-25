@@ -230,7 +230,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     setSaving && setSaving(true);
 
     return await gridApiOp(async (gridApi) => {
-      const selectedRows = gridApi.getSelectedRows();
+      const selectedRows = props.selectedRows;
       //TODO do I need to do this for all rows?
       /*if (!props.multiEdit) {
         // You can't use data as it could be an orphaned reference due to updates
@@ -243,13 +243,13 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         selectedRows.map((data) => data.id),
         async () => {
           // Need to refresh to get spinners to work on all rows
-          gridApi.refreshCells({ rowNodes: selectedRows, force: true });
+          gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
           ok = await fnUpdate(selectedRows);
         },
       );
 
       // async processes need to refresh their own rows
-      gridApi.refreshCells({ rowNodes: selectedRows, force: true });
+      gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
       if (ok) {
         const cell = gridApi.getFocusedCell();
