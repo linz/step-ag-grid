@@ -107,7 +107,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
 
   return popoutWrapper(
     <ComponentLoadingWrapper loading={!options}>
-      <>
+      <div className={"Grid-popoverContainerList"}>
         {options && formProps.filtered && (
           <>
             <FocusableItem className={"filter-item"}>
@@ -174,7 +174,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             </>
           ),
         )}
-      </>
+      </div>
     </ComponentLoadingWrapper>,
   );
 };

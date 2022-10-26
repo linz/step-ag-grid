@@ -70,7 +70,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
   const { popoutWrapper } = useGridPopoutHook(props);
   return popoutWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions}>
-      <>
+      <div className={"Grid-popoverContainerList"}>
         {options?.map((item, index) =>
           item.label === MenuSeparator ? (
             <MenuDivider key={`$$divider_${index}`} />
@@ -84,7 +84,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
             </MenuItem>
           ),
         )}
-      </>
+      </div>
     </ComponentLoadingWrapper>,
   );
 };

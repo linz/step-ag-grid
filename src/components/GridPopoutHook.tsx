@@ -72,6 +72,7 @@ export const useGridPopoutHook = <RowType extends GridBaseRow>(
         document.removeEventListener("click", handleScreenMouseEvent, true);
       };
     }
+    return () => {};
   }, [handleScreenMouseDown, handleScreenMouseEvent, isOpen]);
 
   const popoutWrapper = useCallback(

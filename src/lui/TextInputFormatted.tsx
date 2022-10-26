@@ -8,8 +8,8 @@ import { LuiIcon } from "@linzjs/lui";
 export interface LuiTextInputProps {
   onChange?: ChangeEventHandler<HTMLInputElement>;
   inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-  error?: string;
-  warning?: string;
+  error?: string | boolean | null;
+  warning?: string | boolean | null;
 
   className?: string;
   value: string;
@@ -21,7 +21,14 @@ export interface LuiTextInputProps {
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
   return (
-    <div className={clsx("LuiTextInput", props.error && "hasError", props.warning && "hasWarning", props.className)}>
+    <div
+      className={clsx(
+        "LuiTextInput Grid-popoverContainer",
+        props.error && "hasError",
+        props.warning && "hasWarning",
+        props.className,
+      )}
+    >
       <span className="LuiTextInput-inputWrapper">
         <input
           type={"text"}

@@ -26,7 +26,9 @@ export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormProp
 
   return popoutWrapper(
     <ComponentLoadingWrapper loading={message === null}>
-      <div style={{ maxWidth: 400, padding: 16 }}>{message}</div>
+      <div style={{ maxWidth: 400 }} className={"Grid-popoverContainer"}>
+        {message}
+      </div>
     </ComponentLoadingWrapper>,
   );
 };

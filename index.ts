@@ -20,7 +20,7 @@ export { GridPopoutEditMultiSelect } from "./src/components/gridPopoverEdit/Grid
 export { GridPopoutMenu } from "./src/components/gridPopoverEdit/GridPopoutMenu";
 export { GridPopoverEditBearing } from "./src/components/gridPopoverEdit/GridPopoverEditBearing";
 export { GridPopoverEditDropDown } from "./src/components/gridPopoverEdit/GridPopoverEditDropDown";
-export { GridPopoverMessage} from "./src/components/gridPopoverEdit/GridPopoverMessage";
+export { GridPopoverMessage } from "./src/components/gridPopoverEdit/GridPopoverMessage";
 
 export { GridHeaderSelect } from "./src/components/gridHeader/GridHeaderSelect";
 
@@ -37,4 +37,3 @@ export { TextInputFormatted } from "./src/lui/TextInputFormatted";
 
 export * from "./src/utils/bearing";
 export * from "./src/utils/util";
-

@@ -23,6 +23,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormPro
     if (formProps.maxlength && value.length > formProps.maxlength) {
       return `Text must be no longer than ${formProps.maxlength} characters`;
     }
+    return null;
   }, [formProps.maxlength, formProps.required, value.length]);
 
   const save = useCallback(
