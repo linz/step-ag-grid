@@ -1,4 +1,10 @@
 
-.FormTest .LuiTextInput-input {
+.FormTest {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+.FormTest-textInput {
   width: 100px;
 }

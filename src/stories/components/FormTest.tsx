@@ -36,10 +36,16 @@ export const FormTest = <RowType extends GridBaseRow>(props: GridFormProps<RowTy
   const { popoutWrapper } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
-    <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest"}>
-      <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
-      <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
-      <LuiTextInput label={"Plan"} value={plan} onChange={(e) => setPlan(e.target.value)} />
+    <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
+      <div className={"FormTest-textInput"}>
+        <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
+      </div>
+      <div className={"FormTest-textInput"}>
+        <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
+      </div>
+      <div className={"FormTest-textInput"}>
+        <LuiTextInput label={"Plan"} value={plan} onChange={(e) => setPlan(e.target.value)} />
+      </div>
     </div>,
   );
 };
