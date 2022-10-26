@@ -100,6 +100,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   return (
     <Grid
       {...props}
+      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}

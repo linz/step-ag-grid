@@ -19,6 +19,7 @@ export interface GridBaseRow {
 }
 
 export interface GridProps {
+  selectable?: boolean;
   dataTestId?: string;
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
@@ -111,21 +112,24 @@ export const Grid = (params: GridProps): JSX.Element => {
   }, [synchroniseExternallySelectedItemsToGrid]);
 
   const columnDefs = useMemo(
-    (): GridOptions["columnDefs"] => [
-      {
-        colId: "selection",
-        editable: false,
-        initialWidth: 35,
-        minWidth: 35,
-        maxWidth: 35,
-        suppressSizeToFit: true,
-        checkboxSelection: true,
-        headerComponent: GridHeaderSelect,
-        onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
-      },
-      ...(params.columnDefs as ColDef[]),
-    ],
-    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs],
+    (): GridOptions["columnDefs"] =>
+      params.selectable
+        ? [
+            {
+              colId: "selection",
+              editable: false,
+              initialWidth: 35,
+              minWidth: 35,
+              maxWidth: 35,
+              suppressSizeToFit: true,
+              checkboxSelection: true,
+              headerComponent: GridHeaderSelect,
+              onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
+            },
+            ...(params.columnDefs as ColDef[]),
+          ]
+        : [...(params.columnDefs as ColDef[])],
+    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs, params.selectable],
   );
 
   const onGridReady = useCallback(
