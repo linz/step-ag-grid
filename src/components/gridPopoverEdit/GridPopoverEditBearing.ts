@@ -13,7 +13,7 @@ export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
     maxWidth: 150,
     valueFormatter: bearingValueFormatter,
     cellRenderer: GridGenericCellRendererComponent,
-    cellClass: colDef.cellEditor?.multiEdit ? GenericMultiEditCellClass : undefined,
+    cellClass: colDef.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
     ...colDef,
     ...(colDef?.cellEditorParams && {
       cellEditorParams: {

@@ -160,8 +160,6 @@ export const Grid = (params: GridProps): JSX.Element => {
       force: true,
       rowNodes: event.api.getSelectedNodes(),
     });
-    const cell = event.api.getFocusedCell();
-    cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
   }, []);
 
   const startCellEditing = useCallback(
@@ -211,6 +209,9 @@ export const Grid = (params: GridProps): JSX.Element => {
   const onCellEditingStopped = useCallback(
     (event: CellEvent) => {
       refreshSelectedRows(event);
+      // The grid loses cell focus after editing
+      const cell = event.api.getFocusedCell();
+      cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
     },
     [refreshSelectedRows],
   );

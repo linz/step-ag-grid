@@ -92,7 +92,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             await wait(500);
             return [
               {
-                label: "Single edit",
+                label: "Single edit only",
                 action: async (selectedRows) => {
                   alert(`Single-edit: ${selectedRows.length} rows`);
                   await wait(1500);
