@@ -16,29 +16,29 @@ jobs:
           node-version: 16.x
 
       - name: Install dependencies
-        working-directory: ./web
+        working-directory: ./
         run: npm i
 
       - name: Lint
-        working-directory: ./web
+        working-directory: ./
         run: npm run lint
 
       - name: Test
-        working-directory: ./web
+        working-directory: ./
         run: npm run test --ci --coverage --maxWorkers=2
 
       - name: Build
-        working-directory: ./web
+        working-directory: ./
         if: github.ref == 'refs/heads/master'
         run: npm run build
 
       - name: Build Storybook
-        working-directory: ./web
+        working-directory: ./
         if: github.ref == 'refs/heads/master'
         run: npm run build-storybook
 
       - name: Release
-        working-directory: ./web
+        working-directory: ./
         if: github.ref == 'refs/heads/master'
         run: npx semantic-release
         env:
@@ -79,8 +79,8 @@ jobs:
         with:
           node-version: 16
       - run: npm i
-        working-directory: ./web
+        working-directory: ./
       - run: npm run deploy-storybook -- --ci
-        working-directory: ./web
+        working-directory: ./
         env:
           GH_TOKEN: github-actions:${{secrets.GITHUB_TOKEN}}

@@ -3,6 +3,16 @@
   "repository": "github:linz/step-ag-grid.git",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "module": "dist/step-ag-grid.esm.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
   "resolutions": {
     "webpack": "5"
   },
@@ -18,17 +28,21 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "^5.0.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "autoprefixer": "^10.0.2",
+    "postcss": "^8.1.7",
+    "postcss-loader": "^4.0.4"
   },
   "scripts": {
-    "build": "react-app-rewired build",
+    "build": "rollup -c && npm run",
     "test": "react-app-rewired test --passWithNoTests",
     "eject": "react-app-rewired eject",
     "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
     "deploy-storybook": "npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",
-    "chromatic": "chromatic --exit-zero-on-changes"
+    "chromatic": "chromatic --exit-zero-on-changes",
+    "semantic-release": "semantic-release"
   },
   "eslintConfig": {
     "extends": [
@@ -49,6 +63,9 @@
     ]
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.2",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
     "@storybook/builder-webpack5": "^6.5.13",
     "@storybook/cli": "^6.5.12",
     "@storybook/manager-webpack5": "^6.5.13",
@@ -78,6 +95,11 @@
     "eslint-plugin-testing-library": "^5.3.1",
     "prettier": "^2.2.1",
     "react-app-rewired": "^2.2.1",
+    "rollup": "^2.56.3",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.31.2",
     "sass": "^1.49.9",
     "sass-loader": "^10.3.1",
     "semantic-release": "^19.0.5",

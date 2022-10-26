@@ -13,12 +13,6 @@
 .idea/**/dataSources/
 .idea/**/dataSources.local.xml
 
-# ignore package.json in the root, but not in the web folder
-/package.json
-/package-lock.json
-!/web/package.json
-!/web/package-lock.json
-
 # ignore storybook static folder
 /web/storybook-static
 
@@ -27,3 +21,27 @@
 
 # Dependency directories
 node_modules/
+
+
+# dependencies
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache

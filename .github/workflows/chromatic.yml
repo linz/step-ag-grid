@@ -19,7 +19,7 @@ jobs:
           node-version: '16'
           registry-url: 'https://npm.pkg.github.com'
       - name: Install dependencies
-        working-directory: ./web
+        working-directory: ./
         run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{secrets.AUTH_TOKEN_GITHUB_PACKAGES}}
@@ -28,7 +28,7 @@ jobs:
         uses: chromaui/action@v1
         # Chromatic GitHub Action options
         with:
-          workingDir: web
+          workingDir: ./
           token: ${{ secrets.GITHUB_TOKEN }}
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
