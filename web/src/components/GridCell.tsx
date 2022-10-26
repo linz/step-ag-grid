@@ -69,7 +69,7 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
   const field = props.colDef.field ?? "";
 
   const formProps = colDef.cellEditorParams ?? {};
-  const value = colDef.cellEditorParams?.value;
+  const value = props.value;
   // TODO maybe useRef to make sure this doesn't change
   const selectedRows = multiEdit ? getSelectedRows<RowType>() : [data];
 
@@ -86,7 +86,7 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
 
   // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
-    <div>
+    <>
       <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
       {cellEditorParams?.form && (
         <cellEditorParams.form
@@ -99,6 +99,6 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
           selectedRows={selectedRows}
         />
       )}
-    </div>
+    </>
   );
 };

@@ -50,7 +50,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
   const selectItemHandler = useCallback(
     async (value: ValueType): Promise<boolean> => {
       const field = props.field;
-      console.log("psr", [...props.selectedRows]);
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
