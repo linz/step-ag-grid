@@ -1,93 +1,101 @@
-import { MutableRefObject, useCallback, useContext, useState } from "react";
-import { BaseGridRow } from "./Grid";
+import { useCallback, useContext, useMemo, useState } from "react";
+import { GridBaseRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 
-type SaveFn = (selectedRows: any[]) => Promise<boolean>;
-
-export interface GridFormProps {
+export interface GridFormProps<RowType extends GridBaseRow> {
   cellEditorParams: ICellEditorParams;
-  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
+  updateValue: (saveFn: (selectedRows: RowType[]) => Promise<boolean>) => Promise<boolean>;
   saving: boolean;
+  value: any;
+  field: string | undefined;
+  selectedRows: RowType[];
+  formProps: Record<string, any>;
 }
 
-export interface GenericCellEditorParams {
+export interface GenericCellEditorParams<RowType extends GridBaseRow> {
   multiEdit?: boolean;
-  form?: (props: GridFormProps) => JSX.Element;
+  form?: (props: GridFormProps<RowType>) => JSX.Element;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface GenericCellEditorColDef<RowType, FormProps extends Record<string, any>> extends ColDef {
-  cellEditorParams?: GenericCellEditorParams & FormProps;
+export interface GenericCellEditorColDef<
+  RowType extends GridBaseRow,
+  FormProps extends GenericCellEditorParams<RowType>,
+> extends ColDef {
+  cellEditorParams?: FormProps;
   cellRendererParams?: GenericCellRendererParams;
 }
 
 /**
  * For editing a text area.
  */
-export const GridCell = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
+export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericCellEditorParams<RowType>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
-  return props.cellEditorParams
-    ? {
-        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
-        ...props,
-        editable: props.editable ?? true,
-        sortable: !!(props?.field || props?.valueGetter),
-        resizable: true,
-        cellEditor: GenericCellEditorComponent,
-        cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-      }
-    : {
-        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
-        sortable: !!(props?.field || props?.valueGetter),
-        resizable: true,
-        ...props,
-      };
+  return {
+    cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
+    sortable: !!(props?.field || props?.valueGetter),
+    resizable: true,
+    ...(props.cellEditorParams && {
+      cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      editable: true,
+      cellEditor: GenericCellEditorComponent,
+    }),
+    ...props,
+  };
 };
 
-interface GenericCellEditorICellEditorParams<RowType extends BaseGridRow, FormProps extends Record<string, any>>
+interface GenericCellEditorICellEditorParams<RowType extends GridBaseRow, FormProps extends Record<string, any>>
   extends ICellEditorParams {
   data: RowType;
   colDef: GenericCellEditorColDef<RowType, FormProps>;
 }
 
-export interface GridGenericCellEditorFormContextParams {
-  cellEditorParamsRef: MutableRefObject<ICellEditorParams>;
-  saveRef: MutableRefObject<SaveFn>;
-  triggerSave: () => Promise<void>;
-}
-
-export const GenericCellEditorComponent = <RowType extends BaseGridRow, FormProps extends Record<string, any>>(
+export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
 ) => {
-  const { updatingCells } = useContext(GridContext);
+  const { updatingCells, getSelectedRows } = useContext(GridContext);
 
   const { colDef, data } = props;
   const { cellEditorParams } = props.colDef;
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   const field = props.colDef.field ?? "";
 
+  const formProps = colDef.cellEditorParams ?? {};
+  const value = props.value;
+
+  const selectedRows = useMemo(
+    () => (multiEdit ? getSelectedRows<RowType>() : [data]),
+    [data, getSelectedRows, multiEdit],
+  );
+
   const [saving, setSaving] = useState(false);
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
-      return !saving && (await updatingCells({ data, multiEdit, field }, saveFn, setSaving));
+      return !saving && (await updatingCells({ selectedRows, field }, saveFn, setSaving));
     },
-    [data, field, multiEdit, saving, updatingCells],
+    [field, saving, selectedRows, updatingCells],
   );
 
   if (cellEditorParams == null) return <></>;
 
-  // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
-    <div>
+    <>
       <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
       {cellEditorParams?.form && (
-        <cellEditorParams.form cellEditorParams={props} updateValue={updateValue} saving={saving} />
+        <cellEditorParams.form
+          cellEditorParams={props}
+          updateValue={updateValue}
+          saving={saving}
+          formProps={formProps}
+          value={value}
+          field={field}
+          selectedRows={selectedRows}
+        />
       )}
-    </div>
+    </>
   );
 };

@@ -1,12 +1,12 @@
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
-export interface GridFormPopoutMenuProps<RowType> {
+export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
 }
 
@@ -27,15 +27,8 @@ export interface MenuOption<RowType> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormProps) => {
-  const { popoutWrapper } = useGridPopoutHook(props);
-  const { colDef } = props.cellEditorParams;
-  const formProps: GridFormPopoutMenuProps<RowType> = colDef.cellEditorParams;
-  const { getSelectedRows } = useContext(GridContext);
-
-  const { cellEditorParams } = props;
-  const { data } = cellEditorParams;
-  const field = colDef.field ?? colDef.colId ?? "";
+export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
+  const formProps = props.formProps as GridFormPopoutMenuProps<RowType>;
 
   const { updatingCells } = useContext(GridContext);
   const optionsInitialising = useRef(false);
@@ -49,30 +42,31 @@ export const GridFormPopoutMenu = <RowType extends BaseGridRow>(props: GridFormP
 
     (async () => {
       if (typeof optionsConf == "function") {
-        setOptions(await optionsConf(getSelectedRows()));
+        setOptions(await optionsConf(props.selectedRows));
       } else {
         setOptions(optionsConf);
       }
 
       optionsInitialising.current = false;
     })();
-  }, [getSelectedRows, options, formProps.options]);
+  }, [options, formProps.options, props.selectedRows]);
 
   const actionClick = useCallback(
     async (menuOption: MenuOption<any>) => {
-      return await updatingCells({ data, field, multiEdit: menuOption.multiEdit }, async (selectedRows) => {
+      return await updatingCells({ selectedRows: props.selectedRows, field: props.field }, async (selectedRows) => {
         await menuOption.action(selectedRows);
         return true;
       });
     },
-    [data, field, updatingCells],
+    [props.field, props.selectedRows, updatingCells],
   );
 
-  const selectedRowCount = getSelectedRows().length;
+  const selectedRowCount = props.selectedRows.length;
   const filteredOptions = options?.filter(
     (menuOption) => menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit,
   );
 
+  const { popoutWrapper } = useGridPopoutHook(props);
   return popoutWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions}>
       <>

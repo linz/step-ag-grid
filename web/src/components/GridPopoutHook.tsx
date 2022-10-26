@@ -4,8 +4,12 @@ import { GridContext } from "../contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
 import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "../utils/util";
+import { GridBaseRow } from "./Grid";
 
-export const useGridPopoutHook = (props: GridFormProps, save?: (selectedRows: any[]) => Promise<boolean>) => {
+export const useGridPopoutHook = <RowType extends GridBaseRow>(
+  props: GridFormProps<RowType>,
+  save?: (selectedRows: any[]) => Promise<boolean>,
+) => {
   const { cellEditorParams, saving, updateValue } = props;
   const { eGridCell } = cellEditorParams as ICellEditorParams;
   const { stopEditing } = useContext(GridContext);

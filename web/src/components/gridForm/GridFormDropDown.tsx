@@ -2,12 +2,12 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
-import { GridFormProps } from "../GridCell";
+import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoutHook } from "../GridPopoutHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
@@ -25,7 +25,8 @@ export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridFormPopoutDropDownProps<RowType, ValueType> {
+export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType>
+  extends GenericCellEditorParams<RowType> {
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -35,15 +36,9 @@ export interface GridFormPopoutDropDownProps<RowType, ValueType> {
   optionsRequestCancel?: () => void;
 }
 
-export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: GridFormProps) => {
-  const { getSelectedRows } = useContext(GridContext);
+export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
   const { popoutWrapper } = useGridPopoutHook(props);
-
-  const { cellEditorParams } = props;
-  const { data, colDef } = cellEditorParams;
-  const formProps: GridFormPopoutDropDownProps<RowType, ValueType> = colDef.cellEditorParams;
-  const field = colDef.field ?? colDef.colId ?? "";
-  const { multiEdit } = colDef.cellEditorParams;
+  const formProps = props.formProps as GridFormPopoutDropDownProps<RowType, ValueType>;
 
   const { updatingCells, stopEditing } = useContext(GridContext);
 
@@ -54,7 +49,8 @@ export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: 
 
   const selectItemHandler = useCallback(
     async (value: ValueType): Promise<boolean> => {
-      return await updatingCells({ data, field, multiEdit }, async (selectedRows) => {
+      const field = props.field;
+      return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
           if (formProps.onSelectedItem) {
@@ -66,7 +62,7 @@ export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: 
         return true;
       });
     },
-    [data, field, formProps, multiEdit, updatingCells],
+    [formProps, props.field, props.selectedRows, updatingCells],
   );
 
   // Load up options list if it's async function
@@ -77,7 +73,7 @@ export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: 
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(getSelectedRows(), filter);
+        optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -96,7 +92,7 @@ export const GridFormDropDown = <RowType extends BaseGridRow, ValueType>(props: 
       }
       optionsInitialising.current = false;
     })();
-  }, [filter, getSelectedRows, options, formProps.filtered, formProps.options]);
+  }, [filter, options, formProps.filtered, formProps.options, props.selectedRows]);
 
   // Local filtering
   useEffect(() => {

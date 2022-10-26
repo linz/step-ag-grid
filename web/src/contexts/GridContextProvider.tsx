@@ -4,6 +4,7 @@ import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty } from "../utils/util";
 import { UpdatingContext } from "./UpdatingContext";
+import { GridBaseRow } from "../components/Grid";
 
 interface GridContextProps {
   children: ReactNode;
@@ -222,32 +223,33 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const stopEditing = (): void => gridApiOp((gridApi) => gridApi.stopEditing());
 
   const updatingCells = async (
-    props: { data: any; multiEdit?: boolean; field: string },
+    props: { selectedRows: GridBaseRow[]; field?: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
   ): Promise<boolean> => {
     setSaving && setSaving(true);
 
     return await gridApiOp(async (gridApi) => {
-      let selectedRows = gridApi.getSelectedRows();
-      if (!props.multiEdit) {
+      const selectedRows = props.selectedRows;
+      //TODO do I need to do this for all rows?
+      /*if (!props.multiEdit) {
         // You can't use data as it could be an orphaned reference due to updates
         selectedRows = selectedRows.filter((row) => row.id === props.data.id);
       }
-
+*/
       let ok = false;
       await modifyUpdating(
-        props.field,
+        props.field ?? "",
         selectedRows.map((data) => data.id),
         async () => {
           // Need to refresh to get spinners to work on all rows
-          gridApi.refreshCells({ rowNodes: selectedRows, force: true });
+          gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
           ok = await fnUpdate(selectedRows);
         },
       );
 
       // async processes need to refresh their own rows
-      gridApi.refreshCells({ rowNodes: selectedRows, force: true });
+      gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
       if (ok) {
         const cell = gridApi.getFocusedCell();

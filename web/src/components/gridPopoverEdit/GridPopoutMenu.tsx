@@ -3,7 +3,7 @@ import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "../GenericCellClass";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { GridCell } from "../GridCell";
 import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
@@ -12,10 +12,10 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 /**
  * Popout burger menu
  */
-export const GridPopoutMenu = <RowType extends BaseGridRow>(
-  colDef: GenericCellColDef<GridFormPopoutMenuProps<RowType>>,
+export const GridPopoutMenu = <RowType extends GridBaseRow>(
+  colDef: GenericCellColDef<RowType, GridFormPopoutMenuProps<RowType>>,
 ): ColDef =>
-  GridCell({
+  GridCell<RowType, GridFormPopoutMenuProps<RowType>>({
     maxWidth: 64,
     editable: colDef.editable != null ? colDef.editable : true,
     cellRenderer: GridRenderPopoutMenuCell,

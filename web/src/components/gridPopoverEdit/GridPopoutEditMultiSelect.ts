@@ -1,13 +1,13 @@
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GenericCellColDef, GridGenericCellRendererComponent } from "../gridRender/GridRenderGenericCell";
 import { GridCell } from "../GridCell";
-import { BaseGridRow } from "../Grid";
+import { GridBaseRow } from "../Grid";
 import { GridFormMultiSelect, GridFormMultiSelectProps } from "../gridForm/GridFormMultiSelect";
 
-export const GridPopoutEditMultiSelect = <RowType extends BaseGridRow, ValueType>(
-  colDef: GenericCellColDef<GridFormMultiSelectProps<RowType, ValueType>>,
+export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow, ValueType>(
+  colDef: GenericCellColDef<RowType, GridFormMultiSelectProps<RowType, ValueType>>,
 ) =>
-  GridCell({
+  GridCell<RowType, GridFormMultiSelectProps<RowType, ValueType>>({
     initialWidth: 65,
     maxWidth: 150,
     cellRenderer: GridGenericCellRendererComponent,

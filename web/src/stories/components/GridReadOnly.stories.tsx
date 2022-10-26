@@ -81,7 +81,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             await wait(1000);
             return `There are ${selectedRows.length} row(s) selected`;
           },
-          multiEdit: false,
+          multiEdit: true,
         },
       }),
       GridPopoutMenu<ITestRow>({
