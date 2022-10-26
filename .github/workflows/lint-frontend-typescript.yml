@@ -6,23 +6,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pull Code
+      - name: Checkout repo
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
-      - name: Setup node
-        uses: actions/setup-node@v1
+      - name: Use Node 16
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
 
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install NPM packages
-        run: npm i
-        continue-on-error: true
+      - name: Install deps
+        run: npm ci
 
-      - name: Run ESLint
+      - name: Lint
         run: npm run lint
