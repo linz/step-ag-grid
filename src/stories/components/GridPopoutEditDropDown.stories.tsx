@@ -16,7 +16,7 @@ import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider"
 import { ColDef } from "ag-grid-community";
 import { wait } from "../../utils/util";
 import { GridCell } from "../../components/GridCell";
-import { GridPopoutEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
+import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {
   title: "Components / Grids",
@@ -85,7 +85,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             multiEdit: false,
           },
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position2"]>({
+        GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>({
           field: "position2",
           maxWidth: 100,
           headerName: "Multi-edit",
@@ -102,7 +102,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             ],
           },
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
+        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
           field: "position3",
           initialWidth: 65,
           maxWidth: 150,
@@ -116,7 +116,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             },
           },
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position"]>({
+        GridPopoverEditDropDown<ITestRow, ITestRow["position"]>({
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
@@ -135,7 +135,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             multiEdit: false,
           },
         }),
-        GridPopoutEditDropDown<ITestRow, ITestRow["position3"]>({
+        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
           field: "position3",
           initialWidth: 65,
           maxWidth: 150,

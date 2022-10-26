@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { TextAreaInput } from "../../lui/TextArea";
+import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoutHook } from "../GridPopoutHook";
 import { GridBaseRow } from "../Grid";
 

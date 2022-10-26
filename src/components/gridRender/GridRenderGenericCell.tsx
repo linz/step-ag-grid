@@ -20,7 +20,7 @@ export interface GenericCellRendererParams {
   info?: (props: ICellRendererParams) => string | boolean | undefined;
 }
 
-export const GridGenericCellRendererComponent = (props: ICellRendererParams): JSX.Element => {
+export const GridRendererGenericCell = (props: ICellRendererParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 
   const cellRendererParams = props.colDef?.cellRendererParams as GenericCellRendererParams | undefined;
