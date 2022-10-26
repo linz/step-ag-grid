@@ -34,22 +34,17 @@ export interface GenericCellEditorColDef<
 export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericCellEditorParams<RowType>>(
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
-  return props.cellEditorParams
-    ? {
-        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
-        ...props,
-        editable: props.editable ?? true,
-        sortable: !!(props?.field || props?.valueGetter),
-        resizable: true,
-        cellEditor: GenericCellEditorComponent,
-        cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-      }
-    : {
-        cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
-        sortable: !!(props?.field || props?.valueGetter),
-        resizable: true,
-        ...props,
-      };
+  return {
+    cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
+    sortable: !!(props?.field || props?.valueGetter),
+    resizable: true,
+    ...(props.cellEditorParams && {
+      cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      editable: true,
+      cellEditor: GenericCellEditorComponent,
+    }),
+    ...props,
+  };
 };
 
 interface GenericCellEditorICellEditorParams<RowType extends GridBaseRow, FormProps extends Record<string, any>>
