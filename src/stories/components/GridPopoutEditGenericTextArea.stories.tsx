@@ -12,6 +12,8 @@ import { IFormTestRow } from "./FormTest";
 import { GridFormTextArea, GridFormTextAreaProps } from "../../components/gridForm/GridFormTextArea";
 import { GridFormTextInput, GridFormTextInputProps } from "../../components/gridForm/GridFormTextInput";
 import { wait } from "../../utils/util";
+import { GridPopoverTextArea } from "../../components/gridPopoverEdit/GridPopoverTextArea";
+import { GridPopoverTextInput } from "../../components/gridPopoverEdit/GridPopoverTextInput";
 
 export default {
   title: "Components / Grids",
@@ -43,16 +45,18 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell<IFormTestRow, GridFormTextInputProps<IFormTestRow>>({
+      GridPopoverTextInput<IFormTestRow>({
         field: "name",
         headerName: "Text input",
         maxWidth: 140,
         cellEditorParams: {
-          form: GridFormTextInput,
           required: true,
           maxlength: 12,
           placeholder: "Enter some text...",
-          width: 240,
+          validate: (value: string) => {
+            if (value === "never") return "The value 'never' is not allowed";
+            return null;
+          },
           multiEdit: false,
           onSave: async (selectedRows, value) => {
             await wait(1000);
@@ -61,17 +65,19 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
       }),
-      GridCell<IFormTestRow, GridFormTextAreaProps<IFormTestRow>>({
+      GridPopoverTextArea<IFormTestRow>({
         field: "plan",
         headerName: "Text area",
         maxWidth: 140,
         cellEditorParams: {
-          form: GridFormTextArea,
           required: true,
           maxlength: 32,
           placeholder: "Enter some text...",
-          width: 260,
           multiEdit: true,
+          validate: (value: string) => {
+            if (value === "never") return "The value 'never' is not allowed";
+            return null;
+          },
           onSave: async (selectedRows, value) => {
             await wait(1000);
             selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
