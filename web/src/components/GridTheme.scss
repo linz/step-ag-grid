@@ -1,7 +1,7 @@
 @use '~@linzjs/lui/dist/scss/Core' as lui;
 
-@import "ag-grid-community/src/styles/ag-grid.scss";
-@import "ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+@import "node_modules/ag-grid-community/src/styles/ag-grid.scss";
+@import "node_modules/ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
 
 .ag-theme-alpine {
   // AG Grid themes can be customized using theme parameters, which are arguments that change its appearance. Refer to
