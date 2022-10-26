@@ -1,8 +1,8 @@
 {
   "name": "@linzjs/step-ag-grid",
   "repository": "github:linz/step-ag-grid.git",
+  "license": "MIT",
   "version": "0.1.0",
-  "private": true,
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "module": "dist/step-ag-grid.esm.js",
@@ -10,6 +10,9 @@
     "dist",
     "src"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=10"
   },
@@ -66,6 +69,8 @@
     "@rollup/plugin-commonjs": "^21.0.2",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/git": "^10.0.1",
     "@storybook/builder-webpack5": "^6.5.13",
     "@storybook/cli": "^6.5.12",
     "@storybook/manager-webpack5": "^6.5.13",
@@ -112,5 +117,10 @@
     "presets": [
       "react-app"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }
