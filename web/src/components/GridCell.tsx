@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
@@ -65,8 +65,11 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
 
   const formProps = colDef.cellEditorParams ?? {};
   const value = props.value;
-  // TODO maybe useRef to make sure this doesn't change
-  const selectedRows = multiEdit ? getSelectedRows<RowType>() : [data];
+
+  const selectedRows = useMemo(
+    () => (multiEdit ? getSelectedRows<RowType>() : [data]),
+    [data, getSelectedRows, multiEdit],
+  );
 
   const [saving, setSaving] = useState(false);
 
@@ -79,7 +82,6 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
 
   if (cellEditorParams == null) return <></>;
 
-  // The key=${saving} ensures the cell re-renders when the updatingContext redraws.
   return (
     <>
       <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
