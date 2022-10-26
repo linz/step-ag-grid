@@ -29,6 +29,7 @@ export const GridPopoutMenu = <RowType extends GridBaseRow>(
       cellEditorParams: {
         ...colDef.cellEditorParams,
         form: GridFormPopoutMenu,
+        multiEdit: true,
       },
     }),
   });

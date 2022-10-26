@@ -62,9 +62,11 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
   );
 
   const selectedRowCount = props.selectedRows.length;
-  const filteredOptions = options?.filter(
-    (menuOption) => menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit,
-  );
+
+  const filteredOptions = options?.filter((menuOption) => {
+    console.log({ selectedRowCount, multi: menuOption.multiEdit });
+    return menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit;
+  });
 
   const { popoutWrapper } = useGridPopoutHook(props);
   return popoutWrapper(
