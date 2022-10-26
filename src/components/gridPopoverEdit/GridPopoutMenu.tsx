@@ -19,7 +19,7 @@ export const GridPopoutMenu = <RowType extends GridBaseRow>(
     maxWidth: 64,
     editable: colDef.editable != null ? colDef.editable : true,
     cellRenderer: GridRenderPopoutMenuCell,
-    cellClass: GenericMultiEditCellClass,
+    cellClass: colDef?.cellEditorParams?.multiEdit !== false ? GenericMultiEditCellClass : undefined,
     ...colDef,
     cellRendererParams: {
       // Menus open on single click, this parameter is picked up in Grid.tsx
@@ -27,9 +27,9 @@ export const GridPopoutMenu = <RowType extends GridBaseRow>(
     },
     ...(colDef?.cellEditorParams && {
       cellEditorParams: {
+        multiEdit: true,
         ...colDef.cellEditorParams,
         form: GridFormPopoutMenu,
-        multiEdit: true,
       },
     }),
   });
