@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { TextAreaInput } from "../../lui/TextArea";
+import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoutHook } from "../GridPopoutHook";
 import { GridBaseRow } from "../Grid";
 
@@ -23,6 +23,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormPro
     if (formProps.maxlength && value.length > formProps.maxlength) {
       return `Text must be no longer than ${formProps.maxlength} characters`;
     }
+    return null;
   }, [formProps.maxlength, formProps.required, value.length]);
 
   const save = useCallback(

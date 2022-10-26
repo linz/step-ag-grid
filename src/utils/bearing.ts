@@ -14,9 +14,9 @@ export const bearingNumberParser = (value: string): number | null => {
 };
 
 const validMaskForDmsBearing = /^(\d+)?(\.([0-5](\d([0-5](\d(\d+)?)?)?)?)?)?$/;
-export const bearingStringValidator = (value: string): string | undefined => {
+export const bearingStringValidator = (value: string): string | null => {
   value = value.trim();
-  if (value === "") return undefined;
+  if (value === "") return null;
   const match = value.match(validMaskForDmsBearing);
   if (!match) return "Bearing must be a positive number in D.MMSSS format";
   const decimalPart = match[3];
@@ -26,6 +26,7 @@ export const bearingStringValidator = (value: string): string | undefined => {
 
   const bearing = parseFloat(value);
   if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
+  return null;
 };
 
 // Decimal-ish degrees to Degrees Minutes Seconds converter

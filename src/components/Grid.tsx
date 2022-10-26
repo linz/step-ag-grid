@@ -9,7 +9,7 @@ import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-commun
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
-import { usePostSortRowsHook } from "./PostSortRowHook";
+import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { isNotEmpty } from "../utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { UpdatingContext } from "../contexts/UpdatingContext";

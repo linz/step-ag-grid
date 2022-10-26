@@ -41,7 +41,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
   const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
 
   return popoutWrapper(
-    <div className={"GridFormEditBearing-input"}>
+    <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
       <TextInputFormatted
         value={value ?? ""}
         onChange={(e) => {

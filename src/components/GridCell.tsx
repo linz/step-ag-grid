@@ -2,7 +2,7 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridContext } from "../contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { GenericCellRendererParams, GridGenericCellRendererComponent } from "./gridRender/GridRenderGenericCell";
+import { GenericCellRendererParams, GridRendererGenericCell } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams } from "ag-grid-community";
 
 export interface GridFormProps<RowType extends GridBaseRow> {
@@ -35,7 +35,7 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
   return {
-    cellRenderer: props.cellRenderer ?? GridGenericCellRendererComponent,
+    cellRenderer: props.cellRenderer ?? GridRendererGenericCell,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(props.cellEditorParams && {

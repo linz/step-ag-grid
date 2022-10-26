@@ -14,7 +14,7 @@ export interface LuiTextAreaInputProps {
   inputProps?: InputHTMLAttributes<HTMLTextAreaElement>;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
   value: string;
-  error?: string | boolean;
+  error?: string | boolean | null;
 }
 
 export const TextAreaInput = (props: LuiTextAreaInputProps) => {
@@ -23,7 +23,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
   return (
     <div
       className={clsx(
-        "LuiTextAreaInput",
+        "LuiTextAreaInput Grid-popoverContainer",
         props.inputProps?.disabled ? "isDisabled" : "",
         props?.error ? "hasError" : "",
       )}
