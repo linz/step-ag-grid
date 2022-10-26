@@ -21,8 +21,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install NPM packages
-        run: cd web && npm i
+        run: npm i
         continue-on-error: true
 
       - name: Run ESLint
-        run: cd web && npm run lint
+        run: npm run lint

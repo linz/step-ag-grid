@@ -10,7 +10,7 @@ const packageJson = require('./package.json');
 const outputDir = 'dist';
 
 export default {
-  input: 'index.tsx',
+  input: 'index.ts',
   external: [
     'ag-grid-community',
   ],
