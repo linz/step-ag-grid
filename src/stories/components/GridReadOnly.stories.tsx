@@ -109,6 +109,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                 },
                 multiEdit: true,
               },
+              {
+                label: "Disabled item",
+                disabled: "Disabled for test",
+                multiEdit: true,
+              },
             ];
           },
         },
