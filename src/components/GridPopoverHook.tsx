@@ -66,10 +66,12 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
       document.addEventListener("mousedown", handleScreenMouseDown, true);
       document.addEventListener("mouseup", handleScreenMouseEvent, true);
       document.addEventListener("click", handleScreenMouseEvent, true);
+      document.addEventListener("dblclick", handleScreenMouseEvent, true);
       return () => {
         document.removeEventListener("mousedown", handleScreenMouseDown, true);
         document.removeEventListener("mouseup", handleScreenMouseEvent, true);
         document.removeEventListener("click", handleScreenMouseEvent, true);
+        document.removeEventListener("dblclick", handleScreenMouseEvent, true);
       };
     }
     return () => {};
