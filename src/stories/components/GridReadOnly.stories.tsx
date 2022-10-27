@@ -9,7 +9,7 @@ import { useMemo, useState } from "react";
 import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
 import { wait } from "../../utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutMenu } from "../../components/gridPopoverEdit/GridPopoutMenu";
+import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
 import { GridCell } from "../../components/GridCell";
 
@@ -84,7 +84,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           multiEdit: true,
         },
       }),
-      GridPopoutMenu<ITestRow>({
+      GridPopoverMenu<ITestRow>({
         headerName: "Menu",
         cellEditorParams: {
           options: async () => {
@@ -113,7 +113,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       }),
-      GridPopoutMenu<ITestRow>({
+      GridPopoverMenu<ITestRow>({
         headerName: "Menu disabled",
         editable: false,
         cellEditorParams: {

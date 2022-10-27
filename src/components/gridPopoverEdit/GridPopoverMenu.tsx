@@ -1,4 +1,4 @@
-import "./GridPopoutMenu.scss";
+import "./GridPopoverMenu.scss";
 import "@szhsin/react-menu/dist/index.css";
 
 import { ColDef } from "ag-grid-community";
@@ -12,7 +12,7 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 /**
  * Popout burger menu
  */
-export const GridPopoutMenu = <RowType extends GridBaseRow>(
+export const GridPopoverMenu = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormPopoutMenuProps<RowType>>,
 ): ColDef =>
   GridCell<RowType, GridFormPopoutMenuProps<RowType>>({

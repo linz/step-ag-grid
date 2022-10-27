@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
 import { GridFormProps } from "../../components/GridCell";
-import { useGridPopoutHook } from "../../components/GridPopoutHook";
+import { useGridPopoverHook } from "../../components/GridPopoverHook";
 import { GridBaseRow } from "../../components/Grid";
 
 export interface IFormTestRow {
@@ -33,9 +33,9 @@ export const FormTest = <RowType extends GridBaseRow>(props: GridFormProps<RowTy
     // Close form
     return true;
   }, [nameType, numba, plan, props.selectedRows]);
-  const { popoutWrapper } = useGridPopoutHook(props, save);
+  const { popoverWrapper } = useGridPopoverHook(props, save);
 
-  return popoutWrapper(
+  return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
       <div className={"FormTest-textInput"}>
         <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />

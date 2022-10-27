@@ -10,14 +10,14 @@ export { GridIcon } from "./src/components/GridIcon";
 export { ComponentLoadingWrapper } from "./src/components/ComponentLoadingWrapper";
 export { GenericMultiEditCellClass } from "./src/components/GenericCellClass";
 export { GridLoadableCell } from "./src/components/GridLoadableCell";
-export { useGridPopoutHook } from "./src/components/GridPopoutHook";
+export { useGridPopoverHook } from "./src/components/GridPopoverHook";
 export { usePostSortRowsHook } from "./src/components/PostSortRowsHook";
 
 export { GridRendererGenericCell } from "./src/components/gridRender/GridRenderGenericCell";
 export { GridRenderPopoutMenuCell } from "./src/components/gridRender/GridRenderPopoutMenuCell";
 
 export { GridPopoutEditMultiSelect } from "./src/components/gridPopoverEdit/GridPopoutEditMultiSelect";
-export { GridPopoutMenu } from "./src/components/gridPopoverEdit/GridPopoutMenu";
+export { GridPopoverMenu } from "./src/components/gridPopoverEdit/GridPopoverMenu";
 export { GridPopoverEditBearing } from "./src/components/gridPopoverEdit/GridPopoverEditBearing";
 export { GridPopoverEditDropDown } from "./src/components/gridPopoverEdit/GridPopoverEditDropDown";
 export { GridPopoverMessage } from "./src/components/gridPopoverEdit/GridPopoverMessage";

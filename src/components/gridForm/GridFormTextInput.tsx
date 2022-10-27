@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
@@ -50,9 +50,9 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
     },
     [invalid, props.value, props.field, value, formProps],
   );
-  const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
+  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
 
-  return popoutWrapper(
+  return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
       <TextInputFormatted
         value={value}

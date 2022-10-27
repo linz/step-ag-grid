@@ -3,7 +3,7 @@ import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { ICellEditorParams } from "ag-grid-community";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridBaseRow } from "../Grid";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridFormMessageProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   message: (
@@ -16,7 +16,7 @@ export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormProp
   const formProps = props.formProps as GridFormMessageProps<RowType>;
 
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
-  const { popoutWrapper } = useGridPopoutHook(props);
+  const { popoverWrapper } = useGridPopoverHook(props);
 
   useEffect(() => {
     (async () => {
@@ -24,7 +24,7 @@ export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormProp
     })().then();
   }, [formProps, props.selectedRows, props]);
 
-  return popoutWrapper(
+  return popoverWrapper(
     <ComponentLoadingWrapper loading={message === null}>
       <div style={{ maxWidth: 400 }} className={"Grid-popoverContainer"}>
         {message}

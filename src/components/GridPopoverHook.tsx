@@ -6,7 +6,7 @@ import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "../utils/util";
 import { GridBaseRow } from "./Grid";
 
-export const useGridPopoutHook = <RowType extends GridBaseRow>(
+export const useGridPopoverHook = <RowType extends GridBaseRow>(
   props: GridFormProps<RowType>,
   save?: (selectedRows: any[]) => Promise<boolean>,
 ) => {
@@ -75,7 +75,7 @@ export const useGridPopoutHook = <RowType extends GridBaseRow>(
     return () => {};
   }, [handleScreenMouseDown, handleScreenMouseEvent, isOpen]);
 
-  const popoutWrapper = useCallback(
+  const popoverWrapper = useCallback(
     (children: JSX.Element) => {
       return (
         <>
@@ -112,7 +112,7 @@ export const useGridPopoutHook = <RowType extends GridBaseRow>(
   );
 
   return {
-    popoutWrapper,
+    popoverWrapper,
     triggerSave,
   };
 };
