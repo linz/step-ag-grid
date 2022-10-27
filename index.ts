@@ -21,6 +21,8 @@ export { GridPopoutMenu } from "./src/components/gridPopoverEdit/GridPopoutMenu"
 export { GridPopoverEditBearing } from "./src/components/gridPopoverEdit/GridPopoverEditBearing";
 export { GridPopoverEditDropDown } from "./src/components/gridPopoverEdit/GridPopoverEditDropDown";
 export { GridPopoverMessage } from "./src/components/gridPopoverEdit/GridPopoverMessage";
+export { GridPopoverTextArea } from "./src/components/gridPopoverEdit/GridPopoverTextArea";
+export { GridPopoverTextInput } from "./src/components/gridPopoverEdit/GridPopoverTextInput";
 
 export { GridHeaderSelect } from "./src/components/gridHeader/GridHeaderSelect";
 
