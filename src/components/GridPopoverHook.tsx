@@ -5,6 +5,7 @@ import { ControlledMenu } from "@szhsin/react-menu";
 import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "@utils/util";
 import { GridBaseRow } from "./Grid";
+import { isEmpty } from "lodash-es";
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(
   props: GridFormProps<RowType>,
@@ -84,7 +85,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
-              portal={true}
+              portal={isEmpty(document.querySelectorAll(".PopoutWindowContainer"))}
               unmountOnClose={true}
               anchorRef={anchorRef}
               menuClassName={"lui-menu"}
