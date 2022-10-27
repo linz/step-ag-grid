@@ -98,7 +98,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   await wait(1500);
                   return true;
                 },
-                multiEdit: false,
+                supportsMultiEdit: false,
               },
               {
                 label: "Multi-edit",
@@ -107,12 +107,12 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   await wait(1500);
                   return true;
                 },
-                multiEdit: true,
+                supportsMultiEdit: true,
               },
               {
                 label: "Disabled item",
                 disabled: "Disabled for test",
-                multiEdit: true,
+                supportsMultiEdit: true,
               },
             ];
           },
