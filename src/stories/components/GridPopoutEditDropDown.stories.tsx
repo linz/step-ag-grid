@@ -94,11 +94,12 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             options: [
               {
                 value: "1",
-                label: <span style={{ border: "2px dashed blue" }}>One</span>,
+                label: "One",
+                disabled: "Disabled for test",
               },
-              { value: "2", label: <span style={{ border: "2px dashed red" }}>Two</span> },
+              { value: "2", label: "Two" },
               MenuSeparator,
-              { value: "3", label: <span style={{ border: "2px dashed green" }}>Three</span> },
+              { value: "3", label: "Three" },
             ],
           },
         }),

@@ -9,6 +9,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   placeHolder: string;
+  range?: (value: number | null) => string | null;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
@@ -55,7 +56,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
           onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
         }}
         formatted={bearingStringValidator(value) ? "?" : convertDDToDMS(bearingNumberParser(value))}
-        error={bearingStringValidator(value)}
+        error={bearingStringValidator(value, formProps.range)}
       />
     </div>,
   );

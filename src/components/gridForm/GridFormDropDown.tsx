@@ -18,6 +18,7 @@ export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
 interface FinalSelectOption<ValueType> {
   value: ValueType;
   label?: JSX.Element | string;
+  disabled?: boolean | string;
 }
 
 export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
@@ -78,7 +79,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
 
       const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
-          item = { value: item as ValueType, label: item } as FinalSelectOption<ValueType>;
+          item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
       }) as any as FinalSelectOption<ValueType>[];
@@ -180,7 +181,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
             ) : filteredValues.includes(item.value) ? null : (
-              <MenuItem key={`${item.value}`} value={item.value} onClick={() => selectItemHandler(item.value)}>
+              <MenuItem
+                key={`${item.value}`}
+                disabled={!!item.disabled}
+                title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                value={item.value}
+                onClick={() => selectItemHandler(item.value)}
+              >
                 {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
               </MenuItem>
             ),

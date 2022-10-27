@@ -19,7 +19,8 @@ interface MenuSeparatorType {
 
 export interface MenuOption<RowType> {
   label: JSX.Element | string | MenuSeparatorType;
-  action: (selectedRows: RowType[]) => Promise<boolean>;
+  action?: (selectedRows: RowType[]) => Promise<boolean>;
+  disabled?: string | boolean;
   multiEdit: boolean;
 }
 
@@ -54,7 +55,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
   const actionClick = useCallback(
     async (menuOption: MenuOption<any>) => {
       return await updatingCells({ selectedRows: props.selectedRows, field: props.field }, async (selectedRows) => {
-        await menuOption.action(selectedRows);
+        menuOption.action && (await menuOption.action(selectedRows));
         return true;
       });
     },
@@ -78,7 +79,8 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
             <MenuItem
               key={`${item.label}`}
               onClick={() => actionClick(item)}
-              disabled={!filteredOptions?.includes(item)}
+              disabled={!!item.disabled || !filteredOptions?.includes(item)}
+              title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
             >
               {item.label as JSX.Element | string}
             </MenuItem>

@@ -5,7 +5,15 @@ export const bearingValueFormatter = (params: ValueFormatterParams): string => {
   if (value == null) {
     return "-";
   }
-  return convertDDToDMS(value);
+  return convertDDToDMS(value, false, false);
+};
+
+export const bearingCorrectionValueFormatter = (params: ValueFormatterParams): string => {
+  const value = params.value;
+  if (value == null) {
+    return "-";
+  }
+  return convertDDToDMS(value, true, true);
 };
 
 export const bearingNumberParser = (value: string): number | null => {
@@ -13,27 +21,30 @@ export const bearingNumberParser = (value: string): number | null => {
   return parseFloat(value);
 };
 
-const validMaskForDmsBearing = /^(\d+)?(\.([0-5](\d([0-5](\d(\d+)?)?)?)?)?)?$/;
-export const bearingStringValidator = (value: string): string | null => {
+const validMaskForDmsBearing = /^((-)?\d+)?(\.([0-5](\d([0-5](\d(\d+)?)?)?)?)?)?$/;
+export const bearingStringValidator = (
+  value: string,
+  customValidate?: (value: number | null) => string | null,
+): string | null => {
   value = value.trim();
   if (value === "") return null;
   const match = value.match(validMaskForDmsBearing);
   if (!match) return "Bearing must be a positive number in D.MMSSS format";
-  const decimalPart = match[3];
+  const decimalPart = match[4];
   if (decimalPart != null && decimalPart.length > 5) {
     return "Bearing has a maximum of 5 decimal places";
   }
 
   const bearing = parseFloat(value);
-  if (bearing >= 360) return "Bearing must be between 0 and 360 inclusive";
-  return null;
+
+  return customValidate ? customValidate(bearing) : null;
 };
 
 // Decimal-ish degrees to Degrees Minutes Seconds converter
 export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, addTrailingZeros = true): string => {
   if (dd == null) return "–";
 
-  if (dd === 0) addTrailingZeros = true;
+  if (dd === 0) addTrailingZeros = false;
 
   // toFixed rounds parts up greater than 60, which has to be corrected below
   const [bearingWholeString, beringDecimalString] = dd.toFixed(5).split(".");
@@ -64,7 +75,7 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
     dmsString += `\xa0${minString}'\xa0${secString}.${deciSecString}"`; // "\xa0" is here for non-breaking space
   } else if (secNumeric != 0) {
     dmsString += `\xa0${minString}'\xa0${secString}"`;
-  } else if (minNumeric != 0) {
+  } else {
     dmsString += `\xa0${minString}'`;
   }
 
