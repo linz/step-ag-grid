@@ -28,7 +28,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
       return formProps.validate(value);
     }
     return null;
-  }, [formProps.maxlength, formProps.required, value.length]);
+  }, [formProps, value]);
 
   const save = useCallback(
     async (selectedRows: any[]): Promise<boolean> => {
