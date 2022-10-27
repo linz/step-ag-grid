@@ -3,7 +3,7 @@ import "./GridFormEditBearing.scss";
 import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
+import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "@utils/bearing";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 

@@ -30,5 +30,16 @@
     // error out if import and file system have a casing mismatch. Recommended by TS
     "forceConsistentCasingInFileNames": true,
     "declarationDir":"./declaration",
+    "paths": {
+      "@components/*": [
+        "./src/components/*",
+      ],
+      "@contexts/*": [
+        "./src/contexts/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*",
+      ],
+    }
   }
 }

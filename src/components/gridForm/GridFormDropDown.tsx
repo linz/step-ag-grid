@@ -4,7 +4,7 @@ import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "../../contexts/GridContext";
+import { GridContext } from "@contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";

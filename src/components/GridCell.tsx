@@ -1,10 +1,10 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
-import { GridContext } from "../contexts/GridContext";
+import { UpdatingContext } from "@contexts/UpdatingContext";
+import { GridContext } from "@contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridRendererGenericCell } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
-import { UpdatingContext } from "../contexts/UpdatingContext";
 import { GridLoadableCell } from "./GridLoadableCell";
 
 export interface GridFormProps<RowType extends GridBaseRow> {

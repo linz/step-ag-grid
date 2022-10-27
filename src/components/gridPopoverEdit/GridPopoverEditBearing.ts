@@ -1,6 +1,6 @@
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
-import { bearingValueFormatter } from "../../utils/bearing";
+import { bearingValueFormatter } from "@utils/bearing";
 import { GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { GridBaseRow } from "../Grid";

@@ -1,9 +1,9 @@
 import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GridContext } from "../contexts/GridContext";
+import { GridContext } from "@contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
 import { GridFormProps } from "./GridCell";
-import { hasParentClass } from "../utils/util";
+import { hasParentClass } from "@utils/util";
 import { GridBaseRow } from "./Grid";
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(
