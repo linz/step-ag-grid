@@ -4,11 +4,11 @@ import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "../../contexts/GridContext";
+import { GridContext } from "@contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
@@ -37,7 +37,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
 }
 
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
-  const { popoutWrapper } = useGridPopoutHook(props);
+  const { popoverWrapper } = useGridPopoverHook(props);
   const formProps = props.formProps as GridFormPopoutDropDownProps<RowType, ValueType>;
 
   const { updatingCells, stopEditing } = useContext(GridContext);
@@ -148,7 +148,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
     [filteredValues, options, selectItemHandler, stopEditing],
   );
 
-  return popoutWrapper(
+  return popoverWrapper(
     <>
       {formProps.filtered && (
         <>

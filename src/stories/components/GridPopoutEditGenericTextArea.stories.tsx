@@ -3,17 +3,15 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridContextProvider } from "../../contexts/GridContextProvider";
-import { Grid, GridProps } from "../../components/Grid";
+import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridContextProvider } from "@contexts/GridContextProvider";
+import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
-import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GridCell } from "../../components/GridCell";
+import { GridCell } from "@components/GridCell";
 import { IFormTestRow } from "./FormTest";
-import { GridFormTextArea, GridFormTextAreaProps } from "../../components/gridForm/GridFormTextArea";
-import { GridFormTextInput, GridFormTextInputProps } from "../../components/gridForm/GridFormTextInput";
-import { wait } from "../../utils/util";
-import { GridPopoverTextArea } from "../../components/gridPopoverEdit/GridPopoverTextArea";
-import { GridPopoverTextInput } from "../../components/gridPopoverEdit/GridPopoverTextInput";
+import { wait } from "@utils/util";
+import { GridPopoverTextArea } from "@components/gridPopoverEdit/GridPopoverTextArea";
+import { GridPopoverTextInput } from "@components/gridPopoverEdit/GridPopoverTextInput";
 
 export default {
   title: "Components / Grids",

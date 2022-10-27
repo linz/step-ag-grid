@@ -3,15 +3,15 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridContextProvider } from "../../contexts/GridContextProvider";
-import { Grid, GridProps } from "../../components/Grid";
+import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridContextProvider } from "@contexts/GridContextProvider";
+import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
-import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { wait } from "../../utils/util";
+import { wait } from "@utils/util";
 import { ICellRendererParams } from "ag-grid-community";
-import { GridPopoutMenu } from "../../components/gridPopoverEdit/GridPopoutMenu";
-import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
-import { GridCell } from "../../components/GridCell";
+import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
+import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
+import { GridCell } from "@components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -84,7 +84,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           multiEdit: true,
         },
       }),
-      GridPopoutMenu<ITestRow>({
+      GridPopoverMenu<ITestRow>({
         headerName: "Menu",
         cellEditorParams: {
           options: async () => {
@@ -113,7 +113,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       }),
-      GridPopoutMenu<ITestRow>({
+      GridPopoverMenu<ITestRow>({
         headerName: "Menu disabled",
         editable: false,
         cellEditorParams: {
@@ -138,7 +138,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   return (
     <Grid
       {...props}
-      selectable={false}
+      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}

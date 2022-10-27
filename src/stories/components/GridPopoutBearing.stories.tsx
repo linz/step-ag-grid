@@ -3,13 +3,13 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridContextProvider } from "../../contexts/GridContextProvider";
-import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
-import { GridPopoverEditBearing } from "../../components/gridPopoverEdit/GridPopoverEditBearing";
-import { wait } from "../../utils/util";
-import { GridCell } from "../../components/GridCell";
+import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridContextProvider } from "@contexts/GridContextProvider";
+import { Grid, GridProps } from "@components/Grid";
+import { GridCell } from "@components/GridCell";
+import { GridPopoverEditBearing } from "@components/gridPopoverEdit/GridPopoverEditBearing";
+import { wait } from "@utils/util";
 
 export default {
   title: "Components / Grids",

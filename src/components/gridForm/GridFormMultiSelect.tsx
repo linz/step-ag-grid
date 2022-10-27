@@ -7,7 +7,7 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 interface FinalSelectOption<ValueType> {
   value: ValueType;
@@ -58,7 +58,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
     },
     [formProps, selectedValues],
   );
-  const { popoutWrapper } = useGridPopoutHook(props, save);
+  const { popoverWrapper } = useGridPopoverHook(props, save);
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -105,7 +105,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
     );
   }, [formProps.filtered, filter, options]);
 
-  return popoutWrapper(
+  return popoverWrapper(
     <ComponentLoadingWrapper loading={!options}>
       <div className={"Grid-popoverContainerList"}>
         {options && formProps.filtered && (

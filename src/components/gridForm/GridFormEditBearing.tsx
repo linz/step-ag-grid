@@ -3,9 +3,9 @@ import "./GridFormEditBearing.scss";
 import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
+import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "@utils/bearing";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   placeHolder: string;
@@ -38,9 +38,9 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
     },
     [formProps, props.field, props.value, value],
   );
-  const { popoutWrapper, triggerSave } = useGridPopoutHook(props, save);
+  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
 
-  return popoutWrapper(
+  return popoverWrapper(
     <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
       <TextInputFormatted
         value={value ?? ""}

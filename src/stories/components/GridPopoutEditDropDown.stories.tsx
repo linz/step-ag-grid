@@ -3,20 +3,20 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridContextProvider } from "../../contexts/GridContextProvider";
-import { Grid, GridProps } from "../../components/Grid";
+import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridContextProvider } from "@contexts/GridContextProvider";
+import { Grid, GridProps } from "@components/Grid";
 import { useCallback, useMemo, useState } from "react";
 import {
   GridFormDropDown,
   GridFormPopoutDropDownProps,
   MenuSeparator,
   MenuSeparatorString,
-} from "../../components/gridForm/GridFormDropDown";
-import { UpdatingContextProvider } from "../../contexts/UpdatingContextProvider";
+} from "@components/gridForm/GridFormDropDown";
 import { ColDef } from "ag-grid-community";
-import { wait } from "../../utils/util";
-import { GridCell } from "../../components/GridCell";
-import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
+import { wait } from "@utils/util";
+import { GridCell } from "@components/GridCell";
+import { GridPopoverEditDropDown } from "@components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {
   title: "Components / Grids",

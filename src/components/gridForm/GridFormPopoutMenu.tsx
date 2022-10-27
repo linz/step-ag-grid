@@ -1,10 +1,10 @@
 import { GridBaseRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GridContext } from "../../contexts/GridContext";
+import { GridContext } from "@contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { MenuDivider, MenuItem } from "@szhsin/react-menu";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
-import { useGridPopoutHook } from "../GridPopoutHook";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
@@ -67,8 +67,8 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
     return menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit;
   });
 
-  const { popoutWrapper } = useGridPopoutHook(props);
-  return popoutWrapper(
+  const { popoverWrapper } = useGridPopoverHook(props);
+  return popoverWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions}>
       <div className={"Grid-popoverContainerList"}>
         {options?.map((item, index) =>

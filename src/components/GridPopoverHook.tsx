@@ -1,12 +1,12 @@
 import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GridContext } from "../contexts/GridContext";
+import { GridContext } from "@contexts/GridContext";
 import { ControlledMenu } from "@szhsin/react-menu";
 import { GridFormProps } from "./GridCell";
-import { hasParentClass } from "../utils/util";
+import { hasParentClass } from "@utils/util";
 import { GridBaseRow } from "./Grid";
 
-export const useGridPopoutHook = <RowType extends GridBaseRow>(
+export const useGridPopoverHook = <RowType extends GridBaseRow>(
   props: GridFormProps<RowType>,
   save?: (selectedRows: any[]) => Promise<boolean>,
 ) => {
@@ -66,16 +66,18 @@ export const useGridPopoutHook = <RowType extends GridBaseRow>(
       document.addEventListener("mousedown", handleScreenMouseDown, true);
       document.addEventListener("mouseup", handleScreenMouseEvent, true);
       document.addEventListener("click", handleScreenMouseEvent, true);
+      document.addEventListener("dblclick", handleScreenMouseEvent, true);
       return () => {
         document.removeEventListener("mousedown", handleScreenMouseDown, true);
         document.removeEventListener("mouseup", handleScreenMouseEvent, true);
         document.removeEventListener("click", handleScreenMouseEvent, true);
+        document.removeEventListener("dblclick", handleScreenMouseEvent, true);
       };
     }
     return () => {};
   }, [handleScreenMouseDown, handleScreenMouseEvent, isOpen]);
 
-  const popoutWrapper = useCallback(
+  const popoverWrapper = useCallback(
     (children: JSX.Element) => {
       return (
         <>
@@ -112,7 +114,7 @@ export const useGridPopoutHook = <RowType extends GridBaseRow>(
   );
 
   return {
-    popoutWrapper,
+    popoverWrapper,
     triggerSave,
   };
 };

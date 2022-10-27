@@ -1,9 +1,11 @@
 import { useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
-import { GridContext } from "../contexts/GridContext";
+import { UpdatingContext } from "@contexts/UpdatingContext";
+import { GridContext } from "@contexts/GridContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridRendererGenericCell } from "./gridRender/GridRenderGenericCell";
-import { ColDef, ICellEditorParams } from "ag-grid-community";
+import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
+import { GridLoadableCell } from "./GridLoadableCell";
 
 export interface GridFormProps<RowType extends GridBaseRow> {
   cellEditorParams: ICellEditorParams;
@@ -28,6 +30,24 @@ export interface GenericCellEditorColDef<
   cellRendererParams?: GenericCellRendererParams;
 }
 
+export const GridCellRenderer = (cellRendererParams: ICellRendererParams) => {
+  const { checkUpdating } = useContext(UpdatingContext);
+  const colDef = cellRendererParams.colDef;
+
+  return colDef?.cellRendererParams?.oldCellRenderer ? (
+    <GridLoadableCell
+      isLoading={checkUpdating(
+        cellRendererParams.colDef?.field ?? cellRendererParams.colDef?.colId ?? "",
+        cellRendererParams.data.id,
+      )}
+    >
+      <colDef.cellRendererParams.oldCellRenderer {...cellRendererParams} />
+    </GridLoadableCell>
+  ) : (
+    <GridRendererGenericCell {...cellRendererParams} />
+  );
+};
+
 /**
  * For editing a text area.
  */
@@ -35,7 +55,7 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
   return {
-    cellRenderer: props.cellRenderer ?? GridRendererGenericCell,
+    cellRenderer: GridCellRenderer,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(props.cellEditorParams && {
@@ -44,6 +64,10 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
       cellEditor: GenericCellEditorComponent,
     }),
     ...props,
+    cellRendererParams: {
+      originalCellRender: props.cellRenderer,
+      ...props.cellRendererParams,
+    },
   };
 };
 

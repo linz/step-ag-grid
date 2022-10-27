@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { GridApi } from "ag-grid-community";
-import { GridBaseRow } from "../components/Grid";
+import { GridBaseRow } from "@components/Grid";
 
 export interface GridContextType {
   gridReady: () => boolean;
