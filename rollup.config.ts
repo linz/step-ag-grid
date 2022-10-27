@@ -13,7 +13,6 @@ const outputDir = "dist";
 
 export default {
   input: "index.ts",
-  external: ["ag-grid-community"],
   output: [
     {
       file: packageJson.main,
@@ -27,7 +26,7 @@ export default {
     },
   ],
   plugins: [
-    peerDepsExternal(),
+    peerDepsExternal({ includeDependencies: true }),
     resolve(),
     commonjs(),
     typescript(),
