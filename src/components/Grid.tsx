@@ -24,8 +24,8 @@ export interface GridProps {
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
   quickFilterValue?: string;
-  externalSelectedItems: any[];
-  setExternalSelectedItems: (items: any[]) => void;
+  externalSelectedItems?: any[];
+  setExternalSelectedItems?: (items: any[]) => void;
   onGridReady?: GridOptions["onGridReady"];
   defaultColDef: GridOptions["defaultColDef"];
   columnDefs: GridOptions["columnDefs"];
@@ -59,16 +59,21 @@ export const Grid = (params: GridProps): JSX.Element => {
   /**
    * Ensure external selected items list is in sync with panel.
    */
-  const synchroniseExternalStateToGridSelection = ({ api }: SelectionChangedEvent) => {
-    const selectedRows = api.getSelectedRows();
-    // We don't want to update selected Items if it hasn't changed to prevent excess renders
-    if (
-      params.externalSelectedItems.length != selectedRows.length ||
-      isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
-    ) {
-      params.setExternalSelectedItems([...selectedRows]);
-    }
-  };
+  const synchroniseExternalStateToGridSelection = useCallback(
+    ({ api }: SelectionChangedEvent) => {
+      if (!params.externalSelectedItems || !params.setExternalSelectedItems) return;
+
+      const selectedRows = api.getSelectedRows();
+      // We don't want to update selected Items if it hasn't changed to prevent excess renders
+      if (
+        params.externalSelectedItems.length != selectedRows.length ||
+        isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
+      ) {
+        params.setExternalSelectedItems([...selectedRows]);
+      }
+    },
+    [params],
+  );
 
   /**
    * Synchronise externally selected items to grid.
@@ -76,6 +81,7 @@ export const Grid = (params: GridProps): JSX.Element => {
    */
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
     if (!gridReady()) return;
+    if (!params.externalSelectedItems) return;
 
     const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
     const lastNewId = last(difference(selectedIds, lastSelectedIds.current));

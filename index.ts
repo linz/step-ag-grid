@@ -19,6 +19,7 @@ export { GridRenderPopoutMenuCell } from "./src/components/gridRender/GridRender
 export { GridPopoutEditMultiSelect } from "./src/components/gridPopoverEdit/GridPopoutEditMultiSelect";
 export { GridPopoverMenu } from "./src/components/gridPopoverEdit/GridPopoverMenu";
 export { GridPopoverEditBearing } from "./src/components/gridPopoverEdit/GridPopoverEditBearing";
+export { GridPopoverEditBearingCorrection } from "./src/components/gridPopoverEdit/GridPopoverEditBearing";
 export { GridPopoverEditDropDown } from "./src/components/gridPopoverEdit/GridPopoverEditDropDown";
 export { GridPopoverMessage } from "./src/components/gridPopoverEdit/GridPopoverMessage";
 export { GridPopoverTextArea } from "./src/components/gridPopoverEdit/GridPopoverTextArea";
