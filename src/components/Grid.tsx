@@ -24,6 +24,7 @@ export interface GridProps {
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
   quickFilterValue?: string;
+  domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   onGridReady?: GridOptions["onGridReady"];
@@ -259,6 +260,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         onCellDoubleClicked={onCellDoubleClick}
         onCellEditingStarted={refreshSelectedRows}
         onCellEditingStopped={onCellEditingStopped}
+        domLayout={params.domLayout}
         columnDefs={columnDefs}
         rowData={params.rowData}
         noRowsOverlayComponent={noRowsOverlayComponent}
