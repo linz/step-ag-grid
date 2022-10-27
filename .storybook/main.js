@@ -7,7 +7,12 @@ module.exports = {
   }),
   framework: '@storybook/react',
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: [],
+  addons: [
+    "@storybook/addon-links",
+    "@storybook/addon-essentials",
+    "storybook-addon-mock/register",
+    "@storybook/addon-interactions",
+  ],
   webpackFinal: async config => {
     // Handling scss files when used within components consumed by a story
     config.module.rules.push({
