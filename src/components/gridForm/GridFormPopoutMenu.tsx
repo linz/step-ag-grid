@@ -21,7 +21,7 @@ export interface MenuOption<RowType> {
   label: JSX.Element | string | MenuSeparatorType;
   action?: (selectedRows: RowType[]) => Promise<boolean>;
   disabled?: string | boolean;
-  multiEdit: boolean;
+  supportsMultiEdit: boolean;
 }
 
 /**
@@ -65,7 +65,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
   const selectedRowCount = props.selectedRows.length;
 
   const filteredOptions = options?.filter((menuOption) => {
-    return menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.multiEdit;
+    return menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.supportsMultiEdit;
   });
 
   const { popoverWrapper } = useGridPopoverHook(props);
