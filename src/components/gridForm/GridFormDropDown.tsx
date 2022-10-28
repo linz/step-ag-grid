@@ -17,6 +17,7 @@ export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
 
 interface FinalSelectOption<ValueType> {
   value: ValueType;
+  key?:string;
   label?: JSX.Element | string;
   disabled?: boolean | string;
 }
@@ -182,7 +183,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
               <MenuDivider key={`$$divider_${index}`} />
             ) : filteredValues.includes(item.value) ? null : (
               <MenuItem
-                key={`${item.value}`}
+                key={`${item.key ?? item.value}`}
                 disabled={!!item.disabled}
                 title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                 value={item.value}
