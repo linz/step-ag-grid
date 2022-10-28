@@ -13,6 +13,9 @@ export const bearingCorrectionValueFormatter = (params: ValueFormatterParams): s
   if (value == null) {
     return "-";
   }
+  if (typeof value === 'string') {
+    return convertDDToDMS(bearingNumberParser(value), true, true);
+  }
   return convertDDToDMS(value, true, true);
 };
 
