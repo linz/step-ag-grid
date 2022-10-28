@@ -50,11 +50,11 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
   if (dd === 0) addTrailingZeros = false;
 
   // toFixed rounds parts up greater than 60, which has to be corrected below
-  const [bearingWholeString, beringDecimalString] = dd.toFixed(5).split(".");
+  const [bearingWholeString, bearingDecimalString] = dd.toFixed(5).split(".");
 
   let bearingWhole = Math.abs(parseInt(bearingWholeString));
-  let minNumeric = parseInt(beringDecimalString?.substring(0, 2));
-  let secNumeric = parseInt(beringDecimalString?.substring(2, 4));
+  let minNumeric = parseInt(bearingDecimalString?.substring(0, 2));
+  let secNumeric = parseInt(bearingDecimalString?.substring(2, 4));
 
   // If the toFixed caused rounding beyond 60 minutes/seconds then apply the carry
   if (secNumeric >= 60) {
@@ -71,7 +71,7 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
 
   const minString = minNumeric.toString().padStart(2, "0");
   const secString = secNumeric.toString().padStart(2, "0");
-  const deciSecString = beringDecimalString?.substring(4, 5);
+  const deciSecString = bearingDecimalString?.substring(4, 5);
 
   let dmsString = `${showPositiveSymbol && dd > 0 ? "+" : ""}${dd < 0 ? "-" : ""}${bearingWhole}°`;
   if (addTrailingZeros || deciSecString != "0") {
