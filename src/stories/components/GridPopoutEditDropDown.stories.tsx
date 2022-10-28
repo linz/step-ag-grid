@@ -176,7 +176,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: optionsObjects.map(o =>{
-               return {key: o.code, value: o, label: o.desc, disabled:false}
+               return {value: o, label: o.desc, disabled:false}
             }),
           },
         }),
