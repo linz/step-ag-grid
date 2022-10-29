@@ -8,12 +8,10 @@ import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useCallback, useMemo, useState } from "react";
 import {
-  FinalSelectOption,
   GridFormDropDown,
   GridFormPopoutDropDownProps,
   MenuSeparator,
   MenuSeparatorString,
-  SelectOption,
 } from "@components/gridForm/GridFormDropDown";
 import { ColDef } from "ag-grid-community";
 import { wait } from "@utils/util";
@@ -48,9 +46,9 @@ interface ITestRow {
   position4: ICode | null;
 }
 
-interface ICode{
-  code:string;
-  desc:string;
+interface ICode {
+  code: string;
+  desc: string;
 }
 
 const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
@@ -73,14 +71,13 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
     ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
   }, []);
 
-
   const optionsObjects = useMemo(
-    () => 
-    [
-      {code:"O1", desc:"Object One"}, 
-      {code:"O2", desc:"Object Two"}
-    ],[]
-  )
+    () => [
+      { code: "O1", desc: "Object One" },
+      { code: "O2", desc: "Object Two" },
+    ],
+    [],
+  );
 
   const columnDefs = useMemo(
     () =>
@@ -175,20 +172,32 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             multiEdit: true,
             filtered: "local",
             filterPlaceholder: "Filter this",
-            options: optionsObjects.map(o =>{
-               return {value: o, label: o.desc, disabled:false}
+            options: optionsObjects.map((o) => {
+              return { value: o, label: o.desc, disabled: false };
             }),
           },
         }),
       ] as ColDef[],
-    [optionsFn],
+    [optionsFn, optionsObjects],
   );
 
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, position: "Tester", position2: "1", position3: "Tester", position4: {code:"O1", desc:"Object One"} },
-        { id: 1001, position: "Developer", position2: "2", position3: "Developer", position4: {code:"O2", desc:"Object Two"}  },
+        {
+          id: 1000,
+          position: "Tester",
+          position2: "1",
+          position3: "Tester",
+          position4: { code: "O1", desc: "Object One" },
+        },
+        {
+          id: 1001,
+          position: "Developer",
+          position2: "2",
+          position3: "Developer",
+          position4: { code: "O2", desc: "Object Two" },
+        },
       ] as ITestRow[],
     [],
   );
