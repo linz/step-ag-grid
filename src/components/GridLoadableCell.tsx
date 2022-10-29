@@ -1,9 +1,13 @@
+import "./GridLoadableCell.scss";
+
 import { LuiMiniSpinner } from "@linzjs/lui";
+import clsx from "clsx";
 
 export const GridLoadableCell = (props: {
   isLoading: boolean;
   dataTestId?: string;
   children: JSX.Element | string;
+  className?: string;
 }): JSX.Element => {
   // console.log(`Rendering LoadableCell - loading: ${props.isLoading}`);
   if (props.isLoading) {
@@ -15,7 +19,7 @@ export const GridLoadableCell = (props: {
   }
   // only add test id into ONE of the columns in a grid. this way each row will have one unique id :)
   return (
-    <div data-testid={props.dataTestId} style={{ display: "flex", alignItems: "center" }}>
+    <div data-testid={props.dataTestId} className={clsx("GridLoadableCell-container", props.className)}>
       {props.children}
     </div>
   );
