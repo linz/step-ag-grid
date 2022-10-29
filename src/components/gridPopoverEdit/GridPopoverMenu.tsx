@@ -1,5 +1,5 @@
 import "./GridPopoverMenu.scss";
-import "@szhsin/react-menu/dist/index.css";
+import "../../react-menu3/styles/index.scss";
 
 import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "../GenericCellClass";

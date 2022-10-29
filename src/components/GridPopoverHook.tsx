@@ -1,11 +1,10 @@
 import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
-import { ControlledMenu } from "@szhsin/react-menu";
 import { GridFormProps } from "./GridCell";
 import { hasParentClass } from "@utils/util";
 import { GridBaseRow } from "./Grid";
-import { isEmpty } from "lodash-es";
+import { ControlledMenu } from "../react-menu3";
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(
   props: GridFormProps<RowType>,
@@ -85,7 +84,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
-              portal={isEmpty(document.querySelectorAll(".PopoutWindowContainer"))}
+              portal={{ target: anchorRef.current.ownerDocument.body }}
               unmountOnClose={true}
               anchorRef={anchorRef}
               menuClassName={"lui-menu"}

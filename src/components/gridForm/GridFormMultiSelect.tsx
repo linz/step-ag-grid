@@ -1,6 +1,6 @@
-import "@szhsin/react-menu/dist/index.css";
+import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
+import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
