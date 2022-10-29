@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { forwardRef, useRef, useMemo } from "react";
+import { forwardRef, useRef, useMemo, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { string, number, bool, func, object, oneOf, oneOfType, exact } from "prop-types";
 import { MenuList } from "./MenuList";
@@ -19,6 +19,7 @@ import {
   SettingsContext,
   ItemSettingsContext,
 } from "../utils";
+import { hasParentClass } from "@utils/util";
 
 export const ControlledMenu = forwardRef(function ControlledMenu(
   {
@@ -40,6 +41,7 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
     theming,
     onItemClick,
     onClose,
+    saveButtonRef,
     ...restProps
   }: any,
   externalRef,
@@ -74,6 +76,65 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
       viewScroll,
     ],
   );
+
+  const clickIsWithinMenu = useCallback((ev: MouseEvent) => {
+    return hasParentClass("szh-menu--state-open", ev.target as Node);
+  }, []);
+
+  const handleScreenEventForSave = useCallback(
+    (ev: MouseEvent) => {
+      if (!clickIsWithinMenu(ev)) {
+        //!ev.currentTarget.contains(ev.relatedTarget || document.activeElement)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        // There's an issue in React17
+        // the cell doesn't refresh during update if save is invoked from a native event
+        // This doesn't happen in React18
+        // To work around it, I invoke the save by clicking on an invisible button in the dropdown
+        saveButtonRef.current?.click();
+        // safeCall(onClose, { reason: CloseReason.BLUR }); old code
+
+        // If a user clicks on the menu button when a menu is open, we need to close the menu.
+        // However, a blur event will be fired prior to the click event on menu button,
+        // which makes the menu first close and then open again.
+        // If this happen, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
+        // and makes it difficult to determine whether onBlur is fired because of clicking on menu button.
+        // This is a workaround approach which sets a flag to skip a following click event.
+        if (skipOpen) {
+          skipOpen.current = true;
+          setTimeout(() => (skipOpen.current = false), 300);
+        }
+      }
+    },
+    [clickIsWithinMenu, onClose],
+  );
+
+  const handleScreenEventForCancel = useCallback(
+    (ev: MouseEvent) => {
+      if (!clickIsWithinMenu(ev)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    },
+    [clickIsWithinMenu],
+  );
+
+  useEffect(() => {
+    if (isMenuOpen(state)) {
+      const thisDocument = document; //anchorRef.current.ownerDocument;
+      thisDocument.addEventListener("mousedown", handleScreenEventForCancel, true);
+      thisDocument.addEventListener("mouseup", handleScreenEventForSave, true);
+      thisDocument.addEventListener("click", handleScreenEventForCancel, true);
+      thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
+      return () => {
+        thisDocument.removeEventListener("mousedown", handleScreenEventForCancel, true);
+        thisDocument.removeEventListener("mouseup", handleScreenEventForSave, true);
+        thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
+        thisDocument.removeEventListener("dblclick", handleScreenEventForCancel, true);
+      };
+    }
+    return () => {};
+  }, [handleScreenEventForSave, handleScreenEventForCancel, state]);
 
   const itemSettings = useMemo(
     () => ({

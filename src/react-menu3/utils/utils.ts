@@ -4,7 +4,7 @@ import { unstable_batchedUpdates } from "react-dom";
 export const isMenuOpen = (state) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback) => callback());
 export const values = Object.values || ((obj) => Object.keys(obj).map((key) => obj[key]));
-export const floatEqual = (a, b, diff = 0.0001) => Math.abs(a - b) < diff;
+export const floatEqual = (a: number, b: number, diff = 0.0001) => Math.abs(a - b) < diff;
 export const getTransition = (transition: boolean | Record<string, string>, name: string) =>
   transition === true || !!(transition && transition[name]);
 export const safeCall = (fn, arg) => (typeof fn === "function" ? fn(arg) : fn);

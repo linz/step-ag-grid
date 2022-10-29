@@ -2,7 +2,6 @@ import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
 import { GridFormProps } from "./GridCell";
-import { hasParentClass } from "@utils/util";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
 
@@ -32,51 +31,6 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
     [save, stopEditing, updateValue],
   );
 
-  const clickIsWithinMenu = useCallback((ev: MouseEvent) => {
-    return hasParentClass("szh-menu--state-open", ev.target as Node);
-  }, []);
-
-  const handleScreenMouseDown = useCallback(
-    (ev: MouseEvent) => {
-      if (!clickIsWithinMenu(ev)) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // There's an issue in React17
-        // the cell doesn't refresh during update if save is invoked from a native event
-        // This doesn't happen in React18
-        // To work around it, I invoke the save by clicking on an invisible button in the dropdown
-        saveButtonRef.current?.click();
-      }
-    },
-    [clickIsWithinMenu],
-  );
-
-  const handleScreenMouseEvent = useCallback(
-    (ev: MouseEvent) => {
-      if (!clickIsWithinMenu(ev)) {
-        ev.preventDefault();
-        ev.stopPropagation();
-      }
-    },
-    [clickIsWithinMenu],
-  );
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("mousedown", handleScreenMouseDown, true);
-      document.addEventListener("mouseup", handleScreenMouseEvent, true);
-      document.addEventListener("click", handleScreenMouseEvent, true);
-      document.addEventListener("dblclick", handleScreenMouseEvent, true);
-      return () => {
-        document.removeEventListener("mousedown", handleScreenMouseDown, true);
-        document.removeEventListener("mouseup", handleScreenMouseEvent, true);
-        document.removeEventListener("click", handleScreenMouseEvent, true);
-        document.removeEventListener("dblclick", handleScreenMouseEvent, true);
-      };
-    }
-    return () => {};
-  }, [handleScreenMouseDown, handleScreenMouseEvent, isOpen]);
-
   const popoverWrapper = useCallback(
     (children: JSX.Element) => {
       return (
@@ -87,6 +41,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
               portal={true}
               unmountOnClose={true}
               anchorRef={anchorRef}
+              saveButtonRef={saveButtonRef}
               menuClassName={"lui-menu"}
               onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
             >
