@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { placeArrowVertical } from "./placeArrowVertical";
 
 export const placeLeftorRight = ({

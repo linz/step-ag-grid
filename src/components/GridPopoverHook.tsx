@@ -88,7 +88,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
               unmountOnClose={true}
               anchorRef={anchorRef}
               menuClassName={"lui-menu"}
-              onClose={(event) => triggerSave(event.reason).then()}
+              onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
             >
               {saving && (
                 <div

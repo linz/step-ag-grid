@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const placeArrowHorizontal = ({ arrowRef, menuX, anchorRect, containerRect, menuRect }) => {
   let x = anchorRect.left - containerRect.left - menuX + anchorRect.width / 2;
   const offset = arrowRef.current.offsetWidth * 1.25;

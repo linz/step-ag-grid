@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { placeLeftorRight } from "./placeLeftorRight";
 import { placeToporBottom } from "./placeToporBottom";
 

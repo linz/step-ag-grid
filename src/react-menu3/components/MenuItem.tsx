@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useContext, useMemo } from "react";
 import { any, string, bool, func, node, oneOf, oneOfType } from "prop-types";
 import { useBEM, useItemState, useCombinedRef } from "../hooks";

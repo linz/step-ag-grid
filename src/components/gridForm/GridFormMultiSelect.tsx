@@ -137,7 +137,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             <>
               <MenuItem
                 key={`${item.value}`}
-                onClick={(e) => {
+                onClick={(e: { keepOpen: boolean }) => {
                   e.keepOpen = true;
                   // onSelectMenuOption(itemIndex, e.value);
                   return false;
@@ -158,7 +158,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
               </MenuItem>
               {selectedValues.includes(item.value) && item.subComponent && (
                 <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                  {(ref) =>
+                  {(ref: any) =>
                     item.subComponent &&
                     item.subComponent(
                       {

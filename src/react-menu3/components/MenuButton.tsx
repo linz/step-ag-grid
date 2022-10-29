@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useMemo } from "react";
 import { bool } from "prop-types";
 import { useBEM } from "../hooks";

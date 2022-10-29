@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useContext, useRef, useState } from "react";
 import { bool } from "prop-types";
 import { useBEM, useLayoutEffect, useCombinedRef } from "../hooks";

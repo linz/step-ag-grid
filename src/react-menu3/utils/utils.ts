@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { unstable_batchedUpdates } from "react-dom";
 
 export const isMenuOpen = (state) => !!state && state[0] === "o";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { parsePadding } from "../utils";
 
 export const getPositionHelpers = (containerRef, menuRef, menuScroll, boundingBoxPadding) => {

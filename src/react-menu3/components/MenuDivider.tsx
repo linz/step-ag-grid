@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { memo, forwardRef } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuDividerClass, stylePropTypes } from "../utils";

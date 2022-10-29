@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { string, number, bool, func, object, oneOf, oneOfType, exact } from "prop-types";
@@ -40,7 +41,7 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
     onItemClick,
     onClose,
     ...restProps
-  },
+  }: any,
   externalRef,
 ) {
   const containerRef = useRef(null);

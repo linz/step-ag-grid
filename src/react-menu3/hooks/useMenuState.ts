@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useTransition } from "react-transition-state";
 import { MenuStateMap, getTransition } from "../utils";
 

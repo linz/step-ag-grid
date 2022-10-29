@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export const useItemEffect = (isDisabled, itemRef, updateItems) => {

@@ -1,6 +1,6 @@
 import { string, number, bool, func, object, oneOf, oneOfType, exact } from "prop-types";
 
-export const stylePropTypes = (name) => ({
+export const stylePropTypes = (name?: string) => ({
   [name ? `${name}ClassName` : "className"]: oneOfType([string, func]),
 });
 

@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { memo, forwardRef, useContext, useRef } from "react";
 import { HoverItemContext } from "./constants";
 
-export const withHovering = (name, WrappedComponent) => {
+export const withHovering = (name: string, WrappedComponent: any): any => {
   const Component = memo(WrappedComponent);
-  const WithHovering = forwardRef((props, ref) => {
+  const WithHovering = forwardRef<any>((props: any, ref) => {
     const itemRef = useRef(null);
     return (
       <Component

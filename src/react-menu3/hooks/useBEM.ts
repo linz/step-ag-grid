@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from "react";
 
 // Generate className following BEM methodology: http://getbem.com/naming/

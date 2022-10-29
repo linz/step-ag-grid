@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRef, useContext, useEffect, useMemo, useImperativeHandle } from "react";
 import { createPortal } from "react-dom";
 import { node, func, bool, shape, oneOf, oneOfType } from "prop-types";

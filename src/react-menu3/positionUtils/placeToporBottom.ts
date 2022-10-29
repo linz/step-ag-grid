@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { placeArrowHorizontal } from "./placeArrowHorizontal";
 
 export const placeToporBottom = ({
