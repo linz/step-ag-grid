@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext } from "react";
 import { flushSync } from "react-dom";
 import { useBEM, useCombinedRef, useLayoutEffect, useItems } from "../hooks";

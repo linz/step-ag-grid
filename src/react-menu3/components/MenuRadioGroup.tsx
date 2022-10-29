@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { forwardRef, useMemo } from "react";
 import { any, string, func } from "prop-types";
 import { useBEM } from "../hooks";

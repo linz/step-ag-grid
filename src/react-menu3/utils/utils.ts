@@ -1,17 +1,17 @@
-
 import { unstable_batchedUpdates } from "react-dom";
 
 export const isMenuOpen = (state: string | undefined) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());
-export const values = Object.values || ((obj: { [x: string]: any; }) => Object.keys(obj).map((key) => obj[key]));
+export const values = Object.values || ((obj: { [x: string]: any }) => Object.keys(obj).map((key) => obj[key]));
 export const floatEqual = (a: number, b: number, diff = 0.0001) => Math.abs(a - b) < diff;
 export const getTransition = (transition: boolean | Record<string, string>, name: string) =>
   transition === true || !!(transition && transition[name]);
-export const safeCall = <T, R>(fn: (arg: T) => R, arg: T): (T | R) => (typeof fn === "function" ? fn(arg) : fn);
+export const safeCall = <T, R>(fn: (arg: T) => R, arg: T): T | R => (typeof fn === "function" ? fn(arg) : fn);
 
 const internalKey = "_szhsinMenu";
 export const getName = (component: Record<string, any | undefined>) => component[internalKey];
-export const defineName = (name: string, component: Record<string, any | undefined>) => Object.defineProperty(component, internalKey, { value: name });
+export const defineName = (name: string, component: Record<string, any | undefined>) =>
+  Object.defineProperty(component, internalKey, { value: name });
 
 export const mergeProps = (target: Record<string, any>, source: Record<string, any>) => {
   source &&
@@ -52,7 +52,7 @@ export const getScrollAncestor = (node: Node | null): Element | null => {
     node = node.parentNode;
     if (!node || node === thisWindow?.document?.body) return null;
     if (node instanceof Element) {
-      const {overflow, overflowX, overflowY} = thisWindow.getComputedStyle(node);
+      const { overflow, overflowX, overflowY } = thisWindow.getComputedStyle(node);
       if (/auto|scroll|overlay|hidden/.test(overflow + overflowY + overflowX)) return node;
     }
   }

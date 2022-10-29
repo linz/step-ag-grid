@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { useRef, useEffect } from "react";
 import { safeCall } from "../utils";
 

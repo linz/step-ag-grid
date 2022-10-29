@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { useRef, useContext, useEffect } from "react";
 import { ItemSettingsContext, MenuListItemContext, HoverActionTypes } from "../utils";
 import { useItemEffect } from "./useItemEffect";
