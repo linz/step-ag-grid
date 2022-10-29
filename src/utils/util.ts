@@ -17,7 +17,8 @@ export const isFloat = (value: string) => {
 export const hasParentClass = function (className: string, child: Node) {
   let node: Node | null = child;
   while (node) {
-    if (node instanceof Node && node instanceof HTMLElement && node.classList.contains(className)) {
+    // When nodes are in portals they aren't type node anymore hence treating it as any here
+    if ((node as any).classList && (node as any).classList.contains(className)) {
       return true;
     }
     node = node.parentNode;

@@ -1,6 +1,6 @@
-import "@szhsin/react-menu/dist/index.css";
+import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@szhsin/react-menu";
+import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
@@ -137,7 +137,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             <>
               <MenuItem
                 key={`${item.value}`}
-                onClick={(e) => {
+                onClick={(e: { keepOpen: boolean }) => {
                   e.keepOpen = true;
                   // onSelectMenuOption(itemIndex, e.value);
                   return false;
@@ -158,7 +158,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
               </MenuItem>
               {selectedValues.includes(item.value) && item.subComponent && (
                 <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                  {(ref) =>
+                  {(ref: any) =>
                     item.subComponent &&
                     item.subComponent(
                       {

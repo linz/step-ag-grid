@@ -1,0 +1,20 @@
+@use 'sass:math';
+
+$color: #212529;
+$color-dark: #cad1d8;
+$color-disabled: #aaa;
+$color-disabled-dark: #666;
+
+$header-color: #888;
+$divider-color: rgba(0, 0, 0, 0.12);
+$divider-color-dark: #3a3a3a;
+$border-color: rgba(0, 0, 0, 0.1);
+$border-color-dark: #333;
+
+$background-color: #fff;
+$background-color-dark: #22262c;
+$background-color-hover: #ebebeb;
+$background-color-hover-dark: #31363c;
+
+$arrow-size: 0.75rem;
+$arrow-pos: -(math.div($arrow-size, 2));

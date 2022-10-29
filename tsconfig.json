@@ -41,6 +41,9 @@
       "@utils/*": [
         "./src/utils/*",
       ],
+      "@react-menu3": [
+        "./src/react-menu3"
+      ]
     }
   }
 }

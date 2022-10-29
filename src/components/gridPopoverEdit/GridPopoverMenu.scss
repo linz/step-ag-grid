@@ -1,7 +1,11 @@
 @use 'node_modules/@linzjs/lui/dist/scss/Core' as lui;
 
-.GridPopoutMenu-burger svg {
-  fill: lui.$sea;
+.GridPopoutMenu-burger {
+  cursor: pointer;
+
+  & svg {
+    fill: lui.$sea;
+  }
 }
 
 .GridPopoutMenu-burgerDisabled svg {

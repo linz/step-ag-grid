@@ -2,7 +2,7 @@ import { GridBaseRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { MenuDivider, MenuItem } from "@szhsin/react-menu";
+import { MenuDivider, MenuItem } from "@react-menu3";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
