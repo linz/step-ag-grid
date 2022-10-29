@@ -1,22 +1,35 @@
-// @ts-nocheck
 import { placeArrowVertical } from "./placeArrowVertical";
+import { getPositionHelpers } from "./getPositionHelpers";
+import { MutableRefObject } from "react";
 
-export const placeLeftorRight = ({
-  anchorRect,
-  containerRect,
-  menuRect,
-  placeLeftorRightY,
-  placeLeftX,
-  placeRightX,
-  getLeftOverflow,
-  getRightOverflow,
-  confineHorizontally,
-  confineVertically,
-  arrowRef,
-  arrow,
-  direction,
-  position,
-}) => {
+export interface placeLeftorRightParams {
+  anchorRect: DOMRect;
+  placeLeftorRightY: number;
+  placeLeftX: number;
+  placeRightX: number;
+  arrowRef: MutableRefObject<HTMLElement>;
+  arrow: boolean;
+  direction: "left" | "right" | "top" | "bottom";
+  position: "auto" | "anchor" | "initial";
+}
+
+export const placeLeftorRight = (props: ReturnType<typeof getPositionHelpers> & placeLeftorRightParams) => {
+  const {
+    anchorRect,
+    containerRect,
+    menuRect,
+    placeLeftorRightY,
+    placeLeftX,
+    placeRightX,
+    getLeftOverflow,
+    getRightOverflow,
+    confineHorizontally,
+    confineVertically,
+    arrowRef,
+    arrow,
+    direction,
+    position,
+  } = props;
   let computedDirection = direction;
   let y = placeLeftorRightY;
   if (position !== "initial") {

@@ -1,5 +1,12 @@
-// @ts-nocheck
-export const positionContextMenu = ({ positionHelpers, anchorPoint }) => {
+import { getPositionHelpers } from "./getPositionHelpers";
+
+export const positionContextMenu = ({
+  positionHelpers,
+  anchorPoint,
+}: {
+  positionHelpers: ReturnType<typeof getPositionHelpers>;
+  anchorPoint: { x: number; y: number };
+}) => {
   const {
     menuRect,
     containerRect,

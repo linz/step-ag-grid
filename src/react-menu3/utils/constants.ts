@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createContext } from "react";
 
 export const menuContainerClass = "szh-menu-container";
@@ -12,7 +11,7 @@ export const menuGroupClass = "group";
 export const subMenuClass = "submenu";
 export const radioGroupClass = "radio-group";
 
-export const HoverItemContext = createContext();
+export const HoverItemContext = createContext(undefined);
 export const MenuListItemContext = createContext({});
 export const MenuListContext = createContext({});
 export const EventHandlersContext = createContext({});

@@ -1,22 +1,35 @@
-// @ts-nocheck
 import { placeArrowHorizontal } from "./placeArrowHorizontal";
+import { getPositionHelpers } from "./getPositionHelpers";
+import { MutableRefObject } from "react";
 
-export const placeToporBottom = ({
-  anchorRect,
-  containerRect,
-  menuRect,
-  placeToporBottomX,
-  placeTopY,
-  placeBottomY,
-  getTopOverflow,
-  getBottomOverflow,
-  confineHorizontally,
-  confineVertically,
-  arrowRef,
-  arrow,
-  direction,
-  position,
-}) => {
+export interface placeToporBottomParams {
+  anchorRect: DOMRect;
+  placeToporBottomX: number;
+  placeTopY: number;
+  placeBottomY: number;
+  arrowRef: MutableRefObject<HTMLElement>;
+  arrow: boolean;
+  direction: "left" | "right" | "top" | "bottom";
+  position: "auto" | "anchor" | "initial";
+}
+
+export const placeToporBottom = (props: ReturnType<typeof getPositionHelpers> & placeToporBottomParams) => {
+  const {
+    anchorRect,
+    containerRect,
+    menuRect,
+    placeToporBottomX,
+    placeTopY,
+    placeBottomY,
+    getTopOverflow,
+    getBottomOverflow,
+    confineHorizontally,
+    confineVertically,
+    arrowRef,
+    arrow,
+    direction,
+    position,
+  } = props;
   // make sure invalid direction is treated as 'bottom'
   let computedDirection = direction === "top" ? "top" : "bottom";
   let x = placeToporBottomX;

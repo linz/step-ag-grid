@@ -1,18 +1,22 @@
-// @ts-nocheck
 import { placeLeftorRight } from "./placeLeftorRight";
 import { placeToporBottom } from "./placeToporBottom";
+import { MutableRefObject } from "react";
+import { getPositionHelpers } from "./getPositionHelpers";
 
-export const positionMenu = ({
-  arrow,
-  align,
-  direction,
-  offsetX,
-  offsetY,
-  position,
-  anchorRef,
-  arrowRef,
-  positionHelpers,
-}) => {
+interface positionMenuProps {
+  offsetX: number;
+  offsetY: number;
+  arrowRef: MutableRefObject<HTMLElement>;
+  anchorRef: MutableRefObject<HTMLElement>;
+  arrow: boolean;
+  direction: "left" | "right" | "top" | "bottom";
+  position: "auto" | "anchor" | "initial";
+  align: "start" | "center" | "end";
+  positionHelpers: ReturnType<typeof getPositionHelpers>;
+}
+
+export const positionMenu = (props: positionMenuProps) => {
+  const { arrow, align, direction, offsetX, offsetY, position, anchorRef, arrowRef, positionHelpers } = props;
   const { menuRect, containerRect } = positionHelpers;
 
   let horizontalOffset = offsetX;

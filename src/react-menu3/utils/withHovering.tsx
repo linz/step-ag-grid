@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { memo, forwardRef, useContext, useRef } from "react";
 import { HoverItemContext } from "./constants";
 
