@@ -5,7 +5,6 @@ export const getPositionHelpers = (containerRef, menuRef, menuScroll, boundingBo
   const menuRect = menuRef.current.getBoundingClientRect();
   const containerRect = containerRef.current.getBoundingClientRect();
   const thisWindow = containerRef.current.ownerDocument.defaultView;
-  console.log({ menuScroll }, window, menuScroll === window);
   const boundingRect =
     menuScroll === window || menuScroll === thisWindow
       ? {
