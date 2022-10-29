@@ -8,10 +8,12 @@ import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useCallback, useMemo, useState } from "react";
 import {
+  FinalSelectOption,
   GridFormDropDown,
   GridFormPopoutDropDownProps,
   MenuSeparator,
   MenuSeparatorString,
+  SelectOption,
 } from "@components/gridForm/GridFormDropDown";
 import { ColDef } from "ag-grid-community";
 import { wait } from "@utils/util";
@@ -43,6 +45,12 @@ interface ITestRow {
   position: string | null;
   position2: string | null;
   position3: string | null;
+  position4: ICode | null;
+}
+
+interface ICode{
+  code:string;
+  desc:string;
 }
 
 const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
@@ -64,6 +72,15 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       "(other)",
     ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
   }, []);
+
+
+  const optionsObjects = useMemo(
+    () => 
+    [
+      {code:"O1", desc:"Object One"}, 
+      {code:"O2", desc:"Object Two"}
+    ],[]
+  )
 
   const columnDefs = useMemo(
     () =>
@@ -148,6 +165,21 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
           },
         }),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position4"]>({
+          field: "position4",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Filtered (object)",
+          valueGetter: (params) => params.data.position4?.desc,
+          cellEditorParams: {
+            multiEdit: true,
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: optionsObjects.map(o =>{
+               return {value: o, label: o.desc, disabled:false}
+            }),
+          },
+        }),
       ] as ColDef[],
     [optionsFn],
   );
@@ -155,8 +187,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
-        { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
+        { id: 1000, position: "Tester", position2: "1", position3: "Tester", position4: {code:"O1", desc:"Object One"} },
+        { id: 1001, position: "Developer", position2: "2", position3: "Developer", position4: {code:"O2", desc:"Object Two"}  },
       ] as ITestRow[],
     [],
   );

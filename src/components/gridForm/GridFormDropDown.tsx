@@ -182,7 +182,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
               <MenuDivider key={`$$divider_${index}`} />
             ) : filteredValues.includes(item.value) ? null : (
               <MenuItem
-                key={`${item.value}`}
+                key={`${props.field}-${index}`}
                 disabled={!!item.disabled}
                 title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                 value={item.value}
