@@ -84,12 +84,18 @@ export const MenuList = ({
   const scrollNodes = scrollNodesRef.current;
 
   const onKeyDown = (e) => {
+    const isTextInputTarget =
+      e.target.nodeName === "TEXTAREA" || (e.target.nodeName === "INPUT" && e.target.getAttribute("type") === "text");
     switch (e.key) {
       case Keys.HOME:
+        // Don't eat home/end events on inputs
+        if (isTextInputTarget) return;
         dispatch(HoverActionTypes.FIRST);
         break;
 
       case Keys.END:
+        // Don't eat home/end events on inputs
+        if (isTextInputTarget) return;
         dispatch(HoverActionTypes.LAST);
         break;
 

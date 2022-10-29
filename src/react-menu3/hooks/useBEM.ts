@@ -1,9 +1,17 @@
-// @ts-nocheck
 import { useMemo } from "react";
+
+type useBemModifiers = Record<string, boolean | string | undefined>;
+
+interface useBemProps {
+  block: string;
+  element: string;
+  modifiers: useBemModifiers;
+  className: string | ((modifiers: useBemModifiers) => string | undefined);
+}
 
 // Generate className following BEM methodology: http://getbem.com/naming/
 // Modifier value can be one of the following types: boolean, string, undefined
-export const useBEM = ({ block, element, modifiers, className }) =>
+export const useBEM = ({ block, element, modifiers, className }: useBemProps) =>
   useMemo(() => {
     const blockElement = element ? `${block}__${element}` : block;
 

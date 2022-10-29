@@ -5,14 +5,15 @@ export const isMenuOpen = (state) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback) => callback());
 export const values = Object.values || ((obj) => Object.keys(obj).map((key) => obj[key]));
 export const floatEqual = (a, b, diff = 0.0001) => Math.abs(a - b) < diff;
-export const getTransition = (transition, name) => transition === true || !!(transition && transition[name]);
+export const getTransition = (transition: boolean | Record<string, string>, name: string) =>
+  transition === true || !!(transition && transition[name]);
 export const safeCall = (fn, arg) => (typeof fn === "function" ? fn(arg) : fn);
 
 const internalKey = "_szhsinMenu";
 export const getName = (component) => component[internalKey];
 export const defineName = (name, component) => Object.defineProperty(component, internalKey, { value: name });
 
-export const mergeProps = (target, source) => {
+export const mergeProps = (target: Record<string, any>, source: Record<string, any>) => {
   source &&
     Object.keys(source).forEach((key) => {
       const targetProp = target[key];

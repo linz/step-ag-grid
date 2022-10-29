@@ -55,7 +55,7 @@ export const FocusPositions = Object.freeze({
   LAST: "last",
 });
 
-export const MenuStateMap = Object.freeze({
+export const MenuStateMap: Record<string, string | undefined> = Object.freeze({
   entering: "opening",
   entered: "open",
   exiting: "closing",

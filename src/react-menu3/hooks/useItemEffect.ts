@@ -1,7 +1,11 @@
-// @ts-nocheck
+import { MutableRefObject } from "react";
 import { useLayoutEffect } from "./useIsomorphicLayoutEffect";
 
-export const useItemEffect = (isDisabled, itemRef, updateItems) => {
+export const useItemEffect = (
+  isDisabled: boolean,
+  itemRef: MutableRefObject<any>,
+  updateItems: (item: any, isMounted?: boolean) => void,
+) => {
   useLayoutEffect(() => {
     if (process.env.NODE_ENV !== "production" && !updateItems) {
       throw new Error(
