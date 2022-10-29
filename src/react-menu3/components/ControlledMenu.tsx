@@ -87,17 +87,17 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
         //!ev.currentTarget.contains(ev.relatedTarget || document.activeElement)) {
         ev.preventDefault();
         ev.stopPropagation();
-        // There's an issue in React17
+        // FIXME There's an issue in React17
         // the cell doesn't refresh during update if save is invoked from a native event
         // This doesn't happen in React18
-        // To work around it, I invoke the save by clicking on an invisible button in the dropdown
-        saveButtonRef.current?.click();
-        // safeCall(onClose, { reason: CloseReason.BLUR }); old code
+        // To work around it, I invoke the save by clicking on a passed in invisible button ref
+        if (saveButtonRef.current) saveButtonRef.current.click();
+        else safeCall(onClose, { reason: CloseReason.BLUR });
 
         // If a user clicks on the menu button when a menu is open, we need to close the menu.
         // However, a blur event will be fired prior to the click event on menu button,
         // which makes the menu first close and then open again.
-        // If this happen, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
+        // If this happens, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
         // and makes it difficult to determine whether onBlur is fired because of clicking on menu button.
         // This is a workaround approach which sets a flag to skip a following click event.
         if (skipOpen) {
@@ -121,7 +121,7 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
 
   useEffect(() => {
     if (isMenuOpen(state)) {
-      const thisDocument = document; //anchorRef.current.ownerDocument;
+      const thisDocument = anchorRef.current ? anchorRef.current.ownerDocument : document;
       thisDocument.addEventListener("mousedown", handleScreenEventForCancel, true);
       thisDocument.addEventListener("mouseup", handleScreenEventForSave, true);
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
