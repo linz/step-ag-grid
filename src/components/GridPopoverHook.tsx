@@ -84,7 +84,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
-              portal={{ target: anchorRef.current.ownerDocument.body }}
+              portal={true}
               unmountOnClose={true}
               anchorRef={anchorRef}
               menuClassName={"lui-menu"}

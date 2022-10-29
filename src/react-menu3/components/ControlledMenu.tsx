@@ -169,6 +169,10 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
     </div>
   );
 
+  if (portal === true && anchorRef.current !== undefined) {
+    portal = { target: anchorRef.current.ownerDocument.body };
+  }
+
   if (portal === true && typeof document !== "undefined") {
     return createPortal(menuList, document.body);
   } else if (portal) {
