@@ -1,13 +1,25 @@
 import { useContext } from "react";
-import { ICellRendererParams } from "ag-grid-community";
+import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { UpdatingContext } from "@contexts/UpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { LuiIcon } from "@linzjs/lui";
+import { Column } from "ag-grid-community/dist/lib/entities/column";
 
 export const GridRenderPopoutMenuCell = (props: ICellRendererParams) => {
   const { checkUpdating } = useContext(UpdatingContext);
   const isLoading = checkUpdating(props.colDef?.field ?? "", props.data.id);
-  const disabled = !props.colDef?.editable;
+  const editable = props.colDef?.editable;
+  const disabled = !(typeof editable === "function"
+    ? editable({
+        node: props.node,
+        data: props.data,
+        column: props.column as Column,
+        colDef: props.colDef as ColDef,
+        api: props.api,
+        columnApi: props.columnApi,
+        context: props.context,
+      })
+    : editable);
 
   return (
     <GridLoadableCell
