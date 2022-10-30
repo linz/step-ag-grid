@@ -2,14 +2,14 @@ import { parsePadding } from "../utils";
 import { MutableRefObject } from "react";
 
 export const getPositionHelpers = (
-  containerRef: MutableRefObject<HTMLElement>,
+  containerRef: MutableRefObject<HTMLElement | undefined>,
   menuRef: MutableRefObject<HTMLElement>,
   menuScroll: Window | Element,
   boundingBoxPadding: string | undefined,
 ) => {
   const menuRect = menuRef.current.getBoundingClientRect();
-  const containerRect = containerRef.current.getBoundingClientRect();
-  const thisWindow = containerRef.current.ownerDocument.defaultView ?? window;
+  const thisWindow = containerRef.current?.ownerDocument.defaultView ?? window;
+  const containerRect = (containerRef.current ?? thisWindow.document.body).getBoundingClientRect();
 
   const boundingRect =
     menuScroll === window || menuScroll === thisWindow

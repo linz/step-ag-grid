@@ -1,7 +1,7 @@
 import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem, RadioChangeEvent } from "@react-menu3";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MenuItem, MenuDivider, FocusableItem, ClickEvent } from "@react-menu3";
+import { Fragment, useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay } from "lodash-es";
@@ -99,7 +99,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             return undefined;
           }
           const str = (option.label as string) || "";
-          return str.toLowerCase().indexOf(filter) === -1 ? option.value : undefined;
+          return str.toLowerCase().indexOf(filter.trim()) === -1 ? option.value : undefined;
         })
         .filter((r) => r !== undefined),
     );
@@ -110,7 +110,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
       <div className={"Grid-popoverContainerList"}>
         {options && formProps.filtered && (
           <>
-            <FocusableItem className={"filter-item"}>
+            <FocusableItem className={"filter-item"} key={"filter"}>
               {({ ref }: any) => (
                 <div style={{ display: "flex", width: "100%" }}>
                   <input
@@ -134,34 +134,47 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : filteredValues.includes(item.value) ? null : (
-            <>
+            <Fragment key={`${index}`}>
               <MenuItem
-                key={`${item.value}`}
-                onClick={(e: RadioChangeEvent) => {
-                  // FIXME Matt Event type guessed here
+                key={`${index}`}
+                onClick={(e: ClickEvent) => {
                   e.keepOpen = true;
-                  if (selectedValues.includes(e.value)) {
+                  if (selectedValues.includes(item.value)) {
                     setSelectedValues(selectedValues.filter((value) => value != item.value));
                   } else {
-                    setSelectedValues([...selectedValues, item.value as string]);
+                    setSelectedValues([...selectedValues, item.value]);
                   }
-                  return false;
                 }}
-                onKeyDown={async (e) => e.key === "Enter" && triggerSave().then()}
+                onKeyDown={async (e: KeyboardEvent) => {
+                  if (e.key === "Enter") triggerSave().then();
+                  else if (e.key === " ") {
+                    if (selectedValues.includes(item.value)) {
+                      setSelectedValues(selectedValues.filter((value) => value != item.value));
+                    } else {
+                      setSelectedValues([...selectedValues, item.value]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
               >
                 <LuiCheckboxInput
                   isChecked={selectedValues.includes(item.value)}
                   value={`${item.value}`}
                   label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedValues([...selectedValues, item.value as string]);
-                    } else {
-                      setSelectedValues(selectedValues.filter((value) => value != item.value));
-                    }
+                  inputProps={{
+                    onClick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return false;
+                    },
+                  }}
+                  onChange={() => {
+                    /*Do nothing, change handled by menuItem*/
                   }}
                 />
               </MenuItem>
+
               {selectedValues.includes(item.value) && item.subComponent && (
                 <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
                   {(ref: any) =>
@@ -177,7 +190,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
                   }
                 </FocusableItem>
               )}
-            </>
+            </Fragment>
           ),
         )}
       </div>

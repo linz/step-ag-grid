@@ -9,7 +9,7 @@ import {
   withHovering,
   EventHandlersContext,
 } from "../utils";
-import { BaseProps } from "../index";
+import { BaseProps } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
 
 export interface FocusableItemProps extends BaseProps, withHoveringResultProps {
@@ -72,4 +72,4 @@ export const FocusableItemFr = ({
   );
 };
 
-export const FocusableItem = withHovering("FocusableItem", FocusableItemFr) as any as typeof FocusableItemFr;
+export const FocusableItem = withHovering("FocusableItem", FocusableItemFr);

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ClassNameProp } from "../index";
+import { ClassNameProp } from "../types";
 
 type useBemModifiers = Record<string, boolean | string | undefined>;
 

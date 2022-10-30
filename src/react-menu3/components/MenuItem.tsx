@@ -12,7 +12,7 @@ import {
   Keys,
   RMEvent,
 } from "../utils";
-import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../index";
+import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
 
 //
@@ -179,5 +179,4 @@ const MenuItemFr = ({
   }
 };
 
-// FIXME matt as any
-export const MenuItem = withHovering("MenuItem", MenuItemFr) as any as typeof MenuItemFr;
+export const MenuItem = withHovering("MenuItem", MenuItemFr);

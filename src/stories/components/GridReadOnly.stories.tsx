@@ -8,7 +8,6 @@ import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { wait } from "@utils/util";
-import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
 import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
 import { GridCell } from "@components/GridCell";
@@ -51,14 +50,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell({
+      GridCell<ITestRow, any>({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.value === "Tester" && "Testers are testing",
-          info: (props: ICellRendererParams) => props.value === "Developer" && "Developers are awesome",
+          warning: (props) => props.value === "Tester" && "Testers are testing",
+          info: (props) => props.value === "Developer" && "Developers are awesome",
         },
       }),
       GridCell({
