@@ -79,7 +79,7 @@ interface GenericCellEditorICellEditorParams<RowType extends GridBaseRow, FormPr
 
 export const GenericCellEditorComponentFr = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
-  _: ForwardedRef<any>,
+  _: ForwardedRef<any>, // We don't forward the ref, as that's for generic aggrid cell editing
 ) => {
   const { updatingCells, getSelectedRows } = useContext(GridContext);
 

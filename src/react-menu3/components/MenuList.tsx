@@ -345,7 +345,22 @@ export const MenuList = ({
         () => {
           // If focus has already been set to a children element, don't set focus on menu or item
           if (!menuRef.current.contains(document.activeElement)) {
-            focusRef.current?.focus();
+            // Handle popover portal focus
+            const popupElement = focusRef.current?.nextSibling;
+            if (popupElement instanceof Element) {
+              const input = popupElement.querySelectorAll("input,textarea")[0] as HTMLElement;
+              if (input) {
+                input.focus();
+                // Text areas should start at end
+                if (input instanceof HTMLTextAreaElement) {
+                  input.selectionStart = input.value.length;
+                }
+              } else {
+                focusRef.current?.focus();
+              }
+            } else {
+              focusRef.current?.focus();
+            }
             setItemFocus();
           }
         },
