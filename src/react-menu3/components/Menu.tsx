@@ -6,8 +6,6 @@ import {
   useCallback,
   useImperativeHandle,
   ReactElement,
-  LegacyRef,
-  MutableRefObject,
   ForwardedRef,
 } from "react";
 import { ControlledMenu } from "./ControlledMenu";
@@ -43,7 +41,7 @@ export function MenuFr(
   const handleClose = useCallback(
     (e) => {
       toggleMenu(false);
-      if (e.key) buttonRef.current?.focus && buttonRef.current.focus();
+      if (e.key) buttonRef.current && buttonRef.current.focus();
     },
     [toggleMenu],
   );
@@ -71,7 +69,8 @@ export function MenuFr(
     e.preventDefault();
   };
 
-  const button = safeCall(menuButton, { open: isOpen });
+  // FIXME erk! button seems to be many types
+  const button: any = safeCall(menuButton, { open: isOpen });
   if (!button || !button.type) throw new Error("Menu requires a menuButton prop.");
 
   const buttonProps = {
@@ -107,10 +106,3 @@ export function MenuFr(
   );
 }
 export const Menu = forwardRef(MenuFr);
-/*
-Menu.propTypes = {
-  ...rootMenuPropTypes,
-  ...uncontrolledMenuPropTypes,
-  menuButton: oneOfType([element, func]).isRequired,
-};
-*/

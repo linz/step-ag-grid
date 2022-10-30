@@ -2,14 +2,15 @@ import { placeLeftorRight } from "./placeLeftorRight";
 import { placeToporBottom } from "./placeToporBottom";
 import { MutableRefObject } from "react";
 import { getPositionHelpers } from "./getPositionHelpers";
+import { MenuDirection, RectElement } from "../index";
 
 interface positionMenuProps {
   offsetX: number;
   offsetY: number;
-  arrowRef: MutableRefObject<HTMLElement>;
-  anchorRef: MutableRefObject<HTMLElement>;
-  arrow: boolean;
-  direction: "left" | "right" | "top" | "bottom";
+  arrowRef: MutableRefObject<HTMLDivElement | null>;
+  anchorRef: MutableRefObject<HTMLElement | null>;
+  arrow?: boolean;
+  direction: MenuDirection;
   position: "auto" | "anchor" | "initial";
   align: "start" | "center" | "end";
   positionHelpers: ReturnType<typeof getPositionHelpers>;
@@ -21,7 +22,7 @@ export const positionMenu = (props: positionMenuProps) => {
 
   let horizontalOffset = offsetX;
   let verticalOffset = offsetY;
-  if (arrow) {
+  if (arrow && arrowRef.current) {
     if (direction === "left" || direction === "right") {
       horizontalOffset += arrowRef.current.offsetWidth;
     } else {
@@ -29,7 +30,9 @@ export const positionMenu = (props: positionMenuProps) => {
     }
   }
 
-  const anchorRect = anchorRef.current.getBoundingClientRect();
+  const anchorRect = anchorRef.current
+    ? anchorRef.current.getBoundingClientRect()
+    : ({ left: 0, right: 0, top: 200, bottom: 200, width: 200, height: 200 } as DOMRect);
   const placeLeftX = anchorRect.left - containerRect.left - menuRect.width - horizontalOffset;
   const placeRightX = anchorRect.right - containerRect.left + horizontalOffset;
   const placeTopY = anchorRect.top - containerRect.top - menuRect.height - verticalOffset;

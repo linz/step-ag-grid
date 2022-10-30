@@ -1,13 +1,12 @@
-// @ts-nocheck
-/* eslint-disable */
 import { useRef, useEffect } from "react";
 import { safeCall } from "../utils";
+import { EventHandler, MenuChangeEvent } from "../index";
 
-export const useMenuChange = (onMenuChange, isOpen) => {
+export const useMenuChange = (onMenuChange?: EventHandler<MenuChangeEvent>, isOpen?: boolean) => {
   const prevOpen = useRef(isOpen);
 
   useEffect(() => {
-    if (prevOpen.current !== isOpen) safeCall(onMenuChange, { open: isOpen });
+    if (onMenuChange && prevOpen.current !== isOpen) safeCall(onMenuChange, { open: !!isOpen });
     prevOpen.current = isOpen;
   }, [onMenuChange, isOpen]);
 };

@@ -1,4 +1,5 @@
 import { getPositionHelpers } from "./getPositionHelpers";
+import { MenuDirection } from "../index";
 
 export const positionContextMenu = ({
   positionHelpers,
@@ -6,7 +7,11 @@ export const positionContextMenu = ({
 }: {
   positionHelpers: ReturnType<typeof getPositionHelpers>;
   anchorPoint: { x: number; y: number };
-}) => {
+}): {
+  x: number;
+  y: number;
+  computedDirection: MenuDirection;
+} => {
   const {
     menuRect,
     containerRect,
@@ -40,7 +45,7 @@ export const positionContextMenu = ({
   }
 
   // Similar logic to the left and right side above.
-  let computedDirection = "bottom";
+  let computedDirection: MenuDirection = "bottom";
   const bottomOverflow = getBottomOverflow(y);
   if (bottomOverflow > 0) {
     const adjustedY = y - menuRect.height;

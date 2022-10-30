@@ -1,6 +1,4 @@
-// @ts-nocheck
-/* eslint-disable */
-import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext } from "react";
+import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext, MutableRefObject } from "react";
 import { flushSync } from "react-dom";
 import { useBEM, useCombinedRef, useLayoutEffect, useItems } from "../hooks";
 import { getPositionHelpers, positionMenu, positionContextMenu } from "../positionUtils";
@@ -24,6 +22,65 @@ import {
   MenuListItemContext,
   HoverItemContext,
 } from "../utils";
+import { EventHandler, FocusPosition, MenuCloseEvent, MenuDirection, MenuState, RootMenuProps } from "../index";
+
+interface ExtraMenuProps {
+  isDisabled?: boolean;
+  ariaLabel?: string;
+  containerRef: MutableRefObject<HTMLElement>;
+  externalRef: MutableRefObject<HTMLUListElement>;
+  parentScrollingRef: MutableRefObject<any>;
+}
+
+//
+// ControlledMenu
+// ----------------------------------------------------------------------
+export interface ControlledMenuProps extends RootMenuProps, ExtraMenuProps {
+  /**
+   * Viewport coordinates to which context menu will be positioned.
+   *
+   * *Use this prop only for context menu*
+   */
+  anchorPoint?: {
+    x: number;
+    y: number;
+  };
+  /**
+   * A ref object attached to a DOM element to which menu will be positioned.
+   *
+   * *Don't set this prop for context menu*
+   */
+  anchorRef?: React.MutableRefObject<HTMLElement>;
+  skipOpen?: React.RefObject<boolean>;
+  /**
+   * If `true`, the menu list element will gain focus after menu is open.
+   * @default true
+   */
+  captureFocus?: boolean;
+  /**
+   * Controls the state of menu. When the prop is `undefined`, menu will be unmounted from DOM.
+   */
+  state?: MenuState;
+  /**
+   * Sets which menu item receives focus (hover) when menu opens.
+   * You will usually set this prop when the menu is opened by keyboard events.
+   *
+   * *Note: If you don't intend to update focus (hover) position,
+   * it's important to keep this prop's identity stable when your component re-renders.*
+   */
+  menuItemFocus?: {
+    position?: FocusPosition;
+    alwaysUpdate?: boolean;
+  };
+  /**
+   * Set the return value of `useMenuState` to this prop.
+   */
+  endTransition?: () => void;
+  /**
+   * Event fired when menu is about to close.
+   */
+  onClose?: EventHandler<MenuCloseEvent>;
+}
 
 export const MenuList = ({
   ariaLabel,
@@ -53,10 +110,10 @@ export const MenuList = ({
   children,
   onClose,
   ...restProps
-}) => {
+}: ControlledMenuProps) => {
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-  const [arrowPosition, setArrowPosition] = useState({});
-  const [overflowData, setOverflowData] = useState();
+  const [arrowPosition, setArrowPosition] = useState({ x: 0, y: 0 });
+  const [overflowData, setOverflowData] = useState<{ height: number; overflowAmt: number | undefined }>();
   const [expandedDirection, setExpandedDirection] = useState(direction);
   const [openSubmenuCount, setOpenSubmenuCount] = useState(0);
   const [reposSubmenu, forceReposSubmenu] = useReducer((c) => c + 1, 1);
@@ -71,9 +128,9 @@ export const MenuList = ({
     viewScroll,
   } = useContext(SettingsContext);
   const reposFlag = useContext(MenuListContext).reposSubmenu || repositionFlag;
-  const menuRef = useRef(null);
-  const focusRef = useRef();
-  const arrowRef = useRef();
+  const menuRef = useRef<HTMLUListElement>({} as HTMLUListElement);
+  const focusRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLDivElement>(null);
   const prevOpen = useRef(false);
   const latestMenuSize = useRef({ width: 0, height: 0 });
   const latestHandlePosition = useRef(() => {});
@@ -84,34 +141,37 @@ export const MenuList = ({
   const closeTransition = getTransition(transition, "close");
   const scrollNodes = scrollNodesRef.current;
 
-  const onKeyDown = (e) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    const elementTarget = e.target instanceof HTMLElement ? (e.target as HTMLElement) : null;
     const isTextInputTarget =
-      e.target.nodeName === "TEXTAREA" || (e.target.nodeName === "INPUT" && e.target.getAttribute("type") === "text");
+      elementTarget &&
+      (elementTarget.nodeName === "TEXTAREA" ||
+        (elementTarget.nodeName === "INPUT" && elementTarget.getAttribute("type") === "text"));
     switch (e.key) {
       case Keys.HOME:
         // Don't eat home/end events on inputs
         if (isTextInputTarget) return;
-        dispatch(HoverActionTypes.FIRST);
+        dispatch(HoverActionTypes.FIRST, null, 0);
         break;
 
       case Keys.END:
         // Don't eat home/end events on inputs
         if (isTextInputTarget) return;
-        dispatch(HoverActionTypes.LAST);
+        dispatch(HoverActionTypes.LAST, null, 0);
         break;
 
       case Keys.UP:
-        dispatch(HoverActionTypes.DECREASE, hoverItem);
+        dispatch(HoverActionTypes.DECREASE, hoverItem, 0);
         break;
 
       case Keys.DOWN:
-        dispatch(HoverActionTypes.INCREASE, hoverItem);
+        dispatch(HoverActionTypes.INCREASE, hoverItem, 0);
         break;
 
       // prevent browser from scrolling the page when SPACE is pressed
       case Keys.SPACE:
         // Don't preventDefault on children of FocusableItem
-        if (e.target && e.target.className.indexOf(menuClass) !== -1) {
+        if (elementTarget && elementTarget.className.includes(menuClass)) {
           e.preventDefault();
         }
         return;
@@ -126,14 +186,14 @@ export const MenuList = ({
 
   const onAnimationEnd = () => {
     if (state === "closing") {
-      setOverflowData(); // reset overflowData after closing
+      setOverflowData(undefined); // reset overflowData after closing
     }
 
-    safeCall(endTransition);
+    endTransition && safeCall(endTransition);
   };
 
   const handlePosition = useCallback(
-    (noOverflowCheck) => {
+    (noOverflowCheck?: boolean) => {
       if (!containerRef.current) {
         if (process.env.NODE_ENV !== "production") {
           console.error(
@@ -147,12 +207,16 @@ export const MenuList = ({
         scrollNodes.menu =
           (boundingBoxRef
             ? boundingBoxRef.current // user explicitly sets boundingBoxRef
-            : getScrollAncestor(rootMenuRef.current)) || window; // try to discover bounding box automatically
+            : getScrollAncestor(rootMenuRef?.current)) || window; // try to discover bounding box automatically
       }
 
       const positionHelpers = getPositionHelpers(containerRef, menuRef, scrollNodes.menu, boundingBoxPadding);
       const { menuRect } = positionHelpers;
-      let results = { computedDirection: "bottom" };
+      let results: { computedDirection: MenuDirection; arrowX?: number; arrowY?: number; x: number; y: number } = {
+        computedDirection: "bottom",
+        x: 0,
+        y: 0,
+      };
       if (anchorPoint) {
         results = positionContextMenu({ positionHelpers, anchorPoint });
       } else if (anchorRef) {
@@ -168,13 +232,14 @@ export const MenuList = ({
           positionHelpers,
         });
       }
-      let { arrowX, arrowY, x, y, computedDirection } = results;
+      let { y } = results;
+      const { x, arrowX, arrowY, computedDirection } = results;
       let menuHeight = menuRect.height;
 
       if (!noOverflowCheck && overflow !== "visible") {
         const { getTopOverflow, getBottomOverflow } = positionHelpers;
 
-        let height, overflowAmt;
+        let height: number | undefined, overflowAmt: number | undefined;
         const prevHeight = latestMenuSize.current.height;
         const bottomOverflow = getBottomOverflow(y);
         // When bottomOverflow is 0, menu is on the bottom edge of viewport
@@ -193,16 +258,16 @@ export const MenuList = ({
           }
         }
 
-        if (height >= 0) {
+        if (height != null && height >= 0) {
           // To avoid triggering reposition in the next ResizeObserver callback
           menuHeight = height;
           setOverflowData({ height, overflowAmt });
         } else {
-          setOverflowData();
+          setOverflowData(undefined);
         }
       }
 
-      if (arrow) setArrowPosition({ x: arrowX, y: arrowY });
+      if (arrow) setArrowPosition({ x: arrowX ?? 0, y: arrowY ?? 0 });
       setMenuPosition({ x, y });
       setExpandedDirection(computedDirection);
       latestMenuSize.current = { width: menuRect.width, height: menuHeight };
@@ -239,7 +304,9 @@ export const MenuList = ({
     if (overflowData && !setDownOverflow) menuRef.current.scrollTop = 0;
   }, [overflowData, setDownOverflow]);
 
-  useLayoutEffect(() => updateItems, [updateItems]);
+  useLayoutEffect(() => {
+    updateItems();
+  }, [updateItems]);
 
   useEffect(() => {
     let { menu: menuScroll } = scrollNodes;
@@ -268,11 +335,11 @@ export const MenuList = ({
     };
 
     const scrollObservers = scrollNodes.anchors.concat(viewScroll !== "initial" ? menuScroll : []);
-    scrollObservers.forEach((o) => o.addEventListener("scroll", handleScroll));
+    scrollObservers.forEach((o: any) => o.addEventListener("scroll", handleScroll));
     return () => scrollObservers.forEach((o) => o.removeEventListener("scroll", handleScroll));
   }, [rootAnchorRef, scrollNodes, isOpen, onClose, viewScroll, handlePosition]);
 
-  const hasOverflow = !!overflowData && overflowData.overflowAmt > 0;
+  const hasOverflow = !!overflowData && overflowData.overflowAmt != null && overflowData.overflowAmt > 0;
   useEffect(() => {
     if (hasOverflow || !isOpen || !parentScrollingRef) return;
 
@@ -314,18 +381,18 @@ export const MenuList = ({
 
   useEffect(() => {
     if (!isOpen) {
-      dispatch(HoverActionTypes.RESET);
-      if (!closeTransition) setOverflowData();
-      return;
+      dispatch(HoverActionTypes.RESET, undefined, 0);
+      if (!closeTransition) setOverflowData(undefined);
+      return () => {};
     }
 
     const { position, alwaysUpdate } = menuItemFocus || {};
     const setItemFocus = () => {
       if (position === FocusPositions.FIRST) {
-        dispatch(HoverActionTypes.FIRST);
+        dispatch(HoverActionTypes.FIRST, undefined, 0);
       } else if (position === FocusPositions.LAST) {
-        dispatch(HoverActionTypes.LAST);
-      } else if (position >= -1) {
+        dispatch(HoverActionTypes.LAST, undefined, 0);
+      } else if (typeof position === "number" && position >= -1) {
         dispatch(HoverActionTypes.SET_INDEX, undefined, position);
       }
     };
@@ -338,7 +405,7 @@ export const MenuList = ({
         () => {
           // If focus has already been set to a children element, don't set focus on menu or item
           if (!menuRef.current.contains(document.activeElement)) {
-            focusRef.current.focus();
+            focusRef.current?.focus();
             setItemFocus();
           }
         },
@@ -347,6 +414,7 @@ export const MenuList = ({
 
       return () => clearTimeout(id);
     }
+    return () => {};
   }, [isOpen, openTransition, closeTransition, captureFocus, menuItemFocus, dispatch]);
 
   const isSubmenuOpen = openSubmenuCount > 0;
@@ -361,7 +429,8 @@ export const MenuList = ({
     [isOpen, isSubmenuOpen, dispatch, updateItems],
   );
 
-  let maxHeight, overflowAmt;
+  let maxHeight: number | undefined;
+  let overflowAmt: number | undefined;
   if (overflowData) {
     setDownOverflow ? (overflowAmt = overflowData.overflowAmt) : (maxHeight = overflowData.height);
   }
@@ -376,7 +445,7 @@ export const MenuList = ({
     }),
     [reposSubmenu, overflow, overflowAmt, expandedDirection],
   );
-  const overflowStyle = maxHeight >= 0 ? { maxHeight, overflow } : undefined;
+  const overflowStyle = maxHeight != null && maxHeight >= 0 ? { maxHeight, overflow } : undefined;
 
   const modifiers = useMemo(
     () => ({

@@ -64,7 +64,7 @@ export const FocusableItemFr = ({
       role="menuitem"
       {...mergedProps}
       {...commonProps(isDisabled)}
-      ref={useCombinedRef(externalRef as Ref<any>, menuItemRef)}
+      ref={useCombinedRef(externalRef, menuItemRef)}
       className={useBEM({ block: menuClass, element: menuItemClass, modifiers, className })}
     >
       {renderChildren}

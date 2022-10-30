@@ -5,7 +5,7 @@ export const getPositionHelpers = (
   containerRef: MutableRefObject<HTMLElement>,
   menuRef: MutableRefObject<HTMLElement>,
   menuScroll: Window | Element,
-  boundingBoxPadding: string,
+  boundingBoxPadding: string | undefined,
 ) => {
   const menuRect = menuRef.current.getBoundingClientRect();
   const containerRect = containerRef.current.getBoundingClientRect();

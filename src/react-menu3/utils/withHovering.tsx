@@ -1,4 +1,4 @@
-import { memo, forwardRef, useContext, useRef, LegacyRef, MutableRefObject } from "react";
+import { memo, forwardRef, useContext, useRef, LegacyRef, MutableRefObject, ForwardedRef } from "react";
 import { HoverItemContext } from "./constants";
 
 export interface withHoveringResultProps {

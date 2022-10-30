@@ -1,7 +1,6 @@
-import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
-import { any, string, func } from "prop-types";
+import { ForwardedRef, forwardRef, ReactNode, useMemo } from "react";
 import { useBEM } from "../hooks";
-import { stylePropTypes, menuClass, radioGroupClass, RadioGroupContext } from "../utils";
+import { menuClass, radioGroupClass, RadioGroupContext } from "../utils";
 import { BaseProps, Event, EventHandler } from "../index";
 
 export interface RadioChangeEvent extends Event {
@@ -49,10 +48,10 @@ export interface MenuRadioGroupProps extends BaseProps {
   onRadioChange?: EventHandler<RadioChangeEvent>;
 }
 
-export const MenuRadioGroup = forwardRef(function MenuRadioGroup(
+export const MenuRadioGroupFr = (
   { "aria-label": ariaLabel, className, name, value, onRadioChange, ...restProps }: MenuRadioGroupProps,
-  externalRef: LegacyRef<HTMLUListElement>,
-) {
+  externalRef: ForwardedRef<HTMLUListElement>,
+) => {
   const contextValue = useMemo(() => ({ name, value, onRadioChange }), [name, value, onRadioChange]);
 
   return (
@@ -68,11 +67,6 @@ export const MenuRadioGroup = forwardRef(function MenuRadioGroup(
       </li>
     </RadioGroupContext.Provider>
   );
-});
-
-MenuRadioGroup.propTypes = {
-  ...stylePropTypes(),
-  name: string,
-  value: any,
-  onRadioChange: func,
 };
+
+export const MenuRadioGroup = forwardRef(MenuRadioGroupFr) as any as typeof MenuRadioGroupFr;

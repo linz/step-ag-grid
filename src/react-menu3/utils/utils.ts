@@ -2,6 +2,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { MenuState, MenuStateOptions } from "../index";
 import { MenuButtonProps } from "../components/MenuButton";
 import { findIndex } from "lodash-es";
+import { ForwardedRef } from "react";
 
 export const isMenuOpen = (state?: MenuState) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());
@@ -16,9 +17,9 @@ export type TransitionMap = {
 export const getTransition = (transition: MenuStateOptions["transition"], name: keyof TransitionMap) =>
   transition === true || !!(transition && transition[name]);
 
-export function safeCall<T, R>(fn: (arg: T) => R, arg: T): R;
+export function safeCall<T, R>(fn: (arg?: T) => R, arg?: T): R;
 export function safeCall<T, R>(fn: T, arg: R): T;
-export function safeCall<T, R>(fn: (arg: T) => R, arg: T): T | R {
+export function safeCall<T, R>(fn: (arg?: T) => R, arg?: T): T | R {
   return typeof fn === "function" ? fn(arg) : fn;
 }
 
@@ -50,8 +51,8 @@ export const mergeProps = (target: Record<string, any>, source: Record<string, a
   return target;
 };
 
-export const parsePadding = (paddingStr: any) => {
-  if (typeof paddingStr !== "string") return { top: 0, right: 0, bottom: 0, left: 0 };
+export const parsePadding = (paddingStr: string | undefined) => {
+  if (paddingStr == null) return { top: 0, right: 0, bottom: 0, left: 0 };
 
   const padding = paddingStr.trim().split(/\s+/, 4).map(parseFloat);
   const top = !isNaN(padding[0]) ? padding[0] : 0;

@@ -71,7 +71,7 @@ export interface EventHandler<E> {
   (event: E): void;
 }
 
-interface RectElement {
+export interface RectElement {
   getBoundingClientRect(): {
     left: number;
     right: number;

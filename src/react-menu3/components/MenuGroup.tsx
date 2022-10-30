@@ -1,4 +1,4 @@
-import { forwardRef, LegacyRef, ReactNode, Ref, useContext, useRef, useState } from "react";
+import { ForwardedRef, forwardRef, ReactNode, useContext, useRef, useState } from "react";
 import { useBEM, useLayoutEffect, useCombinedRef } from "../hooks";
 import { menuClass, menuGroupClass, MenuListContext } from "../utils";
 import { BaseProps, MenuOverflow } from "../index";
@@ -14,9 +14,9 @@ export interface MenuGroupProps extends BaseProps {
 
 export const MenuGroupFr = (
   { className, style, takeOverflow, ...restProps }: MenuGroupProps,
-  externalRef: LegacyRef<HTMLDivElement>,
+  externalRef: ForwardedRef<HTMLDivElement>,
 ) => {
-  const ref = useRef<Element>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [overflowStyle, setOverflowStyle] = useState<{ maxHeight?: number; overflow?: MenuOverflow }>();
   const { overflow, overflowAmt } = useContext(MenuListContext);
 
@@ -37,7 +37,7 @@ export const MenuGroupFr = (
   return (
     <div
       {...restProps}
-      ref={useCombinedRef(externalRef as Ref<HTMLDivElement>, ref) as LegacyRef<HTMLDivElement>} // TODO wierd refs
+      ref={useCombinedRef(externalRef, ref)} // TODO wierd refs
       className={useBEM({ block: menuClass, element: menuGroupClass, className })}
       style={{ ...style, ...overflowStyle }}
     />

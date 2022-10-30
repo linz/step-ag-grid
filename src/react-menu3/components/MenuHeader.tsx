@@ -1,9 +1,9 @@
-import { memo, forwardRef, LegacyRef } from "react";
+import { memo, forwardRef, ForwardedRef } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuHeaderClass } from "../utils";
 import { BaseProps } from "../index";
 
-export const MenuHeaderFr = ({ className, ...restProps }: BaseProps, externalRef: LegacyRef<HTMLLIElement>) => {
+export const MenuHeaderFr = ({ className, ...restProps }: BaseProps, externalRef: ForwardedRef<HTMLLIElement>) => {
   return (
     <li
       role="presentation"

@@ -1,19 +1,22 @@
 import { placeArrowHorizontal } from "./placeArrowHorizontal";
 import { getPositionHelpers } from "./getPositionHelpers";
 import { MutableRefObject } from "react";
+import { MenuDirection } from "../index";
 
 export interface placeToporBottomParams {
   anchorRect: DOMRect;
   placeToporBottomX: number;
   placeTopY: number;
   placeBottomY: number;
-  arrowRef: MutableRefObject<HTMLElement>;
-  arrow: boolean;
+  arrowRef: MutableRefObject<HTMLElement | null>;
+  arrow?: boolean;
   direction: "left" | "right" | "top" | "bottom";
   position: "auto" | "anchor" | "initial";
 }
 
-export const placeToporBottom = (props: ReturnType<typeof getPositionHelpers> & placeToporBottomParams) => {
+export const placeToporBottom = (
+  props: ReturnType<typeof getPositionHelpers> & placeToporBottomParams,
+): { arrowX?: number | undefined; x: number; y: number; computedDirection: MenuDirection } => {
   const {
     anchorRect,
     containerRect,
@@ -31,7 +34,7 @@ export const placeToporBottom = (props: ReturnType<typeof getPositionHelpers> & 
     position,
   } = props;
   // make sure invalid direction is treated as 'bottom'
-  let computedDirection = direction === "top" ? "top" : "bottom";
+  let computedDirection: MenuDirection = direction === "top" ? "top" : "bottom";
   let x = placeToporBottomX;
   if (position !== "initial") {
     x = confineHorizontally(x);

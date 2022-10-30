@@ -8,13 +8,15 @@ export interface placeLeftorRightParams {
   placeLeftorRightY: number;
   placeLeftX: number;
   placeRightX: number;
-  arrowRef: MutableRefObject<HTMLElement>;
-  arrow: boolean;
+  arrowRef: MutableRefObject<HTMLElement | null>;
+  arrow?: boolean;
   direction: MenuDirection;
   position: "auto" | "anchor" | "initial";
 }
 
-export const placeLeftorRight = (props: ReturnType<typeof getPositionHelpers> & placeLeftorRightParams) => {
+export const placeLeftorRight = (
+  props: ReturnType<typeof getPositionHelpers> & placeLeftorRightParams,
+): { arrowY: number | undefined; x: number; y: number; computedDirection: MenuDirection } => {
   const {
     anchorRect,
     containerRect,

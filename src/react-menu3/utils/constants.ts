@@ -1,6 +1,7 @@
 import { createContext, MutableRefObject } from "react";
 import { EventHandler, MenuDirection, MenuOverflow, MenuState } from "../index";
 import { RadioChangeEvent } from "../components/MenuRadioGroup";
+import { ControlledMenuProps } from "../components/MenuList";
 
 export const menuContainerClass = "szh-menu-container";
 export const menuClass = "szh-menu";
@@ -26,6 +27,7 @@ export const MenuListContext = createContext<{
   overflowAmt?: number;
   parentMenuRef?: MutableRefObject<any>;
   parentDir?: MenuDirection;
+  reposSubmenu?: boolean;
 }>({});
 export interface RMEvent {
   value: any;
@@ -45,7 +47,13 @@ export const RadioGroupContext = createContext<{
   name?: string;
   onRadioChange?: EventHandler<RadioChangeEvent>;
 }>({});
-export const SettingsContext = createContext<{ rootMenuRef?: MutableRefObject<any> }>({});
+export const SettingsContext = createContext<
+  ControlledMenuProps & {
+    rootMenuRef?: MutableRefObject<any>;
+    rootAnchorRef?: MutableRefObject<any>;
+    scrollNodesRef: MutableRefObject<{ anchors?: Element[]; menu: any }>;
+  }
+>({});
 export const ItemSettingsContext = createContext<{ submenuCloseDelay: number; submenuOpenDelay: number }>({
   submenuOpenDelay: 0,
   submenuCloseDelay: 0,

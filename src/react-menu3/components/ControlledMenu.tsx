@@ -48,7 +48,7 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
   externalRef,
 ) {
   const containerRef = useRef(null);
-  const scrollNodesRef = useRef({});
+  const scrollNodesRef = useRef<{anchors?:HTMLDivElement[]}>({});
   const { anchorRef, state } = restProps;
 
   const settings = useMemo(

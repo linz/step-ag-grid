@@ -217,7 +217,7 @@ export const SubMenuFr = ({
       // LEFT key is bubbled up from submenu items
       case Keys.LEFT:
         if (isOpen) {
-          menuItemRef?.current.focus();
+          menuItemRef?.current && menuItemRef.current.focus();
           toggleMenu(false);
           handled = true;
         }
@@ -255,7 +255,7 @@ export const SubMenuFr = ({
     // Don't set focus when parent menu is closed, otherwise focus will be lost
     // and onBlur event will be fired with relatedTarget setting as null.
     if (isHovering && isParentOpen) {
-      menuItemRef?.current.focus();
+      menuItemRef?.current && menuItemRef.current.focus();
     } else {
       toggleMenu(false);
     }
@@ -271,7 +271,7 @@ export const SubMenuFr = ({
     },
     closeMenu: () => {
       if (isOpen) {
-        menuItemRef?.current.focus();
+        menuItemRef?.current && menuItemRef.current.focus();
         toggleMenu(false);
       }
     },
@@ -347,14 +347,3 @@ export const SubMenuFr = ({
 };
 
 export const SubMenu = withHovering("SubMenu", SubMenuFr) as any as typeof SubMenuFr;
-/*
-SubMenu.propTypes = {
-  ...menuPropTypes,
-  ...uncontrolledMenuPropTypes,
-  disabled: bool,
-  openTrigger: oneOf(["none", "clickOnly"]),
-  label: oneOfType([node, func]),
-  itemProps: shape({
-    ...stylePropTypes(),
-  }),
-};*/
