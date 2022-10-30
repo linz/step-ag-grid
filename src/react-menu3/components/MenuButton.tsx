@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, useMemo } from "react";
+import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { useBEM } from "../hooks";
 import { menuButtonClass } from "../utils";
 import { BaseProps, MenuButtonModifiers } from "../index";
@@ -8,12 +8,12 @@ export interface MenuButtonProps extends BaseProps<MenuButtonModifiers> {
   children?: ReactNode;
 
   // FIXME Matt added, seems to be an internal thing
-  isOpen: boolean;
+  isOpen?: boolean;
 }
 
 export const MenuButton = forwardRef(function MenuButton(
   { className, isOpen, disabled, children, ...restProps }: MenuButtonProps,
-  ref,
+  ref: LegacyRef<HTMLButtonElement>,
 ) {
   const modifiers = useMemo(() => ({ open: isOpen }), [isOpen]);
 

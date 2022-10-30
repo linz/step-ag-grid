@@ -1,6 +1,6 @@
 import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
+import { MenuItem, MenuDivider, FocusableItem, RadioChangeEvent } from "@react-menu3";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
@@ -137,7 +137,8 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             <>
               <MenuItem
                 key={`${item.value}`}
-                onClick={(e: { keepOpen: boolean }) => {
+                onClick={(e: RadioChangeEvent) => {
+                  // FIXME Matt Event type guessed here
                   e.keepOpen = true;
                   // onSelectMenuOption(itemIndex, e.value);
                   return false;

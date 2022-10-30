@@ -1,22 +1,17 @@
-// @ts-nocheck
-/* eslint-disable */
-import { memo, forwardRef } from "react";
+import { memo, forwardRef, LegacyRef } from "react";
 import { useBEM } from "../hooks";
-import { menuClass, menuHeaderClass, stylePropTypes } from "../utils";
+import { menuClass, menuHeaderClass } from "../utils";
+import { BaseProps } from "../index";
 
-export const MenuHeader = memo(
-  forwardRef(function MenuHeader({ className, ...restProps }, externalRef) {
-    return (
-      <li
-        role="presentation"
-        {...restProps}
-        ref={externalRef}
-        className={useBEM({ block: menuClass, element: menuHeaderClass, className })}
-      />
-    );
-  }),
-);
-
-MenuHeader.propTypes = {
-  ...stylePropTypes(),
+export const MenuHeaderFr = ({ className, ...restProps }: BaseProps, externalRef: LegacyRef<HTMLLIElement>) => {
+  return (
+    <li
+      role="presentation"
+      {...restProps}
+      ref={externalRef}
+      className={useBEM({ block: menuClass, element: menuHeaderClass, className })}
+    />
+  );
 };
+
+export const MenuHeader = memo(forwardRef(MenuHeaderFr));

@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, useMemo } from "react";
+import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { any, string, func } from "prop-types";
 import { useBEM } from "../hooks";
 import { stylePropTypes, menuClass, radioGroupClass, RadioGroupContext } from "../utils";
@@ -22,13 +22,6 @@ export interface RadioChangeEvent extends Event {
    * DOM event object (React synthetic event)
    */
   syntheticEvent: MouseEvent | KeyboardEvent;
-}
-
-export interface ClickEvent extends RadioChangeEvent {
-  /**
-   * Indicates if the menu item is checked, only for `MenuItem` type="checkbox".
-   */
-  checked?: boolean;
 }
 
 //
@@ -56,10 +49,9 @@ export interface MenuRadioGroupProps extends BaseProps {
   onRadioChange?: EventHandler<RadioChangeEvent>;
 }
 
-//NamedExoticComponent<MenuRadioGroupProps>
 export const MenuRadioGroup = forwardRef(function MenuRadioGroup(
   { "aria-label": ariaLabel, className, name, value, onRadioChange, ...restProps }: MenuRadioGroupProps,
-  externalRef,
+  externalRef: LegacyRef<HTMLUListElement>,
 ) {
   const contextValue = useMemo(() => ({ name, value, onRadioChange }), [name, value, onRadioChange]);
 

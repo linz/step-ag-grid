@@ -1,39 +1,47 @@
-// @ts-nocheck
-/* eslint-disable */
-import { forwardRef, useContext, useRef, useState } from "react";
-import { bool } from "prop-types";
+import { forwardRef, LegacyRef, ReactNode, Ref, useContext, useRef, useState } from "react";
 import { useBEM, useLayoutEffect, useCombinedRef } from "../hooks";
-import { menuClass, menuGroupClass, stylePropTypes, MenuListContext } from "../utils";
+import { menuClass, menuGroupClass, MenuListContext } from "../utils";
+import { BaseProps, MenuOverflow } from "../index";
 
-export const MenuGroup = forwardRef(function MenuGroup({ className, style, takeOverflow, ...restProps }, externalRef) {
-  const ref = useRef(null);
-  const [overflowStyle, setOverflowStyle] = useState();
+export interface MenuGroupProps extends BaseProps {
+  children?: ReactNode;
+  /**
+   * Set `true` to apply overflow of the parent menu to the group.
+   * Only one `MenuGroup` in a menu should set this prop as `true`.
+   */
+  takeOverflow?: boolean;
+}
+
+export const MenuGroupFr = (
+  { className, style, takeOverflow, ...restProps }: MenuGroupProps,
+  externalRef: LegacyRef<HTMLDivElement>,
+) => {
+  const ref = useRef<Element>(null);
+  const [overflowStyle, setOverflowStyle] = useState<{ maxHeight?: number; overflow?: MenuOverflow }>();
   const { overflow, overflowAmt } = useContext(MenuListContext);
 
   useLayoutEffect(() => {
     let maxHeight;
-    if (takeOverflow && overflowAmt >= 0) {
+    if (takeOverflow && overflowAmt != null && overflowAmt >= 0 && ref.current) {
+      // FIXME Matt added && ref.current
       maxHeight = ref.current.getBoundingClientRect().height - overflowAmt;
       if (maxHeight < 0) maxHeight = 0;
     }
-    setOverflowStyle(maxHeight >= 0 ? { maxHeight, overflow } : undefined);
+    setOverflowStyle(maxHeight != null && maxHeight >= 0 ? { maxHeight, overflow } : undefined);
   }, [takeOverflow, overflow, overflowAmt]);
 
   useLayoutEffect(() => {
-    if (overflowStyle) ref.current.scrollTop = 0;
+    if (overflowStyle && ref.current) ref.current.scrollTop = 0;
   }, [overflowStyle]);
 
   return (
     <div
       {...restProps}
-      ref={useCombinedRef(externalRef, ref)}
+      ref={useCombinedRef(externalRef as Ref<HTMLDivElement>, ref) as LegacyRef<HTMLDivElement>} // TODO wierd refs
       className={useBEM({ block: menuClass, element: menuGroupClass, className })}
       style={{ ...style, ...overflowStyle }}
     />
   );
-});
-
-MenuGroup.propTypes = {
-  ...stylePropTypes(),
-  takeOverflow: bool,
 };
+
+export const MenuGroup = forwardRef(MenuGroupFr);

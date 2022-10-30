@@ -146,7 +146,7 @@ export interface MenuStateOptions {
   transitionTimeout?: number;
 }
 
-interface Hoverable {
+export interface Hoverable {
   disabled?: boolean;
   index?: number;
 }
@@ -389,4 +389,54 @@ export interface MenuProps extends RootMenuProps, UncontrolledMenuProps {
    * - Accepts `onClick` and `onKeyDown` event props.
    */
   menuButton: RenderProp<MenuButtonModifiers, React.ReactElement>;
+}
+
+//
+// ControlledMenu
+// ----------------------------------------------------------------------
+export interface ControlledMenuProps extends RootMenuProps {
+  /**
+   * Viewport coordinates to which context menu will be positioned.
+   *
+   * *Use this prop only for context menu*
+   */
+  anchorPoint?: {
+    x: number;
+    y: number;
+  };
+  /**
+   * A ref object attached to a DOM element to which menu will be positioned.
+   *
+   * *Don't set this prop for context menu*
+   */
+  anchorRef?: React.RefObject<Element | RectElement>;
+  skipOpen?: React.RefObject<boolean>;
+  /**
+   * If `true`, the menu list element will gain focus after menu is open.
+   * @default true
+   */
+  captureFocus?: boolean;
+  /**
+   * Controls the state of menu. When the prop is `undefined`, menu will be unmounted from DOM.
+   */
+  state?: MenuState;
+  /**
+   * Sets which menu item receives focus (hover) when menu opens.
+   * You will usually set this prop when the menu is opened by keyboard events.
+   *
+   * *Note: If you don't intend to update focus (hover) position,
+   * it's important to keep this prop's identity stable when your component re-renders.*
+   */
+  menuItemFocus?: {
+    position?: FocusPosition;
+    alwaysUpdate?: boolean;
+  };
+  /**
+   * Set the return value of `useMenuState` to this prop.
+   */
+  endTransition?: () => void;
+  /**
+   * Event fired when menu is about to close.
+   */
+  onClose?: EventHandler<MenuCloseEvent>;
 }

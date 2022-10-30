@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { MenuState } from "../index";
+import { MenuOverflow, MenuState } from "../index";
 
 export const menuContainerClass = "szh-menu-container";
 export const menuClass = "szh-menu";
@@ -13,12 +13,31 @@ export const subMenuClass = "submenu";
 export const radioGroupClass = "radio-group";
 
 export const HoverItemContext = createContext(undefined);
-export const MenuListItemContext = createContext({});
-export const MenuListContext = createContext({});
-export const EventHandlersContext = createContext({});
-export const RadioGroupContext = createContext({});
+export const MenuListItemContext = createContext<{
+  isParentOpen?: boolean;
+  isSubmenuOpen?: boolean;
+  dispatch: (a: number, ref: any) => void;
+  updateItems: (item: any, isMounted?: boolean) => void;
+}>({ dispatch: () => {}, updateItems: () => {} });
+export const MenuListContext = createContext<{ overflow?: MenuOverflow; overflowAmt?: number }>({});
+export interface RMEvent {
+  value: any;
+  syntheticEvent: any;
+  checked?: boolean;
+  name?: string;
+  key?: string;
+}
+export const EventHandlersContext = createContext<{
+  handleClose?: () => void;
+  handleClick: (event: RMEvent, checked: boolean) => void;
+}>({
+  handleClick: () => {},
+});
+export const RadioGroupContext = createContext<{ value?: any; name?: string; onRadioChange: () => void }>({
+  onRadioChange: () => {},
+});
 export const SettingsContext = createContext({});
-export const ItemSettingsContext = createContext({});
+export const ItemSettingsContext = createContext<{ submenuCloseDelay?: number }>({});
 
 export const Keys = Object.freeze({
   ENTER: "Enter",

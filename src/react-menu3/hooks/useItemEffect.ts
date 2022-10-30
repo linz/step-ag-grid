@@ -2,7 +2,7 @@ import { MutableRefObject } from "react";
 import { useLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export const useItemEffect = (
-  isDisabled: boolean,
+  isDisabled: boolean | undefined,
   itemRef: MutableRefObject<any>,
   updateItems: (item: any, isMounted?: boolean) => void,
 ) => {

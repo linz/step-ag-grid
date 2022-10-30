@@ -1,14 +1,17 @@
-// @ts-nocheck
-/* eslint-disable */
-import { useRef, useContext, useEffect } from "react";
+import { useRef, useContext, useEffect, FocusEvent, MutableRefObject } from "react";
 import { ItemSettingsContext, MenuListItemContext, HoverActionTypes } from "../utils";
 import { useItemEffect } from "./useItemEffect";
 
 // This hook includes some common stateful logic in MenuItem and FocusableItem
-export const useItemState = (itemRef, focusRef, isHovering, isDisabled) => {
+export const useItemState = (
+  itemRef: MutableRefObject<any>,
+  focusRef: MutableRefObject<any>,
+  isHovering?: boolean,
+  isDisabled?: boolean,
+) => {
   const { submenuCloseDelay } = useContext(ItemSettingsContext);
   const { isParentOpen, isSubmenuOpen, dispatch, updateItems } = useContext(MenuListItemContext);
-  const timeoutId = useRef(0);
+  const timeoutId = useRef<ReturnType<typeof setTimeout>>();
 
   const setHover = () => {
     !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, itemRef.current);
@@ -18,7 +21,7 @@ export const useItemState = (itemRef, focusRef, isHovering, isDisabled) => {
     !isDisabled && dispatch(HoverActionTypes.UNSET, itemRef.current);
   };
 
-  const onBlur = (e) => {
+  const onBlur = (e: FocusEvent) => {
     // Focus has moved out of the entire item
     // It handles situation such as clicking on a sibling disabled menu item
     if (isHovering && !e.currentTarget.contains(e.relatedTarget)) unsetHover();
@@ -28,7 +31,7 @@ export const useItemState = (itemRef, focusRef, isHovering, isDisabled) => {
     if (isSubmenuOpen) {
       if (!timeoutId.current)
         timeoutId.current = setTimeout(() => {
-          timeoutId.current = 0;
+          timeoutId.current = undefined;
           setHover();
         }, submenuCloseDelay);
     } else {
@@ -36,10 +39,10 @@ export const useItemState = (itemRef, focusRef, isHovering, isDisabled) => {
     }
   };
 
-  const onPointerLeave = (_, keepHover) => {
+  const onPointerLeave = (_: PointerEvent, keepHover: boolean) => {
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
-      timeoutId.current = 0;
+      timeoutId.current = undefined;
     }
 
     !keepHover && unsetHover();

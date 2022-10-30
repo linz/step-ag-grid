@@ -1,4 +1,13 @@
-import { cloneElement, Fragment, forwardRef, useRef, useCallback, useImperativeHandle, ReactElement, Ref } from "react";
+import {
+  cloneElement,
+  Fragment,
+  forwardRef,
+  useRef,
+  useCallback,
+  useImperativeHandle,
+  ReactElement,
+  LegacyRef,
+} from "react";
 import { ControlledMenu } from "./ControlledMenu";
 import { useMenuChange, useMenuStateAndFocus, useCombinedRef } from "../hooks";
 import { getName, mergeProps, safeCall, isMenuOpen, Keys, FocusPositions } from "../utils";
@@ -22,7 +31,7 @@ export interface MenuProps extends RootMenuProps, UncontrolledMenuProps {
 
 export function MenuFr(
   { "aria-label": ariaLabel, menuButton, instanceRef, onMenuChange, ...restProps }: MenuProps,
-  externalRef: Ref<unknown> | undefined, // FIXME Matt correct type?
+  externalRef: LegacyRef<any>, // FIXME Matt correct type?
 ) {
   const [stateProps, toggleMenu, openMenu] = useMenuStateAndFocus(restProps);
   const isOpen = isMenuOpen(stateProps.state);

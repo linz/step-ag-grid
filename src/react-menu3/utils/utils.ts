@@ -77,7 +77,7 @@ export const getScrollAncestor = (node: Node | null): Element | null => {
   return null;
 };
 
-export function commonProps(isDisabled: boolean, isHovering: boolean) {
+export function commonProps(isDisabled?: boolean, isHovering?: boolean) {
   return {
     "aria-disabled": isDisabled || undefined,
     tabIndex: isHovering ? 0 : -1,
