@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, MutableRefObject } from "react";
 import { HoverActionTypes, indexOfNode } from "../utils";
-import { FocusPosition } from "../index";
+import { FocusPosition } from "../types";
 
 export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObject<any> | undefined) => {
   const [hoverItem, setHoverItem] = useState<any>();

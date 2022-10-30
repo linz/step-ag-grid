@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
 import { GridFormProps } from "./GridCell";
 import { GridBaseRow } from "./Grid";
-import { ControlledMenu } from "../react-menu3";
+import { ControlledMenu } from "@react-menu3";
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(
   props: GridFormProps<RowType>,

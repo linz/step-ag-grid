@@ -32,7 +32,7 @@ import {
   MenuPosition,
   RenderProp,
   UncontrolledMenuProps,
-} from "../index";
+} from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
 
 //

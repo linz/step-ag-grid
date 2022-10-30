@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext, MutableRefObject } from "react";
+import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext } from "react";
 import { flushSync } from "react-dom";
 import { useBEM, useCombinedRef, useLayoutEffect, useItems } from "../hooks";
 import { getPositionHelpers, positionMenu, positionContextMenu } from "../positionUtils";
@@ -22,65 +22,7 @@ import {
   MenuListItemContext,
   HoverItemContext,
 } from "../utils";
-import { EventHandler, FocusPosition, MenuCloseEvent, MenuDirection, MenuState, RootMenuProps } from "../index";
-
-interface ExtraMenuProps {
-  isDisabled?: boolean;
-  ariaLabel?: string;
-  containerRef: MutableRefObject<HTMLElement>;
-  externalRef: MutableRefObject<HTMLUListElement>;
-  parentScrollingRef: MutableRefObject<any>;
-}
-
-//
-// ControlledMenu
-// ----------------------------------------------------------------------
-export interface ControlledMenuProps extends RootMenuProps, ExtraMenuProps {
-  /**
-   * Viewport coordinates to which context menu will be positioned.
-   *
-   * *Use this prop only for context menu*
-   */
-  anchorPoint?: {
-    x: number;
-    y: number;
-  };
-  /**
-   * A ref object attached to a DOM element to which menu will be positioned.
-   *
-   * *Don't set this prop for context menu*
-   */
-  anchorRef?: React.MutableRefObject<HTMLElement>;
-  skipOpen?: React.RefObject<boolean>;
-  /**
-   * If `true`, the menu list element will gain focus after menu is open.
-   * @default true
-   */
-  captureFocus?: boolean;
-  /**
-   * Controls the state of menu. When the prop is `undefined`, menu will be unmounted from DOM.
-   */
-  state?: MenuState;
-  /**
-   * Sets which menu item receives focus (hover) when menu opens.
-   * You will usually set this prop when the menu is opened by keyboard events.
-   *
-   * *Note: If you don't intend to update focus (hover) position,
-   * it's important to keep this prop's identity stable when your component re-renders.*
-   */
-  menuItemFocus?: {
-    position?: FocusPosition;
-    alwaysUpdate?: boolean;
-  };
-  /**
-   * Set the return value of `useMenuState` to this prop.
-   */
-  endTransition?: () => void;
-  /**
-   * Event fired when menu is about to close.
-   */
-  onClose?: EventHandler<MenuCloseEvent>;
-}
+import { ControlledMenuProps, MenuDirection } from "../types";
 
 export const MenuList = ({
   ariaLabel,
@@ -194,7 +136,7 @@ export const MenuList = ({
 
   const handlePosition = useCallback(
     (noOverflowCheck?: boolean) => {
-      if (!containerRef.current) {
+      if (!containerRef?.current) {
         if (process.env.NODE_ENV !== "production") {
           console.error(
             '[React-Menu] Menu cannot be positioned properly as container ref is null. If you need to initialise `state` prop to "open" for ControlledMenu, please see this solution: https://codesandbox.io/s/initial-open-sp10wn',

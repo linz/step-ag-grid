@@ -1,7 +1,7 @@
 import { memo, forwardRef, LegacyRef } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuDividerClass } from "../utils";
-import { BaseProps } from "../index";
+import { BaseProps } from "../types";
 
 const MenuDividerFr = ({ className, ...restProps }: BaseProps, externalRef: LegacyRef<HTMLLIElement>) => {
   return (

@@ -1,5 +1,5 @@
 import { unstable_batchedUpdates } from "react-dom";
-import { MenuState, MenuStateOptions } from "../index";
+import { MenuState, MenuStateOptions } from "../types";
 import { MenuButtonProps } from "../components/MenuButton";
 import { findIndex } from "lodash-es";
 
@@ -32,7 +32,7 @@ export const defineName = (
   component: React.ForwardRefExoticComponent<React.PropsWithoutRef<MenuButtonProps> & React.RefAttributes<unknown>>,
 ) => Object.defineProperty(component, internalKey, { value: name });
 
-export const mergeProps = (target: Record<string, any>, source: Record<string, any>) => {
+export const mergeProps = (target: any, source: any) => {
   source &&
     Object.keys(source).forEach((key) => {
       const targetProp = target[key];

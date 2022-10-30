@@ -1,7 +1,17 @@
-import { createContext, MutableRefObject } from "react";
-import { EventHandler, FocusPosition, MenuDirection, MenuOverflow, MenuState } from "../index";
+import { createContext, MutableRefObject, RefObject } from "react";
+import {
+  ControlledMenuProps,
+  EventHandler,
+  FocusPosition,
+  MenuDirection,
+  MenuOverflow,
+  MenuReposition,
+  MenuState,
+  MenuViewScroll,
+  RectElement,
+  TransitionFieldType,
+} from "../types";
 import { RadioChangeEvent } from "../components/MenuRadioGroup";
-import { ControlledMenuProps } from "../components/MenuList";
 
 export const menuContainerClass = "szh-menu-container";
 export const menuClass = "szh-menu";
@@ -59,10 +69,19 @@ export const RadioGroupContext = createContext<{
   onRadioChange?: EventHandler<RadioChangeEvent>;
 }>({});
 
-interface SettingsContextType extends ControlledMenuProps, MenuListItemContextType {
+interface SettingsContextType extends ControlledMenuProps {
   rootMenuRef?: MutableRefObject<any>;
   rootAnchorRef?: MutableRefObject<any>;
-  scrollNodesRef: MutableRefObject<{ anchors?: Element[]; menu: any }>;
+  scrollNodesRef: MutableRefObject<{ anchors?: Element[]; menu?: any }>;
+
+  initialMounted?: boolean;
+  unmountOnClose?: boolean;
+  transition?: TransitionFieldType;
+  transitionTimeout?: number;
+  boundingBoxRef?: RefObject<Element | RectElement>;
+  boundingBoxPadding?: string;
+  reposition?: MenuReposition;
+  viewScroll?: MenuViewScroll;
 }
 
 // FIXME hacking a default context in here is probably bad

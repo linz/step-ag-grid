@@ -1,7 +1,7 @@
 import { placeArrowVertical } from "./placeArrowVertical";
 import { getPositionHelpers } from "./getPositionHelpers";
 import { MutableRefObject } from "react";
-import { MenuDirection } from "../index";
+import { MenuDirection } from "../types";
 
 export interface placeLeftorRightParams {
   anchorRect: DOMRect;

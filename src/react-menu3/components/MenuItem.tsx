@@ -12,7 +12,7 @@ import {
   Keys,
   RMEvent,
 } from "../utils";
-import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../index";
+import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
 
 //

@@ -9,7 +9,7 @@ import {
   withHovering,
   EventHandlersContext,
 } from "../utils";
-import { BaseProps } from "../index";
+import { BaseProps } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
 
 export interface FocusableItemProps extends BaseProps, withHoveringResultProps {

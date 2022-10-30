@@ -11,7 +11,7 @@ import {
 import { ControlledMenu } from "./ControlledMenu";
 import { useMenuChange, useMenuStateAndFocus, useCombinedRef } from "../hooks";
 import { getName, mergeProps, safeCall, isMenuOpen, Keys, FocusPositions } from "../utils";
-import { MenuButtonModifiers, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../index";
+import { MenuButtonModifiers, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../types";
 
 //
 // Menu
