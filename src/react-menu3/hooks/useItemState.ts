@@ -14,11 +14,11 @@ export const useItemState = (
   const timeoutId = useRef<ReturnType<typeof setTimeout>>();
 
   const setHover = () => {
-    !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, menuItemRef?.current);
+    !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, menuItemRef?.current, 0);
   };
 
   const unsetHover = () => {
-    !isDisabled && dispatch(HoverActionTypes.UNSET, menuItemRef?.current);
+    !isDisabled && dispatch(HoverActionTypes.UNSET, menuItemRef?.current, 0);
   };
 
   const onBlur = (e: FocusEvent) => {

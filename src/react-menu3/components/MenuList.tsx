@@ -165,7 +165,6 @@ export const MenuList = ({
         break;
 
       case Keys.DOWN:
-        console.log("down");
         dispatch(HoverActionTypes.INCREASE, hoverItem, 0);
         break;
 

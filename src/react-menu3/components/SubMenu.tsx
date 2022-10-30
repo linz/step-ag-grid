@@ -188,7 +188,7 @@ export const SubMenuFr = ({
     !isDisabled && _openMenu(...args);
   };
 
-  const setHover = () => !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, menuItemRef?.current);
+  const setHover = () => !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, menuItemRef?.current, 0);
 
   const delayOpen = (delay: number) => {
     setHover();
@@ -207,7 +207,7 @@ export const SubMenuFr = ({
 
   const handlePointerLeave = () => {
     stopTimer();
-    if (!isOpen) dispatch(HoverActionTypes.UNSET, menuItemRef?.current);
+    if (!isOpen) dispatch(HoverActionTypes.UNSET, menuItemRef?.current, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
