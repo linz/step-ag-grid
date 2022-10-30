@@ -1,7 +1,7 @@
 import "../../react-menu3/styles/index.scss";
 
 import { MenuItem, MenuDivider, FocusableItem, RadioChangeEvent } from "@react-menu3";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay } from "lodash-es";
@@ -110,7 +110,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
       <div className={"Grid-popoverContainerList"}>
         {options && formProps.filtered && (
           <>
-            <FocusableItem className={"filter-item"}>
+            <FocusableItem className={"filter-item"} key={"filter"}>
               {({ ref }: any) => (
                 <div style={{ display: "flex", width: "100%" }}>
                   <input
@@ -134,9 +134,9 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : filteredValues.includes(item.value) ? null : (
-            <>
+            <Fragment key={`${index}`}>
               <MenuItem
-                key={`${item.value}`}
+                key={`${index}`}
                 onClick={(e: RadioChangeEvent) => {
                   // FIXME Matt Event type guessed here
                   e.keepOpen = true;
@@ -161,23 +161,24 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
                     }
                   }}
                 />
-              </MenuItem>
-              {selectedValues.includes(item.value) && item.subComponent && (
-                <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                  {(ref: any) =>
-                    item.subComponent &&
-                    item.subComponent(
-                      {
-                        setValue: (value: any) => {
-                          subSelectedValues.current[item.value as string] = value;
+
+                {selectedValues.includes(item.value) && item.subComponent && (
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                    {(ref: any) =>
+                      item.subComponent &&
+                      item.subComponent(
+                        {
+                          setValue: (value: any) => {
+                            subSelectedValues.current[item.value as string] = value;
+                          },
                         },
-                      },
-                      ref,
-                    )
-                  }
-                </FocusableItem>
-              )}
-            </>
+                        ref,
+                      )
+                    }
+                  </FocusableItem>
+                )}
+              </MenuItem>
+            </Fragment>
           ),
         )}
       </div>
