@@ -258,9 +258,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         }
         // This is needed to trigger postSortRowsHook
         gridApi.refreshClientSideRowModel();
-        stopEditing();
+      } else {
+        // Don't set saving if ok as the form has already closed
+        setSaving && setSaving(false);
       }
-      setSaving && setSaving(false);
       return ok;
     });
   };
