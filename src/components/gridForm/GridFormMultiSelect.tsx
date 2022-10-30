@@ -145,7 +145,18 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
                     setSelectedValues([...selectedValues, item.value]);
                   }
                 }}
-                onKeyDown={async (e: KeyboardEvent) => e.key === "Enter" && triggerSave().then()}
+                onKeyDown={async (e: KeyboardEvent) => {
+                  if (e.key === "Enter") triggerSave().then();
+                  else if (e.key === " ") {
+                    if (selectedValues.includes(item.value)) {
+                      setSelectedValues(selectedValues.filter((value) => value != item.value));
+                    } else {
+                      setSelectedValues([...selectedValues, item.value]);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
               >
                 <LuiCheckboxInput
                   isChecked={selectedValues.includes(item.value)}
