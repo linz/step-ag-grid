@@ -179,5 +179,4 @@ const MenuItemFr = ({
   }
 };
 
-// FIXME matt as any
-export const MenuItem = withHovering("MenuItem", MenuItemFr) as any as typeof MenuItemFr;
+export const MenuItem = withHovering("MenuItem", MenuItemFr);

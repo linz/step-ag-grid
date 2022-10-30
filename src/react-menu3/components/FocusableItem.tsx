@@ -72,4 +72,4 @@ export const FocusableItemFr = ({
   );
 };
 
-export const FocusableItem = withHovering("FocusableItem", FocusableItemFr) as any as typeof FocusableItemFr;
+export const FocusableItem = withHovering("FocusableItem", FocusableItemFr);

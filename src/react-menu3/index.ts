@@ -9,4 +9,4 @@ export { MenuDivider } from "./components/MenuDivider";
 export { MenuHeader } from "./components/MenuHeader";
 export { MenuGroup } from "./components/MenuGroup";
 export { MenuRadioGroup } from "./components/MenuRadioGroup";
-export { RadioChangeEvent } from "./types";
+export { ClickEvent } from "./types";

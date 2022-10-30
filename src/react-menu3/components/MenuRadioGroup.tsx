@@ -69,4 +69,4 @@ export const MenuRadioGroupFr = (
   );
 };
 
-export const MenuRadioGroup = forwardRef(MenuRadioGroupFr) as any as typeof MenuRadioGroupFr;
+export const MenuRadioGroup = forwardRef(MenuRadioGroupFr);

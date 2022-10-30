@@ -1,4 +1,13 @@
-import { useRef, useContext, useEffect, useMemo, useImperativeHandle } from "react";
+import {
+  useRef,
+  useContext,
+  useEffect,
+  useMemo,
+  useImperativeHandle,
+  CSSProperties,
+  ReactNode,
+  KeyboardEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { useBEM, useCombinedRef, useMenuChange, useMenuStateAndFocus, useItemEffect } from "../hooks";
 import { MenuList } from "./MenuList";
@@ -64,7 +73,7 @@ interface BaseMenuProps extends Omit<BaseProps, "style"> {
   /**
    * This prop is forwarded to the `style` prop of menu DOM element.
    */
-  menuStyle?: React.CSSProperties;
+  menuStyle?: CSSProperties;
   /**
    * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
    */
@@ -72,7 +81,7 @@ interface BaseMenuProps extends Omit<BaseProps, "style"> {
   /**
    * This prop is forwarded to the `style` prop of menu arrow DOM element.
    */
-  arrowStyle?: React.CSSProperties;
+  arrowStyle?: CSSProperties;
   /**
    * Set `true` to display an arrow pointing to its anchor element.
    */
@@ -124,7 +133,7 @@ interface BaseMenuProps extends Omit<BaseProps, "style"> {
    * The `MenuGroup` should have `takeOverflow` prop set as `true` accordingly.
    */
   setDownOverflow?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export interface SubMenuProps extends BaseMenuProps, Hoverable, UncontrolledMenuProps, withHoveringResultProps {
@@ -210,7 +219,7 @@ export const SubMenuFr = ({
     if (!isOpen) dispatch(HoverActionTypes.UNSET, menuItemRef?.current, 0);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     let handled = false;
 
     switch (e.key) {
@@ -235,7 +244,7 @@ export const SubMenuFr = ({
     }
   };
 
-  const handleItemKeyDown = (e: React.KeyboardEvent) => {
+  const handleItemKeyDown = (e: KeyboardEvent) => {
     if (!isHovering) return;
 
     switch (e.key) {
@@ -346,4 +355,4 @@ export const SubMenuFr = ({
   );
 };
 
-export const SubMenu = withHovering("SubMenu", SubMenuFr) as any as typeof SubMenuFr;
+export const SubMenu = withHovering("SubMenu", SubMenuFr);

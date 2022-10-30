@@ -152,7 +152,7 @@ export const ControlledMenuFr = (
 
   const eventHandlers = useMemo(
     () => ({
-      handleClick(event: RadioChangeEvent, isCheckorRadio: boolean) {
+      handleClick(event: RadioChangeEvent, isCheckOrRadio: boolean) {
         if (!event.stopPropagation) safeCall(onItemClick, event);
 
         let keepOpen = event.keepOpen;
@@ -160,7 +160,7 @@ export const ControlledMenuFr = (
           // if event.keepOpen is undefined, the following default behaviour is used
           // According to WAI-ARIA Authoring Practices 1.1
           // Keep menu open when check or radio is invoked by SPACE key
-          keepOpen = isCheckorRadio && event.key === Keys.SPACE;
+          keepOpen = isCheckOrRadio && event.key === Keys.SPACE;
         }
 
         if (!keepOpen) {
@@ -252,4 +252,4 @@ export const ControlledMenuFr = (
   return menuList;
 };
 
-export const ControlledMenu = forwardRef(ControlledMenuFr) as any as typeof ControlledMenuFr;
+export const ControlledMenu = forwardRef(ControlledMenuFr);
