@@ -27,7 +27,7 @@ export interface GenericCellEditorColDef<
   FormProps extends GenericCellEditorParams<RowType>,
 > extends ColDef {
   cellEditorParams?: FormProps;
-  cellRendererParams?: GenericCellRendererParams;
+  cellRendererParams?: GenericCellRendererParams<RowType>;
 }
 
 export const GridCellRenderer = (cellRendererParams: ICellRendererParams) => {

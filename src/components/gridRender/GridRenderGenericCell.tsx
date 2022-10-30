@@ -1,7 +1,7 @@
 import "./GridRenderGenericCell.scss";
 
 import { useContext } from "react";
-import { UpdatingContext } from "../../contexts/UpdatingContext";
+import { UpdatingContext } from "@contexts/UpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
@@ -9,21 +9,25 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 import { GenericCellEditorParams } from "../GridCell";
 import { GridBaseRow } from "../Grid";
 
+export interface RowICellRendererParams<RowType extends GridBaseRow> extends ICellRendererParams {
+  data: RowType;
+}
+
 export interface GenericCellColDef<RowType extends GridBaseRow, FormProps extends Record<string, any>> extends ColDef {
-  cellRendererParams?: GenericCellRendererParams;
+  cellRendererParams?: GenericCellRendererParams<RowType>;
   cellEditorParams?: GenericCellEditorParams<RowType> & FormProps;
 }
 
-export interface GenericCellRendererParams {
+export interface GenericCellRendererParams<RowType extends GridBaseRow> {
   singleClickEdit?: boolean;
-  warning?: (props: ICellRendererParams) => string | boolean | undefined;
-  info?: (props: ICellRendererParams) => string | boolean | undefined;
+  warning?: (props: RowICellRendererParams<RowType>) => string | boolean | undefined;
+  info?: (props: RowICellRendererParams<RowType>) => string | boolean | undefined;
 }
 
-export const GridRendererGenericCell = (props: ICellRendererParams): JSX.Element => {
+export const GridRendererGenericCell = <RowType extends GridBaseRow>(props: ICellRendererParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 
-  const cellRendererParams = props.colDef?.cellRendererParams as GenericCellRendererParams | undefined;
+  const cellRendererParams = props.colDef?.cellRendererParams as GenericCellRendererParams<RowType> | undefined;
   const warningFn = cellRendererParams?.warning;
   const warningText = warningFn ? warningFn(props) : undefined;
   const infoFn = cellRendererParams?.info;

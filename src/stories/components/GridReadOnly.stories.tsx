@@ -51,14 +51,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell({
+      GridCell<ITestRow, any>({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: (props: ICellRendererParams) => props.value === "Tester" && "Testers are testing",
-          info: (props: ICellRendererParams) => props.value === "Developer" && "Developers are awesome",
+          warning: (props) => props.value === "Tester" && "Testers are testing",
+          info: (props) => props.value === "Developer" && "Developers are awesome",
         },
       }),
       GridCell({
