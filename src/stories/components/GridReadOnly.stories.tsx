@@ -8,7 +8,6 @@ import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { wait } from "@utils/util";
-import { ICellRendererParams } from "ag-grid-community";
 import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
 import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
 import { GridCell } from "@components/GridCell";
