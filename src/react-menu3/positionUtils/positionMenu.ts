@@ -2,7 +2,7 @@ import { placeLeftorRight } from "./placeLeftorRight";
 import { placeToporBottom } from "./placeToporBottom";
 import { MutableRefObject } from "react";
 import { getPositionHelpers } from "./getPositionHelpers";
-import { MenuDirection, RectElement } from "../index";
+import { MenuDirection } from "../index";
 
 interface positionMenuProps {
   offsetX: number;

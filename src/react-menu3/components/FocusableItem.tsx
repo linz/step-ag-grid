@@ -1,4 +1,4 @@
-import { LegacyRef, Ref, useContext, useMemo, useRef } from "react";
+import { LegacyRef, useContext, useMemo, useRef } from "react";
 import { useBEM, useCombinedRef, useItemState } from "../hooks";
 import {
   mergeProps,

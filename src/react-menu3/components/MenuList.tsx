@@ -165,6 +165,7 @@ export const MenuList = ({
         break;
 
       case Keys.DOWN:
+        console.log("down");
         dispatch(HoverActionTypes.INCREASE, hoverItem, 0);
         break;
 
@@ -304,9 +305,7 @@ export const MenuList = ({
     if (overflowData && !setDownOverflow) menuRef.current.scrollTop = 0;
   }, [overflowData, setDownOverflow]);
 
-  useLayoutEffect(() => {
-    updateItems();
-  }, [updateItems]);
+  useLayoutEffect(() => updateItems, [updateItems]);
 
   useEffect(() => {
     let { menu: menuScroll } = scrollNodes;
