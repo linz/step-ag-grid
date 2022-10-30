@@ -4,8 +4,8 @@ import { useItemEffect } from "./useItemEffect";
 
 // This hook includes some common stateful logic in MenuItem and FocusableItem
 export const useItemState = (
-  itemRef: MutableRefObject<any>,
-  focusRef: MutableRefObject<any>,
+  menuItemRef: MutableRefObject<any> | undefined,
+  focusRef: MutableRefObject<any> | undefined,
   isHovering?: boolean,
   isDisabled?: boolean,
 ) => {
@@ -14,11 +14,11 @@ export const useItemState = (
   const timeoutId = useRef<ReturnType<typeof setTimeout>>();
 
   const setHover = () => {
-    !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, itemRef.current);
+    !isHovering && !isDisabled && dispatch(HoverActionTypes.SET, menuItemRef?.current);
   };
 
   const unsetHover = () => {
-    !isDisabled && dispatch(HoverActionTypes.UNSET, itemRef.current);
+    !isDisabled && dispatch(HoverActionTypes.UNSET, menuItemRef?.current);
   };
 
   const onBlur = (e: FocusEvent) => {
@@ -48,13 +48,13 @@ export const useItemState = (
     !keepHover && unsetHover();
   };
 
-  useItemEffect(isDisabled, itemRef, updateItems);
+  useItemEffect(isDisabled, menuItemRef, updateItems);
   useEffect(() => () => clearTimeout(timeoutId.current), []);
   useEffect(() => {
     // Don't set focus when parent menu is closed, otherwise focus will be lost
     // and onBlur event will be fired with relatedTarget setting as null.
     if (isHovering && isParentOpen) {
-      focusRef.current && focusRef.current.focus();
+      focusRef?.current && focusRef.current.focus();
     }
   }, [focusRef, isHovering, isParentOpen]);
 

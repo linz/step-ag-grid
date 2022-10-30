@@ -22,13 +22,13 @@ export const FocusableItemFr = ({
   disabled,
   children,
   isHovering,
-  itemRef,
+  menuItemRef,
   externalRef,
   ...restProps
 }: FocusableItemProps) => {
   const isDisabled = !!disabled;
   const ref = useRef(null);
-  const { setHover, onPointerLeave, ...restStateProps } = useItemState(itemRef, ref, isHovering, isDisabled);
+  const { setHover, onPointerLeave, ...restStateProps } = useItemState(menuItemRef, ref, isHovering, isDisabled);
   const { handleClose } = useContext(EventHandlersContext);
 
   const modifiers = useMemo(
@@ -64,7 +64,7 @@ export const FocusableItemFr = ({
       role="menuitem"
       {...mergedProps}
       {...commonProps(isDisabled)}
-      ref={useCombinedRef(externalRef as Ref<any>, itemRef)}
+      ref={useCombinedRef(externalRef as Ref<any>, menuItemRef)}
       className={useBEM({ block: menuClass, element: menuItemClass, modifiers, className })}
     >
       {renderChildren}

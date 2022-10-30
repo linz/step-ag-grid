@@ -1,6 +1,7 @@
 import { placeArrowVertical } from "./placeArrowVertical";
 import { getPositionHelpers } from "./getPositionHelpers";
 import { MutableRefObject } from "react";
+import { MenuDirection } from "../index";
 
 export interface placeLeftorRightParams {
   anchorRect: DOMRect;
@@ -9,7 +10,7 @@ export interface placeLeftorRightParams {
   placeRightX: number;
   arrowRef: MutableRefObject<HTMLElement>;
   arrow: boolean;
-  direction: "left" | "right" | "top" | "bottom";
+  direction: MenuDirection;
   position: "auto" | "anchor" | "initial";
 }
 

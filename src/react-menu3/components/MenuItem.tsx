@@ -85,12 +85,12 @@ const MenuItemFr = ({
   children,
   onClick,
   isHovering,
-  itemRef,
+  menuItemRef,
   externalRef,
   ...restProps
 }: MenuItemProps & withHoveringResultProps) => {
   const isDisabled = !!disabled;
-  const { setHover, ...restStateProps } = useItemState(itemRef, itemRef, isHovering, isDisabled);
+  const { setHover, ...restStateProps } = useItemState(menuItemRef, menuItemRef, isHovering, isDisabled);
   const eventHandlers = useContext(EventHandlersContext);
   const radioGroup = useContext(RadioGroupContext);
   const isRadio = type === "radio";
@@ -125,8 +125,7 @@ const MenuItemFr = ({
       case Keys.ENTER:
       case Keys.SPACE:
         if (isAnchor) {
-          // FIXME this is very odd itemRef is a string from an HTMLElement
-          itemRef.current.click();
+          menuItemRef?.current && menuItemRef.current.click();
         } else {
           handleClick(e);
         }
@@ -164,7 +163,7 @@ const MenuItemFr = ({
     "aria-checked": isRadio || isCheckBox ? isChecked : undefined,
     ...mergedProps,
     ...commonProps(isDisabled, isHovering),
-    ref: useCombinedRef(externalRef as Ref<any>, itemRef),
+    ref: useCombinedRef(externalRef as Ref<any>, menuItemRef),
     className: useBEM({ block: menuClass, element: menuItemClass, modifiers, className }),
     children: useMemo(() => safeCall(children, modifiers), [children, modifiers]),
   };

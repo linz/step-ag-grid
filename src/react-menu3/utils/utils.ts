@@ -1,6 +1,7 @@
 import { unstable_batchedUpdates } from "react-dom";
 import { MenuState, MenuStateOptions } from "../index";
 import { MenuButtonProps } from "../components/MenuButton";
+import { findIndex } from "lodash-es";
 
 export const isMenuOpen = (state?: MenuState) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());
@@ -84,6 +85,4 @@ export function commonProps(isDisabled?: boolean, isHovering?: boolean) {
   };
 }
 
-export function indexOfNode(nodeList: Node[], node: Node) {
-  return nodeList.indexOf(node);
-}
+export const indexOfNode = (nodeList: NodeListOf<Node>, node: Node) => findIndex(nodeList, node);

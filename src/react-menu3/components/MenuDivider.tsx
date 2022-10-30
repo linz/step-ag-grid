@@ -14,4 +14,4 @@ const MenuDividerFr = ({ className, ...restProps }: BaseProps, externalRef: Lega
   );
 };
 
-export const MenuDivider = memo(forwardRef(MenuDividerFr));
+export const MenuDivider = memo(forwardRef(MenuDividerFr)) as any as typeof MenuDividerFr;
