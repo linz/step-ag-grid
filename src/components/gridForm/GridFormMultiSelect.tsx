@@ -1,6 +1,6 @@
 import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
+import { MenuItem, MenuDivider, FocusableItem, RadioChangeEvent } from "@react-menu3";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
@@ -58,7 +58,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
     },
     [formProps, selectedValues],
   );
-  const { popoverWrapper } = useGridPopoverHook(props, save);
+  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -137,11 +137,17 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
             <>
               <MenuItem
                 key={`${item.value}`}
-                onClick={(e: { keepOpen: boolean }) => {
+                onClick={(e: RadioChangeEvent) => {
+                  // FIXME Matt Event type guessed here
                   e.keepOpen = true;
-                  // onSelectMenuOption(itemIndex, e.value);
+                  if (selectedValues.includes(e.value)) {
+                    setSelectedValues(selectedValues.filter((value) => value != item.value));
+                  } else {
+                    setSelectedValues([...selectedValues, item.value as string]);
+                  }
                   return false;
                 }}
+                onKeyDown={async (e) => e.key === "Enter" && triggerSave().then()}
               >
                 <LuiCheckboxInput
                   isChecked={selectedValues.includes(item.value)}

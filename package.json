@@ -17,23 +17,23 @@
     "node": ">=14"
   },
   "peerDependencies": {
-    "react": ">=17",
-    "react-dom": ">=17",
+    "@linzjs/lui": ">=17",
     "ag-grid-community": ">=27",
     "ag-grid-react": ">=27",
-    "@linzjs/lui": ">=17"
+    "react": ">=17",
+    "react-dom": ">=17"
   },
   "dependencies": {
-    "@linzjs/lui": "^17.18.2",
-    "ag-grid-community": "^27.3.0",
-    "ag-grid-react": "^27.3.0",
+    "@linzjs/lui": ">=17",
+    "ag-grid-community": ">=27",
+    "ag-grid-react": ">=27",
     "debounce-promise": "^3.1.2",
     "lodash-es": "^4.17.21",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "uuid": "^9.0.0",
     "prop-types": "^15.8.1",
-    "react-transition-state": "^1.1.5"
+    "react": ">=17",
+    "react-dom": ">=17",
+    "react-transition-state": "^1.1.5",
+    "uuid": "^9.0.0"
   },
   "scripts": {
     "build": "rollup -c && npm run",

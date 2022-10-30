@@ -4,6 +4,8 @@ export const stylePropTypes = (name?: string) => ({
   [name ? `${name}ClassName` : "className"]: oneOfType([string, func]),
 });
 
+export const Direction = oneOf(["left", "right", "top", "bottom"]);
+
 // Menu, SubMenu and ControlledMenu
 export const menuPropTypes = {
   className: string,
@@ -16,7 +18,7 @@ export const menuPropTypes = {
   offsetX: number,
   offsetY: number,
   align: oneOf(["start", "center", "end"]),
-  direction: oneOf(["left", "right", "top", "bottom"]),
+  direction: Direction,
   position: oneOf(["auto", "anchor", "initial"]),
   overflow: oneOf(["auto", "visible", "hidden"]),
 };

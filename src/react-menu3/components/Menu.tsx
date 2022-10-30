@@ -1,43 +1,58 @@
-// @ts-nocheck
-import { cloneElement, Fragment, forwardRef, useRef, useCallback, useImperativeHandle } from "react";
-import { element, func, oneOfType } from "prop-types";
+import {
+  cloneElement,
+  Fragment,
+  forwardRef,
+  useRef,
+  useCallback,
+  useImperativeHandle,
+  ReactElement,
+  ForwardedRef,
+} from "react";
 import { ControlledMenu } from "./ControlledMenu";
 import { useMenuChange, useMenuStateAndFocus, useCombinedRef } from "../hooks";
-import {
-  getName,
-  mergeProps,
-  safeCall,
-  isMenuOpen,
-  uncontrolledMenuPropTypes,
-  rootMenuPropTypes,
-  Keys,
-  FocusPositions,
-} from "../utils";
+import { getName, mergeProps, safeCall, isMenuOpen, Keys, FocusPositions } from "../utils";
+import { MenuButtonModifiers, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../index";
 
-export const Menu = forwardRef(function Menu(
-  { "aria-label": ariaLabel, captureFocus: _, menuButton, instanceRef, onMenuChange, ...restProps },
-  externalRef,
+//
+// Menu
+// ----------------------------------------------------------------------
+export interface MenuProps extends RootMenuProps, UncontrolledMenuProps {
+  /**
+   * Can be a `MenuButton`, a `button` element, or a React component.
+   * It also can be a render function that returns one.
+   *
+   * If a React component is provided, it needs to implement the following contracts:
+   * - Accepts a `ref` prop that is forwarded to an element to which menu will be positioned.
+   * The element should be able to receive focus.
+   * - Accepts `onClick` and `onKeyDown` event props.
+   */
+  menuButton: RenderProp<MenuButtonModifiers, ReactElement>;
+}
+
+export function MenuFr(
+  { "aria-label": ariaLabel, menuButton, instanceRef, onMenuChange, ...restProps }: MenuProps,
+  externalRef: ForwardedRef<any>, // FIXME Matt correct type?
 ) {
   const [stateProps, toggleMenu, openMenu] = useMenuStateAndFocus(restProps);
   const isOpen = isMenuOpen(stateProps.state);
   const skipOpen = useRef(false);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = useCallback(
     (e) => {
       toggleMenu(false);
-      if (e.key) buttonRef.current.focus();
+      if (e.key) buttonRef.current && buttonRef.current.focus();
     },
     [toggleMenu],
   );
 
-  const onClick = (e) => {
+  const onClick = (e: MouseEvent) => {
     if (skipOpen.current) return;
     // Focus (hover) the first menu item when onClick event is trigger by keyboard
     openMenu(e.detail === 0 ? FocusPositions.FIRST : undefined);
   };
 
-  const onKeyDown = (e) => {
+  const onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
       case Keys.UP:
         openMenu(FocusPositions.LAST);
@@ -54,12 +69,14 @@ export const Menu = forwardRef(function Menu(
     e.preventDefault();
   };
 
-  const button = safeCall(menuButton, { open: isOpen });
+  // FIXME erk! button seems to be many types
+  const button: any = safeCall(menuButton, { open: isOpen });
   if (!button || !button.type) throw new Error("Menu requires a menuButton prop.");
 
   const buttonProps = {
     ref: useCombinedRef(button.ref, buttonRef),
     ...mergeProps({ onClick, onKeyDown }, button.props),
+    isOpen: false,
   };
   if (getName(button.type) === "MenuButton") {
     buttonProps.isOpen = isOpen;
@@ -87,10 +104,5 @@ export const Menu = forwardRef(function Menu(
       />
     </Fragment>
   );
-});
-
-Menu.propTypes = {
-  ...rootMenuPropTypes,
-  ...uncontrolledMenuPropTypes,
-  menuButton: oneOfType([element, func]).isRequired,
-};
+}
+export const Menu = forwardRef(MenuFr);

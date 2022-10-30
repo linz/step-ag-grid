@@ -1,17 +1,22 @@
-// @ts-nocheck
-import { memo, forwardRef, useContext, useRef } from "react";
+import { memo, forwardRef, useContext, useRef, MutableRefObject } from "react";
 import { HoverItemContext } from "./constants";
 
-export const withHovering = (name: string, WrappedComponent: any): any => {
+export interface withHoveringResultProps {
+  isHovering?: boolean;
+  externalRef?: MutableRefObject<any>;
+  menuItemRef?: MutableRefObject<any>;
+}
+
+export const withHovering = (name: string, WrappedComponent: (...args: any) => JSX.Element): any => {
   const Component = memo(WrappedComponent);
   const WithHovering = forwardRef<any>((props: any, ref) => {
-    const itemRef = useRef(null);
+    const menuItemRef = useRef<any>(null);
     return (
       <Component
         {...props}
-        itemRef={itemRef}
+        menuItemRef={menuItemRef}
         externalRef={ref}
-        isHovering={useContext(HoverItemContext) === itemRef.current}
+        isHovering={useContext(HoverItemContext) === menuItemRef.current}
       />
     );
   });

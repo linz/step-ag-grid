@@ -1,18 +1,18 @@
-// @ts-nocheck
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, MutableRefObject } from "react";
 import { HoverActionTypes, indexOfNode } from "../utils";
+import { FocusPosition } from "../index";
 
-export const useItems = (menuRef, focusRef) => {
-  const [hoverItem, setHoverItem] = useState();
+export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObject<any> | undefined) => {
+  const [hoverItem, setHoverItem] = useState<any>();
   const stateRef = useRef({
-    items: [],
+    items: [] as any[],
     hoverIndex: -1,
     sorted: false,
   });
   const mutableState = stateRef.current;
 
   const updateItems = useCallback(
-    (item, isMounted) => {
+    (item?: any, isMounted?: boolean) => {
       const { items } = mutableState;
       if (!item) {
         mutableState.items = [];
@@ -23,8 +23,8 @@ export const useItems = (menuRef, focusRef) => {
         if (index > -1) {
           items.splice(index, 1);
           if (item.contains(document.activeElement)) {
-            focusRef.current.focus();
-            setHoverItem();
+            focusRef?.current?.focus();
+            setHoverItem(undefined);
           }
         }
       }
@@ -35,7 +35,7 @@ export const useItems = (menuRef, focusRef) => {
   );
 
   const dispatch = useCallback(
-    (actionType, item, nextIndex) => {
+    (actionType: number, item: any, nextIndex: FocusPosition) => {
       const { items, hoverIndex } = mutableState;
       const sortItems = () => {
         if (mutableState.sorted) return;
@@ -55,7 +55,7 @@ export const useItems = (menuRef, focusRef) => {
           break;
 
         case HoverActionTypes.UNSET:
-          newItem = (prevItem) => (prevItem === item ? undefined : prevItem);
+          newItem = (prevItem: any) => (prevItem === item ? undefined : prevItem);
           break;
 
         case HoverActionTypes.FIRST:
@@ -71,6 +71,7 @@ export const useItems = (menuRef, focusRef) => {
           break;
 
         case HoverActionTypes.SET_INDEX:
+          if (typeof nextIndex !== "number") break;
           sortItems();
           index = nextIndex;
           newItem = items[index];

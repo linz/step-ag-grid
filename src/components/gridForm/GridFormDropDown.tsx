@@ -153,7 +153,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
     <>
       {formProps.filtered && (
         <>
-          <FocusableItem className={"filter-item"} index={-1}>
+          <FocusableItem className={"filter-item"}>
             {({ ref }: any) => (
               <div style={{ display: "flex", width: "100%" }}>
                 <input

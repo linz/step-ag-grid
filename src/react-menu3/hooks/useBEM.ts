@@ -1,12 +1,13 @@
 import { useMemo } from "react";
+import { ClassNameProp } from "../index";
 
 type useBemModifiers = Record<string, boolean | string | undefined>;
 
 interface useBemProps {
   block: string;
-  element: string;
-  modifiers: useBemModifiers;
-  className: string | ((modifiers: useBemModifiers) => string | undefined);
+  element?: string;
+  modifiers?: useBemModifiers;
+  className?: ClassNameProp<any>; // FIXME Matt any?
 }
 
 // Generate className following BEM methodology: http://getbem.com/naming/

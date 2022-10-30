@@ -1,21 +1,17 @@
-// @ts-nocheck
-import { memo, forwardRef } from "react";
+import { memo, forwardRef, LegacyRef } from "react";
 import { useBEM } from "../hooks";
-import { menuClass, menuDividerClass, stylePropTypes } from "../utils";
+import { menuClass, menuDividerClass } from "../utils";
+import { BaseProps } from "../index";
 
-export const MenuDivider = memo(
-  forwardRef(function MenuDivider({ className, ...restProps }, externalRef) {
-    return (
-      <li
-        role="separator"
-        {...restProps}
-        ref={externalRef}
-        className={useBEM({ block: menuClass, element: menuDividerClass, className })}
-      />
-    );
-  }),
-);
-
-MenuDivider.propTypes = {
-  ...stylePropTypes(),
+const MenuDividerFr = ({ className, ...restProps }: BaseProps, externalRef: LegacyRef<HTMLLIElement>) => {
+  return (
+    <li
+      role="separator"
+      {...restProps}
+      ref={externalRef}
+      className={useBEM({ block: menuClass, element: menuDividerClass, className })}
+    />
+  );
 };
+
+export const MenuDivider = memo(forwardRef(MenuDividerFr)) as any as typeof MenuDividerFr;

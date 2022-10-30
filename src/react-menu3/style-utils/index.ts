@@ -11,14 +11,17 @@ import {
   subMenuClass,
 } from "../utils";
 
-const bem = (block) => (element) => (modifier) => {
-  let selector = `.${block}`;
-  if (element) selector += `__${element}`;
-  if (modifier) selector += `--${modifier}`;
-  return selector;
-};
+const bem =
+  (block: string) =>
+  (element?: string) =>
+  (modifier?: string): string => {
+    let selector = `.${block}`;
+    if (element) selector += `__${element}`;
+    if (modifier) selector += `--${modifier}`;
+    return selector;
+  };
 
-const createSelector = (blockElement, modifiers = []) => {
+const createSelector = (blockElement: (modifier?: string) => string, modifiers: string[] = []) => {
   const selectorObj = {};
   Object.defineProperty(selectorObj, "name", {
     value: blockElement(),

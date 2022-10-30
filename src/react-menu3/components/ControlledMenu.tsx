@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable */
 import { forwardRef, useRef, useMemo, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { string, number, bool, func, object, oneOf, oneOfType, exact } from "prop-types";
@@ -47,7 +48,7 @@ export const ControlledMenu = forwardRef(function ControlledMenu(
   externalRef,
 ) {
   const containerRef = useRef(null);
-  const scrollNodesRef = useRef({});
+  const scrollNodesRef = useRef<{anchors?:HTMLDivElement[]}>({});
   const { anchorRef, state } = restProps;
 
   const settings = useMemo(
