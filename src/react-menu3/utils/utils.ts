@@ -1,17 +1,35 @@
 import { unstable_batchedUpdates } from "react-dom";
+import { MenuState, MenuStateOptions } from "../index";
+import { MenuButtonProps } from "../components/MenuButton";
 
-export const isMenuOpen = (state: string | undefined) => !!state && state[0] === "o";
+export const isMenuOpen = (state?: MenuState) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());
 export const values = Object.values || ((obj: { [x: string]: any }) => Object.keys(obj).map((key) => obj[key]));
 export const floatEqual = (a: number, b: number, diff = 0.0001) => Math.abs(a - b) < diff;
-export const getTransition = (transition: boolean | Record<string, string>, name: string) =>
+
+export type TransitionMap = {
+  open?: boolean;
+  close?: boolean;
+  item?: boolean;
+};
+export const getTransition = (transition: MenuStateOptions["transition"], name: keyof TransitionMap) =>
   transition === true || !!(transition && transition[name]);
-export const safeCall = <T, R>(fn: (arg: T) => R, arg: T): T | R => (typeof fn === "function" ? fn(arg) : fn);
+
+export function safeCall<T, R>(fn: (arg: T) => R, arg: T): R;
+export function safeCall<T, R>(fn: T, arg: R): T;
+export function safeCall<T, R>(fn: (arg: T) => R, arg: T): T | R {
+  return typeof fn === "function" ? fn(arg) : fn;
+}
 
 const internalKey = "_szhsinMenu";
 export const getName = (component: Record<string, any | undefined>) => component[internalKey];
-export const defineName = (name: string, component: Record<string, any | undefined>) =>
-  Object.defineProperty(component, internalKey, { value: name });
+//export const defineName = <T extends any[]>(name: string, component: (...args: T) => JSX.Element) =>
+//  Object.defineProperty(component, internalKey, { value: name });
+
+export const defineName = (
+  name: string,
+  component: React.ForwardRefExoticComponent<React.PropsWithoutRef<MenuButtonProps> & React.RefAttributes<unknown>>,
+) => Object.defineProperty(component, internalKey, { value: name });
 
 export const mergeProps = (target: Record<string, any>, source: Record<string, any>) => {
   source &&

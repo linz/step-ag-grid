@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import { MenuState } from "../index";
 
 export const menuContainerClass = "szh-menu-container";
 export const menuClass = "szh-menu";
@@ -54,7 +55,7 @@ export const FocusPositions = Object.freeze({
   LAST: "last",
 });
 
-export const MenuStateMap: Record<string, string | undefined> = Object.freeze({
+export const MenuStateMap: Record<string, MenuState> = Object.freeze({
   entering: "opening",
   entered: "open",
   exiting: "closing",

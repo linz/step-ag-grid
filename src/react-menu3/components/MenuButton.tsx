@@ -1,34 +1,34 @@
-// @ts-nocheck
-/* eslint-disable */
-import { forwardRef, useMemo } from "react";
-import { bool } from "prop-types";
+import { forwardRef, ReactNode, useMemo } from "react";
 import { useBEM } from "../hooks";
-import { defineName, menuButtonClass, stylePropTypes } from "../utils";
+import { menuButtonClass } from "../utils";
+import { BaseProps, MenuButtonModifiers } from "../index";
 
-export const MenuButton = defineName(
-  "MenuButton",
-  forwardRef(function MenuButton({ className, isOpen, disabled, children, ...restProps }, ref) {
-    const modifiers = useMemo(() => ({ open: isOpen }), [isOpen]);
+export interface MenuButtonProps extends BaseProps<MenuButtonModifiers> {
+  disabled?: boolean;
+  children?: ReactNode;
 
-    return (
-      <button
-        aria-haspopup
-        aria-expanded={isOpen}
-        aria-disabled={disabled || undefined}
-        type="button"
-        disabled={disabled}
-        {...restProps}
-        ref={ref}
-        className={useBEM({ block: menuButtonClass, modifiers, className })}
-      >
-        {children}
-      </button>
-    );
-  }),
-);
+  // FIXME Matt added, seems to be an internal thing
+  isOpen: boolean;
+}
 
-MenuButton.propTypes = {
-  ...stylePropTypes(),
-  isOpen: bool,
-  disabled: bool,
-};
+export const MenuButton = forwardRef(function MenuButton(
+  { className, isOpen, disabled, children, ...restProps }: MenuButtonProps,
+  ref,
+) {
+  const modifiers = useMemo(() => ({ open: isOpen }), [isOpen]);
+
+  return (
+    <button
+      aria-haspopup
+      aria-expanded={isOpen}
+      aria-disabled={disabled || undefined}
+      type="button"
+      disabled={disabled}
+      {...restProps}
+      ref={ref}
+      className={useBEM({ block: menuButtonClass, modifiers, className })}
+    >
+      {children}
+    </button>
+  );
+});

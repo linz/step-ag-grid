@@ -1,12 +1,64 @@
-// @ts-nocheck
-/* eslint-disable */
-import { forwardRef, useMemo } from "react";
+import { forwardRef, ReactNode, useMemo } from "react";
 import { any, string, func } from "prop-types";
 import { useBEM } from "../hooks";
 import { stylePropTypes, menuClass, radioGroupClass, RadioGroupContext } from "../utils";
+import { BaseProps, Event, EventHandler } from "../index";
 
+export interface RadioChangeEvent extends Event {
+  /**
+   * The `name` prop passed to the `MenuRadioGroup` when the menu item is in a radio group.
+   */
+  name?: string;
+  /**
+   * Set this property on event object to control whether to keep menu open after menu item is activated.
+   * Leaving it `undefined` will behave in accordance with WAI-ARIA Authoring Practices.
+   */
+  keepOpen?: boolean;
+  /**
+   * Setting this property on event object to `true` will skip `onItemClick` event on root menu component.
+   */
+  stopPropagation?: boolean;
+  /**
+   * DOM event object (React synthetic event)
+   */
+  syntheticEvent: MouseEvent | KeyboardEvent;
+}
+
+export interface ClickEvent extends RadioChangeEvent {
+  /**
+   * Indicates if the menu item is checked, only for `MenuItem` type="checkbox".
+   */
+  checked?: boolean;
+}
+
+//
+// MenuRadioGroup
+// ----------------------------------------------------------------------
+export interface MenuRadioGroupProps extends BaseProps {
+  /**
+   * Optionally set the radio group name.
+   *
+   * The name will be passed to the `onRadioChange` event.
+   * It's useful for identifying radio groups if you attach the same event handler to multiple groups.
+   */
+  name?: string;
+  /**
+   * Set value of the radio group.
+   *
+   * The child menu item which has the same value (strict equality ===) as the
+   * radio group is marked as checked.
+   */
+  value?: any;
+  children?: ReactNode;
+  /**
+   * Event fired when a child menu item is clicked (selected).
+   */
+  onRadioChange?: EventHandler<RadioChangeEvent>;
+}
+
+//NamedExoticComponent<MenuRadioGroupProps>
 export const MenuRadioGroup = forwardRef(function MenuRadioGroup(
-  { "aria-label": ariaLabel, className, name, value, onRadioChange, ...restProps },
+  { "aria-label": ariaLabel, className, name, value, onRadioChange, ...restProps }: MenuRadioGroupProps,
   externalRef,
 ) {
   const contextValue = useMemo(() => ({ name, value, onRadioChange }), [name, value, onRadioChange]);
