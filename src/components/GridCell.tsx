@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useState } from "react";
+import { ForwardedRef, forwardRef, useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
 import { UpdatingContext } from "@contexts/UpdatingContext";
 import { GridContext } from "@contexts/GridContext";
@@ -77,8 +77,9 @@ interface GenericCellEditorICellEditorParams<RowType extends GridBaseRow, FormPr
   colDef: GenericCellEditorColDef<RowType, FormProps>;
 }
 
-export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
+export const GenericCellEditorComponentFr = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
   props: GenericCellEditorICellEditorParams<RowType, FormProps>,
+  _: ForwardedRef<any>,
 ) => {
   const { updatingCells, getSelectedRows } = useContext(GridContext);
 
@@ -123,3 +124,5 @@ export const GenericCellEditorComponent = <RowType extends GridBaseRow, FormProp
     </>
   );
 };
+
+export const GenericCellEditorComponent = forwardRef(GenericCellEditorComponentFr);
