@@ -37,6 +37,7 @@ export { GridFormTextInput } from "./src/components/gridForm/GridFormTextInput";
 
 export { TextAreaInput } from "./src/lui/TextAreaInput";
 export { TextInputFormatted } from "./src/lui/TextInputFormatted";
+export { GridSubComponentTextArea } from "./src/components/GridSubComponentTextArea"
 
 export * from "./src/utils/bearing";
 export * from "./src/utils/util";
