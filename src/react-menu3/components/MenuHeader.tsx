@@ -1,11 +1,10 @@
-import { memo, forwardRef, ForwardedRef, ReactNode } from "react";
+import { memo, forwardRef, ForwardedRef } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuHeaderClass } from "../utils";
-import { BaseProps } from "../types";
+import { BasePropsWithChildren } from "../types";
 
 export const MenuHeaderFr = (
-  // STRANGE baseprops excludes children, so I had to add it back here
-  { className, ...restProps }: BaseProps & { children?: JSX.Element },
+  { className, ...restProps }: BasePropsWithChildren,
   externalRef: ForwardedRef<HTMLLIElement>,
 ) => {
   return (

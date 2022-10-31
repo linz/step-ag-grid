@@ -31,6 +31,14 @@ export interface BaseProps<M = undefined> extends Omit<React.HTMLAttributes<HTML
   className?: ClassNameProp<M>;
 }
 
+export interface BasePropsWithChildren<M = undefined> extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
+  ref?: React.Ref<any>;
+  /**
+   * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
+   */
+  className?: ClassNameProp<M>;
+}
+
 export interface Event {
   /**
    * The `value` prop passed to the `MenuItem` being clicked.
