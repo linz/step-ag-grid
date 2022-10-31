@@ -6,6 +6,8 @@ import { GenericMultiEditCellClass } from "./GenericCellClass";
 import { GenericCellRendererParams, GridRendererGenericCell } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
+import { GridIcon } from "@components/GridIcon";
+import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 export interface GridFormProps<RowType extends GridBaseRow> {
   cellEditorParams: ICellEditorParams;
@@ -30,21 +32,26 @@ export interface GenericCellEditorColDef<
   cellRendererParams?: GenericCellRendererParams<RowType>;
 }
 
-export const GridCellRenderer = (cellRendererParams: ICellRendererParams) => {
+export const GridCellRenderer = (props: ICellRendererParams) => {
   const { checkUpdating } = useContext(UpdatingContext);
-  const colDef = cellRendererParams.colDef;
+  const colDef = props.colDef as ColDef;
 
-  return colDef?.cellRendererParams?.oldCellRenderer ? (
-    <GridLoadableCell
-      isLoading={checkUpdating(
-        cellRendererParams.colDef?.field ?? cellRendererParams.colDef?.colId ?? "",
-        cellRendererParams.data.id,
-      )}
-    >
-      <colDef.cellRendererParams.oldCellRenderer {...cellRendererParams} />
+  const rendererParams = colDef.cellRendererParams as GenericCellRendererParams<any> | undefined;
+  const warningFn = rendererParams?.warning;
+  const warningText = warningFn ? warningFn(props) : undefined;
+  const infoFn = rendererParams?.info;
+  const infoText = infoFn ? infoFn(props) : undefined;
+
+  return colDef?.cellRendererParams?.originalCellRenderer ? (
+    <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
+      <>
+        {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
+        {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}
+        <colDef.cellRendererParams.originalCellRenderer {...props} />
+      </>
     </GridLoadableCell>
   ) : (
-    <GridRendererGenericCell {...cellRendererParams} />
+    <GridRendererGenericCell {...props} />
   );
 };
 
@@ -55,7 +62,6 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
   props: GenericCellEditorColDef<RowType, FormProps>,
 ): ColDef => {
   return {
-    cellRenderer: GridCellRenderer,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(props.cellEditorParams && {
@@ -63,9 +69,16 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
       editable: true,
       cellEditor: GenericCellEditorComponent,
     }),
+    // Default value formatter, otherwise react freaks out on objects
+    valueFormatter: (params: ValueFormatterParams) => {
+      const types = ["number", "undefined", "boolean", "string"];
+      if (types.includes(typeof params.value)) return params.value;
+      else return JSON.stringify(params.value);
+    },
     ...props,
+    cellRenderer: GridCellRenderer,
     cellRendererParams: {
-      originalCellRender: props.cellRenderer,
+      originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
     },
   };

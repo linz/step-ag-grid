@@ -20,21 +20,22 @@ export interface GenericCellColDef<RowType extends GridBaseRow, FormProps extend
 
 export interface GenericCellRendererParams<RowType extends GridBaseRow> {
   singleClickEdit?: boolean;
-  warning?: (props: RowICellRendererParams<RowType>) => string | boolean | undefined;
-  info?: (props: RowICellRendererParams<RowType>) => string | boolean | undefined;
+  warning?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
+  info?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
 }
 
 export const GridRendererGenericCell = <RowType extends GridBaseRow>(props: ICellRendererParams): JSX.Element => {
   const { checkUpdating } = useContext(UpdatingContext);
 
-  const cellRendererParams = props.colDef?.cellRendererParams as GenericCellRendererParams<RowType> | undefined;
+  const colDef = props.colDef as ColDef;
+  const cellRendererParams = colDef.cellRendererParams as GenericCellRendererParams<RowType> | undefined;
   const warningFn = cellRendererParams?.warning;
   const warningText = warningFn ? warningFn(props) : undefined;
   const infoFn = cellRendererParams?.info;
   const infoText = infoFn ? infoFn(props) : undefined;
 
   const defaultFormatter = (props: ValueFormatterParams): string => props.value;
-  const formatter = props.colDef?.valueFormatter ?? defaultFormatter;
+  const formatter = colDef.valueFormatter ?? defaultFormatter;
   if (typeof formatter === "string") {
     console.error("valueFormatter must be a function");
     return <span>valueFormatter must be a function</span>;
@@ -42,7 +43,7 @@ export const GridRendererGenericCell = <RowType extends GridBaseRow>(props: ICel
   const formatted = formatter(props as ValueFormatterParams);
 
   return (
-    <GridLoadableCell isLoading={checkUpdating(props.colDef?.field ?? props.colDef?.colId ?? "", props.data.id)}>
+    <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
       <>
         {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
         {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}
