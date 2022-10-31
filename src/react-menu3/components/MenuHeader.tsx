@@ -1,9 +1,13 @@
-import { memo, forwardRef, ForwardedRef } from "react";
+import { memo, forwardRef, ForwardedRef, ReactNode } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuHeaderClass } from "../utils";
 import { BaseProps } from "../types";
 
-export const MenuHeaderFr = ({ className, ...restProps }: BaseProps, externalRef: ForwardedRef<HTMLLIElement>) => {
+export const MenuHeaderFr = (
+  // STRANGE baseprops excludes children, so I had to add it back here
+  { className, ...restProps }: BaseProps & { children?: JSX.Element },
+  externalRef: ForwardedRef<HTMLLIElement>,
+) => {
   return (
     <li
       role="presentation"
