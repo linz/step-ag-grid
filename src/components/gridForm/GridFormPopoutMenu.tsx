@@ -22,6 +22,7 @@ export interface MenuOption<RowType> {
   action?: (selectedRows: RowType[]) => Promise<boolean>;
   disabled?: string | boolean;
   supportsMultiEdit: boolean;
+  hidden?: boolean;
 }
 
 /**
@@ -76,6 +77,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
           item.label === MenuSeparator ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
+            !item.hidden &&
             <MenuItem
               key={`${item.label}`}
               onClick={() => actionClick(item)}

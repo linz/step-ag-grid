@@ -86,7 +86,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridPopoverMenu<ITestRow>({
         headerName: "Menu",
         cellEditorParams: {
-          options: async () => {
+          options: async (selectedItems) => {
             // Just doing a timeout here to demonstrate deferred loading
             await wait(500);
             return [
@@ -111,6 +111,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
               {
                 label: "Disabled item",
                 disabled: "Disabled for test",
+                supportsMultiEdit: true,
+              },
+              {
+                label: "Developer Only",
+                hidden: selectedItems.some(x=> x.position != "Developer"),
                 supportsMultiEdit: true,
               },
             ];
