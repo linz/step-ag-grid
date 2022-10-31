@@ -397,7 +397,7 @@ export interface ControlledMenuProps extends RootMenuProps, ExtraMenuProps {
    *
    * *Don't set this prop for context menu*
    */
-  anchorRef?: React.MutableRefObject<HTMLElement>;
+  anchorRef?: React.RefObject<Element>;
   skipOpen?: React.MutableRefObject<boolean>;
   /**
    * If `true`, the menu list element will gain focus after menu is open.

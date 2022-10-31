@@ -8,7 +8,7 @@ interface positionMenuProps {
   offsetX: number;
   offsetY: number;
   arrowRef: MutableRefObject<HTMLDivElement | null>;
-  anchorRef: MutableRefObject<HTMLElement | null>;
+  anchorRef: MutableRefObject<Element | null>;
   arrow?: boolean;
   direction: MenuDirection;
   position: "auto" | "anchor" | "initial";
