@@ -236,7 +236,7 @@ export const ControlledMenuFr = (
     </div>
   );
 
-  if (portal === true && anchorRef?.current !== undefined) {
+  if (portal === true && anchorRef?.current != null) {
     portal = { target: anchorRef.current.ownerDocument.body } as PortalFieldType;
   }
 

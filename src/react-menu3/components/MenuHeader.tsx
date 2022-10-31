@@ -1,9 +1,12 @@
 import { memo, forwardRef, ForwardedRef } from "react";
 import { useBEM } from "../hooks";
 import { menuClass, menuHeaderClass } from "../utils";
-import { BaseProps } from "../types";
+import { BasePropsWithChildren } from "../types";
 
-export const MenuHeaderFr = ({ className, ...restProps }: BaseProps, externalRef: ForwardedRef<HTMLLIElement>) => {
+export const MenuHeaderFr = (
+  { className, ...restProps }: BasePropsWithChildren,
+  externalRef: ForwardedRef<HTMLLIElement>,
+) => {
   return (
     <li
       role="presentation"

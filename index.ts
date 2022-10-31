@@ -1,3 +1,6 @@
+export * from "./src/react-menu3/index";
+export * from "./src/react-menu3/types";
+
 export { UpdatingContext } from "./src/contexts/UpdatingContext";
 export { UpdatingContextProvider } from "./src/contexts/UpdatingContextProvider";
 export { GridContext } from "./src/contexts/GridContext";
@@ -37,9 +40,7 @@ export { GridFormTextInput } from "./src/components/gridForm/GridFormTextInput";
 
 export { TextAreaInput } from "./src/lui/TextAreaInput";
 export { TextInputFormatted } from "./src/lui/TextInputFormatted";
-export { GridSubComponentTextArea } from "./src/components/GridSubComponentTextArea"
+export { GridSubComponentTextArea } from "./src/components/GridSubComponentTextArea";
 
 export * from "./src/utils/bearing";
 export * from "./src/utils/util";
-
-export * from "./src/react-menu3/index";
