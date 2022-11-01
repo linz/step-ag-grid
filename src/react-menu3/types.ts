@@ -377,6 +377,10 @@ export interface RootMenuProps extends BaseMenuProps, MenuStateOptions {
    * Event fired when descendent menu items are clicked.
    */
   onItemClick?: EventHandler<ClickEvent>;
+  /**
+   * NEW Don't shrink container if menu direction is "top"
+   */
+  dontShrinkIfDirectionIsTop?: boolean;
 }
 
 export interface ExtraMenuProps {

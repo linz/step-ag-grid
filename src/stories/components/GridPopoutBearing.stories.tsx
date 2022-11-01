@@ -67,7 +67,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Bearing Correction",
         cellEditorParams: {
           multiEdit: true,
-          placeHolder: "Enter Bearing",
+          placeHolder: "Enter Bearing Correction",
           onSave: async (selectedRows: ITestRow[], value: ITestRow["bearingCorrection"]) => {
             await wait(1000);
             selectedRows.forEach((row) => (row["bearingCorrection"] = value));
