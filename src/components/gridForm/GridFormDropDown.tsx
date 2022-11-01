@@ -163,7 +163,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         }
       }
     },
-    [filteredValues, options, selectItemHandler, stopEditing],
+    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, formProps],
   );
 
   return popoverWrapper(
