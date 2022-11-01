@@ -97,7 +97,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           cellEditorParams: {
             form: GridFormDropDown,
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-            multiEdit: false
+            multiEdit: false,
           },
         }),
         GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>({
@@ -191,13 +191,12 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
-            onSelectedItem: async (selected)=>{
-              selected.selectedRows.forEach(row => row.code = selected.value.code)
+            onSelectedItem: async (selected) => {
+              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
             },
             onSelectFilter: async (selected) => {
-              selected.selectedRows.forEach(row => row.code = selected.value)
+              selected.selectedRows.forEach((row) => (row.code = selected.value));
             },
-
           },
         }),
       ] as ColDef[],
@@ -213,7 +212,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           position2: "1",
           position3: "Tester",
           position4: { code: "O1", desc: "Object One" },
-          code: "O1"
+          code: "O1",
         },
         {
           id: 1001,
@@ -221,7 +220,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           position2: "2",
           position3: "Developer",
           position4: { code: "O2", desc: "Object Two" },
-          code: "O2"
+          code: "O2",
         },
       ] as ITestRow[],
     [],

@@ -115,7 +115,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
               },
               {
                 label: "Developer Only",
-                hidden: selectedItems.some(x=> x.position != "Developer"),
+                hidden: selectedItems.some((x) => x.position != "Developer"),
                 supportsMultiEdit: true,
               },
             ];

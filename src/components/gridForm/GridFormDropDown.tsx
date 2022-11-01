@@ -78,7 +78,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
       });
     },
     [formProps, props.field, props.selectedRows, updatingCells],
-  )
+  );
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -154,7 +154,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         if (activeOptions.length == 1) {
           await selectItemHandler(activeOptions[0].value);
           stopEditing();
-        } else if(formProps.onSelectFilter){
+        } else if (formProps.onSelectFilter) {
           await selectFilterHandler(filter);
           stopEditing();
         } else {
