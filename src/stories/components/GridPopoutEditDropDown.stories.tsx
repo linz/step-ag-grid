@@ -96,7 +96,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           cellEditorParams: {
             form: GridFormDropDown,
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-            multiEdit: false,
+            multiEdit: false
           },
         }),
         GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>({
@@ -160,6 +160,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+            canSelectFilterInput:true
           },
         }),
         GridPopoverEditDropDown<ITestRow, ITestRow["position4"]>({
