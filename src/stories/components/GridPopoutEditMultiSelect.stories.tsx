@@ -45,6 +45,12 @@ interface ITestRow {
 const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
+  const postionMap: Record<string, string> = {
+    "1": "One",
+    "2": "Two",
+    "3": "Three",
+  };
+
   const columnDefs = useMemo(
     () =>
       [
@@ -76,6 +82,26 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
                 subComponent: (props) => <GridSubComponentTextArea {...props} />,
               },
             ],
+            onSave: async (result: MultiSelectResult<ITestRow>) => {
+              // eslint-disable-next-line no-console
+              console.log(result);
+              await wait(1000);
+              return true;
+            },
+          },
+        }),
+        GridPopoutEditMultiSelect<ITestRow, ITestRow["position2"]>({
+          field: "position2",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Inital editor values ",
+          valueGetter: (props) => postionMap[props.data.position2],
+          cellEditorParams: {
+            multiEdit: false,
+            filtered: true,
+            filterPlaceholder: "Filter position",
+            initialSelectedValues: (selectedRows) => [selectedRows[0].position2],
+            options: Object.entries(postionMap).map(([k, v]) => ({ value: k, label: v })),
             onSave: async (result: MultiSelectResult<ITestRow>) => {
               // eslint-disable-next-line no-console
               console.log(result);
