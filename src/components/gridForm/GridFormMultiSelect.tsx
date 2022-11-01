@@ -33,6 +33,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+  initialSelectedValues?: any[];
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
@@ -44,6 +45,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>([]);
+
+  if (formProps.initialSelectedValues) {
+    setSelectedValues(formProps.initialSelectedValues);
+  }
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
