@@ -24,26 +24,38 @@ export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
 
 export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormEditBearingProps<RowType>>,
-) => ({
-  ...GridPopoverEditBearingLike(colDef),
-  valueFormatter: bearingValueFormatter,
-  range: (value: number | null) => {
-    if (value === null) return "Bearing is required";
-    if (value >= 360) return "Bearing must be less than 360 degrees";
-    if (value < 0) return "Bearing must not be negative";
-    return null;
-  },
-});
+) => {
+  const init = GridPopoverEditBearingLike(colDef);
+  return {
+    ...init,
+    valueFormatter: bearingValueFormatter,
+    cellEditorParams: {
+      ...init.cellEditorParams,
+      range: (value: number | null) => {
+        if (value === null) return "Bearing is required";
+        if (value >= 360) return "Bearing must be less than 360 degrees";
+        if (value < 0) return "Bearing must not be negative";
+        return null;
+      },
+    },
+  };
+};
 
 export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType, GridFormEditBearingProps<RowType>>,
-) => ({
-  ...GridPopoverEditBearingLike(colDef),
-  valueFormatter: bearingCorrectionValueFormatter,
-  range: (value: number | null) => {
-    if (value === null) return "Bearing is required";
-    if (value >= 360) return "Bearing must be less than 360 degrees";
-    if (value <= -180) return "Bearing must be greater then -180 degrees";
-    return null;
-  },
-});
+) => {
+  const init = GridPopoverEditBearingLike(colDef);
+  return {
+    ...init,
+    valueFormatter: bearingCorrectionValueFormatter,
+    cellEditorParams: {
+      ...init.cellEditorParams,
+      range: (value: number | null) => {
+        if (value === null) return "Bearing is required";
+        if (value >= 360) return "Bearing must be less than 360 degrees";
+        if (value <= -180) return "Bearing must be greater then -180 degrees";
+        return null;
+      },
+    },
+  };
+};

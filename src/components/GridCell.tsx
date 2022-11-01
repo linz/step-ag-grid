@@ -13,6 +13,7 @@ export interface GridFormProps<RowType extends GridBaseRow> {
   cellEditorParams: ICellEditorParams;
   updateValue: (saveFn: (selectedRows: RowType[]) => Promise<boolean>) => Promise<boolean>;
   saving: boolean;
+  data: RowType;
   value: any;
   field: string | undefined;
   selectedRows: RowType[];

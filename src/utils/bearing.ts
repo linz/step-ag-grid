@@ -39,7 +39,6 @@ export const bearingStringValidator = (
   }
 
   const bearing = parseFloat(value);
-
   return customValidate ? customValidate(bearing) : null;
 };
 

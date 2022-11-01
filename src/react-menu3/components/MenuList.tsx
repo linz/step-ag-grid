@@ -47,6 +47,7 @@ export const MenuList = ({
   endTransition,
   isDisabled,
   menuItemFocus,
+  dontShrinkIfDirectionIsTop,
   offsetX = 0,
   offsetY = 0,
   children,
@@ -417,6 +418,23 @@ export const MenuList = ({
     className: arrowClassName,
   });
 
+  const minHeight = useRef(0);
+  if (dontShrinkIfDirectionIsTop && menuRef.current?.getBoundingClientRect) {
+    const h = menuRef.current?.getBoundingClientRect().height;
+    if (minHeight.current < h) minHeight.current = h;
+  }
+
+  const dontShrinkOps = useMemo(
+    () =>
+      expandedDirection === "top" && dontShrinkIfDirectionIsTop
+        ? {
+            overflowY: isSubmenuOpen ? "" : "auto",
+            minHeight: (isSubmenuOpen ? 0 : minHeight.current) + "px",
+          }
+        : undefined,
+    [dontShrinkIfDirectionIsTop, expandedDirection, isSubmenuOpen],
+  );
+
   return (
     <ul
       role="menu"
@@ -428,6 +446,7 @@ export const MenuList = ({
       style={{
         ...menuStyle,
         ...overflowStyle,
+        ...dontShrinkOps,
         margin: 0,
         display: state === "closed" ? "none" : undefined,
         position: "absolute",

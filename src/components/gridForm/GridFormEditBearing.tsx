@@ -55,7 +55,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
           maxLength: 16,
           onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
         }}
-        formatted={bearingStringValidator(value) ? "?" : convertDDToDMS(bearingNumberParser(value))}
+        formatted={bearingStringValidator(value, formProps.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
         error={bearingStringValidator(value, formProps.range)}
       />
     </div>,
