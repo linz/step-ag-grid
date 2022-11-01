@@ -49,6 +49,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
     async (selectedRows: RowType[]): Promise<boolean> => {
       const values: Record<string, any> = selectedValues.reduce((previousValue, value) => {
         previousValue[value] = subSelectedValues.current[value] ?? true;
+        return previousValue;
       }, {});
       if (formProps.onSave) {
         return await formProps.onSave({ selectedRows, values });
