@@ -12,7 +12,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   selectedRows: RowType[];
-  value: ValueType | string;
+  value: ValueType;
 }
 
 interface FinalSelectOption<ValueType> {
@@ -30,8 +30,8 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
   extends GenericCellEditorParams<RowType> {
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
-  filterInputSelectable?:boolean;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
+  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType, string>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
@@ -50,7 +50,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[] | null>(null);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType | string): Promise<boolean> => {
+    async (value: ValueType): Promise<boolean> => {
       const field = props.field;
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
@@ -66,6 +66,19 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
     },
     [formProps, props.field, props.selectedRows, updatingCells],
   );
+
+  const selectFilterHandler = useCallback(
+    async (value: string): Promise<boolean> => {
+      const field = props.field;
+      return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
+        if (formProps.onSelectFilter) {
+          await formProps.onSelectFilter({ selectedRows, value });
+        }
+        return true;
+      });
+    },
+    [formProps, props.field, props.selectedRows, updatingCells],
+  )
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -141,8 +154,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         if (activeOptions.length == 1) {
           await selectItemHandler(activeOptions[0].value);
           stopEditing();
-        } else if(formProps.filterInputSelectable){
-          await selectItemHandler(filter);
+        } else if(formProps.onSelectFilter){
+          await selectFilterHandler(filter);
           stopEditing();
         } else {
           e.preventDefault();
