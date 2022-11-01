@@ -31,6 +31,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
+  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType, string>) => Promise<void>;
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
@@ -59,6 +60,19 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
           } else {
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
+        }
+        return true;
+      });
+    },
+    [formProps, props.field, props.selectedRows, updatingCells],
+  );
+
+  const selectFilterHandler = useCallback(
+    async (value: string): Promise<boolean> => {
+      const field = props.field;
+      return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
+        if (formProps.onSelectFilter) {
+          await formProps.onSelectFilter({ selectedRows, value });
         }
         return true;
       });
@@ -140,13 +154,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         if (activeOptions.length == 1) {
           await selectItemHandler(activeOptions[0].value);
           stopEditing();
+        } else if (formProps.onSelectFilter) {
+          await selectFilterHandler(filter);
+          stopEditing();
         } else {
           e.preventDefault();
           e.stopPropagation();
         }
       }
     },
-    [filteredValues, options, selectItemHandler, stopEditing],
+    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, formProps],
   );
 
   return popoverWrapper(

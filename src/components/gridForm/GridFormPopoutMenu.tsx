@@ -77,15 +77,16 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
           item.label === MenuSeparator ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
-            !item.hidden &&
-            <MenuItem
-              key={`${item.label}`}
-              onClick={() => actionClick(item)}
-              disabled={!!item.disabled || !filteredOptions?.includes(item)}
-              title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-            >
-              {item.label as JSX.Element | string}
-            </MenuItem>
+            !item.hidden && (
+              <MenuItem
+                key={`${item.label}`}
+                onClick={() => actionClick(item)}
+                disabled={!!item.disabled || !filteredOptions?.includes(item)}
+                title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+              >
+                {item.label as JSX.Element | string}
+              </MenuItem>
+            )
           ),
         )}
       </div>

@@ -44,6 +44,7 @@ interface ITestRow {
   position2: string | null;
   position3: string | null;
   position4: ICode | null;
+  code: string | null;
 }
 
 interface ICode {
@@ -177,6 +178,27 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             }),
           },
         }),
+        GridPopoverEditDropDown<ITestRow, ICode>({
+          field: "code",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Filter Selectable",
+          valueGetter: (params) => params.data.code,
+          cellEditorParams: {
+            multiEdit: true,
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: optionsObjects.map((o) => {
+              return { value: o, label: o.desc, disabled: false };
+            }),
+            onSelectedItem: async (selected) => {
+              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
+            },
+            onSelectFilter: async (selected) => {
+              selected.selectedRows.forEach((row) => (row.code = selected.value));
+            },
+          },
+        }),
       ] as ColDef[],
     [optionsFn, optionsObjects],
   );
@@ -190,6 +212,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           position2: "1",
           position3: "Tester",
           position4: { code: "O1", desc: "Object One" },
+          code: "O1",
         },
         {
           id: 1001,
@@ -197,6 +220,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           position2: "2",
           position3: "Developer",
           position4: { code: "O2", desc: "Object Two" },
+          code: "O2",
         },
       ] as ITestRow[],
     [],
