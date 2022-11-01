@@ -33,22 +33,24 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
-  initialSelectedValues?: any[];
+  initialSelectedValues?: (props: GridFormProps<RowType>) => any[];
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
   const formProps = props.formProps as GridFormMultiSelectProps<RowType, ValueType>;
+  let initValues = [];
+  console.log("here 1 yalc");
+  if (formProps.initialSelectedValues) {
+    initValues = formProps.initialSelectedValues(props);
+  }
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
-  const [selectedValues, setSelectedValues] = useState<any[]>([]);
+  const [selectedValues, setSelectedValues] = useState<any[]>(initValues);
 
-  if (formProps.initialSelectedValues) {
-    setSelectedValues(formProps.initialSelectedValues);
-  }
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
