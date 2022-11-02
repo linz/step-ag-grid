@@ -4,7 +4,7 @@ import "./GridTheme.scss";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AgGridEvent, CellClickedEvent, ColDef } from "ag-grid-community";
+import { CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
@@ -28,7 +28,7 @@ export interface GridProps {
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   onGridReady?: GridOptions["onGridReady"];
-  defaultColDef: GridOptions["defaultColDef"];
+  defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: GridOptions["columnDefs"];
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
@@ -38,8 +38,15 @@ export interface GridProps {
  * Wrapper for AgGrid to add commonly used functionality.
  */
 export const Grid = (params: GridProps): JSX.Element => {
-  const { gridReady, setGridApi, setQuickFilter, ensureRowVisible, selectRowsById, ensureSelectedRowIsVisible } =
-    useContext(GridContext);
+  const {
+    gridReady,
+    setGridApi,
+    setQuickFilter,
+    ensureRowVisible,
+    selectRowsById,
+    ensureSelectedRowIsVisible,
+    sizeColumnsToFit,
+  } = useContext(GridContext);
   const { checkUpdating } = useContext(UpdatingContext);
 
   const [internalQuickFilter, setInternalQuickFilter] = useState("");
@@ -156,15 +163,6 @@ export const Grid = (params: GridProps): JSX.Element => {
     [params.noRowsOverlayText],
   );
 
-  const sizeColumnsToFit = useCallback((event: AgGridEvent) => {
-    // @ts-ignore (gridBodyCtrl is private)
-    if (event.api.gridBodyCtrl == undefined) {
-      return;
-      // this is here because ag grid was throwing api undefined error when closing POPPED OUT panel
-    }
-    event.api.sizeColumnsToFit();
-  }, []);
-
   const refreshSelectedRows = useCallback((event: CellEvent): void => {
     // Force-refresh all selected rows to re-run class function, to update selection highlighting
     event.api.refreshCells({
@@ -226,6 +224,13 @@ export const Grid = (params: GridProps): JSX.Element => {
     },
     [refreshSelectedRows],
   );
+
+  // When rows added or removed then resize columns
+  useEffect(() => {
+    if (columnDefs?.length) {
+      sizeColumnsToFit();
+    }
+  }, [columnDefs?.length, sizeColumnsToFit]);
 
   return (
     <div
