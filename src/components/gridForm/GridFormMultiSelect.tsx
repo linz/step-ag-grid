@@ -8,17 +8,15 @@ import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
+import { MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
 
-interface FinalSelectOption<ValueType> {
+interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
   label?: JSX.Element | string;
   subComponent?: (props: any, ref: any) => any;
 }
 
-export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
-export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
-
-export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
+export type MultiSelectOption<ValueType> = ValueType | MultiFinalSelectOption<ValueType>;
 
 export interface MultiSelectResult<RowType> {
   selectedRows: RowType[];
@@ -31,8 +29,8 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
   options:
-    | SelectOption<ValueType>[]
-    | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+    | MultiSelectOption<ValueType>[]
+    | ((selectedRows: RowType[]) => Promise<MultiSelectOption<ValueType>[]> | MultiSelectOption<ValueType>[]);
   initialSelectedValues?: (selectedRows: RowType[]) => any[];
 }
 
@@ -42,7 +40,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
-  const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
+  const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>(() =>
     formProps.initialSelectedValues ? formProps.initialSelectedValues(props.selectedRows) : [],
@@ -75,10 +73,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
 
       const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
-          item = { value: item as ValueType, label: item } as FinalSelectOption<ValueType>;
+          item = { value: item as ValueType, label: item } as MultiFinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      }) as any as MultiFinalSelectOption<ValueType>[];
 
       if (formProps.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
