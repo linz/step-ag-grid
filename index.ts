@@ -8,7 +8,7 @@ export * from "./src/contexts/GridContextProvider";
 
 export type { GridBaseRow } from "./src/components/Grid";
 export { Grid } from "./src/components/Grid";
-export { GridCell } from "./src/components/GridCell";
+export * from "./src/components/GridCell";
 export { GridIcon } from "./src/components/GridIcon";
 export { ComponentLoadingWrapper } from "./src/components/ComponentLoadingWrapper";
 export { GenericMultiEditCellClass } from "./src/components/GenericCellClass";

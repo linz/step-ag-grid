@@ -9,7 +9,7 @@ import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { GridCell } from "@components/GridCell";
 import { IFormTestRow } from "./FormTest";
-import { wait } from "@utils/util";
+import { isFloat, wait } from "@utils/util";
 import { GridPopoverTextArea } from "@components/gridPopoverEdit/GridPopoverTextArea";
 import { GridPopoverTextInput } from "@components/gridPopoverEdit/GridPopoverTextInput";
 
@@ -63,6 +63,30 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
       }),
+      GridPopoverTextInput<IFormTestRow>({
+        field: "distance",
+        headerName: "Number input",
+        maxWidth: 140,
+        valueFormatter: (params) => {
+          const v = params.data.distance;
+          return v != null ? `${v}${params.colDef.cellEditorParams.units}` : v;
+        },
+        cellEditorParams: {
+          maxlength: 12,
+          placeholder: "Enter distance...",
+          units: "m",
+          validate: (value: string) => {
+            if (value.length && !isFloat(value)) return "Value must be a number";
+            return null;
+          },
+          multiEdit: false,
+          onSave: async (selectedRows, value) => {
+            await wait(1000);
+            selectedRows.forEach((selectedRow) => (selectedRow["distance"] = value.length ? parseFloat(value) : null));
+            return true;
+          },
+        },
+      }),
       GridPopoverTextArea<IFormTestRow>({
         field: "plan",
         headerName: "Text area",
@@ -90,8 +114,8 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
   const rowData = useMemo(
     () =>
       [
-        { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345" },
-        { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523" },
+        { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345", distance: 10 },
+        { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523", distance: null },
       ] as IFormTestRow[],
     [],
   );

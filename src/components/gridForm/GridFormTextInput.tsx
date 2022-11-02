@@ -6,6 +6,7 @@ import { GridBaseRow } from "../Grid";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
   placeholder?: string;
+  units?: string;
   required?: boolean;
   maxlength?: number;
   width?: string | number;
@@ -15,17 +16,19 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Gen
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
   const formProps = props.formProps as GridFormTextInputProps<RowType>;
-  const [value, setValue] = useState(props.value ?? "");
+  const initValue = props.value == null ? "" : `${props.value}`;
+  const [value, setValue] = useState(initValue);
 
   const invalid = useCallback(() => {
-    if (formProps.required && value.length == 0) {
+    const trimmedValue = value.trim();
+    if (formProps.required && trimmedValue.length == 0) {
       return `Some text is required`;
     }
-    if (formProps.maxlength && value.length > formProps.maxlength) {
+    if (formProps.maxlength && trimmedValue.length > formProps.maxlength) {
       return `Text must be no longer than ${formProps.maxlength} characters`;
     }
     if (formProps.validate) {
-      return formProps.validate(value);
+      return formProps.validate(trimmedValue);
     }
     return null;
   }, [formProps, value]);
@@ -33,11 +36,11 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
   const save = useCallback(
     async (selectedRows: any[]): Promise<boolean> => {
       if (invalid()) return false;
-
-      if (props.value === (value ?? "")) return true;
+      const trimmedValue = value.trim();
+      if (initValue === trimmedValue) return true;
 
       if (formProps.onSave) {
-        return await formProps.onSave(selectedRows, value);
+        return await formProps.onSave(selectedRows, trimmedValue);
       }
 
       const field = props.field;
@@ -45,10 +48,10 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
         console.error("ColDef has no field set");
         return false;
       }
-      selectedRows.forEach((row) => (row[field] = value));
+      selectedRows.forEach((row) => (row[field] = trimmedValue));
       return true;
     },
-    [invalid, props.value, props.field, value, formProps],
+    [invalid, value, initValue, formProps, props.field],
   );
   const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
 
@@ -58,7 +61,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
-        formatted={""}
+        formatted={formProps.units}
         inputProps={{
           style: { width: "100%" },
           placeholder: formProps.placeholder,

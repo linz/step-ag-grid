@@ -13,6 +13,7 @@ export interface IFormTestRow {
   nameType: string;
   numba: string;
   plan: string;
+  distance: number | null;
 }
 
 export const FormTest = <RowType extends GridBaseRow>(props: GridFormProps<RowType>): JSX.Element => {

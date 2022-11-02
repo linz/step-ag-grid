@@ -14,9 +14,8 @@ export interface LuiTextInputProps {
   className?: string;
   value: string;
 
-  icon?: JSX.Element;
   placeholder?: string;
-  formatted: string;
+  formatted?: string;
 }
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
@@ -39,7 +38,6 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
           {...props.inputProps}
         />
         <span className={"LuiTextInput-formatted"}>{props.formatted}</span>
-        {props.icon}
       </span>
 
       {props.error && (
