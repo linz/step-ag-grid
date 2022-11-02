@@ -4,7 +4,7 @@ import { MenuItem, MenuDivider, FocusableItem, ClickEvent } from "@react-menu3";
 import { Fragment, useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay } from "lodash-es";
+import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
@@ -33,6 +33,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   options:
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+  initialSelectedValues?: (selectedRows: RowType[]) => any[];
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
@@ -43,16 +44,17 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
-  const [selectedValues, setSelectedValues] = useState<any[]>([]);
+  const [selectedValues, setSelectedValues] = useState<any[]>(() =>
+    formProps.initialSelectedValues ? formProps.initialSelectedValues(props.selectedRows) : [],
+  );
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
-      const values: Record<string, any> = {};
-      selectedValues.forEach((value) => {
-        values[value] = subSelectedValues.current[value] ?? true;
-      });
+      const values: Record<string, any> = fromPairs(
+        selectedValues.map((value) => [value, subSelectedValues.current[value] ?? true]),
+      );
       if (formProps.onSave) {
-        return await formProps.onSave({ selectedRows, values: selectedValues });
+        return await formProps.onSave({ selectedRows, values });
       }
       return true;
     },
