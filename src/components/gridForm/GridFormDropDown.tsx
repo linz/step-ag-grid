@@ -25,9 +25,9 @@ export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
 export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
 export const MenuHeaderString = "_____MENU_HEADER_____";
-export const MenuHeaderItem = (title:string)=> {
-  return {label: title, value: MenuHeaderString }
-}
+export const MenuHeaderItem = (title: string) => {
+  return { label: title, value: MenuHeaderString };
+};
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 

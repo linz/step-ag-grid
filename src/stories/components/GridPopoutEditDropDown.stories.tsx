@@ -108,7 +108,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           cellEditorParams: {
             multiEdit: true,
             options: [
-              MenuHeaderItem("Something"),
+              MenuHeaderItem("Header"),
               {
                 value: "1",
                 label: "One",
