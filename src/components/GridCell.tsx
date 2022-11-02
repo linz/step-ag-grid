@@ -72,8 +72,9 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
     }),
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
-      const types = ["number", "undefined", "boolean", "string"];
-      if (types.includes(typeof params.value)) return params.value;
+      if (params.value == null) return "-";
+      const types = ["number", "boolean", "string"];
+      if (types.includes(typeof params.value)) return `${params.value}`;
       else return JSON.stringify(params.value);
     },
     ...props,
@@ -130,6 +131,7 @@ export const GenericCellEditorComponentFr = <RowType extends GridBaseRow, FormPr
           updateValue={updateValue}
           saving={saving}
           formProps={formProps}
+          data={data}
           value={value}
           field={field}
           selectedRows={selectedRows}
