@@ -220,6 +220,15 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
+  /**
+   * Resize columns to fit container
+   */
+  const sizeColumnsToFit = (): void => {
+    gridApiOp((gridApi) => {
+      gridApi.sizeColumnsToFit();
+    });
+  };
+
   const stopEditing = (): void => gridApiOp((gridApi) => gridApi.stopEditing());
 
   const updatingCells = async (
@@ -283,6 +292,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,
+        sizeColumnsToFit,
         stopEditing,
         updatingCells,
       }}

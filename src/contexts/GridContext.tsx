@@ -17,6 +17,7 @@ export interface GridContextType {
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   ensureRowVisible: (id: number) => void;
   ensureSelectedRowIsVisible: () => void;
+  sizeColumnsToFit: () => void;
   stopEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
@@ -67,6 +68,9 @@ export const GridContext = createContext<GridContextType>({
   },
   ensureSelectedRowIsVisible: () => {
     console.error("no context provider for ensureSelectedRowIsVisible");
+  },
+  sizeColumnsToFit: () => {
+    console.error("no context provider for sizeColumnsToFit");
   },
   editingCells: () => {
     console.error("no context provider for editingCells");

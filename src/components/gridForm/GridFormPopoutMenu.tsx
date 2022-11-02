@@ -11,7 +11,7 @@ export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends Ge
 }
 
 /** Menu configuration types **/
-export const MenuSeparator = Object.freeze({ __isMenuSeparator__: true });
+export const PopoutMenuSeparator = Object.freeze({ __isMenuSeparator__: true });
 
 interface MenuSeparatorType {
   __isMenuSeparator__: boolean;
@@ -66,7 +66,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
   const selectedRowCount = props.selectedRows.length;
 
   const filteredOptions = options?.filter((menuOption) => {
-    return menuOption.label === MenuSeparator || selectedRowCount === 1 || menuOption.supportsMultiEdit;
+    return menuOption.label === PopoutMenuSeparator || selectedRowCount === 1 || menuOption.supportsMultiEdit;
   });
 
   const { popoverWrapper } = useGridPopoverHook(props);
@@ -74,7 +74,7 @@ export const GridFormPopoutMenu = <RowType extends GridBaseRow>(props: GridFormP
     <ComponentLoadingWrapper loading={!filteredOptions}>
       <div className={"Grid-popoverContainerList"}>
         {options?.map((item, index) =>
-          item.label === MenuSeparator ? (
+          item.label === PopoutMenuSeparator ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
             !item.hidden && (

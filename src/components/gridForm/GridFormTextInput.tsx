@@ -10,7 +10,8 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Gen
   required?: boolean;
   maxlength?: number;
   width?: string | number;
-  validate?: (value: string) => string | null;
+  // Return null for ok, otherwise an error string
+  validate?: (value: string, data: RowType) => string | null;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
@@ -28,7 +29,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
       return `Text must be no longer than ${formProps.maxlength} characters`;
     }
     if (formProps.validate) {
-      return formProps.validate(trimmedValue);
+      return formProps.validate(trimmedValue, props.data);
     }
     return null;
   }, [formProps, value]);
