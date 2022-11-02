@@ -48,9 +48,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
       noApiFn = (() => {}) as () => R;
     }
     const gridApi = gridApiRef.current;
-    if (gridApi) return hasApiFn(gridApi);
-    console.error("GridApi not ready");
-    return noApiFn();
+    return gridApi ? hasApiFn(gridApi) : noApiFn();
   };
 
   /**

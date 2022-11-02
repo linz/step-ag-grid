@@ -44,7 +44,6 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
               saveButtonRef={saveButtonRef}
               menuClassName={"lui-menu"}
               onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
-              reposition={"initial"}
               viewScroll={"auto"}
               dontShrinkIfDirectionIsTop={true}
             >
