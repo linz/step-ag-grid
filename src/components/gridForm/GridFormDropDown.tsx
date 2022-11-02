@@ -1,6 +1,6 @@
 import "../../react-menu3/styles/index.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
+import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "@react-menu3";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
@@ -23,6 +23,11 @@ interface FinalSelectOption<ValueType> {
 
 export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
 export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
+
+export const MenuHeaderString = "_____MENU_HEADER_____";
+export const MenuHeaderItem = (title: string) => {
+  return { label: title, value: MenuHeaderString };
+};
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
@@ -197,6 +202,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
           {options?.map((item, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
+            ) : item.value === MenuHeaderString ? (
+              <MenuHeader>{item.label}</MenuHeader>
             ) : filteredValues.includes(item.value) ? null : (
               <MenuItem
                 key={`${props.field}-${index}`}
