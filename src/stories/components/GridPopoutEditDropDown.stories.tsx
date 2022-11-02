@@ -10,6 +10,7 @@ import { useCallback, useMemo, useState } from "react";
 import {
   GridFormDropDown,
   GridFormPopoutDropDownProps,
+  MenuHeaderItem,
   MenuSeparator,
   MenuSeparatorString,
 } from "@components/gridForm/GridFormDropDown";
@@ -107,6 +108,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           cellEditorParams: {
             multiEdit: true,
             options: [
+              MenuHeaderItem("Something"),
               {
                 value: "1",
                 label: "One",
