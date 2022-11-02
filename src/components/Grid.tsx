@@ -28,7 +28,7 @@ export interface GridProps {
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   onGridReady?: GridOptions["onGridReady"];
-  defaultColDef: GridOptions["defaultColDef"];
+  defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: GridOptions["columnDefs"];
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
