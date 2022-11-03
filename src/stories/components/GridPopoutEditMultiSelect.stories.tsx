@@ -3,7 +3,7 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
@@ -25,11 +25,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -58,56 +58,64 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>({
-        field: "position",
-        initialWidth: 65,
-        maxWidth: 150,
-        headerName: "Position",
-        cellEditorParams: {
-          multiEdit: false,
-          filtered: true,
-          filterPlaceholder: "Filter position",
-          options: [
-            { value: "a", label: "Architect" },
-            { value: "b", label: "Developer" },
-            { value: "c", label: "Product Owner" },
-            { value: "d", label: "Scrum Master" },
-            { value: "e", label: "Tester" },
-            MenuSeparator,
-            {
-              value: "f",
-              label: "Other",
-              subComponent: (props) => <GridSubComponentTextArea {...props} />,
+      GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>(
+        {
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Position",
+        },
+        {
+          editorParams: {
+            multiEdit: false,
+            filtered: true,
+            filterPlaceholder: "Filter position",
+            options: [
+              { value: "a", label: "Architect" },
+              { value: "b", label: "Developer" },
+              { value: "c", label: "Product Owner" },
+              { value: "d", label: "Scrum Master" },
+              { value: "e", label: "Tester" },
+              MenuSeparator,
+              {
+                value: "f",
+                label: "Other",
+                subComponent: (props) => <GridSubComponentTextArea {...props} />,
+              },
+            ],
+            onSave: async (result: MultiSelectResult<ITestRow>) => {
+              // eslint-disable-next-line no-console
+              console.log(result);
+              await wait(1000);
+              return true;
             },
-          ],
-          onSave: async (result: MultiSelectResult<ITestRow>) => {
-            // eslint-disable-next-line no-console
-            console.log(result);
-            await wait(1000);
-            return true;
           },
         },
-      }),
-      GridPopoutEditMultiSelect<ITestRow, ITestRow["position2"]>({
-        field: "position2",
-        initialWidth: 65,
-        maxWidth: 150,
-        headerName: "Inital editor values ",
-        valueGetter: (props) => positionTwoMap[props.data.position2],
-        cellEditorParams: {
-          multiEdit: false,
-          filtered: true,
-          filterPlaceholder: "Filter position",
-          initialSelectedValues: (selectedRows) => [selectedRows[0].position2],
-          options: Object.entries(positionTwoMap).map(([k, v]) => ({ value: k, label: v })),
-          onSave: async (result: MultiSelectResult<ITestRow>) => {
-            // eslint-disable-next-line no-console
-            console.log(result);
-            await wait(1000);
-            return true;
+      ),
+      GridPopoutEditMultiSelect<ITestRow, ITestRow["position2"]>(
+        {
+          field: "position2",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Inital editor values ",
+          valueGetter: (props) => positionTwoMap[props.data.position2],
+        },
+        {
+          editorParams: {
+            multiEdit: false,
+            filtered: true,
+            filterPlaceholder: "Filter position",
+            initialSelectedValues: (selectedRows) => [selectedRows[0].position2],
+            options: Object.entries(positionTwoMap).map(([k, v]) => ({ value: k, label: v })),
+            onSave: async (result: MultiSelectResult<ITestRow>) => {
+              // eslint-disable-next-line no-console
+              console.log(result);
+              await wait(1000);
+              return true;
+            },
           },
         },
-      }),
+      ),
     ] as ColDef[];
   }, []);
 

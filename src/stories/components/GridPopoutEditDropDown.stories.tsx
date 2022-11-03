@@ -3,17 +3,11 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useCallback, useMemo, useState } from "react";
-import {
-  GridFormDropDown,
-  GridFormPopoutDropDownProps,
-  MenuHeaderItem,
-  MenuSeparator,
-  MenuSeparatorString,
-} from "@components/gridForm/GridFormDropDown";
+import { MenuHeaderItem, MenuSeparator, MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
 import { ColDef } from "ag-grid-community";
 import { wait } from "@utils/util";
 import { GridCell } from "@components/GridCell";
@@ -29,11 +23,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -90,117 +84,144 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           initialWidth: 65,
           maxWidth: 85,
         }),
-        GridCell<ITestRow, GridFormPopoutDropDownProps<ITestRow, ITestRow["position"]>>({
-          field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Position",
-          cellEditorParams: {
-            form: GridFormDropDown,
-            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-            multiEdit: false,
+        GridPopoverEditDropDown<ITestRow, ITestRow["position"]>(
+          {
+            field: "position",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Position",
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>({
-          field: "position2",
-          maxWidth: 100,
-          headerName: "Multi-edit",
-          cellEditorParams: {
-            multiEdit: true,
-            options: [
-              MenuHeaderItem("Header"),
-              {
-                value: "1",
-                label: "One",
-                disabled: "Disabled for test",
+          {
+            editorParams: {
+              options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+              multiEdit: false,
+            },
+          },
+        ),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>(
+          {
+            field: "position2",
+            maxWidth: 100,
+            headerName: "Multi-edit",
+          },
+          {
+            editorParams: {
+              multiEdit: true,
+              options: [
+                MenuHeaderItem("Header"),
+                {
+                  value: "1",
+                  label: "One",
+                  disabled: "Disabled for test",
+                },
+                { value: "2", label: "Two" },
+                MenuSeparator,
+                { value: "3", label: "Three" },
+              ],
+            },
+          },
+        ),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>(
+          {
+            field: "position3",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Custom callback",
+          },
+          {
+            editorParams: {
+              multiEdit: true,
+              options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+              onSelectedItem: async (selected) => {
+                await wait(2000);
+                selected.selectedRows.forEach((row) => (row.position3 = selected.value));
               },
-              { value: "2", label: "Two" },
-              MenuSeparator,
-              { value: "3", label: "Three" },
-            ],
-          },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
-          field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Custom callback",
-          cellEditorParams: {
-            multiEdit: true,
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-            onSelectedItem: async (selected) => {
-              await wait(2000);
-              selected.selectedRows.forEach((row) => (row.position3 = selected.value));
             },
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position"]>({
-          field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Options Fn",
-          cellEditorParams: {
-            filtered: "reload",
-            filterPlaceholder: "Search me...",
-            options: optionsFn,
-            optionsRequestCancel: () => {
-              // TODO wrap options in an abortable request
-              // When performing rest requests call the abort controller,
-              // otherwise you'll get multiple requests coming back in different order
-              // eslint-disable-next-line no-console
-              console.log("optionsRequestCancelled");
-            },
-            multiEdit: false,
+        ),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position"]>(
+          {
+            field: "position",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Options Fn",
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
-          field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Filtered",
-          cellEditorParams: {
-            multiEdit: true,
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
-          },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position4"]>({
-          field: "position4",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Filtered (object)",
-          valueGetter: (params) => params.data.position4?.desc,
-          cellEditorParams: {
-            multiEdit: true,
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            options: optionsObjects.map((o) => {
-              return { value: o, label: o.desc, disabled: false };
-            }),
-          },
-        }),
-        GridPopoverEditDropDown<ITestRow, ICode>({
-          field: "code",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Filter Selectable",
-          valueGetter: (params) => params.data.code,
-          cellEditorParams: {
-            multiEdit: true,
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            options: optionsObjects.map((o) => {
-              return { value: o, label: o.desc, disabled: false };
-            }),
-            onSelectedItem: async (selected) => {
-              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
-            },
-            onSelectFilter: async (selected) => {
-              selected.selectedRows.forEach((row) => (row.code = selected.value));
+          {
+            editorParams: {
+              filtered: "reload",
+              filterPlaceholder: "Search me...",
+              options: optionsFn,
+              optionsRequestCancel: () => {
+                // TODO wrap options in an abortable request
+                // When performing rest requests call the abort controller,
+                // otherwise you'll get multiple requests coming back in different order
+                // eslint-disable-next-line no-console
+                console.log("optionsRequestCancelled");
+              },
+              multiEdit: false,
             },
           },
-        }),
+        ),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>(
+          {
+            field: "position3",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Filtered",
+          },
+          {
+            editorParams: {
+              multiEdit: true,
+              filtered: "local",
+              filterPlaceholder: "Filter this",
+              options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+            },
+          },
+        ),
+        GridPopoverEditDropDown<ITestRow, ITestRow["position4"]>(
+          {
+            field: "position4",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Filtered (object)",
+            valueGetter: (params) => params.data.position4?.desc,
+          },
+          {
+            editorParams: {
+              multiEdit: true,
+              filtered: "local",
+              filterPlaceholder: "Filter this",
+              options: optionsObjects.map((o) => {
+                return { value: o, label: o.desc, disabled: false };
+              }),
+            },
+          },
+        ),
+        GridPopoverEditDropDown<ITestRow, ICode>(
+          {
+            field: "code",
+            initialWidth: 65,
+            maxWidth: 150,
+            headerName: "Filter Selectable",
+            valueGetter: (params) => params.data.code,
+          },
+          {
+            editorParams: {
+              multiEdit: true,
+              filtered: "local",
+              filterPlaceholder: "Filter this",
+              options: optionsObjects.map((o) => {
+                return { value: o, label: o.desc, disabled: false };
+              }),
+              onSelectedItem: async (selected) => {
+                selected.selectedRows.forEach((row) => (row.code = selected.value.code));
+              },
+              onSelectFilter: async (selected) => {
+                selected.selectedRows.forEach((row) => (row.code = selected.value));
+              },
+            },
+          },
+        ),
       ] as ColDef[],
     [optionsFn, optionsObjects],
   );

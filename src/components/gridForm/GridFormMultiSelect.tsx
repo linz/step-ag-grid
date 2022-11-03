@@ -6,9 +6,9 @@ import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
-import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
+import { CellParams } from "@components/GridCell";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -23,8 +23,8 @@ export interface MultiSelectResult<RowType> {
   values: Record<string, any>;
 }
 
-export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType>
-  extends GenericCellEditorParams<RowType> {
+export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> {
+  multiEdit?: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
@@ -34,16 +34,16 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   initialSelectedValues?: (selectedRows: RowType[]) => any[];
 }
 
-export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
-  const formProps = props.formProps as GridFormMultiSelectProps<RowType, ValueType>;
-
+export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
+  props: GridFormMultiSelectProps<RowType, ValueType> & CellParams<RowType>,
+) => {
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>(() =>
-    formProps.initialSelectedValues ? formProps.initialSelectedValues(props.selectedRows) : [],
+    props.initialSelectedValues ? props.initialSelectedValues(props.selectedRows) : [],
   );
 
   const save = useCallback(
@@ -51,20 +51,20 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
       const values: Record<string, any> = fromPairs(
         selectedValues.map((value) => [value, subSelectedValues.current[value] ?? true]),
       );
-      if (formProps.onSave) {
-        return await formProps.onSave({ selectedRows, values });
+      if (props.onSave) {
+        return await props.onSave({ selectedRows, values });
       }
       return true;
     },
-    [formProps, selectedValues],
+    [props, selectedValues],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ save });
 
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    let optionsConf = formProps.options ?? [];
+    let optionsConf = props.options ?? [];
 
     (async () => {
       if (typeof optionsConf == "function") {
@@ -78,7 +78,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
         return item;
       }) as any as MultiFinalSelectOption<ValueType>[];
 
-      if (formProps.filtered) {
+      if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
         // the mouse up of the double click edit triggers the cell to cancel editing
         delay(() => setOptions(optionsList), 100);
@@ -87,10 +87,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
       }
       optionsInitialising.current = false;
     })();
-  }, [formProps.filtered, formProps.options, options, props.selectedRows]);
+  }, [props.filtered, props.options, options, props.selectedRows]);
 
   useEffect(() => {
-    if (!formProps.filtered || options == null) return;
+    if (!props.filtered || options == null) return;
     setFilteredValues(
       options
         .map((option) => {
@@ -103,12 +103,12 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
         })
         .filter((r) => r !== undefined),
     );
-  }, [formProps.filtered, filter, options]);
+  }, [props.filtered, filter, options]);
 
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options}>
       <div className={"Grid-popoverContainerList"}>
-        {options && formProps.filtered && (
+        {options && props.filtered && (
           <>
             <FocusableItem className={"filter-item"} key={"filter"}>
               {({ ref }: any) => (
@@ -119,7 +119,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(prop
                     style={{ border: "0px" }}
                     ref={ref}
                     type="text"
-                    placeholder={formProps.filterPlaceholder ?? "Placeholder"}
+                    placeholder={props.filterPlaceholder ?? "Placeholder"}
                     data-testid={"filteredMenu-free-text-input"}
                     defaultValue={""}
                     onChange={(e) => setFilter(e.target.value.toLowerCase())}

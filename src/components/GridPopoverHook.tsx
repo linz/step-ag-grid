@@ -1,20 +1,17 @@
-import { ICellEditorParams } from "ag-grid-community";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
-import { GridFormProps } from "./GridCell";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "@react-menu3";
+import { GridPopoverContext } from "@contexts/GridPopoverContext";
 
-export const useGridPopoverHook = <RowType extends GridBaseRow>(
-  props: GridFormProps<RowType>,
-  save?: (selectedRows: any[]) => Promise<boolean>,
-) => {
-  const { cellEditorParams, saving, updateValue } = props;
-  const { eGridCell } = cellEditorParams as ICellEditorParams;
+export interface GridPopoverHookProps<RowType> {
+  save?: (selectedRows: RowType[]) => Promise<boolean>;
+}
+
+export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType> = {}) => {
   const { stopEditing } = useContext(GridContext);
+  const { anchorRef, saving, updateValueRef } = useContext(GridPopoverContext);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
-  const anchorRef = useRef(eGridCell);
-  anchorRef.current = eGridCell;
   const [isOpen, setOpen] = useState(false);
 
   useEffect(() => {
@@ -23,12 +20,12 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (reason == "cancel" || !save || (await updateValue(save))) {
+      if (reason == "cancel" || !props.save || (updateValueRef.current && (await updateValueRef.current(props.save)))) {
         setOpen(false);
         stopEditing();
       }
     },
-    [save, stopEditing, updateValue],
+    [props, stopEditing, updateValueRef],
   );
 
   const popoverWrapper = useCallback(
@@ -67,7 +64,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(
         </>
       );
     },
-    [isOpen, saving, triggerSave],
+    [anchorRef, isOpen, saving, triggerSave],
   );
 
   return {

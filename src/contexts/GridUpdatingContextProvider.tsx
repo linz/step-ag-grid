@@ -1,23 +1,23 @@
 import { ReactNode, useRef } from "react";
 import { castArray, flatten, remove } from "lodash-es";
-import { UpdatingContext } from "./UpdatingContext";
+import { GridUpdatingContext } from "./GridUpdatingContext";
 
 interface UpdatingContextProviderProps {
   children: ReactNode;
 }
 
-export type UpdatingContextStatus = Record<string, (number | string)[] | undefined>;
+export type GridUpdatingContextStatus = Record<string, (number | string)[] | undefined>;
 
 type FieldName = string;
 type IdList = (number | string)[];
 type UpdatingBlock = Record<FieldName, IdList[]>;
 
-export const UpdatingContextProvider = (props: UpdatingContextProviderProps) => {
+export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps) => {
   const updatingBlocks = useRef<UpdatingBlock>({});
-  const updating = useRef<UpdatingContextStatus>({});
+  const updating = useRef<GridUpdatingContextStatus>({});
 
   const resetUpdating = () => {
-    const mergedUpdatingBlocks: UpdatingContextStatus = {};
+    const mergedUpdatingBlocks: GridUpdatingContextStatus = {};
     for (const key in updatingBlocks.current) {
       mergedUpdatingBlocks[key] = flatten(updatingBlocks.current[key]);
     }
@@ -38,6 +38,8 @@ export const UpdatingContextProvider = (props: UpdatingContextProviderProps) => 
     castArray(fields).some((f) => updating.current[f]?.includes(id));
 
   return (
-    <UpdatingContext.Provider value={{ modifyUpdating, checkUpdating }}>{props.children}</UpdatingContext.Provider>
+    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating }}>
+      {props.children}
+    </GridUpdatingContext.Provider>
   );
 };

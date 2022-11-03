@@ -3,7 +3,7 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
@@ -23,11 +23,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -43,70 +43,84 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverTextInput<IFormTestRow>({
-        field: "name",
-        headerName: "Text input",
-        maxWidth: 140,
-        cellEditorParams: {
-          required: true,
-          maxlength: 12,
-          placeholder: "Enter some text...",
-          validate: (value: string) => {
-            if (value === "never") return "The value 'never' is not allowed";
-            return null;
-          },
-          multiEdit: false,
-          onSave: async (selectedRows, value) => {
-            await wait(1000);
-            selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
-            return true;
+      GridPopoverTextInput<IFormTestRow>(
+        {
+          field: "name",
+          headerName: "Text input",
+          maxWidth: 140,
+        },
+        {
+          editorParams: {
+            required: true,
+            maxlength: 12,
+            placeholder: "Enter some text...",
+            validate: (value: string) => {
+              if (value === "never") return "The value 'never' is not allowed";
+              return null;
+            },
+            multiEdit: false,
+            onSave: async (selectedRows, value) => {
+              await wait(1000);
+              selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
+              return true;
+            },
           },
         },
-      }),
-      GridPopoverTextInput<IFormTestRow>({
-        field: "distance",
-        headerName: "Number input",
-        maxWidth: 140,
-        valueFormatter: (params) => {
-          const v = params.data.distance;
-          return v != null ? `${v}${params.colDef.cellEditorParams.units}` : v;
-        },
-        cellEditorParams: {
-          maxlength: 12,
-          placeholder: "Enter distance...",
-          units: "m",
-          validate: (value: string) => {
-            if (value.length && !isFloat(value)) return "Value must be a number";
-            return null;
-          },
-          multiEdit: false,
-          onSave: async (selectedRows, value) => {
-            await wait(1000);
-            selectedRows.forEach((selectedRow) => (selectedRow["distance"] = value.length ? parseFloat(value) : null));
-            return true;
+      ),
+      GridPopoverTextInput<IFormTestRow>(
+        {
+          field: "distance",
+          headerName: "Number input",
+          maxWidth: 140,
+          valueFormatter: (params) => {
+            const v = params.data.distance;
+            return v != null ? `${v}${params.colDef.cellEditorParams.units}` : v;
           },
         },
-      }),
-      GridPopoverTextArea<IFormTestRow>({
-        field: "plan",
-        headerName: "Text area",
-        maxWidth: 140,
-        cellEditorParams: {
-          required: true,
-          maxlength: 32,
-          placeholder: "Enter some text...",
-          multiEdit: true,
-          validate: (value: string) => {
-            if (value === "never") return "The value 'never' is not allowed";
-            return null;
-          },
-          onSave: async (selectedRows, value) => {
-            await wait(1000);
-            selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
-            return true;
+        {
+          editorParams: {
+            maxlength: 12,
+            placeholder: "Enter distance...",
+            units: "m",
+            validate: (value: string) => {
+              if (value.length && !isFloat(value)) return "Value must be a number";
+              return null;
+            },
+            multiEdit: false,
+            onSave: async (selectedRows, value) => {
+              await wait(1000);
+              selectedRows.forEach(
+                (selectedRow) => (selectedRow["distance"] = value.length ? parseFloat(value) : null),
+              );
+              return true;
+            },
           },
         },
-      }),
+      ),
+      GridPopoverTextArea<IFormTestRow>(
+        {
+          field: "plan",
+          headerName: "Text area",
+          maxWidth: 140,
+        },
+        {
+          editorParams: {
+            required: true,
+            maxlength: 32,
+            placeholder: "Enter some text...",
+            multiEdit: true,
+            validate: (value: string) => {
+              if (value === "never") return "The value 'never' is not allowed";
+              return null;
+            },
+            onSave: async (selectedRows, value) => {
+              await wait(1000);
+              selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
+              return true;
+            },
+          },
+        },
+      ),
     ],
     [],
   );

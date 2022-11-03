@@ -3,7 +3,7 @@ import { GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty } from "@utils/util";
-import { UpdatingContext } from "./UpdatingContext";
+import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "@components/Grid";
 
 interface GridContextProps {
@@ -16,7 +16,7 @@ interface GridContextProps {
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
 export const GridContextProvider = (props: GridContextProps): ReactElement => {
-  const { modifyUpdating } = useContext(UpdatingContext);
+  const { modifyUpdating } = useContext(GridUpdatingContext);
   const gridApiRef = useRef<GridApi>();
   const idsBeforeUpdate = useRef<number[]>([]);
 

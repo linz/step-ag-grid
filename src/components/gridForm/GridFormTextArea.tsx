@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
-import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
+import { CellParams } from "@components/GridCell";
 
-export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
+export interface GridFormTextAreaProps<RowType extends GridBaseRow> {
+  multiEdit?: boolean;
   placeholder?: string;
   required?: boolean;
   maxlength?: number;
@@ -13,22 +14,23 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Gene
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
-  const formProps = props.formProps as GridFormTextAreaProps<RowType>;
+export const GridFormTextArea = <RowType extends GridBaseRow>(
+  props: GridFormTextAreaProps<RowType> & CellParams<RowType>,
+) => {
   const [value, setValue] = useState(props.value ?? "");
 
   const invalid = useCallback(() => {
-    if (formProps.required && value.length == 0) {
+    if (props.required && value.length == 0) {
       return `Some text is required`;
     }
-    if (formProps.maxlength && value.length > formProps.maxlength) {
-      return `Text must be no longer than ${formProps.maxlength} characters`;
+    if (props.maxlength && value.length > props.maxlength) {
+      return `Text must be no longer than ${props.maxlength} characters`;
     }
-    if (formProps.validate) {
-      return formProps.validate(value);
+    if (props.validate) {
+      return props.validate(value);
     }
     return null;
-  }, [formProps, value]);
+  }, [props, value]);
 
   const save = useCallback(
     async (selectedRows: any[]): Promise<boolean> => {
@@ -36,8 +38,8 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormPro
 
       if (props.value === (value ?? "")) return true;
 
-      if (formProps.onSave) {
-        return await formProps.onSave(selectedRows, value);
+      if (props.onSave) {
+        return await props.onSave(selectedRows, value);
       }
 
       const field = props.field;
@@ -48,17 +50,16 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormPro
       selectedRows.forEach((row) => (row[field] = value));
       return true;
     },
-    [formProps, invalid, props.field, props.value, value],
+    [props, invalid, value],
   );
-  const { popoverWrapper } = useGridPopoverHook(props, save);
-
+  const { popoverWrapper } = useGridPopoverHook({ save });
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
+    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
       <TextAreaInput
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
-        inputProps={{ placeholder: formProps.placeholder }}
+        inputProps={{ placeholder: props.placeholder }}
       />
     </div>,
   );

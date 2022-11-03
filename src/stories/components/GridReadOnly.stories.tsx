@@ -3,7 +3,7 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
@@ -22,11 +22,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -50,7 +50,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell<ITestRow, any>({
+      GridCell<ITestRow>({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
@@ -72,65 +72,77 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopoverMessage<ITestRow>({
-        headerName: "Popout message",
-        cellRenderer: () => <>Click me!</>,
-        cellEditorParams: {
-          message: async (selectedRows: ITestRow[]) => {
-            await wait(1000);
-            return `There are ${selectedRows.length} row(s) selected`;
-          },
-          multiEdit: true,
+      GridPopoverMessage<ITestRow>(
+        {
+          headerName: "Popout message",
+          cellRenderer: () => <>Click me!</>,
         },
-      }),
-      GridPopoverMenu<ITestRow>({
-        headerName: "Menu",
-        cellEditorParams: {
-          options: async (selectedItems) => {
-            // Just doing a timeout here to demonstrate deferred loading
-            await wait(500);
-            return [
-              {
-                label: "Single edit only",
-                action: async (selectedRows) => {
-                  alert(`Single-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+        {
+          editorParams: {
+            message: async (cellParams) => {
+              await wait(1000);
+              return `There are ${cellParams.selectedRows.length} row(s) selected`;
+            },
+            multiEdit: true,
+          },
+        },
+      ),
+      GridPopoverMenu<ITestRow>(
+        {
+          headerName: "Menu",
+        },
+        {
+          editorParams: {
+            options: async (selectedItems) => {
+              // Just doing a timeout here to demonstrate deferred loading
+              await wait(500);
+              return [
+                {
+                  label: "Single edit only",
+                  action: async (selectedRows) => {
+                    alert(`Single-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  supportsMultiEdit: false,
                 },
-                supportsMultiEdit: false,
-              },
-              {
-                label: "Multi-edit",
-                action: async (selectedRows) => {
-                  alert(`Multi-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+                {
+                  label: "Multi-edit",
+                  action: async (selectedRows) => {
+                    alert(`Multi-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  supportsMultiEdit: true,
                 },
-                supportsMultiEdit: true,
-              },
-              {
-                label: "Disabled item",
-                disabled: "Disabled for test",
-                supportsMultiEdit: true,
-              },
-              {
-                label: "Developer Only",
-                hidden: selectedItems.some((x) => x.position != "Developer"),
-                supportsMultiEdit: true,
-              },
-            ];
+                {
+                  label: "Disabled item",
+                  disabled: "Disabled for test",
+                  supportsMultiEdit: true,
+                },
+                {
+                  label: "Developer Only",
+                  hidden: selectedItems.some((x) => x.position != "Developer"),
+                  supportsMultiEdit: true,
+                },
+              ];
+            },
           },
         },
-      }),
-      GridPopoverMenu<ITestRow>({
-        headerName: "Menu disabled",
-        editable: false,
-        cellEditorParams: {
-          options: async () => {
-            return [];
+      ),
+      GridPopoverMenu<ITestRow>(
+        {
+          headerName: "Menu disabled",
+          editable: false,
+        },
+        {
+          editorParams: {
+            options: async () => {
+              return [];
+            },
           },
         },
-      }),
+      ),
     ],
     [],
   );

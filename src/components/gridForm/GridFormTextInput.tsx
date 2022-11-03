@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
-import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
+import { CellParams } from "@components/GridCell";
 
-export interface GridFormTextInputProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
+export interface GridFormTextInputProps<RowType extends GridBaseRow> {
+  multiEdit?: boolean;
   placeholder?: string;
   units?: string;
   required?: boolean;
@@ -15,24 +16,25 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Gen
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
-  const formProps = props.formProps as GridFormTextInputProps<RowType>;
+export const GridFormTextInput = <RowType extends GridBaseRow>(
+  props: GridFormTextInputProps<RowType> & CellParams<RowType>,
+) => {
   const initValue = props.value == null ? "" : `${props.value}`;
   const [value, setValue] = useState(initValue);
 
   const invalid = useCallback(() => {
     const trimmedValue = value.trim();
-    if (formProps.required && trimmedValue.length == 0) {
+    if (props.required && trimmedValue.length == 0) {
       return `Some text is required`;
     }
-    if (formProps.maxlength && trimmedValue.length > formProps.maxlength) {
-      return `Text must be no longer than ${formProps.maxlength} characters`;
+    if (props.maxlength && trimmedValue.length > props.maxlength) {
+      return `Text must be no longer than ${props.maxlength} characters`;
     }
-    if (formProps.validate) {
-      return formProps.validate(trimmedValue, props.data);
+    if (props.validate) {
+      return props.validate(trimmedValue, props.data);
     }
     return null;
-  }, [formProps, value]);
+  }, [props, value]);
 
   const save = useCallback(
     async (selectedRows: any[]): Promise<boolean> => {
@@ -40,8 +42,8 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
       const trimmedValue = value.trim();
       if (initValue === trimmedValue) return true;
 
-      if (formProps.onSave) {
-        return await formProps.onSave(selectedRows, trimmedValue);
+      if (props.onSave) {
+        return await props.onSave(selectedRows, trimmedValue);
       }
 
       const field = props.field;
@@ -52,20 +54,20 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormPr
       selectedRows.forEach((row) => (row[field] = trimmedValue));
       return true;
     },
-    [invalid, value, initValue, formProps, props.field],
+    [invalid, value, initValue, props],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ save });
 
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row", width: formProps.width ?? 240 }} className={"FormTest"}>
+    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
       <TextInputFormatted
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
-        formatted={formProps.units}
+        formatted={props.units}
         inputProps={{
           style: { width: "100%" },
-          placeholder: formProps.placeholder,
+          placeholder: props.placeholder,
           onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
         }}
       />

@@ -4,19 +4,20 @@ import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "@utils/bearing";
-import { GenericCellEditorParams, GridFormProps } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
+import { CellParams } from "@components/GridCell";
 
-export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends GenericCellEditorParams<RowType> {
-  placeHolder: string;
+export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
+  multiEdit?: boolean;
+  placeHolder?: string;
   range?: (value: number | null) => string | null;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormProps<RowType>) => {
-  const formProps = props.formProps as GridFormEditBearingProps<RowType>;
+export const GridFormEditBearing = <RowType extends GridBaseRow>(
+  props: GridFormEditBearingProps<RowType> & CellParams<RowType>,
+) => {
   const [value, setValue] = useState<string>(`${props.value ?? ""}`);
-
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
@@ -25,8 +26,9 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
       if (parsedValue === props.value) {
         return true;
       }
-      if (formProps.onSave) {
-        return await formProps.onSave(selectedRows, parsedValue);
+
+      if (props.onSave) {
+        return await props.onSave(selectedRows, parsedValue);
       } else {
         const field = props.field;
         if (field == null) {
@@ -37,9 +39,9 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
       }
       return true;
     },
-    [formProps, props.field, props.value, value],
+    [props, value],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook(props, save);
+  const { triggerSave, popoverWrapper } = useGridPopoverHook({ save });
 
   return popoverWrapper(
     <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
@@ -50,13 +52,13 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         }}
         inputProps={{
           autoFocus: true,
-          placeholder: formProps.placeHolder,
+          placeholder: props.placeHolder,
           disabled: false,
           maxLength: 16,
           onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
         }}
-        formatted={bearingStringValidator(value, formProps.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
-        error={bearingStringValidator(value, formProps.range)}
+        formatted={bearingStringValidator(value, props.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
+        error={bearingStringValidator(value, props.range)}
       />
     </div>,
   );

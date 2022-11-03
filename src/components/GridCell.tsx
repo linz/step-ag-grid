@@ -1,40 +1,40 @@
 import { ForwardedRef, forwardRef, useCallback, useContext, useMemo, useState } from "react";
 import { GridBaseRow } from "./Grid";
-import { UpdatingContext } from "@contexts/UpdatingContext";
-import { GridContext } from "@contexts/GridContext";
+import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
-import { GenericCellRendererParams, GridRendererGenericCell } from "./gridRender/GridRenderGenericCell";
+import {
+  GenericCellColDef,
+  GenericCellRendererParams,
+  GridRendererGenericCell,
+} from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "@components/GridIcon";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { GridPopoverContext } from "@contexts/GridPopoverContext";
+import { GridPopoverContextProvider } from "@contexts/GridPopoverContextProvider";
 
-export interface GridFormProps<RowType extends GridBaseRow> {
-  cellEditorParams: ICellEditorParams;
-  updateValue: (saveFn: (selectedRows: RowType[]) => Promise<boolean>) => Promise<boolean>;
-  saving: boolean;
-  data: RowType;
-  value: any;
-  field: string | undefined;
-  selectedRows: RowType[];
-  formProps: Record<string, any>;
+export interface RendererProps<RowType extends GridBaseRow> extends Record<string, any> {
+  data?: RowType;
 }
 
-export interface GenericCellEditorParams<RowType extends GridBaseRow> {
-  multiEdit?: boolean;
-  form?: (props: GridFormProps<RowType>) => JSX.Element;
+export interface EditorProps<RowType extends GridBaseRow> extends Record<string, any> {
+  data?: RowType;
 }
 
-export interface GenericCellEditorColDef<
+export interface GenericCellEditorProps<
   RowType extends GridBaseRow,
-  FormProps extends GenericCellEditorParams<RowType>,
-> extends ColDef {
-  cellEditorParams?: FormProps;
-  cellRendererParams?: GenericCellRendererParams<RowType>;
+  T extends RendererProps<RowType>,
+  E extends EditorProps<RowType>,
+> {
+  renderer?: (props: T) => JSX.Element;
+  editor?: (props: E) => JSX.Element;
+  rendererParams?: T;
+  editorParams?: E;
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
-  const { checkUpdating } = useContext(UpdatingContext);
+  const { checkUpdating } = useContext(GridUpdatingContext);
   const colDef = props.colDef as ColDef;
 
   const rendererParams = colDef.cellRendererParams as GenericCellRendererParams<any> | undefined;
@@ -59,16 +59,20 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
 /**
  * For editing a text area.
  */
-export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericCellEditorParams<RowType>>(
-  props: GenericCellEditorColDef<RowType, FormProps>,
+export const GridCell = <RowType extends GridBaseRow>(
+  props: GenericCellColDef<RowType>,
+  custom?: GenericCellEditorProps<RowType, any, any>,
 ): ColDef => {
   return {
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
-    ...(props.cellEditorParams && {
-      cellClass: props?.cellEditorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
-      editable: true,
-      cellEditor: GenericCellEditorComponent,
+    ...(custom?.editor && {
+      cellClass: custom.editorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      editable: props.editable ?? true,
+      cellEditor: GenericCellEditorComponent(custom.editor),
+    }),
+    ...(custom?.editorParams && {
+      cellEditorParams: custom.editorParams,
     }),
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
@@ -83,62 +87,40 @@ export const GridCell = <RowType extends GridBaseRow, FormProps extends GenericC
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
     },
-  };
+  } as ColDef;
 };
 
-interface GenericCellEditorICellEditorParams<RowType extends GridBaseRow, FormProps extends Record<string, any>>
-  extends ICellEditorParams {
+export interface CellParams<RowType extends GridBaseRow> {
+  value: any;
   data: RowType;
-  colDef: GenericCellEditorColDef<RowType, FormProps>;
+  field: string | undefined;
+  selectedRows: RowType[];
 }
 
-export const GenericCellEditorComponentFr = <RowType extends GridBaseRow, FormProps extends Record<string, any>>(
-  props: GenericCellEditorICellEditorParams<RowType, FormProps>,
-  _: ForwardedRef<any>, // We don't forward the ref, as that's for generic aggrid cell editing
-) => {
-  const { updatingCells, getSelectedRows } = useContext(GridContext);
+// TODO memo?
+export const GenericCellEditorComponent = (editor: (props: any) => JSX.Element) =>
+  forwardRef(function GenericCellEditorComponent2(props: ICellEditorParams, _) {
+    return (
+      <GridPopoverContextProvider>
+        <GenericCellEditorComponent3 {...{ ...props, editor }} />
+      </GridPopoverContextProvider>
+    );
+  });
 
-  const { colDef, data } = props;
-  const { cellEditorParams } = props.colDef;
+export const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
+  const { setProps, propsRef } = useContext(GridPopoverContext);
+
+  const { colDef } = props;
+  const { cellEditorParams } = colDef;
   const multiEdit = cellEditorParams?.multiEdit ?? false;
-  const field = props.colDef.field ?? "";
 
-  const formProps = colDef.cellEditorParams ?? {};
-  const value = props.value;
-
-  const selectedRows = useMemo(
-    () => (multiEdit ? getSelectedRows<RowType>() : [data]),
-    [data, getSelectedRows, multiEdit],
-  );
-
-  const [saving, setSaving] = useState(false);
-
-  const updateValue = useCallback(
-    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
-      return !saving && (await updatingCells({ selectedRows, field }, saveFn, setSaving));
-    },
-    [field, saving, selectedRows, updatingCells],
-  );
-
-  if (cellEditorParams == null) return <></>;
+  // TODO don't need all these props in context
+  setProps(props, multiEdit);
 
   return (
     <>
-      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} saving={saving} /> : props.value}</div>
-      {cellEditorParams?.form && (
-        <cellEditorParams.form
-          cellEditorParams={props}
-          updateValue={updateValue}
-          saving={saving}
-          formProps={formProps}
-          data={data}
-          value={value}
-          field={field}
-          selectedRows={selectedRows}
-        />
-      )}
+      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} /> : props.value}</div>
+      {props?.editor && <props.editor {...cellEditorParams} {...propsRef.current} />}
     </>
   );
 };
-
-export const GenericCellEditorComponent = forwardRef(GenericCellEditorComponentFr);
