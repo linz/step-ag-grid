@@ -40,6 +40,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
   optionsRequestCancel?: () => void;
+  maxRows?: number;
 }
 
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
@@ -95,12 +96,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = optionsConf?.map((item) => {
+      const optionsList = (optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      }) as any) as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -170,6 +171,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
 
+  const maxRowsStyles =
+    props.maxRows !== undefined ? { maxHeight: 62 + 34 * props.maxRows, overFlowY: "auto" } : undefined;
   const { popoverWrapper } = useGridPopoverHook();
   return popoverWrapper(
     <>
@@ -197,7 +200,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         </>
       )}
       <ComponentLoadingWrapper loading={!options}>
-        <>
+        <div style={maxRowsStyles}>
           {options && options.length == filteredValues?.length && <MenuItem>[Empty]</MenuItem>}
           {options?.map((item, index) =>
             item.value === MenuSeparatorString ? (
@@ -216,7 +219,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
               </MenuItem>
             ),
           )}
-        </>
+        </div>
       </ComponentLoadingWrapper>
     </>,
   );

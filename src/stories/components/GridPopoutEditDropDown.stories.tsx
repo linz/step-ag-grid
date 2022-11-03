@@ -200,6 +200,33 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           field: "code",
           initialWidth: 65,
           maxWidth: 150,
+          headerName: "Max height",
+          valueGetter: (params) => params.data.code,
+        },
+        {
+          editorParams: {
+            maxRows: 2,
+            multiEdit: true,
+
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: Array.from(Array(30).keys()).map((o) => {
+              return { value: o, label: `${o}` };
+            }),
+            onSelectedItem: async (selected) => {
+              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
+            },
+            onSelectFilter: async (selected) => {
+              selected.selectedRows.forEach((row) => (row.code = selected.value));
+            },
+          },
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
+          field: "code",
+          initialWidth: 65,
+          maxWidth: 150,
           headerName: "Filter Selectable",
           valueGetter: (params) => params.data.code,
         },
