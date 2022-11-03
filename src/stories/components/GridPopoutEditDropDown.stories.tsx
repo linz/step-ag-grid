@@ -3,20 +3,13 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useCallback, useMemo, useState } from "react";
-import {
-  GridFormDropDown,
-  GridFormPopoutDropDownProps,
-  MenuHeaderItem,
-  MenuSeparator,
-  MenuSeparatorString,
-} from "@components/gridForm/GridFormDropDown";
-import { ColDef } from "ag-grid-community";
+import { MenuHeaderItem, MenuSeparator, MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
 import { wait } from "@utils/util";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { GridPopoverEditDropDown } from "@components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {
@@ -29,11 +22,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -81,32 +74,37 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
     [],
   );
 
-  const columnDefs = useMemo(
-    () =>
-      [
-        GridCell({
-          field: "id",
-          headerName: "Id",
-          initialWidth: 65,
-          maxWidth: 85,
-        }),
-        GridCell<ITestRow, GridFormPopoutDropDownProps<ITestRow, ITestRow["position"]>>({
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
+    () => [
+      GridCell({
+        field: "id",
+        headerName: "Id",
+        initialWidth: 65,
+        maxWidth: 85,
+      }),
+      GridPopoverEditDropDown(
+        {
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Position",
-          cellEditorParams: {
-            form: GridFormDropDown,
+        },
+        {
+          multiEdit: false,
+          editorParams: {
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-            multiEdit: false,
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "position2",
           maxWidth: 100,
           headerName: "Multi-edit",
-          cellEditorParams: {
-            multiEdit: true,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
             options: [
               MenuHeaderItem("Header"),
               {
@@ -119,27 +117,36 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               { value: "3", label: "Three" },
             ],
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "position3",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Custom callback",
-          cellEditorParams: {
-            multiEdit: true,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
             onSelectedItem: async (selected) => {
               await wait(2000);
               selected.selectedRows.forEach((row) => (row.position3 = selected.value));
             },
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position"]>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "position",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Options Fn",
-          cellEditorParams: {
+        },
+        {
+          multiEdit: false,
+          editorParams: {
             filtered: "reload",
             filterPlaceholder: "Search me...",
             options: optionsFn,
@@ -150,44 +157,75 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               // eslint-disable-next-line no-console
               console.log("optionsRequestCancelled");
             },
-            multiEdit: false,
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position3"]>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "position3",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Filtered",
-          cellEditorParams: {
-            multiEdit: true,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ITestRow["position4"]>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "position4",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Filtered (object)",
           valueGetter: (params) => params.data.position4?.desc,
-          cellEditorParams: {
-            multiEdit: true,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
           },
-        }),
-        GridPopoverEditDropDown<ITestRow, ICode>({
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
+          field: "code",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Max height",
+          valueGetter: (params) => params.data.code,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
+            maxRows: 2,
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: Array.from(Array(30).keys()).map((o) => {
+              return { value: o, label: `${o}` };
+            }),
+          },
+        },
+      ),
+      GridPopoverEditDropDown(
+        {
           field: "code",
           initialWidth: 65,
           maxWidth: 150,
           headerName: "Filter Selectable",
           valueGetter: (params) => params.data.code,
-          cellEditorParams: {
-            multiEdit: true,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: optionsObjects.map((o) => {
@@ -200,8 +238,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               selected.selectedRows.forEach((row) => (row.code = selected.value));
             },
           },
-        }),
-      ] as ColDef[],
+        },
+      ),
+    ],
     [optionsFn, optionsObjects],
   );
 

@@ -12,7 +12,7 @@ import { GridContext } from "@contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { isNotEmpty } from "@utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
-import { UpdatingContext } from "@contexts/UpdatingContext";
+import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
 
 export interface GridBaseRow {
   id: string | number;
@@ -47,7 +47,7 @@ export const Grid = (params: GridProps): JSX.Element => {
     ensureSelectedRowIsVisible,
     sizeColumnsToFit,
   } = useContext(GridContext);
-  const { checkUpdating } = useContext(UpdatingContext);
+  const { checkUpdating } = useContext(GridUpdatingContext);
 
   const [internalQuickFilter, setInternalQuickFilter] = useState("");
   const lastSelectedIds = useRef<number[]>([]);

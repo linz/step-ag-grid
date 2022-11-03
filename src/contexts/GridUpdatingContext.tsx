@@ -1,11 +1,11 @@
 import { createContext } from "react";
 
-export type UpdatingContextType = {
+export type GridUpdatingContextType = {
   checkUpdating: (fields: string | string[], id: number | string) => boolean;
   modifyUpdating: (field: string, ids: (number | string)[], fn: () => void | Promise<void>) => Promise<void>;
 };
 
-export const UpdatingContext = createContext<UpdatingContextType>({
+export const GridUpdatingContext = createContext<GridUpdatingContextType>({
   checkUpdating: () => {
     console.error("Missing UpdatingContext");
     return false;

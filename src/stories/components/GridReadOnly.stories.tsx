@@ -3,14 +3,14 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { wait } from "@utils/util";
 import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
+import { CellParams, ColDefT, GridCell } from "@components/GridCell";
 import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
-import { GridCell } from "@components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -22,11 +22,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -42,7 +42,7 @@ interface ITestRow {
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -50,7 +50,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell<ITestRow, any>({
+      GridCell({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
@@ -72,65 +72,81 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopoverMessage<ITestRow>({
-        headerName: "Popout message",
-        cellRenderer: () => <>Click me!</>,
-        cellEditorParams: {
-          message: async (selectedRows: ITestRow[]) => {
-            await wait(1000);
-            return `There are ${selectedRows.length} row(s) selected`;
+      GridPopoverMessage(
+        {
+          headerName: "Popout message",
+          cellRenderer: () => <>Click me!</>,
+          cellRendererParams: {
+            warning: () => "x",
           },
+        },
+        {
+          editorParams: {
+            message: async (formParams: CellParams<ITestRow>): Promise<string> => {
+              await wait(1000);
+              return `There are ${formParams.selectedRows.length} row(s) selected`;
+            },
+            multiEdit: true,
+          },
+        },
+      ),
+      GridPopoverMenu(
+        {
+          headerName: "Menu",
+        },
+        {
           multiEdit: true,
-        },
-      }),
-      GridPopoverMenu<ITestRow>({
-        headerName: "Menu",
-        cellEditorParams: {
-          options: async (selectedItems) => {
-            // Just doing a timeout here to demonstrate deferred loading
-            await wait(500);
-            return [
-              {
-                label: "Single edit only",
-                action: async (selectedRows) => {
-                  alert(`Single-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+          editorParams: {
+            options: async (selectedItems) => {
+              // Just doing a timeout here to demonstrate deferred loading
+              await wait(500);
+              return [
+                {
+                  label: "Single edit only",
+                  action: async (selectedRows) => {
+                    alert(`Single-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  supportsMultiEdit: false,
                 },
-                supportsMultiEdit: false,
-              },
-              {
-                label: "Multi-edit",
-                action: async (selectedRows) => {
-                  alert(`Multi-edit: ${selectedRows.length} rows`);
-                  await wait(1500);
-                  return true;
+                {
+                  label: "Multi-edit",
+                  action: async (selectedRows) => {
+                    alert(`Multi-edit: ${selectedRows.length} rows`);
+                    await wait(1500);
+                    return true;
+                  },
+                  supportsMultiEdit: true,
                 },
-                supportsMultiEdit: true,
-              },
-              {
-                label: "Disabled item",
-                disabled: "Disabled for test",
-                supportsMultiEdit: true,
-              },
-              {
-                label: "Developer Only",
-                hidden: selectedItems.some((x) => x.position != "Developer"),
-                supportsMultiEdit: true,
-              },
-            ];
+                {
+                  label: "Disabled item",
+                  disabled: "Disabled for test",
+                  supportsMultiEdit: true,
+                },
+                {
+                  label: "Developer Only",
+                  hidden: selectedItems.some((x) => x.position != "Developer"),
+                  supportsMultiEdit: true,
+                },
+              ];
+            },
           },
         },
-      }),
-      GridPopoverMenu<ITestRow>({
-        headerName: "Menu disabled",
-        editable: false,
-        cellEditorParams: {
-          options: async () => {
-            return [];
+      ),
+      GridPopoverMenu(
+        {
+          headerName: "Menu disabled",
+          editable: false,
+        },
+        {
+          editorParams: {
+            options: async () => {
+              return [];
+            },
           },
         },
-      }),
+      ),
     ],
     [],
   );

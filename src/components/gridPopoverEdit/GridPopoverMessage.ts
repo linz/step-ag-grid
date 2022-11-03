@@ -1,22 +1,24 @@
-import { GridCell } from "../GridCell";
+import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormMessage, GridFormMessageProps } from "../gridForm/GridFormMessage";
 import { GridBaseRow } from "../Grid";
-import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
+import { ColDef } from "ag-grid-community";
 
 export const GridPopoverMessage = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType, GridFormMessageProps<RowType>>,
-) => {
-  return GridCell<RowType, GridFormMessageProps<RowType>>({
-    maxWidth: 140,
-    ...colDef,
-    cellRendererParams: colDef.cellRendererParams ?? {
-      singleClickEdit: true,
-    },
-    ...(colDef?.cellEditorParams && {
-      cellEditorParams: {
-        ...colDef.cellEditorParams,
-        form: GridFormMessage,
+  colDef: ColDef,
+  props: GenericCellEditorProps<GridFormMessageProps<RowType>>,
+): ColDefT<RowType> => {
+  return GridCell(
+    {
+      maxWidth: 140,
+      ...colDef,
+      cellRendererParams: {
+        singleClickEdit: true,
+        ...colDef.cellRendererParams,
       },
-    }),
-  });
+    },
+    {
+      editor: GridFormMessage,
+      ...props,
+    },
+  );
 };

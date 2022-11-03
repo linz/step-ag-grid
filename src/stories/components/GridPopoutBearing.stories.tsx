@@ -4,10 +4,10 @@ import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import {
   GridPopoverEditBearing,
   GridPopoverEditBearingCorrection,
@@ -24,11 +24,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -42,7 +42,7 @@ interface ITestRow {
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -50,31 +50,34 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverEditBearing<ITestRow>({
-        field: "bearing1",
-        headerName: "Bearing GCE",
-        cellRendererParams: {
-          warning: (props) => props.data.id == 1002 && "Testers are testing",
-          info: (props) => props.data.id == 1001 && "Developers are developing",
-        },
-        cellEditorParams: {
-          multiEdit: false,
-          placeHolder: "Enter Bearing",
-        },
-      }),
-      GridPopoverEditBearingCorrection<ITestRow>({
-        field: "bearingCorrection",
-        headerName: "Bearing Correction",
-        cellEditorParams: {
-          multiEdit: true,
-          placeHolder: "Enter Bearing Correction",
-          onSave: async (selectedRows: ITestRow[], value: ITestRow["bearingCorrection"]) => {
-            await wait(1000);
-            selectedRows.forEach((row) => (row["bearingCorrection"] = value));
-            return true;
+      GridPopoverEditBearing(
+        {
+          field: "bearing1",
+          headerName: "Bearing GCE",
+          cellRendererParams: {
+            warning: (props: any) => props.data.id == 1002 && "Testers are testing",
+            info: (props: any) => props.data.id == 1001 && "Developers are developing",
           },
         },
-      }),
+        {
+          multiEdit: false,
+        },
+      ),
+      GridPopoverEditBearingCorrection(
+        {
+          field: "bearingCorrection",
+          headerName: "Bearing Correction",
+        },
+        {
+          editorParams: {
+            onSave: async (selectedRows, value: ITestRow["bearingCorrection"]) => {
+              await wait(1000);
+              selectedRows.forEach((row) => (row["bearingCorrection"] = value));
+              return true;
+            },
+          },
+        },
+      ),
     ],
     [],
   );

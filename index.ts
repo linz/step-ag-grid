@@ -1,8 +1,8 @@
 export * from "./src/react-menu3/index";
 export * from "./src/react-menu3/types";
 
-export * from "./src/contexts/UpdatingContext";
-export * from "./src/contexts/UpdatingContextProvider";
+export * from "./src/contexts/GridUpdatingContext";
+export * from "./src/contexts/GridUpdatingContextProvider";
 export * from "./src/contexts/GridContext";
 export * from "./src/contexts/GridContextProvider";
 

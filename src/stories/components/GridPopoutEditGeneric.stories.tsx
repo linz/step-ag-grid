@@ -3,11 +3,11 @@ import "@linzjs/lui/dist/fonts";
 import "../../lui-overrides.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { UpdatingContextProvider } from "@contexts/UpdatingContextProvider";
+import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { FormTest, IFormTestRow } from "./FormTest";
 
 export default {
@@ -20,11 +20,11 @@ export default {
   decorators: [
     (Story) => (
       <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <UpdatingContextProvider>
+        <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
           </GridContextProvider>
-        </UpdatingContextProvider>
+        </GridUpdatingContextProvider>
       </div>
     ),
   ],
@@ -32,7 +32,7 @@ export default {
 
 const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -40,15 +40,20 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell({
-        field: "name",
-        headerName: "Popout Generic Edit",
-        maxWidth: 140,
-        cellEditorParams: {
-          form: FormTest,
-          multiEdit: false,
+      GridCell(
+        {
+          field: "name",
+          headerName: "Popout Generic Edit",
+          maxWidth: 140,
         },
-      }),
+        {
+          multiEdit: true,
+          editor: FormTest,
+          editorParams: {
+            a: 4,
+          },
+        },
+      ),
     ],
     [],
   );

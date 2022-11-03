@@ -1,21 +1,19 @@
 import "./GridRenderGenericCell.scss";
 
 import { useContext } from "react";
-import { UpdatingContext } from "@contexts/UpdatingContext";
+import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { GenericCellEditorParams } from "../GridCell";
 import { GridBaseRow } from "../Grid";
 
 export interface RowICellRendererParams<RowType extends GridBaseRow> extends ICellRendererParams {
   data: RowType;
 }
 
-export interface GenericCellColDef<RowType extends GridBaseRow, FormProps extends Record<string, any>> extends ColDef {
+export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDef {
   cellRendererParams?: GenericCellRendererParams<RowType>;
-  cellEditorParams?: GenericCellEditorParams<RowType> & FormProps;
 }
 
 export interface GenericCellRendererParams<RowType extends GridBaseRow> {
@@ -25,7 +23,7 @@ export interface GenericCellRendererParams<RowType extends GridBaseRow> {
 }
 
 export const GridRendererGenericCell = <RowType extends GridBaseRow>(props: ICellRendererParams): JSX.Element => {
-  const { checkUpdating } = useContext(UpdatingContext);
+  const { checkUpdating } = useContext(GridUpdatingContext);
 
   const colDef = props.colDef as ColDef;
   const cellRendererParams = colDef.cellRendererParams as GenericCellRendererParams<RowType> | undefined;

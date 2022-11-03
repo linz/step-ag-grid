@@ -7,7 +7,7 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "@contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
-import { GenericCellEditorParams, GridFormProps } from "../GridCell";
+import { CellParams } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
@@ -31,8 +31,7 @@ export const MenuHeaderItem = (title: string) => {
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType>
-  extends GenericCellEditorParams<RowType> {
+export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType> {
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -41,12 +40,13 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
   optionsRequestCancel?: () => void;
+  maxRows?: number;
 }
 
-export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: GridFormProps<RowType>) => {
-  const { popoverWrapper } = useGridPopoverHook(props);
-  const formProps = props.formProps as GridFormPopoutDropDownProps<RowType, ValueType>;
-
+export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
+  _props: GridFormPopoutDropDownProps<RowType, ValueType>,
+) => {
+  const props = _props as GridFormPopoutDropDownProps<RowType, ValueType> & CellParams<RowType>;
   const { updatingCells, stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
@@ -60,8 +60,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
-          if (formProps.onSelectedItem) {
-            await formProps.onSelectedItem({ selectedRows, value });
+          if (props.onSelectedItem) {
+            await props.onSelectedItem({ selectedRows, value });
           } else {
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
@@ -69,41 +69,41 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         return true;
       });
     },
-    [formProps, props.field, props.selectedRows, updatingCells],
+    [props, updatingCells],
   );
 
   const selectFilterHandler = useCallback(
     async (value: string): Promise<boolean> => {
       const field = props.field;
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
-        if (formProps.onSelectFilter) {
-          await formProps.onSelectFilter({ selectedRows, value });
+        if (props.onSelectFilter) {
+          await props.onSelectFilter({ selectedRows, value });
         }
         return true;
       });
     },
-    [formProps, props.field, props.selectedRows, updatingCells],
+    [props, updatingCells],
   );
 
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    let optionsConf = formProps.options ?? [];
+    let optionsConf = props.options ?? [];
 
     (async () => {
       if (typeof optionsConf == "function") {
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = optionsConf?.map((item) => {
+      const optionsList = (optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      }) as any) as FinalSelectOption<ValueType>[];
 
-      if (formProps.filtered) {
+      if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
         // the mouse up of the double click edit triggers the cell to cancel editing
         delay(() => setOptions(optionsList), 100);
@@ -112,11 +112,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
       }
       optionsInitialising.current = false;
     })();
-  }, [filter, options, formProps.filtered, formProps.options, props.selectedRows]);
+  }, [filter, options, props]);
 
   // Local filtering
   useEffect(() => {
-    if (formProps.filtered == "local") {
+    if (props.filtered == "local") {
       if (options == null) return;
       setFilteredValues(
         options
@@ -131,7 +131,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
           .filter((r) => r !== undefined),
       );
     }
-  }, [formProps.filtered, filter, options]);
+  }, [props.filtered, filter, options]);
 
   const researchOnFilterChange = debounce(
     useCallback(() => {
@@ -144,12 +144,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
 
   // Reload filtering
   useEffect(() => {
-    if (previousFilter.current != filter && formProps.filtered == "reload") {
+    if (previousFilter.current != filter && props.filtered == "reload") {
       previousFilter.current = filter;
-      formProps.optionsRequestCancel && formProps.optionsRequestCancel();
+      props.optionsRequestCancel && props.optionsRequestCancel();
       researchOnFilterChange().then();
     }
-  }, [filter, formProps, props, researchOnFilterChange]);
+  }, [filter, props, researchOnFilterChange]);
 
   const onFilterKeyDown = useCallback(
     async (e: KeyboardEvent) => {
@@ -159,7 +159,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         if (activeOptions.length == 1) {
           await selectItemHandler(activeOptions[0].value);
           stopEditing();
-        } else if (formProps.onSelectFilter) {
+        } else if (props.onSelectFilter) {
           await selectFilterHandler(filter);
           stopEditing();
         } else {
@@ -168,12 +168,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         }
       }
     },
-    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, formProps],
+    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
 
+  const maxRowsStyles =
+    props.maxRows !== undefined ? { maxHeight: 62 + 34 * props.maxRows, overFlowY: "auto" } : undefined;
+  const { popoverWrapper } = useGridPopoverHook();
   return popoverWrapper(
     <>
-      {formProps.filtered && (
+      {props.filtered && (
         <>
           <FocusableItem className={"filter-item"}>
             {({ ref }: any) => (
@@ -184,7 +187,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
                   style={{ border: "0px" }}
                   ref={ref}
                   type="text"
-                  placeholder={formProps.filterPlaceholder ?? "Placeholder"}
+                  placeholder={props.filterPlaceholder ?? "Placeholder"}
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   onChange={(e) => setFilter(e.target.value.toLowerCase())}
@@ -197,7 +200,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
         </>
       )}
       <ComponentLoadingWrapper loading={!options}>
-        <>
+        <div style={maxRowsStyles}>
           {options && options.length == filteredValues?.length && <MenuItem>[Empty]</MenuItem>}
           {options?.map((item, index) =>
             item.value === MenuSeparatorString ? (
@@ -216,7 +219,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(props: 
               </MenuItem>
             ),
           )}
-        </>
+        </div>
       </ComponentLoadingWrapper>
     </>,
   );

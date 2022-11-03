@@ -3,7 +3,7 @@ import "./FormTest.scss";
 import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
 import { wait } from "@utils/util";
-import { GridFormProps } from "@components/GridCell";
+import { CellParams } from "@components/GridCell";
 import { useGridPopoverHook } from "@components/GridPopoverHook";
 import { GridBaseRow } from "@components/Grid";
 
@@ -16,7 +16,8 @@ export interface IFormTestRow {
   distance: number | null;
 }
 
-export const FormTest = <RowType extends GridBaseRow>(props: GridFormProps<RowType>): JSX.Element => {
+export const FormTest = <RowType extends GridBaseRow>(_props: any): JSX.Element => {
+  const props = _props as CellParams<RowType>;
   const [v1, v2, ...v3] = props.value.split(" ");
 
   const [nameType, setNameType] = useState(v1);
@@ -34,7 +35,7 @@ export const FormTest = <RowType extends GridBaseRow>(props: GridFormProps<RowTy
     // Close form
     return true;
   }, [nameType, numba, plan, props.selectedRows]);
-  const { popoverWrapper } = useGridPopoverHook(props, save);
+  const { popoverWrapper } = useGridPopoverHook({ save });
 
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
