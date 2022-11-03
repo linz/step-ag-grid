@@ -55,7 +55,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           field: "bearing1",
           headerName: "Bearing GCE",
           cellRendererParams: {
-            // FIXME
             warning: (props: any) => props.data.id == 1002 && "Testers are testing",
             info: (props: any) => props.data.id == 1001 && "Developers are developing",
           },
