@@ -24,7 +24,6 @@ export interface MultiSelectResult<RowType> {
 }
 
 export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> {
-  multiEdit?: boolean;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;

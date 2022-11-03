@@ -5,7 +5,6 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellParams } from "@components/GridCell";
 
 export interface GridFormMessageProps<RowType extends GridBaseRow> {
-  multiEdit?: boolean;
   message: (cellParams: CellParams<RowType>) => Promise<string | JSX.Element> | string | JSX.Element;
 }
 

@@ -50,6 +50,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           maxWidth: 140,
         },
         {
+          multiEdit: true,
           editorParams: {
             required: true,
             maxlength: 12,
@@ -58,7 +59,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               if (value === "never") return "The value 'never' is not allowed";
               return null;
             },
-            multiEdit: false,
             onSave: async (selectedRows, value) => {
               await wait(1000);
               selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
@@ -78,6 +78,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
         {
+          multiEdit: true,
           editorParams: {
             maxlength: 12,
             placeholder: "Enter distance...",
@@ -86,7 +87,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               if (value.length && !isFloat(value)) return "Value must be a number";
               return null;
             },
-            multiEdit: false,
             onSave: async (selectedRows, value) => {
               await wait(1000);
               selectedRows.forEach(
@@ -104,11 +104,12 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           maxWidth: 140,
         },
         {
+          multiEdit: true,
           editorParams: {
             required: true,
             maxlength: 32,
             placeholder: "Enter some text...",
-            multiEdit: true,
+
             validate: (value: string) => {
               if (value === "never") return "The value 'never' is not allowed";
               return null;

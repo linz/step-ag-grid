@@ -90,9 +90,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           headerName: "Position",
         },
         {
+          multiEdit: false,
           editorParams: {
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-            multiEdit: false,
           },
         },
       ),
@@ -103,8 +103,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           headerName: "Multi-edit",
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             options: [
               MenuHeaderItem("Header"),
               {
@@ -127,8 +127,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           headerName: "Custom callback",
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
             onSelectedItem: async (selected) => {
               await wait(2000);
@@ -145,6 +145,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           headerName: "Options Fn",
         },
         {
+          multiEdit: false,
           editorParams: {
             filtered: "reload",
             filterPlaceholder: "Search me...",
@@ -156,7 +157,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               // eslint-disable-next-line no-console
               console.log("optionsRequestCancelled");
             },
-            multiEdit: false,
           },
         },
       ),
@@ -168,8 +168,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           headerName: "Filtered",
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
@@ -185,8 +185,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           valueGetter: (params) => params.data.position4?.desc,
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: optionsObjects.map((o) => {
@@ -204,10 +204,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           valueGetter: (params) => params.data.code,
         },
         {
+          multiEdit: true,
           editorParams: {
             maxRows: 2,
-            multiEdit: true,
-
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: Array.from(Array(30).keys()).map((o) => {
@@ -225,8 +224,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           valueGetter: (params) => params.data.code,
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: optionsObjects.map((o) => {

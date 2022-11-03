@@ -47,10 +47,10 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           maxWidth: 140,
         },
         {
+          multiEdit: true,
           editor: FormTest,
           editorParams: {
             a: 4,
-            multiEdit: false,
           },
         },
       ),

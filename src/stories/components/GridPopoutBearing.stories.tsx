@@ -60,9 +60,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
         {
-          editorParams: {
-            multiEdit: false,
-          },
+          multiEdit: false,
         },
       ),
       GridPopoverEditBearingCorrection(

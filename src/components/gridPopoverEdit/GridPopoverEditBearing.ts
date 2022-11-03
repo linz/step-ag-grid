@@ -14,7 +14,7 @@ export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
       initialWidth: 65,
       maxWidth: 150,
       valueFormatter: bearingValueFormatter,
-      cellClass: props.editorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      cellClass: props.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
     },
     {
@@ -31,9 +31,9 @@ export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
   return GridPopoverEditBearingLike(
     { valueFormatter: bearingValueFormatter, ...colDef },
     {
+      multiEdit: !!props.multiEdit,
       editorParams: {
         placeHolder: "Enter bearing correction",
-        multiEdit: !!props.editorParams?.multiEdit,
         range: (value: number | null) => {
           if (value === null) return "Bearing correction is required";
           if (value >= 360) return "Bearing correction must be less than 360 degrees";
@@ -53,9 +53,9 @@ export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow>(
   return GridPopoverEditBearingLike(
     { valueFormatter: bearingCorrectionValueFormatter, ...colDef },
     {
+      multiEdit: !!props.multiEdit,
       editorParams: {
         placeHolder: "Enter bearing correction",
-        multiEdit: !!props.editorParams?.multiEdit,
         range: (value: number | null) => {
           if (value === null) return "Bearing is required";
           if (value >= 360) return "Bearing must be less than 360 degrees";

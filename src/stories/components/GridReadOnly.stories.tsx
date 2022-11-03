@@ -95,8 +95,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           headerName: "Menu",
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: true,
             options: async (selectedItems) => {
               // Just doing a timeout here to demonstrate deferred loading
               await wait(500);

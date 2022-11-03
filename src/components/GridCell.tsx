@@ -15,6 +15,7 @@ import { GridPopoverContext } from "@contexts/GridPopoverContext";
 import { GridPopoverContextProvider } from "@contexts/GridPopoverContextProvider";
 
 export interface GenericCellEditorProps<E> {
+  multiEdit?: boolean;
   editor?: (editorProps: E) => JSX.Element;
   editorParams?: E; // Omit<E, keyof CellParams<IFormTestRow>>
 }
@@ -50,9 +51,10 @@ export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
 /*
  * For editing a text area.
  */
-export const GridCell = <RowType extends GridBaseRow, Props extends { multiEdit?: boolean }>(
+export const GridCell = <RowType extends GridBaseRow, Props>(
   props: GenericCellColDef<RowType>,
   custom?: {
+    multiEdit?: boolean;
     editor?: (editorProps: Props) => JSX.Element;
     editorParams?: Props;
   },
@@ -61,12 +63,12 @@ export const GridCell = <RowType extends GridBaseRow, Props extends { multiEdit?
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(custom?.editor && {
-      cellClass: custom.editorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
       editable: props.editable ?? true,
       cellEditor: GenericCellEditorComponent(custom.editor),
     }),
     ...(custom?.editorParams && {
-      cellEditorParams: custom.editorParams,
+      cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
@@ -101,7 +103,7 @@ export const GenericCellEditorComponent = (editor: (props: any) => JSX.Element) 
     );
   });
 
-export const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
+const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
   const { setProps, propsRef } = useContext(GridPopoverContext);
 
   const { colDef } = props;
