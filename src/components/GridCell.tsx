@@ -14,23 +14,9 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 import { GridPopoverContext } from "@contexts/GridPopoverContext";
 import { GridPopoverContextProvider } from "@contexts/GridPopoverContextProvider";
 
-export interface RendererProps<RowType extends GridBaseRow> extends Record<string, any> {
-  data?: RowType;
-}
-
-export interface EditorProps<RowType extends GridBaseRow> extends Record<string, any> {
-  data?: RowType;
-}
-
-export interface GenericCellEditorProps<
-  RowType extends GridBaseRow,
-  T extends RendererProps<RowType>,
-  E extends EditorProps<RowType>,
-> {
-  renderer?: (rendererProps: T) => JSX.Element;
+export interface GenericCellEditorProps<E> {
   editor?: (editorProps: E) => JSX.Element;
-  rendererParams?: T;
-  editorParams?: E;
+  editorParams?: E; // Omit<E, keyof CellParams<IFormTestRow>>
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
@@ -56,13 +42,21 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   );
 };
 
-/**
+// This is so that typescript retains the row type to pass to the GridCells
+export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
+  _?: RowType;
+}
+
+/*
  * For editing a text area.
  */
-export const GridCell = <RowType extends GridBaseRow>(
+export const GridCell = <RowType extends GridBaseRow, Props extends { multiEdit?: boolean }>(
   props: GenericCellColDef<RowType>,
-  custom?: GenericCellEditorProps<RowType, any, any>,
-): ColDef => {
+  custom?: {
+    editor?: (editorProps: Props) => JSX.Element;
+    editorParams?: Props;
+  },
+): ColDefT<RowType> => {
   return {
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,

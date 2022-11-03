@@ -14,9 +14,8 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> {
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextArea = <RowType extends GridBaseRow>(
-  props: GridFormTextAreaProps<RowType> & CellParams<RowType>,
-) => {
+export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTextAreaProps<RowType>) => {
+  const props = _props as GridFormTextAreaProps<RowType> & CellParams<RowType>;
   const [value, setValue] = useState(props.value ?? "");
 
   const invalid = useCallback(() => {

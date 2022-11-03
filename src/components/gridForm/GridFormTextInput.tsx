@@ -16,9 +16,8 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> {
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextInput = <RowType extends GridBaseRow>(
-  props: GridFormTextInputProps<RowType> & CellParams<RowType>,
-) => {
+export const GridFormTextInput = <RowType extends GridBaseRow>(_props: GridFormTextInputProps<RowType>) => {
+  const props = _props as GridFormTextInputProps<RowType> & CellParams<RowType>;
   const initValue = props.value == null ? "" : `${props.value}`;
   const [value, setValue] = useState(initValue);
 

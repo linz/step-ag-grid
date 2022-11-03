@@ -9,9 +9,8 @@ export interface GridFormMessageProps<RowType extends GridBaseRow> {
   message: (cellParams: CellParams<RowType>) => Promise<string | JSX.Element> | string | JSX.Element;
 }
 
-export const GridFormMessage = <RowType extends GridBaseRow>(
-  props: GridFormMessageProps<RowType> & CellParams<RowType>,
-) => {
+export const GridFormMessage = <RowType extends GridBaseRow>(_props: GridFormMessageProps<RowType>) => {
+  const props = _props as GridFormMessageProps<RowType> & CellParams<RowType>;
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
   const { popoverWrapper } = useGridPopoverHook();
 

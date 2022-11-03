@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import {
   GridPopoverEditBearing,
   GridPopoverEditBearingCorrection,
@@ -42,7 +42,7 @@ interface ITestRow {
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -50,7 +50,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverEditBearing<ITestRow>(
+      GridPopoverEditBearing(
         {
           field: "bearing1",
           headerName: "Bearing GCE",
@@ -65,7 +65,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       ),
-      GridPopoverEditBearingCorrection<ITestRow>(
+      GridPopoverEditBearingCorrection(
         {
           field: "bearingCorrection",
           headerName: "Bearing Correction",

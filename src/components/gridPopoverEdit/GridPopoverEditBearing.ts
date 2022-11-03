@@ -1,14 +1,14 @@
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { bearingCorrectionValueFormatter, bearingValueFormatter } from "@utils/bearing";
-import { GenericCellEditorProps, GridCell } from "../GridCell";
+import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { GridBaseRow } from "../Grid";
 import { ColDef } from "ag-grid-community";
 
 export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
   colDef: ColDef,
-  props: GenericCellEditorProps<RowType, any, GridFormEditBearingProps<RowType>>,
-) => {
+  props: GenericCellEditorProps<GridFormEditBearingProps<RowType>>,
+): ColDefT<RowType> => {
   return GridCell(
     {
       initialWidth: 65,
@@ -19,15 +19,15 @@ export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
     },
     {
       editor: GridFormEditBearing,
-      editorParams: props.editorParams,
+      ...props,
     },
   );
 };
 
 export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
   colDef: ColDef,
-  props: GenericCellEditorProps<RowType, any, GridFormEditBearingProps<RowType>>,
-) => {
+  props: GenericCellEditorProps<GridFormEditBearingProps<RowType>>,
+): ColDefT<RowType> => {
   return GridPopoverEditBearingLike(
     { valueFormatter: bearingValueFormatter, ...colDef },
     {
@@ -48,8 +48,8 @@ export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
 
 export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow>(
   colDef: ColDef,
-  props: GenericCellEditorProps<RowType, any, GridFormEditBearingProps<RowType>>,
-) => {
+  props: GenericCellEditorProps<GridFormEditBearingProps<RowType>>,
+): ColDefT<RowType> => {
   return GridPopoverEditBearingLike(
     { valueFormatter: bearingCorrectionValueFormatter, ...colDef },
     {

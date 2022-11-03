@@ -7,7 +7,7 @@ import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvid
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { IFormTestRow } from "./FormTest";
 import { isFloat, wait } from "@utils/util";
 import { GridPopoverTextArea } from "@components/gridPopoverEdit/GridPopoverTextArea";
@@ -35,7 +35,7 @@ export default {
 
 const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -43,7 +43,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverTextInput<IFormTestRow>(
+      GridPopoverTextInput(
         {
           field: "name",
           headerName: "Text input",
@@ -67,7 +67,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
       ),
-      GridPopoverTextInput<IFormTestRow>(
+      GridPopoverTextInput(
         {
           field: "distance",
           headerName: "Number input",
@@ -97,7 +97,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
       ),
-      GridPopoverTextArea<IFormTestRow>(
+      GridPopoverTextArea(
         {
           field: "plan",
           headerName: "Text area",

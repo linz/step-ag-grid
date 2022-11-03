@@ -7,7 +7,7 @@ import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvid
 import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { FormTest, IFormTestRow } from "./FormTest";
 
 export default {
@@ -32,7 +32,7 @@ export default {
 
 const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -40,7 +40,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell<IFormTestRow>(
+      GridCell(
         {
           field: "name",
           headerName: "Popout Generic Edit",

@@ -44,8 +44,9 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
 }
 
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
-  props: GridFormPopoutDropDownProps<RowType, ValueType> & CellParams<RowType>,
+  _props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
+  const props = _props as GridFormPopoutDropDownProps<RowType, ValueType> & CellParams<RowType>;
   const { updatingCells, stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");

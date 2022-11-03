@@ -9,8 +9,8 @@ import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { wait } from "@utils/util";
 import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
+import { CellParams, ColDefT, GridCell } from "@components/GridCell";
 import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
-import { GridCell } from "@components/GridCell";
 
 export default {
   title: "Components / Grids",
@@ -42,7 +42,7 @@ interface ITestRow {
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
-  const columnDefs = useMemo(
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
         field: "id",
@@ -50,7 +50,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell<ITestRow>({
+      GridCell({
         field: "position",
         headerName: "Position",
         initialWidth: 65,
@@ -72,22 +72,25 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 150,
         maxWidth: 200,
       }),
-      GridPopoverMessage<ITestRow>(
+      GridPopoverMessage(
         {
           headerName: "Popout message",
           cellRenderer: () => <>Click me!</>,
+          cellRendererParams: {
+            warning: () => "x",
+          },
         },
         {
           editorParams: {
-            message: async (cellParams) => {
+            message: async (formParams: CellParams<ITestRow>): Promise<string> => {
               await wait(1000);
-              return `There are ${cellParams.selectedRows.length} row(s) selected`;
+              return `There are ${formParams.selectedRows.length} row(s) selected`;
             },
             multiEdit: true,
           },
         },
       ),
-      GridPopoverMenu<ITestRow>(
+      GridPopoverMenu(
         {
           headerName: "Menu",
         },
@@ -131,7 +134,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       ),
-      GridPopoverMenu<ITestRow>(
+      GridPopoverMenu(
         {
           headerName: "Menu disabled",
           editable: false,

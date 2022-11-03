@@ -35,15 +35,16 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
-  props: GridFormMultiSelectProps<RowType, ValueType> & CellParams<RowType>,
+  props: GridFormMultiSelectProps<RowType, ValueType>,
 ) => {
+  const { selectedRows } = props as unknown as CellParams<RowType>;
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
   const subSelectedValues = useRef<Record<string, any>>({});
   const [selectedValues, setSelectedValues] = useState<any[]>(() =>
-    props.initialSelectedValues ? props.initialSelectedValues(props.selectedRows) : [],
+    props.initialSelectedValues ? props.initialSelectedValues(selectedRows) : [],
   );
 
   const save = useCallback(
@@ -68,7 +69,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(props.selectedRows);
+        optionsConf = await optionsConf(selectedRows);
       }
 
       const optionsList = optionsConf?.map((item) => {
@@ -87,7 +88,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
       }
       optionsInitialising.current = false;
     })();
-  }, [props.filtered, props.options, options, props.selectedRows]);
+  }, [props.filtered, props.options, options, selectedRows]);
 
   useEffect(() => {
     if (!props.filtered || options == null) return;

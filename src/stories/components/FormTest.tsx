@@ -16,7 +16,8 @@ export interface IFormTestRow {
   distance: number | null;
 }
 
-export const FormTest = <RowType extends GridBaseRow>(props: CellParams<RowType>): JSX.Element => {
+export const FormTest = <RowType extends GridBaseRow>(_props: any): JSX.Element => {
+  const props = _props as CellParams<RowType>;
   const [v1, v2, ...v3] = props.value.split(" ");
 
   const [nameType, setNameType] = useState(v1);

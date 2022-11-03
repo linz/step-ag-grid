@@ -8,11 +8,10 @@ import { GridContextProvider } from "@contexts/GridContextProvider";
 import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { MenuSeparator } from "@components/gridForm/GridFormDropDown";
-import { ColDef } from "ag-grid-community";
 import { wait } from "@utils/util";
 import { MultiSelectResult } from "@components/gridForm/GridFormMultiSelect";
 import { GridSubComponentTextArea } from "@components/GridSubComponentTextArea";
-import { GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { GridPopoutEditMultiSelect } from "@components/gridPopoverEdit/GridPopoutEditMultiSelect";
 
 export default {
@@ -45,7 +44,7 @@ interface ITestRow {
 const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
-  const columnDefs = useMemo(() => {
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(() => {
     const positionTwoMap: Record<string, string> = {
       "1": "One",
       "2": "Two",
@@ -58,7 +57,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>(
+      GridPopoutEditMultiSelect(
         {
           field: "position",
           initialWidth: 65,
@@ -92,7 +91,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           },
         },
       ),
-      GridPopoutEditMultiSelect<ITestRow, ITestRow["position2"]>(
+      GridPopoutEditMultiSelect(
         {
           field: "position2",
           initialWidth: 65,
@@ -116,7 +115,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           },
         },
       ),
-    ] as ColDef[];
+    ];
   }, []);
 
   const rowData = useMemo(

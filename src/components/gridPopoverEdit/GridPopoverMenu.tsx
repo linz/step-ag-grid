@@ -4,7 +4,7 @@ import "../../react-menu3/styles/index.scss";
 import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GridBaseRow } from "../Grid";
-import { GenericCellEditorProps, GridCell } from "../GridCell";
+import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
 
@@ -13,9 +13,9 @@ import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell
  */
 export const GridPopoverMenu = <RowType extends GridBaseRow>(
   colDef: ColDef,
-  props: GenericCellEditorProps<RowType, any, GridFormPopoutMenuProps<RowType>>,
-): ColDef =>
-  GridCell<RowType>(
+  props: GenericCellEditorProps<GridFormPopoutMenuProps<RowType>>,
+): ColDefT<RowType> =>
+  GridCell<RowType, GridFormPopoutMenuProps<RowType>>(
     {
       maxWidth: 64,
       editable: colDef.editable != null ? colDef.editable : true,

@@ -14,9 +14,8 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends GridBaseRow>(
-  props: GridFormEditBearingProps<RowType> & CellParams<RowType>,
-) => {
+export const GridFormEditBearing = <RowType extends GridBaseRow>(_props: GridFormEditBearingProps<RowType>) => {
+  const props = _props as GridFormEditBearingProps<RowType> & CellParams<RowType>;
   const [value, setValue] = useState<string>(`${props.value ?? ""}`);
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {

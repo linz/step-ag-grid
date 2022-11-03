@@ -30,9 +30,8 @@ export interface MenuOption<RowType> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoutMenu = <RowType extends GridBaseRow>(
-  props: GridFormPopoutMenuProps<RowType> & CellParams<RowType>,
-) => {
+export const GridFormPopoutMenu = <RowType extends GridBaseRow>(_props: GridFormPopoutMenuProps<RowType>) => {
+  const props = _props as GridFormPopoutMenuProps<RowType> & CellParams<RowType>;
   const { updatingCells } = useContext(GridContext);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MenuOption<RowType>[]>();
