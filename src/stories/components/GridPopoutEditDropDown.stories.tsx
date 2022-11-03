@@ -213,12 +213,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             options: Array.from(Array(30).keys()).map((o) => {
               return { value: o, label: `${o}` };
             }),
-            onSelectedItem: async (selected) => {
-              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
-            },
-            onSelectFilter: async (selected) => {
-              selected.selectedRows.forEach((row) => (row.code = selected.value));
-            },
           },
         },
       ),
