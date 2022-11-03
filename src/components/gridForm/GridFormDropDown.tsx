@@ -96,12 +96,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = (optionsConf?.map((item) => {
+      const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any) as FinalSelectOption<ValueType>[];
+      }) as any as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -114,7 +114,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     })();
   }, [filter, options, props]);
 
-  // Local filtering
+  // Local filtering.
   useEffect(() => {
     if (props.filtered == "local") {
       if (options == null) return;
@@ -142,7 +142,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
   const previousFilter = useRef<string>(filter);
 
-  // Reload filtering
+  // Reload filtering.
   useEffect(() => {
     if (previousFilter.current != filter && props.filtered == "reload") {
       previousFilter.current = filter;
@@ -173,6 +173,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
   const maxRowsStyles =
     props.maxRows !== undefined ? { maxHeight: 62 + 34 * props.maxRows, overFlowY: "auto" } : undefined;
+
   const { popoverWrapper } = useGridPopoverHook();
   return popoverWrapper(
     <>
