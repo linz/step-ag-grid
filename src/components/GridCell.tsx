@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef, useCallback, useContext, useMemo, useState } from "react";
+import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
@@ -27,10 +27,10 @@ export interface GenericCellEditorProps<
   T extends RendererProps<RowType>,
   E extends EditorProps<RowType>,
 > {
-  renderer?: (props: T) => JSX.Element;
-  editor?: (props: E) => JSX.Element;
+  renderer?: (rendererProps: T) => JSX.Element;
+  editor?: (editorProps: E) => JSX.Element;
   rendererParams?: T;
-  editorParams?: E;
+  editorParams?: Omit<E, "value" | "data" | "field" | "selectedRows">;
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
@@ -87,7 +87,7 @@ export const GridCell = <RowType extends GridBaseRow>(
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
     },
-  } as ColDef;
+  };
 };
 
 export interface CellParams<RowType extends GridBaseRow> {
