@@ -32,7 +32,6 @@ export const MenuHeaderItem = (title: string) => {
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
 export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType> {
-  multiEdit?: boolean;
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;

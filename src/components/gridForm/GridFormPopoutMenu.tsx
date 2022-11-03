@@ -7,7 +7,6 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellParams } from "@components/GridCell";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> {
-  multiEdit?: boolean;
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
 }
 

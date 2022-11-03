@@ -65,8 +65,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           headerName: "Position",
         },
         {
+          multiEdit: true,
           editorParams: {
-            multiEdit: false,
             filtered: true,
             filterPlaceholder: "Filter position",
             options: [
@@ -100,8 +100,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           valueGetter: (props) => positionTwoMap[props.data.position2],
         },
         {
+          multiEdit: false,
           editorParams: {
-            multiEdit: false,
             filtered: true,
             filterPlaceholder: "Filter position",
             initialSelectedValues: (selectedRows) => [selectedRows[0].position2],

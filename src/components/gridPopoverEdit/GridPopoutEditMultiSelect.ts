@@ -12,7 +12,7 @@ export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow, ValueType
     {
       initialWidth: 65,
       maxWidth: 150,
-      cellClass: colDef.cellEditor?.multiEdit ? GenericMultiEditCellClass : undefined,
+      cellClass: props.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
     },
     {

@@ -5,7 +5,6 @@ import { GridBaseRow } from "../Grid";
 import { CellParams } from "@components/GridCell";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow> {
-  multiEdit?: boolean;
   placeholder?: string;
   units?: string;
   required?: boolean;

@@ -12,7 +12,7 @@ export const GridPopoverEditDropDown = <RowType extends GridBaseRow, ValueType>(
     {
       initialWidth: 65,
       maxWidth: 150,
-      cellClass: props.editorParams?.multiEdit ? GenericMultiEditCellClass : undefined,
+      cellClass: props.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
     },
     {

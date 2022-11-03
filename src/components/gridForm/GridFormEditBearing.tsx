@@ -8,7 +8,6 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellParams } from "@components/GridCell";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
-  multiEdit?: boolean;
   placeHolder?: string;
   range?: (value: number | null) => string | null;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
