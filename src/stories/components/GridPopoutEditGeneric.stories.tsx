@@ -40,15 +40,20 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridCell({
-        field: "name",
-        headerName: "Popout Generic Edit",
-        maxWidth: 140,
-        cellEditorParams: {
-          form: FormTest,
-          multiEdit: false,
+      GridCell<IFormTestRow>(
+        {
+          field: "name",
+          headerName: "Popout Generic Edit",
+          maxWidth: 140,
         },
-      }),
+        {
+          editor: FormTest,
+          editorParams: {
+            a: 4,
+            multiEdit: false,
+          },
+        },
+      ),
     ],
     [],
   );

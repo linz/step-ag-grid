@@ -30,7 +30,7 @@ export interface GenericCellEditorProps<
   renderer?: (rendererProps: T) => JSX.Element;
   editor?: (editorProps: E) => JSX.Element;
   rendererParams?: T;
-  editorParams?: Omit<E, "value" | "data" | "field" | "selectedRows">;
+  editorParams?: E;
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
