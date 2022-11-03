@@ -204,10 +204,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           valueGetter: (params) => params.data.code,
         },
         {
+          multiEdit: true,
           editorParams: {
             maxRows: 2,
-            multiEdit: true,
-
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: Array.from(Array(30).keys()).map((o) => {
