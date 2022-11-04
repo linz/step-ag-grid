@@ -30,14 +30,6 @@ export { GridPopoverTextInput } from "./src/components/gridPopoverEdit/GridPopov
 
 export { GridHeaderSelect } from "./src/components/gridHeader/GridHeaderSelect";
 
-export * from "./src/components/gridForm/GridFormEditBearing";
-export * from "./src/components/gridForm/GridFormDropDown";
-export * from "./src/components/gridForm/GridFormMessage";
-export * from "./src/components/gridForm/GridFormMultiSelect";
-export * from "./src/components/gridForm/GridFormPopoutMenu";
-export * from "./src/components/gridForm/GridFormTextArea";
-export * from "./src/components/gridForm/GridFormTextInput";
-
 export { TextAreaInput } from "./src/lui/TextAreaInput";
 export { TextInputFormatted } from "./src/lui/TextInputFormatted";
 export { GridSubComponentTextArea } from "./src/components/GridSubComponentTextArea";

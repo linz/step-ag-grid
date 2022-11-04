@@ -92,6 +92,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: false,
           editorParams: {
+            className: "Xxx",
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
           },
         },
@@ -206,7 +207,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: true,
           editorParams: {
-            maxRows: 2,
+            className: "GridPopoverEditDropDown-containerSmall",
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: Array.from(Array(30).keys()).map((o) => {

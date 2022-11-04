@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
 
-export interface GridFormTextInputProps<RowType extends GridBaseRow> {
+export interface GridFormTextInputProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
   units?: string;
   required?: boolean;
@@ -54,7 +54,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(_props: GridFormT
     },
     [invalid, value, initValue, props],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ save });
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
 
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>

@@ -1,10 +1,10 @@
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridBaseRow } from "../Grid";
 import { GridFormTextInput, GridFormTextInputProps } from "../gridForm/GridFormTextInput";
-import { ColDef } from "ag-grid-community";
+import { GenericCellColDef } from "@components/gridRender/GridRenderGenericCell";
 
 export const GridPopoverTextInput = <RowType extends GridBaseRow>(
-  colDef: ColDef,
+  colDef: GenericCellColDef<RowType>,
   params: GenericCellEditorProps<GridFormTextInputProps<RowType>>,
 ): ColDefT<RowType> => {
   return GridCell(

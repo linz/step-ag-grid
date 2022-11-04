@@ -76,17 +76,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         {
           headerName: "Popout message",
           cellRenderer: () => <>Click me!</>,
-          cellRendererParams: {
-            warning: () => "x",
-          },
         },
         {
+          multiEdit: true,
           editorParams: {
             message: async (formParams: CellParams<ITestRow>): Promise<string> => {
               await wait(1000);
               return `There are ${formParams.selectedRows.length} row(s) selected`;
             },
-            multiEdit: true,
           },
         },
       ),

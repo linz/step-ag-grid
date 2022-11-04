@@ -49,9 +49,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           multiEdit: true,
           editor: FormTest,
-          editorParams: {
-            a: 4,
-          },
+          editorParams: {},
         },
       ),
     ],

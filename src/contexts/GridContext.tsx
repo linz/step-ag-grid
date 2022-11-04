@@ -7,7 +7,7 @@ export interface GridContextType {
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
-  getSelectedRows: <T extends unknown>() => T[];
+  getSelectedRows: <T extends GridBaseRow>() => T[];
   getSelectedRowIds: () => number[];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;

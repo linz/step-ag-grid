@@ -1,14 +1,14 @@
-import "../../react-menu3/styles/index.scss";
+import "./GridFormMultiSelect.scss";
 
 import { MenuItem, MenuDivider, FocusableItem, ClickEvent } from "@react-menu3";
-import { Fragment, useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -23,7 +23,14 @@ export interface MultiSelectResult<RowType> {
   values: Record<string, any>;
 }
 
-export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> {
+export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
+  // This overrides CellEditorCommon to provide some common class options
+  className?:
+    | "GridMultiSelect-containerSmall"
+    | "GridMultiSelect-containerMedium"
+    | "GridMultiSelect-containerLarge"
+    | string
+    | undefined;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
@@ -58,7 +65,6 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     },
     [props, selectedValues],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ save });
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -105,9 +111,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     );
   }, [props.filtered, filter, options]);
 
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={!options}>
-      <div className={"Grid-popoverContainerList"}>
+    <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
+      <div className={"GridFormMultiSelect-filter"}>
         {options && props.filtered && (
           <>
             <FocusableItem className={"filter-item"} key={"filter"}>
@@ -134,7 +141,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
           item.value === MenuSeparatorString ? (
             <MenuDivider key={`$$divider_${index}`} />
           ) : filteredValues.includes(item.value) ? null : (
-            <Fragment key={`${index}`}>
+            <div key={`${index}`} className={"GridFormMultiSelect-options"}>
               <MenuItem
                 key={`${index}`}
                 onClick={(e: ClickEvent) => {
@@ -190,7 +197,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                   }
                 </FocusableItem>
               )}
-            </Fragment>
+            </div>
           ),
         )}
       </div>

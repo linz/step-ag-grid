@@ -18,5 +18,9 @@ export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow, ValueType
     {
       editor: GridFormMultiSelect,
       ...props,
+      editorParams: {
+        className: "GridMultiSelect-containerMedium",
+        ...(props.editorParams as GridFormMultiSelectProps<RowType, ValueType>),
+      },
     },
   );

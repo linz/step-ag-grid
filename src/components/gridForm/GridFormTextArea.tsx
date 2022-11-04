@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
 
-export interface GridFormTextAreaProps<RowType extends GridBaseRow> {
+export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
   required?: boolean;
   maxlength?: number;
@@ -50,9 +50,9 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTe
     },
     [props, invalid, value],
   );
-  const { popoverWrapper } = useGridPopoverHook({ save });
+  const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
+    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
       <TextAreaInput
         value={value}
         onChange={(e) => setValue(e.target.value)}
