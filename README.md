@@ -44,9 +44,9 @@ npm run storybook
 ```tsx
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/step-ag-grid/index.css"
+import "@linzjs/step-ag-grid/dist/index.css"
 // Only required for LINZ themes otherwise import the default theme from ag-grid
-import "@linzjs/step-ag-grid/GridTheme.scss";
+import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 
 import { useMemo } from "react";
 import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";

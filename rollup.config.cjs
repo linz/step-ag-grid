@@ -54,7 +54,7 @@ module.exports = {
     copy({
       targets: [
         {
-          src: "src/components/GridTheme.scss",
+          src: "src/styles/GridTheme.scss",
           dest: `${outputDir}`,
         },
       ],
