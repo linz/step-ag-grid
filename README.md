@@ -2,7 +2,7 @@
 
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
-Storybook deployed at: https://linz.github.io/step-ag-grid/ (private to LINZ)
+Storybook deployed at: https://linz.github.io/step-ag-grid/
 
 ## Features
 
