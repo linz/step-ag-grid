@@ -1,27 +1,8 @@
 import { ForwardedRef, forwardRef, ReactNode, useMemo } from "react";
 import { useBEM } from "../hooks";
-import { menuClass, radioGroupClass, RadioGroupContext } from "../utils";
-import { BaseProps, Event, EventHandler } from "../types";
-
-export interface RadioChangeEvent extends Event {
-  /**
-   * The `name` prop passed to the `MenuRadioGroup` when the menu item is in a radio group.
-   */
-  name?: string;
-  /**
-   * Set this property on event object to control whether to keep menu open after menu item is activated.
-   * Leaving it `undefined` will behave in accordance with WAI-ARIA Authoring Practices.
-   */
-  keepOpen?: boolean;
-  /**
-   * Setting this property on event object to `true` will skip `onItemClick` event on root menu component.
-   */
-  stopPropagation?: boolean;
-  /**
-   * DOM event object (React synthetic event)
-   */
-  syntheticEvent: MouseEvent | KeyboardEvent;
-}
+import { menuClass, radioGroupClass } from "../utils";
+import { BaseProps, EventHandler, RadioChangeEvent } from "../types";
+import { RadioGroupContext } from "../contexts/RadioGroupContext";
 
 //
 // MenuRadioGroup

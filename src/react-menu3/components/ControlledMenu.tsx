@@ -12,20 +12,12 @@ import {
 import { createPortal } from "react-dom";
 import { MenuList } from "./MenuList";
 import { useBEM } from "../hooks";
-import {
-  menuContainerClass,
-  mergeProps,
-  safeCall,
-  isMenuOpen,
-  getTransition,
-  CloseReason,
-  Keys,
-  EventHandlersContext,
-  SettingsContext,
-  ItemSettingsContext,
-} from "../utils";
+import { menuContainerClass, mergeProps, safeCall, isMenuOpen, getTransition, CloseReason, Keys } from "../utils";
 import { hasParentClass } from "@utils/util";
 import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
+import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
+import { SettingsContext } from "../contexts/SettingsContext";
+import { EventHandlersContext, EventHandlersContextType } from "../contexts/EventHandlersContext";
 
 export const ControlledMenuFr = (
   {
@@ -128,13 +120,13 @@ export const ControlledMenuFr = (
   useEffect(() => {
     if (isMenuOpen(state)) {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
-      thisDocument.addEventListener("mousedown", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("mouseup", handleScreenEventForSave, true);
+      thisDocument.addEventListener("mousedown", handleScreenEventForSave, true);
+      thisDocument.addEventListener("mouseup", handleScreenEventForCancel, true);
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
       thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
-        thisDocument.removeEventListener("mousedown", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("mouseup", handleScreenEventForSave, true);
+        thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
+        thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("dblclick", handleScreenEventForCancel, true);
       };
@@ -151,7 +143,7 @@ export const ControlledMenuFr = (
   );
 
   const eventHandlers = useMemo(
-    () => ({
+    (): EventHandlersContextType => ({
       handleClick(event: RadioChangeEvent, isCheckOrRadio: boolean) {
         if (!event.stopPropagation) safeCall(onItemClick, event);
 

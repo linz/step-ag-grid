@@ -21,10 +21,6 @@ import {
   menuItemClass,
   isMenuOpen,
   withHovering,
-  SettingsContext,
-  ItemSettingsContext,
-  MenuListContext,
-  MenuListItemContext,
   Keys,
   HoverActionTypes,
   FocusPositions,
@@ -43,6 +39,10 @@ import {
   UncontrolledMenuProps,
 } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
+import { MenuListItemContext } from "../contexts/MenuListItemContext";
+import { MenuListContext } from "../contexts/MenuListContext";
+import { SettingsContext } from "../contexts/SettingsContext";
+import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
 
 //
 // SubMenu

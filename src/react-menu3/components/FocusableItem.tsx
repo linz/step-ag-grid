@@ -1,16 +1,9 @@
 import { LegacyRef, useContext, useMemo, useRef } from "react";
 import { useBEM, useCombinedRef, useItemState } from "../hooks";
-import {
-  mergeProps,
-  commonProps,
-  safeCall,
-  menuClass,
-  menuItemClass,
-  withHovering,
-  EventHandlersContext,
-} from "../utils";
+import { mergeProps, commonProps, safeCall, menuClass, menuItemClass, withHovering } from "../utils";
 import { BaseProps } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
+import { EventHandlersContext } from "../contexts/EventHandlersContext";
 
 export interface FocusableItemProps extends BaseProps, withHoveringResultProps {
   disabled?: boolean;

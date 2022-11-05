@@ -17,12 +17,12 @@ import {
   Keys,
   FocusPositions,
   HoverActionTypes,
-  SettingsContext,
-  MenuListContext,
-  MenuListItemContext,
-  HoverItemContext,
 } from "../utils";
 import { ControlledMenuProps, MenuDirection } from "../types";
+import { MenuListItemContext } from "../contexts/MenuListItemContext";
+import { HoverItemContext } from "../contexts/HoverItemContext";
+import { MenuListContext } from "../contexts/MenuListContext";
+import { SettingsContext } from "../contexts/SettingsContext";
 
 export const MenuList = ({
   ariaLabel,
