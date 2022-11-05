@@ -21,6 +21,11 @@
   li[role="menuitem"]:hover {
     background-color: colors.$polar;
   }
+
+  .szh-menu__header {
+    display: flex;
+    align-items: center;
+  }
 }
 
 /**
@@ -123,10 +128,7 @@
   margin: 0.25rem;
 }
 
-.step-ag-grid-react-menu-sub-header {
-  display: flex;
-  align-items: center;
-}
+
 
 .step-ag-grid-react-menu-sub-header-icon {
   margin: spacing.$unit-xs;
