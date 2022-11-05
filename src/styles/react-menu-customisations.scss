@@ -1,0 +1,134 @@
+@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars.scss" as colors;
+@use "@linzjs/lui/dist/scss/Foundation/Variables/FontVars.scss" as fonts;
+@use "@linzjs/lui/dist/scss/Foundation/Variables/SpacingVars.scss" as spacing;
+@use "@linzjs/lui/dist/scss/Foundation/Utilities" as *;
+
+/**
+ * Here is where we can override the styles of react-menu
+ */
+.step-ag-grid-react-menu.szh-menu {
+  z-index: 900;
+  color: colors.$base-type-color;
+  @include fonts.font-light();
+
+  div,
+  a[role="menuitem"] {
+    text-decoration: none;
+    color: colors.$base-type-color;
+    @include fonts.font-light();
+  }
+
+  li[role="menuitem"]:hover {
+    background-color: colors.$polar;
+  }
+}
+
+/**
+ * Here are styles for lui select menu
+ */
+.lui-select-menu.szh-menu-container {
+  @include breakpoint(sm) {
+    position: absolute;
+  }
+}
+
+.lui-select-menu.szh-menu {
+  z-index: 900;
+  width: 92vw;
+  overflow-y: scroll;
+
+  @include breakpoint(sm) {
+    overflow: visible;
+    height: auto;
+    width: 240px;
+  }
+
+  color: colors.$base-type-color;
+  @include fonts.font-light();
+}
+
+.lui-select-menuItem {
+  padding: spacing.$unit-xs spacing.$unit-sm spacing.$unit-xs spacing.$unit-xs;
+  display: flex;
+  line-height: 1;
+  transition: all 0.2s ease-in-out;
+  fill: colors.$fuscous;
+
+  &:hover {
+    background-color: colors.$polar;
+  }
+}
+
+.lui-select-menuItem--error {
+  p {
+    color: colors.$error;
+  }
+
+  .LuiIcon {
+    fill: colors.$error;
+  }
+}
+
+.lui-select-menuItemText {
+  @include fonts.font-regular();
+  color: colors.$charcoal;
+  margin: 0;
+  padding-left: spacing.$unit-lg;
+
+  // if no icon, give it 4px to align with the group header
+  &--noPadding {
+    padding-left: spacing.$unit-xxs;
+  }
+}
+
+.lui-select-icon + .lui-select-menuItemText {
+  padding-left: spacing.$unit-xs;
+}
+
+.lui-select-menu-group {
+  height: 32px;
+  color: colors.$fuscous;
+  padding-left: 0.75rem;
+  text-transform: none;
+  @include fonts.font-semibold();
+}
+
+.lui-select-submenu {
+  flex: 1;
+
+  div[role="menuitem"] {
+    padding: spacing.$unit-xs spacing.$unit-xs spacing.$unit-xs 2.5rem;
+    text-decoration: none;
+    @include fonts.font-regular();
+    height: 40px;
+  }
+  // overwrite the hover color
+  .szh-menu__item--hover {
+    background-color: colors.$polar;
+  }
+}
+
+.lui-select-submenu-with-icon {
+  flex: 1;
+  // width: 200px;
+  div[role="menuitem"] {
+    padding-left: 0;
+    text-decoration: none;
+    @include fonts.font-regular();
+    height: 40px;
+  }
+}
+
+.lui-select-divider {
+  margin: 0.25rem;
+}
+
+.step-ag-grid-react-menu-sub-header {
+  display: flex;
+  align-items: center;
+}
+
+.step-ag-grid-react-menu-sub-header-icon {
+  margin: spacing.$unit-xs;
+  fill: colors.$fuscous;
+}
