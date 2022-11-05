@@ -5,11 +5,11 @@
 }
 
 .AgGridGenericCellRenderer-ic_infoIcon {
-  @extend .AgGridGenericCellRenderer-icon;
+  margin-right: 4px;
   fill: lui.$info;
 }
 
 .AgGridGenericCellRenderer-ic_warningIcon {
-  @extend .AgGridGenericCellRenderer-icon;
+  margin-right: 4px;
   fill: lui.$warning;
 }

@@ -1,4 +1,4 @@
-import "../components/GridTheme.scss";
+import "../styles/GridTheme.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -156,9 +156,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   );
 
   const noRowsOverlayComponent = useCallback(
-    () => (
-      <span className="ag-overlay-no-rows-center">{params.noRowsOverlayText ?? "There are currently no rows"}</span>
-    ),
+    () => <span>{params.noRowsOverlayText ?? "There are currently no rows"}</span>,
     [params.noRowsOverlayText],
   );
 

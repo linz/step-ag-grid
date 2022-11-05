@@ -1,13 +1,13 @@
-@use 'sass:list';
-@use 'sass:map';
+@use "sass:list";
+@use "sass:map";
 
-$menu: 'szh-menu';
+$menu: "szh-menu";
 $duration: 0.15s;
 $directions: (
-  'left': 'X' 1,
-  'right': 'X' -1,
-  'top': 'Y' 1,
-  'bottom': 'Y' -1
+  "left": "X" 1,
+  "right": "X" -1,
+  "top": "Y" 1,
+  "bottom": "Y" -1,
 );
 
 @mixin animation($name, $dir) {
@@ -43,5 +43,5 @@ $directions: (
 }
 
 @each $dir in map.keys($directions) {
-  @include animation('slide', $dir);
+  @include animation("slide", $dir);
 }

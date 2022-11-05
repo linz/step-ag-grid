@@ -7,11 +7,11 @@
 }
 
 .Grid-sortIsStale {
-  span.ag-icon.ag-icon-desc:after {
+  span.ag-icon.ag-icon-desc::after {
     content: "*";
   }
 
-  span.ag-icon.ag-icon-asc:after {
+  span.ag-icon.ag-icon-asc::after {
     content: "*";
   }
 }

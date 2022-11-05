@@ -6,7 +6,6 @@
 
 **[Live examples and docs](https://szhsin.github.io/react-menu/)**
 
-
 ## Features
 
 - React menu components for easy and fast web development.
@@ -37,7 +36,7 @@ yarn add @szhsin/react-menu
 ## Usage
 
 ```jsx
-import { Menu, MenuItem, MenuButton, SubMenu } from '@szhsin/react-menu';
+import { Menu, MenuItem, MenuButton, SubMenu } from "@szhsin/react-menu";
 
 export default function App() {
   return (

@@ -36,9 +36,10 @@
     "uuid": "^9.0.0"
   },
   "scripts": {
-    "build": "run-s clean lint css bundle",
+    "build": "run-s clean stylelint lint css bundle",
     "clean": "rimraf dist && mkdirp ./dist",
     "bundle": "rollup -c",
+    "stylelint": "stylelint src/**/*.scss src/**/*.css --fix",
     "css": "sass ./src/styles/index.scss:dist/index.css --no-source-map",
     "test": "react-scripts test --passWithNoTests",
     "eject": "react-scripts eject",
@@ -110,6 +111,7 @@
     "mkdirp": "^1.0.4",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.1.7",
+    "postcss-scss": "^4.0.5",
     "postcss-loader": "^4.0.4",
     "prettier": "^2.7.1",
     "react-scripts": "^5.0.1",
@@ -123,6 +125,12 @@
     "semantic-release": "^19.0.5",
     "storybook-addon-mock": "^2.4.1",
     "style-loader": "^2.0.0",
+    "stylelint": "^14.14.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^29.0.0",
+    "stylelint-config-recommended-scss": "^8.0.0",
+    "stylelint-prettier": "^2.0.0",
+    "stylelint-scss": "^4.3.0",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
     "typescript": "^4.8.4"
   },

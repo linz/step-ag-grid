@@ -1,9 +1,9 @@
-@use 'var';
-@use 'mixins';
+@use "var";
+@use "mixins";
 
 .szh-menu {
-  @include mixins.reset-list;
-  @include mixins.remove-focus;
+  @include mixins.reset-list ();
+  @include mixins.remove-focus ();
   box-sizing: border-box;
   width: max-content;
   z-index: 100;
@@ -42,7 +42,7 @@
   }
 
   &__item {
-    @include mixins.remove-focus;
+    @include mixins.remove-focus ();
     cursor: pointer;
 
     &--hover {
@@ -65,7 +65,7 @@
   }
 
   &__radio-group {
-    @include mixins.reset-list;
+    @include mixins.reset-list ();
   }
 
   &__divider {
