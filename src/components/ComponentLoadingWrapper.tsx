@@ -7,11 +7,12 @@ export const ComponentLoadingWrapper = (props: {
   loading?: boolean;
   saving?: boolean;
   children: JSX.Element | undefined;
+  className: string | undefined;
 }): JSX.Element => {
   return props.loading ? (
     <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading", style: { padding: 16 } }} />
   ) : (
-    <div style={{ maxHeight: 400, overflowY: "auto", pointerEvents: props.saving ? "none" : "inherit" }}>
+    <div style={{ pointerEvents: props.saving ? "none" : "inherit" }} className={props.className}>
       {props.saving && (
         <div
           style={{

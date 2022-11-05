@@ -1,0 +1,18 @@
+.GridMultiSelect-containerSmall .GridFormMultiSelect-options {
+  max-height: 130px;
+  overflow-y: auto;
+}
+
+.GridMultiSelect-containerMedium .GridFormMultiSelect-options {
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.GridMultiSelect-containerLarge .GridFormMultiSelect-options {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.GridMultiSelect-containerUnlimited .GridFormMultiSelect-options {
+  overflow-y: auto;
+}

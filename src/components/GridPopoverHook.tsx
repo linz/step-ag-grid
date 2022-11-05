@@ -5,12 +5,13 @@ import { ControlledMenu } from "@react-menu3";
 import { GridPopoverContext } from "@contexts/GridPopoverContext";
 
 export interface GridPopoverHookProps<RowType> {
+  className: string | undefined;
   save?: (selectedRows: RowType[]) => Promise<boolean>;
 }
 
-export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType> = {}) => {
+export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
   const { stopEditing } = useContext(GridContext);
-  const { anchorRef, saving, updateValueRef } = useContext(GridPopoverContext);
+  const { anchorRef, saving, propsRef } = useContext(GridPopoverContext);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 
@@ -20,12 +21,16 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (reason == "cancel" || !props.save || (updateValueRef.current && (await updateValueRef.current(props.save)))) {
+      if (
+        reason == "cancel" ||
+        !props.save ||
+        (propsRef.current?.updateValue && (await propsRef.current?.updateValue(props.save)))
+      ) {
         setOpen(false);
         stopEditing();
       }
     },
-    [props, stopEditing, updateValueRef],
+    [props, stopEditing, propsRef],
   );
 
   const popoverWrapper = useCallback(
@@ -39,12 +44,13 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               unmountOnClose={true}
               anchorRef={anchorRef}
               saveButtonRef={saveButtonRef}
-              menuClassName={"lui-menu"}
+              menuClassName={"step-ag-grid-react-menu"}
               onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
               viewScroll={"auto"}
               dontShrinkIfDirectionIsTop={true}
+              className={props.className}
             >
-              {saving && (
+              {saving && ( // This is the overlay that prevents editing when the editor is saving
                 <div
                   style={{
                     position: "absolute",
@@ -64,7 +70,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
         </>
       );
     },
-    [anchorRef, isOpen, saving, triggerSave],
+    [anchorRef, isOpen, props.className, saving, triggerSave],
   );
 
   return {

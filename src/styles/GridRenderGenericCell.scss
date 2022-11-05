@@ -1,15 +1,15 @@
-@use 'node_modules/@linzjs/lui/dist/scss/Core' as lui;
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
 
 .AgGridGenericCellRenderer-icon {
   margin-right: 4px;
 }
 
 .AgGridGenericCellRenderer-ic_infoIcon {
-  @extend .AgGridGenericCellRenderer-icon;
+  margin-right: 4px;
   fill: lui.$info;
 }
 
 .AgGridGenericCellRenderer-ic_warningIcon {
-  @extend .AgGridGenericCellRenderer-icon;
+  margin-right: 4px;
   fill: lui.$warning;
 }

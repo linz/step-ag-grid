@@ -1,6 +1,7 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-import "../../lui-overrides.scss";
+import "../../styles/index.scss";
+import "../../styles/GridTheme.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
@@ -92,6 +93,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: false,
           editorParams: {
+            className: "Xxx",
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
           },
         },
@@ -206,7 +208,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: true,
           editorParams: {
-            maxRows: 2,
+            className: "GridPopoverEditDropDown-containerSmall",
             filtered: "local",
             filterPlaceholder: "Filter this",
             options: Array.from(Array(30).keys()).map((o) => {

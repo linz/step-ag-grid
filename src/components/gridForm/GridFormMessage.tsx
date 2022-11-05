@@ -1,17 +1,18 @@
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridBaseRow } from "../Grid";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
 
-export interface GridFormMessageProps<RowType extends GridBaseRow> {
+export interface GridFormMessageProps<RowType extends GridBaseRow> extends CellEditorCommon {
   message: (cellParams: CellParams<RowType>) => Promise<string | JSX.Element> | string | JSX.Element;
 }
 
 export const GridFormMessage = <RowType extends GridBaseRow>(_props: GridFormMessageProps<RowType>) => {
   const props = _props as GridFormMessageProps<RowType> & CellParams<RowType>;
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
-  const { popoverWrapper } = useGridPopoverHook();
+  const { popoverWrapper } = useGridPopoverHook({ className: props.className });
 
   useEffect(() => {
     (async () => {
@@ -20,10 +21,8 @@ export const GridFormMessage = <RowType extends GridBaseRow>(_props: GridFormMes
   }, [props]);
 
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={message === null}>
-      <div style={{ maxWidth: 400 }} className={"Grid-popoverContainer"}>
-        {message}
-      </div>
+    <ComponentLoadingWrapper loading={message === null} className={clsx("GridFormMessage-container", props.className)}>
+      <>{message}</>
     </ComponentLoadingWrapper>,
   );
 };

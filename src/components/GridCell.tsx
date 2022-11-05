@@ -60,6 +60,7 @@ export const GridCell = <RowType extends GridBaseRow, Props>(
   },
 ): ColDefT<RowType> => {
   return {
+    colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(custom?.editor && {
@@ -85,6 +86,10 @@ export const GridCell = <RowType extends GridBaseRow, Props>(
     },
   };
 };
+
+export interface CellEditorCommon {
+  className?: string | undefined;
+}
 
 export interface CellParams<RowType extends GridBaseRow> {
   value: any;

@@ -1,18 +1,17 @@
 import "./GridPopoverMenu.scss";
-import "../../react-menu3/styles/index.scss";
 
-import { ColDef } from "ag-grid-community";
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
+import { GenericCellColDef } from "@components/gridRender/GridRenderGenericCell";
 
 /**
  * Popout burger menu
  */
 export const GridPopoverMenu = <RowType extends GridBaseRow>(
-  colDef: ColDef,
+  colDef: GenericCellColDef<RowType>,
   props: GenericCellEditorProps<GridFormPopoutMenuProps<RowType>>,
 ): ColDefT<RowType> =>
   GridCell<RowType, GridFormPopoutMenuProps<RowType>>(

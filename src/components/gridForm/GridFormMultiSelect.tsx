@@ -1,14 +1,15 @@
-import "../../react-menu3/styles/index.scss";
+import "../../styles/GridFormMultiSelect.scss";
 
-import { MenuItem, MenuDivider, FocusableItem, ClickEvent } from "@react-menu3";
-import { Fragment, useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
+import { useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
+import { ClickEvent } from "../../react-menu3/types";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -23,7 +24,14 @@ export interface MultiSelectResult<RowType> {
   values: Record<string, any>;
 }
 
-export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> {
+export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
+  // This overrides CellEditorCommon to provide some common class options
+  className?:
+    | "GridMultiSelect-containerSmall"
+    | "GridMultiSelect-containerMedium"
+    | "GridMultiSelect-containerLarge"
+    | string
+    | undefined;
   filtered?: boolean;
   filterPlaceholder?: string;
   onSave?: (props: MultiSelectResult<RowType>) => Promise<boolean>;
@@ -58,7 +66,6 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     },
     [props, selectedValues],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ save });
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -105,14 +112,15 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     );
   }, [props.filtered, filter, options]);
 
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={!options}>
-      <div className={"Grid-popoverContainerList"}>
+    <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
+      <>
         {options && props.filtered && (
           <>
             <FocusableItem className={"filter-item"} key={"filter"}>
               {({ ref }: any) => (
-                <div style={{ display: "flex", width: "100%" }}>
+                <div style={{ display: "flex", width: "100%" }} className={"GridFormMultiSelect-filter"}>
                   <input
                     autoFocus
                     className={"free-text-input"}
@@ -130,70 +138,72 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
             <MenuDivider key={`$$divider_filter`} />
           </>
         )}
-        {options?.map((item, index) =>
-          item.value === MenuSeparatorString ? (
-            <MenuDivider key={`$$divider_${index}`} />
-          ) : filteredValues.includes(item.value) ? null : (
-            <Fragment key={`${index}`}>
-              <MenuItem
-                key={`${index}`}
-                onClick={(e: ClickEvent) => {
-                  e.keepOpen = true;
-                  if (selectedValues.includes(item.value)) {
-                    setSelectedValues(selectedValues.filter((value) => value != item.value));
-                  } else {
-                    setSelectedValues([...selectedValues, item.value]);
-                  }
-                }}
-                onKeyDown={async (e: KeyboardEvent) => {
-                  if (e.key === "Enter") triggerSave().then();
-                  else if (e.key === " ") {
+        <div className={"GridFormMultiSelect-options"}>
+          {options?.map((item, index) =>
+            item.value === MenuSeparatorString ? (
+              <MenuDivider key={`$$divider_${index}`} />
+            ) : filteredValues.includes(item.value) ? null : (
+              <div key={`${index}`}>
+                <MenuItem
+                  key={`${index}`}
+                  onClick={(e: ClickEvent) => {
+                    e.keepOpen = true;
                     if (selectedValues.includes(item.value)) {
                       setSelectedValues(selectedValues.filter((value) => value != item.value));
                     } else {
                       setSelectedValues([...selectedValues, item.value]);
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }
-                }}
-              >
-                <LuiCheckboxInput
-                  isChecked={selectedValues.includes(item.value)}
-                  value={`${item.value}`}
-                  label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                  inputProps={{
-                    onClick: (e) => {
+                  }}
+                  onKeyDown={async (e: KeyboardEvent) => {
+                    if (e.key === "Enter") triggerSave().then();
+                    else if (e.key === " ") {
+                      if (selectedValues.includes(item.value)) {
+                        setSelectedValues(selectedValues.filter((value) => value != item.value));
+                      } else {
+                        setSelectedValues([...selectedValues, item.value]);
+                      }
                       e.preventDefault();
                       e.stopPropagation();
-                      return false;
-                    },
+                    }
                   }}
-                  onChange={() => {
-                    /*Do nothing, change handled by menuItem*/
-                  }}
-                />
-              </MenuItem>
-
-              {selectedValues.includes(item.value) && item.subComponent && (
-                <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                  {(ref: any) =>
-                    item.subComponent &&
-                    item.subComponent(
-                      {
-                        setValue: (value: any) => {
-                          subSelectedValues.current[item.value as string] = value;
-                        },
+                >
+                  <LuiCheckboxInput
+                    isChecked={selectedValues.includes(item.value)}
+                    value={`${item.value}`}
+                    label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                    inputProps={{
+                      onClick: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
                       },
-                      ref,
-                    )
-                  }
-                </FocusableItem>
-              )}
-            </Fragment>
-          ),
-        )}
-      </div>
+                    }}
+                    onChange={() => {
+                      /*Do nothing, change handled by menuItem*/
+                    }}
+                  />
+                </MenuItem>
+
+                {selectedValues.includes(item.value) && item.subComponent && (
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                    {(ref: any) =>
+                      item.subComponent &&
+                      item.subComponent(
+                        {
+                          setValue: (value: any) => {
+                            subSelectedValues.current[item.value as string] = value;
+                          },
+                        },
+                        ref,
+                      )
+                    }
+                  </FocusableItem>
+                )}
+              </div>
+            ),
+          )}
+        </div>
+      </>
     </ComponentLoadingWrapper>,
   );
 };

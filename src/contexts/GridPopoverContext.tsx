@@ -6,11 +6,11 @@ export interface PropsType {
   data: any;
   field: string;
   selectedRows: any[];
+  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
 }
 
 export type GridPopoverContextType = {
   anchorRef: RefObject<Element>;
-  updateValueRef: RefObject<(saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>>;
   saving: boolean;
   setSaving: (saving: boolean) => void;
   setProps: (props: ICellEditorParams, multiEdit: boolean) => void;
@@ -19,12 +19,6 @@ export type GridPopoverContextType = {
 
 export const GridPopoverContext = createContext<GridPopoverContextType>({
   anchorRef: { current: null },
-  updateValueRef: {
-    current: async () => {
-      console.error("Missing GridPopoverContext updateValueRef");
-      return false;
-    },
-  },
   saving: false,
   setSaving: () => {},
   setProps: () => {},

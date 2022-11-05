@@ -1,12 +1,12 @@
-@use 'var';
-@use 'core';
+@use "var";
+@use "core";
 
 .szh-menu {
   user-select: none;
   color: var.$color;
   border: none;
   border-radius: 0.25rem;
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.133), 0 0.6px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 7px rgb(0 0 0 / 13.3%), 0 0.6px 2px rgb(0 0 0 / 10%);
   min-width: 10rem;
   padding: 0.5rem 0;
 
@@ -26,8 +26,9 @@
 
     &--type-radio {
       padding-left: 2.2rem;
+
       &::before {
-        content: '\25cb';
+        content: "\25cb";
         position: absolute;
         left: 0.8rem;
         top: 0.55rem;
@@ -36,11 +37,12 @@
     }
 
     &--type-radio#{&}--checked::before {
-      content: '\25cf';
+      content: "\25cf";
     }
 
     &--type-checkbox {
       padding-left: 2.2rem;
+
       &::before {
         position: absolute;
         left: 0.8rem;
@@ -48,14 +50,15 @@
     }
 
     &--type-checkbox#{&}--checked::before {
-      content: '\2714';
+      content: "\2714";
     }
   }
 
   &__submenu > .szh-menu__item {
     padding-right: 2.5rem;
+
     &::after {
-      content: '\276f';
+      content: "\276f";
       position: absolute;
       right: 1rem;
     }

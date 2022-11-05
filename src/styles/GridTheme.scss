@@ -1,29 +1,40 @@
-@use '~@linzjs/lui/dist/scss/Core' as lui;
+@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
 
-@import "node_modules/ag-grid-community/src/styles/ag-grid.scss";
-@import "node_modules/ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+// These break if we use urls so ignore stylelint
+/* stylelint-disable-next-line */
+@import "ag-grid-community/src/styles/ag-grid";
+/* stylelint-disable-next-line */
+@import "ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
 
 .ag-theme-alpine {
   // AG Grid themes can be customized using theme parameters, which are arguments that change its appearance. Refer to
   // https://www.ag-grid.com/javascript-data-grid/themes-customising/#full-list-of-theme-parameters for a full list of
   // the available theme parameters, which should be used whenever possible.
-  @include ag-theme-alpine((
-          alpine-active-color: lui.$sea,
-          foreground-color: lui.$grey-80,
-          data-color: lui.$grey-80,
-          header-foreground-color: lui.$surfie,
-          background-color: lui.$white,
-          odd-row-background-color: lui.$white,
-          header-background-color: lui.$white,
-          border-color: lui.$lily,
-          secondary-border-color: lui.$lily,
-          row-hover-color: lui.$lily,
-          font-family: ("Open Sans", system-ui, sans-serif),
-          font-size: 0.875rem !important,
-          borders: false,
-          borders-critical: true,
-          borders-secondary: false,
-  ));
+  @include ag-theme-alpine(
+    (
+      alpine-active-color: lui.$sea,
+      foreground-color: lui.$grey-80,
+      data-color: lui.$grey-80,
+      // ag-grid-community >=28
+      selected-row-background-color: lui.$polar,
+      header-foreground-color: lui.$surfie,
+      background-color: lui.$white,
+      odd-row-background-color: lui.$white,
+      header-background-color: lui.$white,
+      border-color: lui.$lily,
+      secondary-border-color: lui.$lily,
+      row-hover-color: lui.$lily,
+      font-family: (
+        "Open Sans",
+        system-ui,
+        sans-serif,
+      ),
+      font-size: 0.875rem !important,
+      borders: false,
+      borders-critical: true,
+      borders-secondary: false,
+    )
+  );
 
   // Fix that when you click below checkbox it doesn't process a click
   .ag-cell[col-id="selection"] {
@@ -31,7 +42,7 @@
   }
 
   // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) {
+  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
     height: auto;
   }
 
@@ -39,6 +50,7 @@
     border-bottom: none;
   }
 
+  // ag-grid-community 27.x.x needs this vs 28 using the selected-row-background-color above
   // You can set a background _color_ with theme parameters, but for something like a gradient, you need to override CSS.
   .ag-row-selected {
     background-color: lui.$polar;
@@ -70,8 +82,10 @@
     word-break: break-word;
   }
 
-  .ag-cell-popup-editing, .ag-selected-for-edit, .ag-cell-inline-editing {
-    background: rgba(72, 160, 244, 0.2);
+  .ag-cell-popup-editing,
+  .ag-selected-for-edit,
+  .ag-cell-inline-editing {
+    background: rgb(72 160 244 / 20%);
     // These are important, it needs to override ag-grid to work
     border: 3px solid #48a0f4 !important;
     border-right: 3px solid #48a0f4 !important;

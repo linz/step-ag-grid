@@ -1,4 +1,4 @@
-import "../../react-menu3/styles/index.scss";
+import "../../styles/GridFormDropDown.scss";
 
 import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "@react-menu3";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
@@ -7,10 +7,11 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "@contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
-import { CellParams } from "../GridCell";
+import { CellEditorCommon, CellParams } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
+  // Note the row that was clicked on will be first
   selectedRows: RowType[];
   value: ValueType;
 }
@@ -31,7 +32,14 @@ export const MenuHeaderItem = (title: string) => {
 
 export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
 
-export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType> {
+export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
+  // This overrides CellEditorCommon to provide some common class options
+  className?:
+    | "GridPopoverEditDropDown-containerSmall"
+    | "GridPopoverEditDropDown-containerMedium"
+    | "GridPopoverEditDropDown-containerLarge"
+    | string
+    | undefined;
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -40,7 +48,6 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
     | SelectOption<ValueType>[]
     | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
   optionsRequestCancel?: () => void;
-  maxRows?: number;
 }
 
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
@@ -171,14 +178,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
 
-  const maxRowsStyles =
-    props.maxRows !== undefined ? { maxHeight: 62 + 34 * props.maxRows, overFlowY: "auto" } : undefined;
-
-  const { popoverWrapper } = useGridPopoverHook();
+  const { popoverWrapper } = useGridPopoverHook({ className: props.className });
   return popoverWrapper(
     <>
       {props.filtered && (
-        <>
+        <div className={"GridFormDropDown-filter"}>
           <FocusableItem className={"filter-item"}>
             {({ ref }: any) => (
               <div style={{ display: "flex", width: "100%" }}>
@@ -198,10 +202,10 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
             )}
           </FocusableItem>
           <MenuDivider key={`$$divider_filter`} />
-        </>
+        </div>
       )}
-      <ComponentLoadingWrapper loading={!options}>
-        <div style={maxRowsStyles}>
+      <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
+        <>
           {options && options.length == filteredValues?.length && <MenuItem>[Empty]</MenuItem>}
           {options?.map((item, index) =>
             item.value === MenuSeparatorString ? (
@@ -220,7 +224,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
               </MenuItem>
             ),
           )}
-        </div>
+        </>
       </ComponentLoadingWrapper>
     </>,
   );

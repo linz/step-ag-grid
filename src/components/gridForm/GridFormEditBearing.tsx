@@ -1,13 +1,13 @@
-import "./GridFormEditBearing.scss";
+import "../../styles/GridFormEditBearing.scss";
 
 import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "@utils/bearing";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "@components/GridCell";
 
-export interface GridFormEditBearingProps<RowType extends GridBaseRow> {
+export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeHolder?: string;
   range?: (value: number | null) => string | null;
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
@@ -39,7 +39,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(_props: GridFor
     },
     [props, value],
   );
-  const { triggerSave, popoverWrapper } = useGridPopoverHook({ save });
+  const { triggerSave, popoverWrapper } = useGridPopoverHook({ className: props.className, save });
 
   return popoverWrapper(
     <div className={"GridFormEditBearing-input Grid-popoverContainer"}>

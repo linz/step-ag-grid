@@ -1,4 +1,6 @@
-@use '~@linzjs/lui/dist/scss/Core' as lui;
+@use "../react-menu3/styles/index";
+@use "./react-menu-customisations.scss";
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
 
 .Grid-container {
   flex: 1;
@@ -6,11 +8,11 @@
 }
 
 .Grid-sortIsStale {
-  span.ag-icon.ag-icon-desc:after {
+  span.ag-icon.ag-icon-desc::after {
     content: "*";
   }
 
-  span.ag-icon.ag-icon-asc:after {
+  span.ag-icon.ag-icon-asc::after {
     content: "*";
   }
 }
@@ -33,6 +35,7 @@
   padding: 4px 8px;
 }
 
-.Grid-popoverContainerList {
-  padding: 4px 4px;
+.GridFormMessage-container {
+  padding: 4px 8px;
+  max-width: 400px;
 }
