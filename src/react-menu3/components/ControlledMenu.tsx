@@ -120,13 +120,13 @@ export const ControlledMenuFr = (
   useEffect(() => {
     if (isMenuOpen(state)) {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
-      thisDocument.addEventListener("mousedown", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("mouseup", handleScreenEventForSave, true);
+      thisDocument.addEventListener("mousedown", handleScreenEventForSave, true);
+      thisDocument.addEventListener("mouseup", handleScreenEventForCancel, true);
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
       thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
-        thisDocument.removeEventListener("mousedown", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("mouseup", handleScreenEventForSave, true);
+        thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
+        thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("dblclick", handleScreenEventForCancel, true);
       };
