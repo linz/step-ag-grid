@@ -1,5 +1,3 @@
-import "../styles/GridTheme.scss";
-
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";

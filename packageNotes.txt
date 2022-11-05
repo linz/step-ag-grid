@@ -1,0 +1,1 @@
+sass-loader is fixed at 10.3.1, anything higher breaks the build with getOptions() not found errors

@@ -10,29 +10,50 @@ module.exports = {
     "storybook-addon-mock/register",
     "@storybook/addon-interactions",
   ],
-  webpackFinal: async config => {
+  webpackFinal: async (config) => {
     // Handling scss files when used within components consumed by a story
     config.module.rules.push({
       test: /\.scss$/,
-      use: ["style-loader", "css-loader", "sass-loader"],
-      include: path.resolve(__dirname, "../")
+      use: [
+        "style-loader",
+        "css-loader",
+        {
+          loader: "sass-loader",
+          options: {
+            webpackImporter: true,
+          },
+        },
+      ],
+      include: path.resolve(__dirname, "../"),
     });
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       loader: require.resolve("babel-loader"),
       options: {
-        presets: [["react-app", {
-          flow: false,
-          typescript: true
-        }], ["@babel/preset-react", {
-          runtime: "automatic"
-        }]]
-      }
+        presets: [
+          [
+            "react-app",
+            {
+              flow: false,
+              typescript: true,
+            },
+          ],
+          [
+            "@babel/preset-react",
+            {
+              runtime: "automatic",
+            },
+          ],
+        ],
+      },
     });
     // Resolving the paths for dynamic locations (@components -> ./xxx/xxx/xxx/Components)
-    config.resolve.plugins = [...(config.resolve.plugins || []), new TsconfigPathsPlugin({
-      extensions: config.resolve.extensions
-    })];
+    config.resolve.plugins = [
+      ...(config.resolve.plugins || []),
+      new TsconfigPathsPlugin({
+        extensions: config.resolve.extensions,
+      }),
+    ];
 
     // Return the altered config
     return config;
