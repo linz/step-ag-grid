@@ -1,13 +1,13 @@
-@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
+@use "../../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
 
 .GridPopoutMenu-burger {
   cursor: pointer;
 
   svg {
-    fill: lui.$sea;
+    fill: colors.$sea;
   }
 }
 
 .GridPopoutMenu-burgerDisabled svg {
-  fill: lui.$disabled-color;
+  fill: colors.$disabled-color;
 }

@@ -29,7 +29,7 @@ const postcssOptions = () => ({
 });
 
 module.exports = {
-  input: "index.ts",
+  input: "./src/index.ts",
   output: [
     {
       file: packageJson.main,

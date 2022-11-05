@@ -1,6 +1,6 @@
 @use "../react-menu3/styles/index";
-@use "./react-menu-customisations.scss";
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
+@use "./react-menu-customisations";
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
 
 .Grid-container {
   flex: 1;
@@ -25,7 +25,7 @@
 .Grid-quickFilterBox {
   width: 100%;
   height: 48px;
-  border: 0.06rem solid lui.$silver;
+  border: 0.06rem solid colors.$silver;
   border-radius: 3px;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
