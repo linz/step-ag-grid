@@ -1,6 +1,3 @@
-import { ClickEvent as ClickEventExt } from "./types";
-export type ClickEvent = ClickEventExt;
-
 export { useMenuState } from "./hooks";
 export { MenuButton } from "./components/MenuButton";
 export { Menu } from "./components/Menu";

@@ -1,6 +1,6 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-import "../../lui-overrides.scss";
+import "../../styles/index.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
@@ -9,7 +9,7 @@ import { Grid, GridProps } from "@components/Grid";
 import { useMemo, useState } from "react";
 import { wait } from "@utils/util";
 import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
-import { CellParams, ColDefT, GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "@components/GridCell";
 import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
 
 export default {
@@ -80,7 +80,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         {
           multiEdit: true,
           editorParams: {
-            message: async (formParams: CellParams<ITestRow>): Promise<string> => {
+            message: async (formParams): Promise<string> => {
               await wait(1000);
               return `There are ${formParams.selectedRows.length} row(s) selected`;
             },
@@ -148,12 +148,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     [],
   );
 
-  const rowData = useMemo(
-    () =>
-      [
-        { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-        { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
-      ] as ITestRow[],
+  const rowData: ITestRow[] = useMemo(
+    () => [
+      { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
+      { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
+    ],
     [],
   );
 

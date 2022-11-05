@@ -1,4 +1,4 @@
-@use 'node_modules/@linzjs/lui/dist/scss/Core' as lui;
+@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
 
 .GridPopoutMenu-burger {
   cursor: pointer;

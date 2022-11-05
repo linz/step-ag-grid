@@ -1,5 +1,3 @@
-import "../react-menu3/styles/index.scss";
-
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "@contexts/GridContext";
 import { GridBaseRow } from "./Grid";
@@ -46,7 +44,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               unmountOnClose={true}
               anchorRef={anchorRef}
               saveButtonRef={saveButtonRef}
-              menuClassName={"lui-menu"}
+              menuClassName={"step-ag-grid-react-menu"}
               onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
               viewScroll={"auto"}
               dontShrinkIfDirectionIsTop={true}

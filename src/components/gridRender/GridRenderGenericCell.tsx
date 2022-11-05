@@ -1,4 +1,4 @@
-import "./GridRenderGenericCell.scss";
+import "../../styles/GridRenderGenericCell.scss";
 
 import { useContext } from "react";
 import { GridUpdatingContext } from "@contexts/GridUpdatingContext";

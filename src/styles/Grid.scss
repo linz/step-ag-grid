@@ -1,4 +1,5 @@
-@use '~@linzjs/lui/dist/scss/Core' as lui;
+@use "../react-menu3/styles/index";
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
 
 .Grid-container {
   flex: 1;

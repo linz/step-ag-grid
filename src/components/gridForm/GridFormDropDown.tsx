@@ -1,4 +1,4 @@
-import "./GridFormDropDown.scss";
+import "../../styles/GridFormDropDown.scss";
 
 import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "@react-menu3";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";

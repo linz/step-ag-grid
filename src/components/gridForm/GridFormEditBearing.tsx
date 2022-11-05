@@ -1,4 +1,4 @@
-import "./GridFormEditBearing.scss";
+import "../../styles/GridFormEditBearing.scss";
 
 import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";

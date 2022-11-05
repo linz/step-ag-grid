@@ -1,0 +1,49 @@
+.step-ag-grid-react-menu {
+  /**
+   * Scrollbar (Only Chrome)
+   */
+  ::-webkit-scrollbar {
+    width: 20px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 20px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+  }
+
+  .szh-menu__item, .szh-menu__header {
+    padding: 2px 1rem;
+  }
+
+  .LuiCheckboxInput {
+    margin-bottom: 0;
+  }
+
+  /** Free text input */
+  .free-text-input {
+    border: transparent;
+    outline: transparent;
+    line-height: 33px;
+    padding-left: 4px;
+  }
+
+  textarea.free-text-input {
+    font-weight: 400;
+    line-height: 1.5;
+    width: 300px;
+    height: 150px;
+    resize: none;
+    border: 0.06rem solid #beb9b4;
+  }
+
+}

@@ -1,5 +1,4 @@
-import "./Grid.scss";
-import "./GridTheme.scss";
+import "../components/GridTheme.scss";
 
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
