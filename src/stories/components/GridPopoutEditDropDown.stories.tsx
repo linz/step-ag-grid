@@ -93,7 +93,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: false,
           editorParams: {
-            className: "Xxx",
             options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
           },
         },
