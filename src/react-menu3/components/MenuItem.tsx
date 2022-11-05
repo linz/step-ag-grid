@@ -1,19 +1,10 @@
 import { Ref, useContext, useMemo } from "react";
 import { useBEM, useItemState, useCombinedRef } from "../hooks";
-import {
-  mergeProps,
-  commonProps,
-  safeCall,
-  menuClass,
-  menuItemClass,
-  withHovering,
-  EventHandlersContext,
-  RadioGroupContext,
-  Keys,
-  RMEvent,
-} from "../utils";
+import { mergeProps, commonProps, safeCall, menuClass, menuItemClass, withHovering, Keys, RMEvent } from "../utils";
 import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
 import { withHoveringResultProps } from "../utils/withHovering";
+import { EventHandlersContext } from "../contexts/EventHandlersContext";
+import { RadioGroupContext } from "../contexts/RadioGroupContext";
 
 //
 // MenuItem

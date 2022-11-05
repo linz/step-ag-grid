@@ -17,7 +17,7 @@ implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/
   - Popover message
   - Custom form
 
-_Please note this requires React >=17, ag-grid-community >=27, and sass.
+*Please note this requires React >=17, ag-grid-community >=27, and sass.*
 
 ## Install
 

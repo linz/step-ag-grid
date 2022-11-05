@@ -41,7 +41,7 @@
     "bundle": "rollup -c",
     "stylelint": "stylelint src/**/*.scss src/**/*.css --fix",
     "css": "sass ./src/styles/index.scss:dist/index.css --no-source-map",
-    "test": "react-scripts test --passWithNoTests",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache",
     "storybook": "start-storybook -p 6006",
