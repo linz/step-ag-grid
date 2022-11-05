@@ -8,8 +8,16 @@ Storybook deployed at: https://linz.github.io/step-ag-grid/ (private to LINZ)
 
 - [ag-grid-community](https://www.npmjs.com/package/ag-grid-community) based grid with custom popover components
 implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/react-menu).
+- Default components
+  - Text input
+  - Text area
+  - Drop-down
+  - Multi-select
+  - Bearing/Bearing Correction
+  - Popover message
+  - Custom form
 
-_Please note this requires React >=17, and ag-grid-community 27.x_
+_Please note this requires React >=17, ag-grid-community 27.x, and sass_
 
 ## Install
 
@@ -34,9 +42,11 @@ npm run storybook
 ## Usage
 
 ```tsx
-import "@linz/step-ag-grid/index.css"
+import "@linzjs/lui/dist/scss/base.scss";
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/step-ag-grid/index.css"
 // Only required for LINZ themes otherwise import the default theme from ag-grid
-import "@linzjs/step-ag-grid/dist/GridTheme.scss";
+import "@linzjs/step-ag-grid/GridTheme.scss";
 
 import { useMemo } from "react";
 import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
