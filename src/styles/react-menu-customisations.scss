@@ -1,7 +1,7 @@
-@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars.scss" as colors;
-@use "@linzjs/lui/dist/scss/Foundation/Variables/FontVars.scss" as fonts;
-@use "@linzjs/lui/dist/scss/Foundation/Variables/SpacingVars.scss" as spacing;
-@use "@linzjs/lui/dist/scss/Foundation/Utilities" as *;
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/FontVars" as fonts;
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/SpacingVars" as spacing;
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Utilities" as *;
 
 /**
  * Here is where we can override the styles of react-menu
@@ -127,7 +127,6 @@
 .lui-select-divider {
   margin: 0.25rem;
 }
-
 
 
 .step-ag-grid-react-menu-sub-header-icon {
