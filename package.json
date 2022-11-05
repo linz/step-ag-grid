@@ -27,7 +27,7 @@
   "dependencies": {
     "@linzjs/lui": ">=17",
     "ag-grid-community": "^27",
-    "ag-grid-react": "^27",
+    "ag-grid-react": "^28",
     "debounce-promise": "^3.1.2",
     "lodash-es": "^4.17.21",
     "react": "^17",
