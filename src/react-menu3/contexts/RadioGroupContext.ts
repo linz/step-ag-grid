@@ -1,6 +1,5 @@
 import { createContext } from "react";
-import { EventHandler } from "../types";
-import { RadioChangeEvent } from "../components/MenuRadioGroup";
+import { EventHandler, RadioChangeEvent } from "../types";
 
 export const RadioGroupContext = createContext<{
   value?: any;
