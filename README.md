@@ -17,7 +17,7 @@ implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/
   - Popover message
   - Custom form
 
-_Please note this requires React >=17, ag-grid-community 27.x, and sass_
+_Please note this requires React >=17, ag-grid-community >=27, and sass.
 
 ## Install
 
@@ -105,11 +105,15 @@ const GridDemo = () => {
   );
 
   return (
-    <Grid
-      selectable={true}
-      columnDefs={columnDefs}
-      rowData={rowData}
-    />
+    <GridUpdatingContextProvider>
+      <GridContextProvider>
+        <Grid
+          selectable={true}
+          columnDefs={columnDefs}
+          rowData={rowData}
+        />
+      </GridContextProvider>
+    </GridUpdatingContextProvider>
   );
 };
 ```
