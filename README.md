@@ -49,16 +49,20 @@ import "@linzjs/step-ag-grid/dist/index.css"
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 
 import { useMemo } from "react";
-import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
-import { GridContextProvider } from "@contexts/GridContextProvider";
-import { ColDefT, GridCell } from "@components/GridCell";
-import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
+import {
+  GridUpdatingContextProvider,
+  GridContextProvider,
+  ColDefT,
+  GridCell,
+  GridPopoverMessage,
+  GridPopoverEditDropDown
+} from "@linzjs/step-ag-grid";
 
 const GridDemo = () => {
   interface ITestRow {
     id: number;
+    name: number;
     position: string;
-    age: number;
   };
   
   const columnDefs: ColDefT<ITestRow>[] = useMemo(() => [
@@ -69,8 +73,8 @@ const GridDemo = () => {
         maxWidth: 85,
       }),
       GridCell({
-        field: "position",
-        headerName: "Position",
+        field: "name",
+        headerName: "Name",
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
@@ -78,6 +82,20 @@ const GridDemo = () => {
           info: (props) => props.value === "Developer" && "Developers are awesome",
         },
       }),
+      GridPopoverEditDropDown(
+        {
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Position",
+        },
+        {
+          multiEdit: false,
+          editorParams: {
+            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+          },
+        },
+      ),
       GridPopoverMessage(
         {
           headerName: "Popout message",
@@ -86,7 +104,7 @@ const GridDemo = () => {
         {
           multiEdit: true,
           editorParams: {
-            message: async (formParams): Promise<string> => {
+            message: async (formParams) => {
               return `There are ${formParams.selectedRows.length} row(s) selected`;
             },
           },
@@ -98,8 +116,8 @@ const GridDemo = () => {
 
   const rowData: ITestRow[] = useMemo(
     () => [
-        { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-        { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
+        { id: 1000, name: "Tom", position: "Tester" },
+        { id: 1001, name: "Sue", position: "Developer" },
     ],
     [],
   );
