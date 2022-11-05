@@ -19,8 +19,8 @@ export default {
   title: "Components / Grids",
   component: Grid,
   args: {
-    externalSelectedItems: [],
-    setExternalSelectedItems: () => {},
+    quickFilterValue: "",
+    selectable: true,
   },
   decorators: [
     (Story) => (
@@ -131,7 +131,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   return (
     <Grid
       {...props}
-      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
