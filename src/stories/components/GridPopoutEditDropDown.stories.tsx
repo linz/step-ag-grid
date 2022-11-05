@@ -17,8 +17,8 @@ export default {
   title: "Components / Grids",
   component: Grid,
   args: {
-    externalSelectedItems: [],
-    setExternalSelectedItems: () => {},
+    quickFilterValue: "",
+    selectable: true,
   },
   decorators: [
     (Story) => (
@@ -272,7 +272,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
   return (
     <Grid
       {...props}
-      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}

@@ -24,7 +24,6 @@ export interface GridProps {
   domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
-  onGridReady?: GridOptions["onGridReady"];
   defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: GridOptions["columnDefs"];
   rowData: GridOptions["rowData"];
@@ -146,11 +145,10 @@ export const Grid = (params: GridProps): JSX.Element => {
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
       setGridApi(event.api);
-      params.onGridReady && params.onGridReady(event);
       synchroniseExternallySelectedItemsToGrid();
       updateQuickFilter();
     },
-    [params, setGridApi, synchroniseExternallySelectedItemsToGrid, updateQuickFilter],
+    [setGridApi, synchroniseExternallySelectedItemsToGrid, updateQuickFilter],
   );
 
   const noRowsOverlayComponent = useCallback(

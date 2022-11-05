@@ -3,6 +3,15 @@
   "repository": "github:linz/step-ag-grid.git",
   "license": "MIT",
   "version": "0.1.1",
+  "keywords": [
+    "aggrid",
+    "ag-grid",
+    "react-menu",
+    "grid",
+    "table",
+    "react",
+    "react-component"
+  ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "module": "dist/step-ag-grid.esm.js",

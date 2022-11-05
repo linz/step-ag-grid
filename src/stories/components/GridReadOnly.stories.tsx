@@ -17,8 +17,10 @@ export default {
   title: "Components / Grids",
   component: Grid,
   args: {
-    externalSelectedItems: [],
-    setExternalSelectedItems: () => {},
+    quickFilter: true,
+    quickFilterValue: "",
+    quickFilterPlaceholder: "Quick filter...",
+    selectable: false,
   },
   decorators: [
     (Story) => (
@@ -160,13 +162,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   return (
     <Grid
       {...props}
-      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
-      quickFilter={true}
-      quickFilterPlaceholder={"Quick filter..."}
     />
   );
 };
