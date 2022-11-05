@@ -1,7 +1,8 @@
 import { ForwardedRef, forwardRef, ReactNode, useMemo } from "react";
 import { useBEM } from "../hooks";
-import { menuClass, radioGroupClass, RadioGroupContext } from "../utils";
+import { menuClass, radioGroupClass } from "../utils";
 import { BaseProps, Event, EventHandler } from "../types";
+import { RadioGroupContext } from "../contexts/RadioGroupContext";
 
 export interface RadioChangeEvent extends Event {
   /**

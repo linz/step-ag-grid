@@ -1,7 +1,8 @@
 import { ForwardedRef, forwardRef, ReactNode, useContext, useRef, useState } from "react";
 import { useBEM, useLayoutEffect, useCombinedRef } from "../hooks";
-import { menuClass, menuGroupClass, MenuListContext } from "../utils";
+import { menuClass, menuGroupClass } from "../utils";
 import { BaseProps, MenuOverflow } from "../types";
+import { MenuListContext } from "../contexts/MenuListContext";
 
 export interface MenuGroupProps extends BaseProps {
   children?: ReactNode;

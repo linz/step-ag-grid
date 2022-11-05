@@ -12,20 +12,12 @@ import {
 import { createPortal } from "react-dom";
 import { MenuList } from "./MenuList";
 import { useBEM } from "../hooks";
-import {
-  menuContainerClass,
-  mergeProps,
-  safeCall,
-  isMenuOpen,
-  getTransition,
-  CloseReason,
-  Keys,
-  EventHandlersContext,
-  SettingsContext,
-  ItemSettingsContext,
-} from "../utils";
+import { menuContainerClass, mergeProps, safeCall, isMenuOpen, getTransition, CloseReason, Keys } from "../utils";
 import { hasParentClass } from "@utils/util";
 import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
+import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
+import { SettingsContext } from "../contexts/SettingsContext";
+import { EventHandlersContext, EventHandlersContextType } from "../contexts/EventHandlersContext";
 
 export const ControlledMenuFr = (
   {
@@ -151,7 +143,7 @@ export const ControlledMenuFr = (
   );
 
   const eventHandlers = useMemo(
-    () => ({
+    (): EventHandlersContextType => ({
       handleClick(event: RadioChangeEvent, isCheckOrRadio: boolean) {
         if (!event.stopPropagation) safeCall(onItemClick, event);
 
