@@ -13,7 +13,7 @@ import { createPortal } from "react-dom";
 import { MenuList } from "./MenuList";
 import { useBEM } from "../hooks";
 import { menuContainerClass, mergeProps, safeCall, isMenuOpen, getTransition, CloseReason, Keys } from "../utils";
-import { hasParentClass } from "@utils/util";
+import { hasParentClass } from "../../utils/util";
 import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
 import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
 import { SettingsContext } from "../contexts/SettingsContext";

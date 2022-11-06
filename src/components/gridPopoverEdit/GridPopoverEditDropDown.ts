@@ -1,7 +1,7 @@
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridBaseRow } from "../Grid";
 import { GridFormDropDown, GridFormPopoutDropDownProps } from "../gridForm/GridFormDropDown";
-import { GenericCellColDef } from "@components/gridRender/GridRenderGenericCell";
+import { GenericCellColDef } from "../../components/gridRender/GridRenderGenericCell";
 
 export const GridPopoverEditDropDown = <RowType extends GridBaseRow, ValueType>(
   colDef: GenericCellColDef<RowType>,

@@ -16,7 +16,7 @@ export { GridLoadableCell } from "./components/GridLoadableCell";
 export { useGridPopoverHook } from "./components/GridPopoverHook";
 export { usePostSortRowsHook } from "./components/PostSortRowsHook";
 
-export { GridRendererGenericCell } from "./components/gridRender/GridRenderGenericCell";
+export * from "./components/gridRender/GridRenderGenericCell";
 export { GridRenderPopoutMenuCell } from "./components/gridRender/GridRenderPopoutMenuCell";
 
 export { GridPopoutEditMultiSelect } from "./components/gridPopoverEdit/GridPopoutEditMultiSelect";

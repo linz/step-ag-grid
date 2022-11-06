@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
-import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
+import { GridUpdatingContext } from "../../contexts/GridUpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { LuiIcon } from "@linzjs/lui";
 import { Column } from "ag-grid-community/dist/lib/entities/column";

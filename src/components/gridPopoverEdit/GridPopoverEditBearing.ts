@@ -1,8 +1,8 @@
-import { bearingCorrectionValueFormatter, bearingValueFormatter } from "@utils/bearing";
+import { bearingCorrectionValueFormatter, bearingValueFormatter } from "../../utils/bearing";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { GridBaseRow } from "../Grid";
-import { GenericCellColDef } from "@components/gridRender/GridRenderGenericCell";
+import { GenericCellColDef } from "../../components/gridRender/GridRenderGenericCell";
 
 export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType>,

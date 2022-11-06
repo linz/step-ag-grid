@@ -1,9 +1,9 @@
 import { ReactNode, RefObject, useCallback, useContext, useRef, useState } from "react";
 import { GridPopoverContext, PropsType } from "./GridPopoverContext";
 import { ICellEditorParams } from "ag-grid-community";
-import { GridContext } from "@contexts/GridContext";
+import { GridContext } from "../contexts/GridContext";
 import { sortBy } from "lodash-es";
-import { GridBaseRow } from "@components/Grid";
+import { GridBaseRow } from "../components/Grid";
 
 interface GridPopoverContextProps {
   children: ReactNode;

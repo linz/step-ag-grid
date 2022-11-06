@@ -31,19 +31,5 @@
     // error out if import and file system have a casing mismatch. Recommended by TS
     "forceConsistentCasingInFileNames": true,
     "declarationDir":"./declaration",
-    "paths": {
-      "@components/*": [
-        "./components/*",
-      ],
-      "@contexts/*": [
-        "./contexts/*"
-      ],
-      "@utils/*": [
-        "./utils/*",
-      ],
-      "@react-menu3": [
-        "./react-menu3"
-      ]
-    }
   }
 }
