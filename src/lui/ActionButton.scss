@@ -1,0 +1,32 @@
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+
+.ActionButton {
+  display: flex;
+  align-items: center;
+}
+
+.ActionButton .LuiIcon {
+  margin: 0 4px !important;
+}
+
+.ActionButton-minimalArea {
+  position: relative;
+}
+
+.ActionButton-minimalAreaDisplay {
+  position: absolute;
+}
+
+.ActionButton-minimalAreaExpand {
+  visibility: hidden;
+}
+
+.ActionButton-inProgress {
+  cursor: progress;
+  color: #007198 !important;
+  background-color: colors.$polar !important;
+
+  svg * {
+    fill: transparent !important;
+  }
+}
