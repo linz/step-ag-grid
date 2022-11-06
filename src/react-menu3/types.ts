@@ -439,4 +439,9 @@ export interface ControlledMenuProps extends RootMenuProps, ExtraMenuProps {
    * Event fired when menu is about to close.
    */
   onClose?: EventHandler<MenuCloseEvent>;
+
+  /**
+   * When clicking outside the menu to close, anything with this class will not cause a close.
+   */
+  closeMenuExclusionClassName?: string;
 }
