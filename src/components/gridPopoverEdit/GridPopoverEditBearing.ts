@@ -1,4 +1,3 @@
-import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { bearingCorrectionValueFormatter, bearingValueFormatter } from "@utils/bearing";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
@@ -14,7 +13,6 @@ export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
       initialWidth: 65,
       maxWidth: 150,
       valueFormatter: bearingValueFormatter,
-      cellClass: props.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
     },
     {
