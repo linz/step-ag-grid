@@ -27,6 +27,9 @@ export { GridPopoverEditDropDown } from "./components/gridPopoverEdit/GridPopove
 export { GridPopoverMessage } from "./components/gridPopoverEdit/GridPopoverMessage";
 export { GridPopoverTextArea } from "./components/gridPopoverEdit/GridPopoverTextArea";
 export { GridPopoverTextInput } from "./components/gridPopoverEdit/GridPopoverTextInput";
+export * from "./components/gridForm/GridFormDropDown";
+export * from "./components/gridForm/GridFormMultiSelect";
+export * from "./components/gridForm/GridFormPopoutMenu";
 
 export { GridHeaderSelect } from "./components/gridHeader/GridHeaderSelect";
 
