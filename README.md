@@ -2,8 +2,6 @@
 
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
-Storybook deployed at: https://linz.github.io/step-ag-grid/
-
 ## Features
 
 - [ag-grid-community](https://www.npmjs.com/package/ag-grid-community) based grid with custom popover components
@@ -38,6 +36,8 @@ yarn add @linz/step-ag-grid
 ```bash
 npm run storybook
 ```
+
+Storybook demo deployed at: https://linz.github.io/step-ag-grid/
 
 ## Usage
 
