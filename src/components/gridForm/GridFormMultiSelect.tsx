@@ -7,8 +7,8 @@ import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { MenuSeparatorString } from "../../components/gridForm/GridFormDropDown";
-import { CellEditorCommon, CellParams } from "../../components/GridCell";
+import { MenuSeparatorString } from "./GridFormDropDown";
+import { CellEditorCommon, CellParams } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 
 interface MultiFinalSelectOption<ValueType> {

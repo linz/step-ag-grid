@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridBaseRow } from "../Grid";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { CellEditorCommon, CellParams } from "../../components/GridCell";
+import { CellEditorCommon, CellParams } from "../GridCell";
 
 export interface GridFormMessageProps<RowType extends GridBaseRow> extends CellEditorCommon {
   message: (cellParams: CellParams<RowType>) => Promise<string | JSX.Element> | string | JSX.Element;
