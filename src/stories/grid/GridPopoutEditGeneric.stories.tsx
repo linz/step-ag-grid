@@ -20,7 +20,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1200, height: 400, display: "flex" }}>
+      <div style={{ width: 1024, height: 400 }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -57,14 +57,10 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
     [],
   );
 
-  const rowData = useMemo(
-    () =>
-      [
-        { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345" },
-        { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523" },
-      ] as IFormTestRow[],
-    [],
-  );
+  const [rowData, setRowData] = useState([
+    { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345" },
+    { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523" },
+  ] as IFormTestRow[]);
 
   return (
     <Grid
@@ -73,6 +69,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      domLayout={"autoHeight"}
     />
   );
 };

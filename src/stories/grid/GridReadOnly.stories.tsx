@@ -24,7 +24,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1200, height: 400, display: "flex" }}>
+      <div style={{ width: 1024, height: 400 }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -151,13 +151,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     [],
   );
 
-  const rowData: ITestRow[] = useMemo(
-    () => [
-      { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-      { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
-    ],
-    [],
-  );
+  const [rowData, setRowData] = useState([
+    { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
+    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
+  ]);
 
   return (
     <Grid
@@ -166,6 +163,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      domLayout={"autoHeight"}
     />
   );
 };
