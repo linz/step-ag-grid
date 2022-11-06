@@ -25,11 +25,13 @@ export default {
   },
   decorators: [
     (Story) => (
-      <GridUpdatingContextProvider>
-        <GridContextProvider>
-          <Story />
-        </GridContextProvider>
-      </GridUpdatingContextProvider>
+      <div style={{ width: 1024, height: 400 }}>
+        <GridUpdatingContextProvider>
+          <GridContextProvider>
+            <Story />
+          </GridContextProvider>
+        </GridUpdatingContextProvider>
+      </div>
     ),
   ],
 } as ComponentMeta<typeof Grid>;
