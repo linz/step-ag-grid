@@ -28,6 +28,7 @@ export interface GridProps {
   columnDefs: GridOptions["columnDefs"];
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
+  postSortRows?: GridOptions["postSortRows"];
 }
 
 /**
@@ -264,7 +265,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         noRowsOverlayComponent={noRowsOverlayComponent}
         onGridReady={onGridReady}
         onSortChanged={ensureSelectedRowIsVisible}
-        postSortRows={postSortRows}
+        postSortRows={params.postSortRows ?? postSortRows}
         onSelectionChanged={synchroniseExternalStateToGridSelection}
       />
     </div>
