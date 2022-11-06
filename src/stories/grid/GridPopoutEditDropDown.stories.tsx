@@ -22,13 +22,11 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <GridUpdatingContextProvider>
-          <GridContextProvider>
-            <Story />
-          </GridContextProvider>
-        </GridUpdatingContextProvider>
-      </div>
+      <GridUpdatingContextProvider>
+        <GridContextProvider>
+          <Story />
+        </GridContextProvider>
+      </GridUpdatingContextProvider>
     ),
   ],
 } as ComponentMeta<typeof Grid>;
@@ -245,28 +243,24 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
     [optionsFn, optionsObjects],
   );
 
-  const rowData = useMemo(
-    () =>
-      [
-        {
-          id: 1000,
-          position: "Tester",
-          position2: "1",
-          position3: "Tester",
-          position4: { code: "O1", desc: "Object One" },
-          code: "O1",
-        },
-        {
-          id: 1001,
-          position: "Developer",
-          position2: "2",
-          position3: "Developer",
-          position4: { code: "O2", desc: "Object Two" },
-          code: "O2",
-        },
-      ] as ITestRow[],
-    [],
-  );
+  const [rowData, setRowData] = useState([
+    {
+      id: 1000,
+      position: "Tester",
+      position2: "1",
+      position3: "Tester",
+      position4: { code: "O1", desc: "Object One" },
+      code: "O1",
+    },
+    {
+      id: 1001,
+      position: "Developer",
+      position2: "2",
+      position3: "Developer",
+      position4: { code: "O2", desc: "Object Two" },
+      code: "O2",
+    },
+  ] as ITestRow[]);
 
   return (
     <Grid
@@ -275,6 +269,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      domLayout={"autoHeight"}
     />
   );
 };

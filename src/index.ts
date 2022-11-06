@@ -34,5 +34,7 @@ export { TextAreaInput } from "./lui/TextAreaInput";
 export { TextInputFormatted } from "./lui/TextInputFormatted";
 export { GridSubComponentTextArea } from "./components/GridSubComponentTextArea";
 
+export * from "./lui/ActionButton";
+
 export * from "./utils/bearing";
 export * from "./utils/util";

@@ -24,13 +24,11 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1200, height: 400, display: "flex" }}>
-        <GridUpdatingContextProvider>
-          <GridContextProvider>
-            <Story />
-          </GridContextProvider>
-        </GridUpdatingContextProvider>
-      </div>
+      <GridUpdatingContextProvider>
+        <GridContextProvider>
+          <Story />
+        </GridContextProvider>
+      </GridUpdatingContextProvider>
     ),
   ],
 } as ComponentMeta<typeof Grid>;
@@ -119,14 +117,10 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
     ];
   }, []);
 
-  const rowData = useMemo(
-    () =>
-      [
-        { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
-        { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
-      ] as ITestRow[],
-    [],
-  );
+  const [rowData, setRowData] = useState([
+    { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
+    { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
+  ] as ITestRow[]);
 
   return (
     <Grid
@@ -135,6 +129,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
+      domLayout={"autoHeight"}
     />
   );
 };
