@@ -53,8 +53,13 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
 
       const hasNewRows = () => nodes.some((row) => previousRowSortIndex[row.data.id] == null);
 
-      const sortIsStale = () =>
-        !hasNewRows() && nodes.some((row, index) => ![null, index].includes(previousRowSortIndex[row.data.id] ?? null));
+      const sortIsStale = () => {
+        // If there are new rows we want to them to be at the bottom of the grid, so we treat it as sort not stale
+        if (hasNewRows()) return false;
+
+        // Otherwise check if the stored sort index matches the new sort index
+        return nodes.some((node, index) => previousRowSortIndex[node.data.id] != index);
+      };
 
       const sortNodesByPreviousSort = () =>
         nodes.sort(
@@ -115,6 +120,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
           if (!sortWasStale.current) {
             // backup sort state, so we can restore it when sort is clicked on a stale column
             previousColSort.current = copyCurrentSortSettings();
+            backupSortOrder();
             sortWasStale.current = true;
             setStaleGrid(true);
           }
