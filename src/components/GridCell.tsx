@@ -120,7 +120,7 @@ const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props
 
   return (
     <>
-      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} /> : props.value}</div>
+      {<colDef.cellRenderer {...props} />}
       {props?.editor && <props.editor {...cellEditorParams} {...propsRef.current} />}
     </>
   );
