@@ -14,12 +14,14 @@ export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
   selectedRows: RowType[];
   value: ValueType;
+  subComponentValue?: ValueType;
 }
 
 interface FinalSelectOption<ValueType> {
   value: ValueType;
   label?: JSX.Element | string;
   disabled?: boolean | string;
+  subComponent?: (props: any, ref: any) => any;
 }
 
 export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
@@ -61,15 +63,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[] | null>(null);
+  const [subComponentValues, setSubComponentValues] = useState<{ optionValue: any; subComponentValue: any }[]>([]);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType): Promise<boolean> => {
+    async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
       const field = props.field;
       return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
           if (props.onSelectedItem) {
-            await props.onSelectedItem({ selectedRows, value });
+            await props.onSelectedItem({ selectedRows, value, subComponentValue });
           } else {
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
@@ -104,12 +107,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = optionsConf?.map((item) => {
+      const optionsList = (optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      }) as any) as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -214,15 +217,49 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
             ) : item.value === MenuHeaderString ? (
               <MenuHeader>{item.label}</MenuHeader>
             ) : filteredValues.includes(item.value) ? null : (
-              <MenuItem
-                key={`${props.field}-${index}`}
-                disabled={!!item.disabled}
-                title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                value={item.value}
-                onClick={() => selectItemHandler(item.value)}
-              >
-                {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-              </MenuItem>
+              <>
+                <MenuItem
+                  key={`${props.field}-${index}`}
+                  disabled={!!item.disabled}
+                  title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                  value={item.value}
+                  onClick={() => {
+                    const subComponentItem = subComponentValues.find(({ optionValue }) => optionValue === item.value);
+                    return subComponentItem
+                      ? selectItemHandler(item.value, subComponentItem.subComponentValue)
+                      : selectItemHandler(item.value);
+                  }}
+                >
+                  {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                </MenuItem>
+                {item.subComponent && (
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                    {(ref: any) =>
+                      item.subComponent &&
+                      item.subComponent(
+                        {
+                          setValue: (value: any) => {
+                            const localSubComponentValues = [...subComponentValues];
+                            const subComponentValueIndex = localSubComponentValues.findIndex(
+                              ({ optionValue }) => optionValue === item.value,
+                            );
+                            if (subComponentValueIndex !== -1) {
+                              localSubComponentValues[subComponentValueIndex].subComponentValue = value;
+                            } else {
+                              localSubComponentValues.push({
+                                subComponentValue: value,
+                                optionValue: item.value,
+                              });
+                            }
+                            setSubComponentValues(localSubComponentValues);
+                          },
+                        },
+                        ref,
+                      )
+                    }
+                  </FocusableItem>
+                )}
+              </>
             ),
           )}
         </>
