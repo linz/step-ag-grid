@@ -40,6 +40,7 @@ export const ControlledMenuFr = (
     onItemClick,
     onClose,
     saveButtonRef,
+    closeMenuExclusionClassName,
     ...restProps
   }: ControlledMenuProps & { saveButtonRef?: MutableRefObject<HTMLButtonElement | null> },
   externalRef: ForwardedRef<HTMLUListElement>,
@@ -75,14 +76,16 @@ export const ControlledMenuFr = (
     ],
   );
 
-  const clickIsWithinMenu = useCallback((ev: MouseEvent) => {
-    return hasParentClass("szh-menu--state-open", ev.target as Node);
-  }, []);
+  const clickIsWithinMenu = useCallback(
+    (ev: MouseEvent) =>
+      hasParentClass("szh-menu--state-open", ev.target as Node) ||
+      (closeMenuExclusionClassName && hasParentClass(closeMenuExclusionClassName, ev.target as Node)),
+    [closeMenuExclusionClassName],
+  );
 
   const handleScreenEventForSave = useCallback(
     (ev: MouseEvent) => {
       if (!clickIsWithinMenu(ev)) {
-        //!ev.currentTarget.contains(ev.relatedTarget || document.activeElement)) {
         ev.preventDefault();
         ev.stopPropagation();
         // FIXME There's an issue in React17
