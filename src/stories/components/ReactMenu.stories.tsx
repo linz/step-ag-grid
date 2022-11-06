@@ -1,6 +1,6 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { Grid } from "@components/Grid";
-import { Menu, MenuItem, MenuButton, MenuDivider, SubMenu } from "@react-menu3";
+import { Grid } from "../../components/Grid";
+import { Menu, MenuItem, MenuButton, MenuDivider, SubMenu } from "../../react-menu3";
 
 export default {
   title: "Components / React-menu",

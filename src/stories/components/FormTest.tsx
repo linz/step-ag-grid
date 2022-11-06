@@ -2,10 +2,10 @@ import "./FormTest.scss";
 
 import { useCallback, useState } from "react";
 import { LuiTextInput } from "@linzjs/lui";
-import { wait } from "@utils/util";
-import { CellEditorCommon, CellParams } from "@components/GridCell";
-import { useGridPopoverHook } from "@components/GridPopoverHook";
-import { GridBaseRow } from "@components/Grid";
+import { wait } from "../../utils/util";
+import { CellEditorCommon, CellParams } from "../../components/GridCell";
+import { useGridPopoverHook } from "../../components/GridPopoverHook";
+import { GridBaseRow } from "../../components/Grid";
 
 export interface IFormTestRow {
   id: number;

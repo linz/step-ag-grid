@@ -13,7 +13,7 @@
     "react-component"
   ],
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/src/index.d.ts",
   "module": "dist/step-ag-grid.esm.js",
   "files": [
     "dist",
@@ -141,6 +141,34 @@
     "stylelint-scss": "^4.3.0",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "typescript": "^4.8.4"
+  },
+  "release": {
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits"
+        }
+      ],
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ]
+        }
+      ],
+      "@semantic-release/github"
+    ]
   },
   "babel": {
     "presets": [

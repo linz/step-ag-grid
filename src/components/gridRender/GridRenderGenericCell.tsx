@@ -1,13 +1,13 @@
 import "../../styles/GridRenderGenericCell.scss";
 
 import { useContext } from "react";
-import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
+import { GridUpdatingContext } from "../../contexts/GridUpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridBaseRow } from "../Grid";
-import { ColDefT } from "@components/GridCell";
+import { ColDefT } from "../GridCell";
 
 export interface RowICellRendererParams<RowType extends GridBaseRow> extends ICellRendererParams {
   data: RowType;

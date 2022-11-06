@@ -4,14 +4,14 @@ import "../../styles/index.scss";
 import "../../styles/GridTheme.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
-import { GridContextProvider } from "@contexts/GridContextProvider";
-import { Grid, GridProps } from "@components/Grid";
+import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useCallback, useMemo, useState } from "react";
-import { MenuHeaderItem, MenuSeparator, MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
-import { wait } from "@utils/util";
-import { ColDefT, GridCell } from "@components/GridCell";
-import { GridPopoverEditDropDown } from "@components/gridPopoverEdit/GridPopoverEditDropDown";
+import { MenuHeaderItem, MenuSeparator, MenuSeparatorString } from "../../components/gridForm/GridFormDropDown";
+import { wait } from "../../utils/util";
+import { ColDefT, GridCell } from "../../components/GridCell";
+import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 
 export default {
   title: "Components / Grids",

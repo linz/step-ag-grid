@@ -2,9 +2,9 @@ import { ReactElement, ReactNode, useContext, useRef } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
-import { isNotEmpty } from "@utils/util";
+import { isNotEmpty } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
-import { GridBaseRow } from "@components/Grid";
+import { GridBaseRow } from "../components/Grid";
 
 interface GridContextProps {
   children: ReactNode;

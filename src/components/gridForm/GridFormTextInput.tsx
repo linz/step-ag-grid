@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
-import { CellEditorCommon, CellParams } from "@components/GridCell";
+import { CellEditorCommon, CellParams } from "../GridCell";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;

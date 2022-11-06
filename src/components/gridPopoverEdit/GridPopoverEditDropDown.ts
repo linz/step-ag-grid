@@ -1,8 +1,7 @@
-import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridBaseRow } from "../Grid";
 import { GridFormDropDown, GridFormPopoutDropDownProps } from "../gridForm/GridFormDropDown";
-import { GenericCellColDef } from "@components/gridRender/GridRenderGenericCell";
+import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
 export const GridPopoverEditDropDown = <RowType extends GridBaseRow, ValueType>(
   colDef: GenericCellColDef<RowType>,
@@ -12,7 +11,6 @@ export const GridPopoverEditDropDown = <RowType extends GridBaseRow, ValueType>(
     {
       initialWidth: 65,
       maxWidth: 150,
-      cellClass: props.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
     },
     {

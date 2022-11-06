@@ -4,14 +4,14 @@ import "../../styles/index.scss";
 import "../../styles/GridTheme.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
-import { GridContextProvider } from "@contexts/GridContextProvider";
-import { Grid, GridProps } from "@components/Grid";
+import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { wait } from "@utils/util";
-import { GridPopoverMenu } from "@components/gridPopoverEdit/GridPopoverMenu";
-import { ColDefT, GridCell } from "@components/GridCell";
-import { GridPopoverMessage } from "@components/gridPopoverEdit/GridPopoverMessage";
+import { wait } from "../../utils/util";
+import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
+import { ColDefT, GridCell } from "../../components/GridCell";
+import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
 
 export default {
   title: "Components / Grids",

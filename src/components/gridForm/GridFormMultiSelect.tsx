@@ -1,14 +1,14 @@
 import "../../styles/GridFormMultiSelect.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "@react-menu3";
+import { MenuItem, MenuDivider, FocusableItem } from "../../react-menu3";
 import { useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { MenuSeparatorString } from "@components/gridForm/GridFormDropDown";
-import { CellEditorCommon, CellParams } from "@components/GridCell";
+import { MenuSeparatorString } from "./GridFormDropDown";
+import { CellEditorCommon, CellParams } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 
 interface MultiFinalSelectOption<ValueType> {

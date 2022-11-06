@@ -5,15 +5,15 @@ import "../../styles/GridTheme.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
-import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
-import { GridContextProvider } from "@contexts/GridContextProvider";
-import { Grid, GridProps } from "@components/Grid";
-import { ColDefT, GridCell } from "@components/GridCell";
+import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
+import { ColDefT, GridCell } from "../../components/GridCell";
 import {
   GridPopoverEditBearing,
   GridPopoverEditBearingCorrection,
-} from "@components/gridPopoverEdit/GridPopoverEditBearing";
-import { wait } from "@utils/util";
+} from "../../components/gridPopoverEdit/GridPopoverEditBearing";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",

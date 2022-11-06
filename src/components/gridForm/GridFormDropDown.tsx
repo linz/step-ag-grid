@@ -1,10 +1,10 @@
 import "../../styles/GridFormDropDown.scss";
 
-import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "@react-menu3";
+import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "../../react-menu3";
 import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "@contexts/GridContext";
+import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon, CellParams } from "../GridCell";

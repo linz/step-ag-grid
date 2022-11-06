@@ -4,15 +4,15 @@ import "../../styles/index.scss";
 import "../../styles/GridTheme.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridUpdatingContextProvider } from "@contexts/GridUpdatingContextProvider";
-import { GridContextProvider } from "@contexts/GridContextProvider";
-import { Grid, GridProps } from "@components/Grid";
+import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
+import { GridContextProvider } from "../../contexts/GridContextProvider";
+import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { ColDefT, GridCell } from "@components/GridCell";
+import { ColDefT, GridCell } from "../../components/GridCell";
 import { IFormTestRow } from "./FormTest";
-import { isFloat, wait } from "@utils/util";
-import { GridPopoverTextArea } from "@components/gridPopoverEdit/GridPopoverTextArea";
-import { GridPopoverTextInput } from "@components/gridPopoverEdit/GridPopoverTextInput";
+import { isFloat, wait } from "../../utils/util";
+import { GridPopoverTextArea } from "../../components/gridPopoverEdit/GridPopoverTextArea";
+import { GridPopoverTextInput } from "../../components/gridPopoverEdit/GridPopoverTextInput";
 
 export default {
   title: "Components / Grids",

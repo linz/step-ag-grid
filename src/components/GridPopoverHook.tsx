@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { GridContext } from "@contexts/GridContext";
+import { GridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
-import { ControlledMenu } from "@react-menu3";
-import { GridPopoverContext } from "@contexts/GridPopoverContext";
+import { ControlledMenu } from "../react-menu3";
+import { GridPopoverContext } from "../contexts/GridPopoverContext";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;

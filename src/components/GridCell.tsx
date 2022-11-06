@@ -1,6 +1,6 @@
 import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
-import { GridUpdatingContext } from "@contexts/GridUpdatingContext";
+import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GenericMultiEditCellClass } from "./GenericCellClass";
 import {
   GenericCellColDef,
@@ -9,10 +9,10 @@ import {
 } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
-import { GridIcon } from "@components/GridIcon";
+import { GridIcon } from "../components/GridIcon";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { GridPopoverContext } from "@contexts/GridPopoverContext";
-import { GridPopoverContextProvider } from "@contexts/GridPopoverContextProvider";
+import { GridPopoverContext } from "../contexts/GridPopoverContext";
+import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -49,9 +49,9 @@ export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
 }
 
 /*
- * For editing a text area.
+ * All cells should use this
  */
-export const GridCell = <RowType extends GridBaseRow, Props>(
+export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCommon>(
   props: GenericCellColDef<RowType>,
   custom?: {
     multiEdit?: boolean;
@@ -120,7 +120,7 @@ const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props
 
   return (
     <>
-      <div>{colDef.cellRenderer ? <colDef.cellRenderer {...props} /> : props.value}</div>
+      {<colDef.cellRenderer {...props} />}
       {props?.editor && <props.editor {...cellEditorParams} {...propsRef.current} />}
     </>
   );
