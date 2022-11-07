@@ -183,8 +183,11 @@ export const ControlledMenuFr = (
   };
 
   const onBlur = (e: FocusEvent) => {
-    if (isMenuOpen(state) && !e.currentTarget.contains(e.relatedTarget || document.activeElement) 
-    && !isWithinMenu(e.relatedTarget)) {
+    if (
+      isMenuOpen(state) &&
+      !e.currentTarget.contains(e.relatedTarget || document.activeElement) &&
+      !isWithinMenu(e.relatedTarget)
+    ) {
       safeCall(onClose, { reason: CloseReason.BLUR });
 
       // If a user clicks on the menu button when a menu is open, we need to close the menu.
