@@ -76,16 +76,16 @@ export const ControlledMenuFr = (
     ],
   );
 
-  const clickIsWithinMenu = useCallback(
-    (ev: MouseEvent) =>
-      hasParentClass("szh-menu--state-open", ev.target as Node) ||
-      (closeMenuExclusionClassName && hasParentClass(closeMenuExclusionClassName, ev.target as Node)),
+  const isWithinMenu = useCallback(
+    (target: EventTarget | null) =>
+      hasParentClass("szh-menu--state-open", target as Node) ||
+      (closeMenuExclusionClassName && hasParentClass(closeMenuExclusionClassName, target as Node)),
     [closeMenuExclusionClassName],
   );
 
   const handleScreenEventForSave = useCallback(
     (ev: MouseEvent) => {
-      if (!clickIsWithinMenu(ev)) {
+      if (!isWithinMenu(ev.target)) {
         ev.preventDefault();
         ev.stopPropagation();
         // FIXME There's an issue in React17
@@ -107,17 +107,17 @@ export const ControlledMenuFr = (
         }
       }
     },
-    [clickIsWithinMenu, onClose, saveButtonRef, skipOpen],
+    [isWithinMenu, onClose, saveButtonRef, skipOpen],
   );
 
   const handleScreenEventForCancel = useCallback(
     (ev: MouseEvent) => {
-      if (!clickIsWithinMenu(ev)) {
+      if (!isWithinMenu(ev)) {
         ev.preventDefault();
         ev.stopPropagation();
       }
     },
-    [clickIsWithinMenu],
+    [isWithinMenu],
   );
 
   useEffect(() => {
@@ -183,7 +183,8 @@ export const ControlledMenuFr = (
   };
 
   const onBlur = (e: FocusEvent) => {
-    if (isMenuOpen(state) && !e.currentTarget.contains(e.relatedTarget || document.activeElement)) {
+    if (isMenuOpen(state) && !e.currentTarget.contains(e.relatedTarget || document.activeElement) 
+    && !isWithinMenu(e.relatedTarget)) {
       safeCall(onClose, { reason: CloseReason.BLUR });
 
       // If a user clicks on the menu button when a menu is open, we need to close the menu.
