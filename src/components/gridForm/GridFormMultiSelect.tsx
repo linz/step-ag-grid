@@ -1,10 +1,10 @@
 import "../../styles/GridFormMultiSelect.scss";
 
 import { MenuItem, MenuDivider, FocusableItem } from "../../react-menu3";
-import { useCallback, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, KeyboardEvent, useMemo } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay, fromPairs } from "lodash-es";
+import { delay, fromPairs, pickBy } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
@@ -38,21 +38,31 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   options:
     | MultiSelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<MultiSelectOption<ValueType>[]> | MultiSelectOption<ValueType>[]);
-  initialSelectedValues?: (selectedRows: RowType[]) => any[];
+  initialSelectedValues?: (selectedRows: RowType[]) => any[] | Record<string, any>;
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   props: GridFormMultiSelectProps<RowType, ValueType>,
 ) => {
   const { selectedRows } = props as unknown as CellParams<RowType>;
+
+  const initialiseValues = useMemo(
+    () => props.initialSelectedValues && props.initialSelectedValues(selectedRows),
+    [props.initialSelectedValues, selectedRows],
+  );
+  const subSelectedValues = useRef<Record<string, any>>(
+    initialiseValues && !Array.isArray(initialiseValues)
+      ? pickBy(initialiseValues, (value) => typeof value !== "boolean")
+      : {},
+  );
+  const [selectedValues, setSelectedValues] = useState<any[]>(() =>
+    initialiseValues ? (Array.isArray(initialiseValues) ? initialiseValues : Object.keys(initialiseValues)) : [],
+  );
+
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
-  const subSelectedValues = useRef<Record<string, any>>({});
-  const [selectedValues, setSelectedValues] = useState<any[]>(() =>
-    props.initialSelectedValues ? props.initialSelectedValues(selectedRows) : [],
-  );
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
@@ -190,6 +200,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                       item.subComponent &&
                       item.subComponent(
                         {
+                          value: subSelectedValues.current[`${item.value}`],
                           setValue: (value: any) => {
                             subSelectedValues.current[item.value as string] = value;
                           },

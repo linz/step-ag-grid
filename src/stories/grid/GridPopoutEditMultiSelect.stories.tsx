@@ -78,11 +78,14 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               { value: "e", label: "Tester" },
               MenuSeparator,
               {
-                value: "f",
+                value: "other",
                 label: "Other",
                 subComponent: (props) => <GridSubComponentTextArea {...props} />,
               },
             ],
+            initialSelectedValues: () => ({
+              other: "Hello",
+            }),
             onSave: async (result: MultiSelectResult<ITestRow>) => {
               // eslint-disable-next-line no-console
               console.log(result);
