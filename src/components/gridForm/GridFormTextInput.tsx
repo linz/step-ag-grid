@@ -63,6 +63,12 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(_props: GridFormT
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         formatted={props.units}
+        onMouseEnter={(e) => {
+          if (document.activeElement != e.currentTarget) {
+            e.currentTarget.focus();
+            e.currentTarget.selectionStart = e.currentTarget.value.length;
+          }
+        }}
         inputProps={{
           style: { width: "100%" },
           placeholder: props.placeholder,

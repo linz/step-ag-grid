@@ -16,6 +16,8 @@ export interface LuiTextInputProps {
 
   placeholder?: string;
   formatted?: string;
+
+  onMouseEnter?: (e: React.MouseEvent<HTMLTextAreaElement>) => void;
 }
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
@@ -33,7 +35,8 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
           type={"text"}
           className={"LuiTextInput-input"}
           min="0"
-          value={props.value}
+          spellCheck={true}
+          defaultValue={props.value}
           onChange={props.onChange}
           {...props.inputProps}
         />
