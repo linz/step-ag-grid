@@ -47,7 +47,6 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               saveButtonRef={saveButtonRef}
               menuClassName={"step-ag-grid-react-menu"}
               onClose={(event: MenuCloseEvent) => {
-                if (event.reason === "blur") return;
                 triggerSave(event.reason).then();
               }}
               viewScroll={"auto"}
