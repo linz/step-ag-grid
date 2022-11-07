@@ -3,6 +3,7 @@ import { GridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
 import { GridPopoverContext } from "../contexts/GridPopoverContext";
+import { MenuCloseEvent } from "../react-menu3/types";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
@@ -45,7 +46,10 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               anchorRef={anchorRef}
               saveButtonRef={saveButtonRef}
               menuClassName={"step-ag-grid-react-menu"}
-              onClose={(event: { reason: string }) => triggerSave(event.reason).then()}
+              onClose={(event: MenuCloseEvent) => {
+                if (event.reason === "blur") return;
+                triggerSave(event.reason).then();
+              }}
               viewScroll={"auto"}
               dontShrinkIfDirectionIsTop={true}
               className={props.className}

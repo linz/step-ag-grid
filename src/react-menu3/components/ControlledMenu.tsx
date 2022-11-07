@@ -86,7 +86,6 @@ export const ControlledMenuFr = (
   const handleScreenEventForSave = useCallback(
     (ev: MouseEvent) => {
       if (!clickIsWithinMenu(ev)) {
-        console.log("clickIsWithinMenu: false");
         ev.preventDefault();
         ev.stopPropagation();
         // FIXME There's an issue in React17
