@@ -50,7 +50,7 @@ export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon):
     //appendToElement={() => (poppedOut && popoutElement) || document.body}
   >
     <h2>Header</h2>
-    <p className="WarningAlertWithButtons-new-line">Description</p>
+    <p className="WarningAlertWithButtons-new-line">This modal was added to help fix a bug where the onBlur for the context menu was prematurely closing the editor and therefore this modal.</p>
     <LuiAlertModalButtons>
         <LuiButton level="secondary" onClick={()=> {setShowModal(false);}} data-testid="WarningAlertWithButtons-cancel">
           Cancel
