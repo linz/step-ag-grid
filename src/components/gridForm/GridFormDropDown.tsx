@@ -233,7 +233,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                 </MenuItem>
                 {item.subComponent && (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${props.field}-${index}_subcomponent`}>
                     {(ref: any) =>
                       item.subComponent &&
                       item.subComponent(
@@ -252,6 +252,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                               });
                             }
                             setSubComponentValues(localSubComponentValues);
+                          },
+                          keyDown: (key: string) => {
+                            const subComponentItem = subComponentValues.find(
+                              ({ optionValue }) => optionValue === item.value,
+                            );
+                            if (key === "Enter" && subComponentItem) {
+                              selectItemHandler(item.value, subComponentItem.subComponentValue);
+                              ref.closeMenu();
+                            }
                           },
                         },
                         ref,

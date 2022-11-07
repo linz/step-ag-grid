@@ -241,6 +241,40 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           },
         },
       ),
+      GridPopoverEditDropDown(
+        {
+          field: "code",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Subcomponent",
+          valueGetter: (params) => params.data.code,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: [
+              {
+                value: "first",
+                label: "One",
+              },
+              {
+                value: "second",
+                label: "Two",
+              },
+              {
+                value: "oth",
+                label: "Other",
+                subComponent: (props) => <SubComponent {...props} />,
+              },
+            ],
+            onSelectedItem: async (selected) => {
+              console.log("onSelectedItem", selected);
+            },
+          },
+        },
+      ),
     ],
     [optionsFn, optionsObjects],
   );
@@ -273,6 +307,27 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       rowData={rowData}
       domLayout={"autoHeight"}
     />
+  );
+};
+
+interface SubComponentProps {
+  setValue: (value: string) => void;
+  keyDown: (key: string) => void;
+}
+
+const SubComponent = (props: SubComponentProps) => {
+  const [inputValue, setInputValue] = useState("");
+  return (
+    <div>
+      <input
+        value={inputValue}
+        onChange={(e) => {
+          setInputValue(e.target.value);
+          props.setValue(inputValue);
+        }}
+        onKeyDown={(k) => props.keyDown(k.key)}
+      />
+    </div>
   );
 };
 
