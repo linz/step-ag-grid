@@ -42,37 +42,52 @@ export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon):
 
   return popoverWrapper(
     <>
-    {showModal &&
-    <LuiAlertModal
-    data-testid="WarningAlertWithButtons-modal"
-    level="warning"
-    // If panel is popped out, append modal to poppped out window DOM, otherwise use default
-    //appendToElement={() => (poppedOut && popoutElement) || document.body}
-  >
-    <h2>Header</h2>
-    <p className="WarningAlertWithButtons-new-line">This modal was added to help fix a bug where the onBlur for the context menu was prematurely closing the editor and therefore this modal.</p>
-    <LuiAlertModalButtons>
-        <LuiButton level="secondary" onClick={()=> {setShowModal(false);}} data-testid="WarningAlertWithButtons-cancel">
-          Cancel
-        </LuiButton>
+      {showModal && (
+        <LuiAlertModal
+          data-testid="WarningAlertWithButtons-modal"
+          level="warning"
+          // If panel is popped out, append modal to poppped out window DOM, otherwise use default
+          //appendToElement={() => (poppedOut && popoutElement) || document.body}
+        >
+          <h2>Header</h2>
+          <p className="WarningAlertWithButtons-new-line">
+            This modal was added to help fix a bug where the onBlur for the context menu was prematurely closing the
+            editor and therefore this modal.
+          </p>
+          <LuiAlertModalButtons>
+            <LuiButton
+              level="secondary"
+              onClick={() => {
+                setShowModal(false);
+              }}
+              data-testid="WarningAlertWithButtons-cancel"
+            >
+              Cancel
+            </LuiButton>
 
-        <LuiButton level="primary" onClick={()=> {setShowModal(false);}} data-testid="WarningAlertWithButtons-ok" >
-          OK
-        </LuiButton>
-    </LuiAlertModalButtons>
-  </LuiAlertModal>
-}
-    <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
-      <div className={"FormTest-textInput"}>
-        <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
+            <LuiButton
+              level="primary"
+              onClick={() => {
+                setShowModal(false);
+              }}
+              data-testid="WarningAlertWithButtons-ok"
+            >
+              OK
+            </LuiButton>
+          </LuiAlertModalButtons>
+        </LuiAlertModal>
+      )}
+      <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
+        <div className={"FormTest-textInput"}>
+          <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
+        </div>
+        <div className={"FormTest-textInput"}>
+          <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
+        </div>
+        <div className={"FormTest-textInput"}>
+          <LuiButton onClick={() => setShowModal(true)}>Show Modal</LuiButton>
+        </div>
       </div>
-      <div className={"FormTest-textInput"}>
-        <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
-      </div>
-      <div className={"FormTest-textInput"}>
-        <LuiButton onClick={() => setShowModal(true)}>Show Modal</LuiButton>
-      </div>
-    </div>
     </>,
   );
 };
