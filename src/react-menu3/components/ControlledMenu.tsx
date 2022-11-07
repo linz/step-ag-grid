@@ -112,7 +112,7 @@ export const ControlledMenuFr = (
 
   const handleScreenEventForCancel = useCallback(
     (ev: MouseEvent) => {
-      if (!isWithinMenu(ev)) {
+      if (!isWithinMenu(ev.target)) {
         ev.preventDefault();
         ev.stopPropagation();
       }
