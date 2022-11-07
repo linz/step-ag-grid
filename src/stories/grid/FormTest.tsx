@@ -1,7 +1,7 @@
 import "./FormTest.scss";
 
 import { useCallback, useState } from "react";
-import { LuiTextInput } from "@linzjs/lui";
+import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
 import { CellEditorCommon, CellParams } from "../../components/GridCell";
 import { useGridPopoverHook } from "../../components/GridPopoverHook";
@@ -35,9 +35,33 @@ export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon):
     // Close form
     return true;
   }, [nameType, numba, plan, props.selectedRows]);
+
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   const { popoverWrapper } = useGridPopoverHook({ className: _props.className, save });
 
   return popoverWrapper(
+    <>
+    {showModal &&
+    <LuiAlertModal
+    data-testid="WarningAlertWithButtons-modal"
+    level="warning"
+    // If panel is popped out, append modal to poppped out window DOM, otherwise use default
+    //appendToElement={() => (poppedOut && popoutElement) || document.body}
+  >
+    <h2>Header</h2>
+    <p className="WarningAlertWithButtons-new-line">Description</p>
+    <LuiAlertModalButtons>
+        <LuiButton level="secondary" onClick={()=> {setShowModal(false);}} data-testid="WarningAlertWithButtons-cancel">
+          Cancel
+        </LuiButton>
+
+        <LuiButton level="primary" onClick={()=> {setShowModal(false);}} data-testid="WarningAlertWithButtons-ok" >
+          OK
+        </LuiButton>
+    </LuiAlertModalButtons>
+  </LuiAlertModal>
+}
     <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
       <div className={"FormTest-textInput"}>
         <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
@@ -46,8 +70,9 @@ export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon):
         <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
       </div>
       <div className={"FormTest-textInput"}>
-        <LuiTextInput label={"Plan"} value={plan} onChange={(e) => setPlan(e.target.value)} />
+        <LuiButton onClick={() => setShowModal(true)}>Show Modal</LuiButton>
       </div>
-    </div>,
+    </div>
+    </>,
   );
 };

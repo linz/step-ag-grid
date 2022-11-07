@@ -82,6 +82,7 @@ export const ControlledMenuFr = (
   const handleScreenEventForSave = useCallback(
     (ev: MouseEvent) => {
       if (!clickIsWithinMenu(ev)) {
+        console.log("clickIsWithinMenu: false")
         //!ev.currentTarget.contains(ev.relatedTarget || document.activeElement)) {
         ev.preventDefault();
         ev.stopPropagation();
