@@ -6,15 +6,8 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 export const GridPopoverTextInput = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType>,
   params: GenericCellEditorProps<GridFormTextInputProps<RowType>>,
-): ColDefT<RowType> => {
-  return GridCell(
-    {
-      maxWidth: 140,
-      ...colDef,
-    },
-    {
-      editor: GridFormTextInput,
-      ...params,
-    },
-  );
-};
+): ColDefT<RowType> =>
+  GridCell(colDef, {
+    editor: GridFormTextInput,
+    ...params,
+  });

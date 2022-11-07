@@ -7,18 +7,11 @@ export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow, ValueType
   colDef: GenericCellColDef<RowType>,
   props: GenericCellEditorProps<GridFormMultiSelectProps<RowType, ValueType>>,
 ): ColDefT<RowType> =>
-  GridCell(
-    {
-      initialWidth: 65,
-      maxWidth: 150,
-      ...colDef,
+  GridCell(colDef, {
+    editor: GridFormMultiSelect,
+    ...props,
+    editorParams: {
+      className: "GridMultiSelect-containerMedium",
+      ...(props.editorParams as GridFormMultiSelectProps<RowType, ValueType>),
     },
-    {
-      editor: GridFormMultiSelect,
-      ...props,
-      editorParams: {
-        className: "GridMultiSelect-containerMedium",
-        ...(props.editorParams as GridFormMultiSelectProps<RowType, ValueType>),
-      },
-    },
-  );
+  });

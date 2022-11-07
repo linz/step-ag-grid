@@ -10,7 +10,6 @@ import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { wait } from "../../utils/util";
-import { MultiSelectResult } from "../../components/gridForm/GridFormMultiSelect";
 import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
@@ -70,6 +69,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           editorParams: {
             filtered: true,
             filterPlaceholder: "Filter position",
+            className: "GridMultiSelect-containerUnlimited",
             options: [
               { value: "a", label: "Architect" },
               { value: "b", label: "Developer" },
@@ -78,15 +78,24 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               { value: "e", label: "Tester" },
               MenuSeparator,
               {
-                value: "f",
+                value: "other",
                 label: "Other",
-                subComponent: (props) => <GridSubComponentTextArea {...props} />,
+                subComponent: (props) => <GridSubComponentTextArea {...props} maxlength={2} />,
               },
             ],
-            onSave: async (result: MultiSelectResult<ITestRow>) => {
+            initialSelectedValues: () => ({
+              other: "Hello",
+            }),
+            onSave: async (selectedRows, selectedOptions) => {
               // eslint-disable-next-line no-console
-              console.log(result);
+              console.log("multiSelect result", { selectedRows, selectedOptions });
+
               await wait(1000);
+              const normalValues = selectedOptions.filter((o) => !o.subComponent).map((o) => o.label);
+              const subValues = selectedOptions.filter((o) => o.subComponent).map((o) => o.subValue);
+              selectedRows.forEach((row) => {
+                row.position = [...normalValues, ...subValues].join(", ");
+              });
               return true;
             },
           },
@@ -107,9 +116,9 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             filterPlaceholder: "Filter position",
             initialSelectedValues: (selectedRows) => [selectedRows[0].position2],
             options: Object.entries(positionTwoMap).map(([k, v]) => ({ value: k, label: v })),
-            onSave: async (result: MultiSelectResult<ITestRow>) => {
+            onSave: async (selectedRows, selectedOptions) => {
               // eslint-disable-next-line no-console
-              console.log(result);
+              console.log("multiSelect result", { selectedRows, selectedOptions });
               await wait(1000);
               return true;
             },

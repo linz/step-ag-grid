@@ -38,6 +38,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
     | "GridPopoverEditDropDown-containerSmall"
     | "GridPopoverEditDropDown-containerMedium"
     | "GridPopoverEditDropDown-containerLarge"
+    | "GridPopoverEditDropDown-containerUnlimited"
     | string
     | undefined;
   filtered?: "local" | "reload";

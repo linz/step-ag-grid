@@ -7,19 +7,12 @@ export const GridPopoverEditDropDown = <RowType extends GridBaseRow, ValueType>(
   colDef: GenericCellColDef<RowType>,
   props: GenericCellEditorProps<GridFormPopoutDropDownProps<RowType, ValueType>>,
 ): ColDefT<RowType> =>
-  GridCell(
-    {
-      initialWidth: 65,
-      maxWidth: 150,
-      ...colDef,
+  GridCell(colDef, {
+    editor: GridFormDropDown,
+    ...props,
+    editorParams: {
+      // Defaults to medium size container
+      className: "GridPopoverEditDropDown-containerMedium",
+      ...(props.editorParams as GridFormPopoutDropDownProps<RowType, ValueType>),
     },
-    {
-      editor: GridFormDropDown,
-      ...props,
-      editorParams: {
-        // Defaults to medium size container
-        className: "GridPopoverEditDropDown-containerMedium",
-        ...(props.editorParams as GridFormPopoutDropDownProps<RowType, ValueType>),
-      },
-    },
-  );
+  });
