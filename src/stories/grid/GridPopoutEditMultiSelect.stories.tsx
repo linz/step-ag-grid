@@ -13,6 +13,7 @@ import { wait } from "../../utils/util";
 import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
+import { partition } from "lodash-es";
 
 export default {
   title: "Components / Grids",
@@ -91,11 +92,9 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               console.log("multiSelect result", { selectedRows, selectedOptions });
 
               await wait(1000);
-              const normalValues = selectedOptions.filter((o) => !o.subComponent).map((o) => o.label);
-              const subValues = selectedOptions.filter((o) => o.subComponent).map((o) => o.subValue);
-              selectedRows.forEach((row) => {
-                row.position = [...normalValues, ...subValues].join(", ");
-              });
+              const [subValues, normalValues] = partition(selectedOptions, (o) => o.subComponent);
+              const newValue = [...normalValues.map((o) => o.label), ...subValues.map((o) => o.subValue)].join(", ");
+              selectedRows.forEach((row) => (row.position = newValue));
               return true;
             },
           },

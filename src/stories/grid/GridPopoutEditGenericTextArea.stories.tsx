@@ -155,14 +155,10 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
     [rowData],
   );
 
-  const [inProgress, setInProgress] = useState(false);
-
   const addRowAction = useCallback(async () => {
-    setInProgress(true);
     await wait(1000);
     const lastRow = rowData[rowData.length - 1];
     setRowData([...rowData, { id: lastRow.id + 1, name: "?", nameType: "?", numba: "?", plan: "", distance: null }]);
-    setInProgress(false);
   }, [rowData]);
 
   return (
@@ -175,13 +171,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         rowData={rowData}
         domLayout={"autoHeight"}
       />
-      <ActionButton
-        icon={"ic_add"}
-        name={"Add new row"}
-        inProgressName={"Adding..."}
-        inProgress={inProgress}
-        onClick={addRowAction}
-      />
+      <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onAction={addRowAction} />
     </>
   );
 };

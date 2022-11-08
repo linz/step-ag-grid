@@ -12,14 +12,14 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
  */
 export const GridPopoverMenu = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType>,
-  props: GenericCellEditorProps<GridFormPopoutMenuProps<RowType>>,
+  custom: GenericCellEditorProps<GridFormPopoutMenuProps<RowType>>,
 ): ColDefT<RowType> =>
   GridCell<RowType, GridFormPopoutMenuProps<RowType>>(
     {
       maxWidth: 64,
       editable: colDef.editable != null ? colDef.editable : true,
       cellRenderer: GridRenderPopoutMenuCell,
-      cellClass: colDef?.cellEditorParams?.multiEdit !== false ? GenericMultiEditCellClass : undefined,
+      cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
       cellRendererParams: {
         // Menus open on single click, this parameter is picked up in Grid.tsx
@@ -28,6 +28,6 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
     },
     {
       editor: GridFormPopoutMenu,
-      ...props,
+      ...custom,
     },
   );
