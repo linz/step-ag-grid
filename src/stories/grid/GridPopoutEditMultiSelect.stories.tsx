@@ -80,7 +80,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               {
                 value: "other",
                 label: "Other",
-                subComponent: (props) => <GridSubComponentTextArea {...props} maxlength={2} />,
+                subComponent: () => <GridSubComponentTextArea maxLength={2} defaultValue={""} />,
               },
             ],
             initialSelectedValues: () => ({
@@ -128,7 +128,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
     ];
   }, []);
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
     { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
   ] as ITestRow[]);

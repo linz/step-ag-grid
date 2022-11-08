@@ -10,7 +10,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
 import { CellEditorCommon, CellParams } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
-import { GridSubComponentProps } from "./GridSubComponentProps";
+import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -208,20 +208,24 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
 
                 {selectedValues.includes(item.value) && item.subComponent && (
                   <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                    {(ref: any) =>
-                      item.subComponent &&
-                      item.subComponent({
-                        ref,
-                        value: subSelectedValues[`${item.value}`],
-                        setValue: (value: any) => {
-                          subSelectedValues[`${item.value}`] = value;
-                          setSubSelectedValues({ ...subSelectedValues });
-                        },
-                        setValid: (valid: boolean) => {
-                          subComponentIsValid.current[`${item.value}`] = valid;
-                        },
-                        triggerSave,
-                      } as GridSubComponentProps)
+                    {(_: any) =>
+                      item.subComponent && (
+                        <GridSubComponentContext.Provider
+                          value={{
+                            value: subSelectedValues[`${item.value}`],
+                            setValue: (value: any) => {
+                              subSelectedValues[`${item.value}`] = value;
+                              setSubSelectedValues({ ...subSelectedValues });
+                            },
+                            setValid: (valid: boolean) => {
+                              subComponentIsValid.current[`${item.value}`] = valid;
+                            },
+                            triggerSave,
+                          }}
+                        >
+                          <item.subComponent />
+                        </GridSubComponentContext.Provider>
+                      )
                     }
                   </FocusableItem>
                 )}

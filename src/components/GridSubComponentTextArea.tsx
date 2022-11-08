@@ -1,24 +1,36 @@
-import { useCallback, useEffect } from "react";
-import { GridSubComponentProps } from "./gridForm/GridSubComponentProps";
+import { useCallback, useContext, useEffect } from "react";
 import { TextInputFormatted } from "../lui/TextInputFormatted";
+import { GridSubComponentContext } from "../contexts/GridSubComponentContext";
 
-export interface GridSubComponentTextAreaProps extends GridSubComponentProps {
+export interface GridSubComponentTextAreaProps {
   placeholder?: string;
   required?: boolean;
-  maxlength?: number;
+  maxLength?: number;
   width?: string | number;
-  validate: (value: string) => string | null;
+  validate?: (value: string) => string | null;
+  defaultValue: string;
 }
 
 export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
-  const { value, setValue, setValid, triggerSave } = props;
+  const gscContext = useContext(GridSubComponentContext);
+  const { value, setValue, setValid, triggerSave } = gscContext;
+
+  // If is not initialised yet as it's just been created then set the default value
+  useEffect(() => {
+    if (value == null) setValue(props.defaultValue);
+  }, [props.defaultValue, setValue, value]);
+
   const validate = useCallback(
     (value: string) => {
+      // This can happen because subcomponent is invoked without type safety
+      if (typeof value !== "string") {
+        console.error("Value is not a string", value);
+      }
       if (props.required && value.length === 0) {
         return `Some text is required`;
       }
-      if (props.maxlength && value.length > props.maxlength) {
-        return `Text must be no longer than ${props.maxlength} characters`;
+      if (props.maxLength && value.length > props.maxLength) {
+        return `Text must be no longer than ${props.maxLength} characters`;
       }
       if (props.validate) {
         return props.validate(value);
@@ -29,7 +41,7 @@ export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): 
   );
 
   useEffect(() => {
-    setValid(validate(value) == null);
+    setValid(value != null && validate(value) == null);
   }, [setValid, validate, value]);
 
   return (
