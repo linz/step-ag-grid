@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { GridApi } from "ag-grid-community";
+import { GridApi, RowNode } from "ag-grid-community";
 import { GridBaseRow } from "../components/Grid";
 
 export interface GridContextType {
@@ -24,6 +24,7 @@ export interface GridContextType {
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
   ) => Promise<boolean>;
+  redrawRows: (rowNodes?: RowNode[]) => void;
 }
 
 export const GridContext = createContext<GridContextType>({
@@ -82,5 +83,8 @@ export const GridContext = createContext<GridContextType>({
   updatingCells: async () => {
     console.error("no context provider for modifyUpdating");
     return false;
+  },
+  redrawRows: () => {
+    console.error("no context provider for redrawRows");
   },
 });

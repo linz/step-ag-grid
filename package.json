@@ -46,6 +46,7 @@
   },
   "scripts": {
     "build": "run-s clean stylelint lint css bundle",
+    "yalc": "run-s clean css bundle && yalc publish",
     "clean": "rimraf dist && mkdirp ./dist",
     "bundle": "rollup -c",
     "stylelint": "stylelint src/**/*.scss src/**/*.css --fix",

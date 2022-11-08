@@ -1,6 +1,9 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useContext, useRef } from "react";
 import { PostSortRowsParams } from "ag-grid-community/dist/lib/entities/iCallbackParams";
 import { ColumnState } from "ag-grid-community/dist/lib/columns/columnModel";
+import { isEmpty } from "lodash-es";
+import { RowNode } from "ag-grid-community";
+import { GridContext } from "../contexts/GridContext";
 
 interface PostSortRowsHookProps {
   setStaleGrid: (stale: boolean) => void;
@@ -12,6 +15,8 @@ interface PostSortRowsHookProps {
  * Handles stale sort, when you edit a row but don't want to re-sort.
  */
 export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => {
+  const { redrawRows } = useContext(GridContext);
+
   // On first run we need to init the first backed up sort order
   const initialised = useRef(false);
 
@@ -19,7 +24,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
   const lastSortOrderHash = useRef<string>("");
 
   // Used to detect if sort order was the same, has the direction changed
-  const previousRowSortIndexRef = useRef<Record<number, number | undefined>>({});
+  const previousRowSortIndexRef = useRef<Record<string, { index: number; hash: string } | undefined>>({});
 
   // stale sort is when there's a sort and user edits a row
   // this applies a class to the div wrapping the grid which in turn adds a * beside the sort arrow
@@ -35,12 +40,16 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
     ({ api, columnApi, nodes }: PostSortRowsParams) => {
       const previousRowSortIndex = previousRowSortIndexRef.current;
 
+      const hashNode = (node: RowNode | undefined) => {
+        return node ? JSON.stringify(node.data) : "";
+      };
+
       const copyCurrentSortSettings = (): ColumnState[] =>
         columnApi.getColumnState().map((row) => ({ colId: row.colId, sort: row.sort, sortIndex: row.sortIndex }));
 
       const backupSortOrder = () => {
         for (const x in previousRowSortIndex) delete previousRowSortIndex[x];
-        nodes.forEach((row, index) => (previousRowSortIndex[row.data.id] = index));
+        nodes.forEach((node, index) => (previousRowSortIndex[`${node.data.id}`] = { index, hash: hashNode(node) }));
       };
 
       // Check if column is the first sorted column.  Note: column is preconfigured to sort its sortIndex is null not 1
@@ -51,22 +60,13 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
 
       const restorePreviousSortColumnState = () => columnApi.applyColumnState({ state: previousColSort.current });
 
-      const hasNewRows = () => nodes.some((row) => previousRowSortIndex[row.data.id] == null);
-
-      const sortIsStale = () => {
-        // If there are new rows we want to them to be at the bottom of the grid, so we treat it as sort not stale
-        if (hasNewRows()) return false;
-
-        // Otherwise check if the stored sort index matches the new sort index
-        return nodes.some((node, index) => previousRowSortIndex[node.data.id] != index);
-      };
-
-      const sortNodesByPreviousSort = () =>
+      const sortNodesByPreviousSort = () => {
         nodes.sort(
           (a, b) =>
-            (previousRowSortIndex[a.data.id] ?? Number.MAX_SAFE_INTEGER) -
-            (previousRowSortIndex[b.data.id] ?? Number.MAX_SAFE_INTEGER),
+            (previousRowSortIndex[`${a.data.id}`]?.index ?? Number.MAX_SAFE_INTEGER) -
+            (previousRowSortIndex[`${b.data.id}`]?.index ?? Number.MAX_SAFE_INTEGER),
         );
+      };
 
       // On first load copy the current sort
       if (!initialised.current) {
@@ -81,6 +81,10 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
       if (previousQuickFilter.current != quickFilter) {
         previousQuickFilter.current = quickFilter;
         sortOrderChanged = true;
+      }
+
+      if (isEmpty(previousRowSortIndex)) {
+        backupSortOrder();
       }
 
       if (sortOrderChanged) {
@@ -115,23 +119,69 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
           lastSortOrderHash.current = newSortOrder;
         }
       } else {
-        if (sortIsStale()) {
+        let firstChangedNodeIndex = -1;
+        let lastNewNode: RowNode | undefined = undefined;
+        let changedRowCount = 0;
+        let newRowCount = 0;
+        let index = 0;
+        for (const node of nodes) {
+          const psr = previousRowSortIndex[`${node.data.id}`];
+          if (psr) {
+            if (psr.hash != hashNode(node)) {
+              if (firstChangedNodeIndex === -1) firstChangedNodeIndex = index;
+              changedRowCount++;
+            }
+          } else {
+            lastNewNode = node;
+            newRowCount++;
+          }
+          index++;
+        }
+
+        let wasStale = false;
+        if (changedRowCount === 0 && newRowCount === 1) {
+          // insert new row at end
+          const newIndex = index - 1;
+          previousRowSortIndex[`${lastNewNode?.data.id}`] = { index: newIndex, hash: hashNode(lastNewNode) };
+          wasStale = true;
+        } else if (changedRowCount === 2 && newRowCount === 0) {
+          // This must be a swap rows
+          backupSortOrder();
+          wasStale = false;
+        } else if (changedRowCount > 1 && newRowCount === 1) {
+          // This must be a insert so, insert new row near the row that changed
+          previousRowSortIndex[`${lastNewNode?.data.id}`] = {
+            index: firstChangedNodeIndex + 0.5,
+            hash: hashNode(lastNewNode),
+          };
+          wasStale = true;
+          // For some reason AgGrid mis-positions the inserted row.
+          lastNewNode && redrawRows();
+        } else if (changedRowCount == 1 && newRowCount === 0) {
+          // User edited one row so, do nothing, retain sort
+          wasStale = true;
+        } else if (changedRowCount !== 0 || newRowCount != 0) {
+          // too many rows changed, resort
+          backupSortOrder();
+        }
+
+        if (wasStale) {
+          // Check if the sort order the aggrid passed matches our stale sort order
+          const stillStale =
+            Object.keys(previousRowSortIndex).length != nodes.length ||
+            nodes.some((node, index) => previousRowSortIndex[`${node.data.id}`]?.index !== index);
+
           // If we haven't already processed a stale sort then...
-          if (!sortWasStale.current) {
+          if (stillStale && !sortWasStale.current) {
             // backup sort state, so we can restore it when sort is clicked on a stale column
             previousColSort.current = copyCurrentSortSettings();
-            backupSortOrder();
             sortWasStale.current = true;
             setStaleGrid(true);
           }
-
-          sortNodesByPreviousSort();
         }
-        // secondary sort backup as there may be new nodes that didn't have their sort registered
-        // which would cause two new rows to sort out of sequence
-        backupSortOrder();
+        sortNodesByPreviousSort();
       }
     },
-    [setStaleGrid],
+    [redrawRows, setStaleGrid],
   );
 };
