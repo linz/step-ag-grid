@@ -18,23 +18,22 @@ export interface IFormTestRow {
 
 export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon): JSX.Element => {
   const props = _props as CellParams<RowType>;
-  const [v1, v2, ...v3] = props.value.split(" ");
+  const [v1, ...v2] = props.value.split(" ");
 
   const [nameType, setNameType] = useState(v1);
-  const [numba, setNumba] = useState(v2);
-  const [plan, setPlan] = useState(v3.join(" "));
+  const [numba, setNumba] = useState(v2.join(" "));
 
   const save = useCallback(async (): Promise<boolean> => {
     // eslint-disable-next-line no-console
-    console.log("onSave", props.selectedRows, nameType, numba, plan);
+    console.log("onSave", props.selectedRows, nameType, numba);
 
     // @ts-ignore
-    props.selectedRows.forEach((row) => (row["name"] = [nameType, numba, plan].join(" ")));
+    props.selectedRows.forEach((row) => (row["name"] = [nameType, numba].join(" ")));
     await wait(1000);
 
     // Close form
     return true;
-  }, [nameType, numba, plan, props.selectedRows]);
+  }, [nameType, numba, props.selectedRows]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
 

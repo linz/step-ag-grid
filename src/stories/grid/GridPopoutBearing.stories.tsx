@@ -83,7 +83,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     [],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     { id: 1000, bearing1: 1.234, bearingCorrection: 90 },
     { id: 1001, bearing1: 1.565, bearingCorrection: 240 },
     { id: 1002, bearing1: null, bearingCorrection: 355.1 },
