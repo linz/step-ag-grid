@@ -61,7 +61,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           multiEdit: true,
           editorParams: {
             required: true,
-            maxlength: 12,
+            maxLength: 12,
             placeholder: "Enter some text...",
             validate: (value: string) => {
               if (value === "never") return "The value 'never' is not allowed";
@@ -88,7 +88,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           multiEdit: true,
           editorParams: {
-            maxlength: 12,
+            maxLength: 12,
             placeholder: "Enter distance...",
             units: "m",
             validate: (value: string) => {
@@ -115,7 +115,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           multiEdit: true,
           editorParams: {
             required: true,
-            maxlength: 32,
+            maxLength: 32,
             placeholder: "Enter some text...",
 
             validate: (value: string) => {

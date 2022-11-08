@@ -7,7 +7,7 @@ import { CellEditorCommon, CellParams } from "../GridCell";
 export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
   required?: boolean;
-  maxlength?: number;
+  maxLength?: number;
   width?: string | number;
   validate?: (value: string) => string | null;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
@@ -21,8 +21,8 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTe
     if (props.required && value.length == 0) {
       return `Some text is required`;
     }
-    if (props.maxlength && value.length > props.maxlength) {
-      return `Text must be no longer than ${props.maxlength} characters`;
+    if (props.maxLength && value.length > props.maxLength) {
+      return `Text must be no longer than ${props.maxLength} characters`;
     }
     if (props.validate) {
       return props.validate(value);

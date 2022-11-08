@@ -8,7 +8,7 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Cel
   placeholder?: string;
   units?: string;
   required?: boolean;
-  maxlength?: number;
+  maxLength?: number;
   width?: string | number;
   // Return null for ok, otherwise an error string
   validate?: (value: string, data: RowType) => string | null;
@@ -25,8 +25,8 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(_props: GridFormT
     if (props.required && trimmedValue.length == 0) {
       return `Some text is required`;
     }
-    if (props.maxlength && trimmedValue.length > props.maxlength) {
-      return `Text must be no longer than ${props.maxlength} characters`;
+    if (props.maxLength && trimmedValue.length > props.maxLength) {
+      return `Text must be no longer than ${props.maxLength} characters`;
     }
     if (props.validate) {
       return props.validate(trimmedValue, props.data);

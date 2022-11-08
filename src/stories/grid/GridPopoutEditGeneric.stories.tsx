@@ -57,7 +57,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
     [],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345" },
     { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523" },
   ] as IFormTestRow[]);

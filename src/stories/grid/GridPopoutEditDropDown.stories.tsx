@@ -245,7 +245,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
     [optionsFn, optionsObjects],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     {
       id: 1000,
       position: "Tester",

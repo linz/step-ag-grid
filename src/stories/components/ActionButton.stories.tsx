@@ -7,7 +7,7 @@ import { useCallback, useState } from "react";
 import { wait } from "../../utils/util";
 
 export default {
-  title: "Components / ButtonTextWithIcon",
+  title: "Components / ActionButton",
   component: ActionButton,
   args: {},
 } as ComponentMeta<typeof ActionButton>;
