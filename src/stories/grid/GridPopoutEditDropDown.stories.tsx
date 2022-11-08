@@ -12,6 +12,7 @@ import { MenuHeaderItem, MenuSeparator, MenuSeparatorString } from "../../compon
 import { wait } from "../../utils/util";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
+import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 
 export default {
   title: "Components / Grids",
@@ -40,6 +41,7 @@ interface ITestRow {
   position3: string | null;
   position4: ICode | null;
   code: string | null;
+  sub: string | null;
 }
 
 interface ICode {
@@ -241,6 +243,42 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           },
         },
       ),
+      GridPopoverEditDropDown(
+        {
+          field: "sub",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Subcomponent",
+          valueGetter: (params) => params.data.sub,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
+            filtered: "local",
+            filterPlaceholder: "Filter this",
+            options: [
+              {
+                value: "one",
+                label: "One",
+              },
+              {
+                value: "two",
+                label: "Two",
+              },
+              {
+                value: "oth",
+                label: "Other",
+                subComponent: (props) => (
+                  <GridFormSubComponentTextInput {...props} placeholder={"Subcomponent value"} />
+                ),
+              },
+            ],
+            onSelectedItem: async (selected) => {
+              console.log("onSelectedItem", selected);
+            },
+          },
+        },
+      ),
     ],
     [optionsFn, optionsObjects],
   );
@@ -253,6 +291,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       position3: "Tester",
       position4: { code: "O1", desc: "Object One" },
       code: "O1",
+      sub: "two",
     },
     {
       id: 1001,
@@ -261,6 +300,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       position3: "Developer",
       position4: { code: "O2", desc: "Object Two" },
       code: "O2",
+      sub: "one",
     },
   ] as ITestRow[]);
 
