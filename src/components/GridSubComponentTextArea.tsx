@@ -12,8 +12,7 @@ export interface GridSubComponentTextAreaProps {
 }
 
 export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
-  const gscContext = useContext(GridSubComponentContext);
-  const { value, setValue, setValid, triggerSave } = gscContext;
+  const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
