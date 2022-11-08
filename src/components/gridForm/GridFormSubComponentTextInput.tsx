@@ -5,14 +5,22 @@ export interface GridFormSubComponentTextInput {
   setValue: (value: string) => void;
   keyDown: (key: string) => void;
   placeholder?: string;
+  className?: string;
 }
 
-export const GridFormSubComponentTextInput = ({ keyDown, placeholder, setValue }: GridFormSubComponentTextInput) => {
+export const GridFormSubComponentTextInput = ({
+  keyDown,
+  placeholder,
+  setValue,
+  className,
+}: GridFormSubComponentTextInput) => {
   const placeholderText = placeholder || "Other...";
+  const inputClass = className || "";
   const [inputValue, setInputValue] = useState("");
   return (
     <>
       <TextInputFormatted
+        className={inputClass}
         value={inputValue}
         onChange={(e) => {
           const value = e.target.value;
@@ -26,6 +34,9 @@ export const GridFormSubComponentTextInput = ({ keyDown, placeholder, setValue }
             if (document.activeElement != e.currentTarget) {
               e.currentTarget.focus();
             }
+          },
+          style: {
+            width: "100%",
           },
         }}
       />
