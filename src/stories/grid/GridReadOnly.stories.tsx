@@ -151,7 +151,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     [],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData] = useState([
     { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
     { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
   ]);

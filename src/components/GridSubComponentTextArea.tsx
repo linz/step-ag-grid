@@ -20,7 +20,8 @@ export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): 
   }, [props.defaultValue, setValue, value]);
 
   const validate = useCallback(
-    (value: string) => {
+    (value: string | null) => {
+      if (value == null) return null;
       // This can happen because subcomponent is invoked without type safety
       if (typeof value !== "string") {
         console.error("Value is not a string", value);
