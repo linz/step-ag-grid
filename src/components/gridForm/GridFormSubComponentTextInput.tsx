@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 
 export interface GridFormSubComponentTextInput {

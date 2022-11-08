@@ -274,6 +274,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               },
             ],
             onSelectedItem: async (selected) => {
+              // eslint-disable-next-line no-console
               console.log("onSelectedItem", selected);
             },
           },
