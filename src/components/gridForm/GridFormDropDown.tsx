@@ -218,21 +218,19 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
               <MenuHeader>{item.label}</MenuHeader>
             ) : filteredValues.includes(item.value) ? null : (
               <>
-                <MenuItem
-                  key={`${props.field}-${index}`}
-                  disabled={!!item.disabled}
-                  title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                  value={item.value}
-                  onClick={() => {
-                    const subComponentItem = subComponentValues.find(({ optionValue }) => optionValue === item.value);
-                    return subComponentItem
-                      ? selectItemHandler(item.value, subComponentItem.subComponentValue)
-                      : selectItemHandler(item.value);
-                  }}
-                >
-                  {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                </MenuItem>
-                {item.subComponent && (
+                {!item.subComponent ? (
+                  <MenuItem
+                    key={`${props.field}-${index}`}
+                    disabled={!!item.disabled}
+                    title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                    value={item.value}
+                    onClick={() => {
+                      selectItemHandler(item.value);
+                    }}
+                  >
+                    {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                  </MenuItem>
+                ) : (
                   <FocusableItem className={"LuiDeprecatedForms"} key={`${props.field}-${index}_subcomponent`}>
                     {(ref: any) =>
                       item.subComponent &&
