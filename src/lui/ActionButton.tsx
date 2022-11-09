@@ -57,6 +57,7 @@ export const ActionButton = ({
       aria-label={ariaLabel ?? name}
       className={clsx("lui-button-icon", "ActionButton", className, localInProgress && "ActionButton-inProgress")}
       size={"lg"}
+      style={name == null ? { padding: "8px 5px" } : {}}
       onClick={async () => {
         const promise = onAction();
         const isPromise = typeof promise !== "undefined";
@@ -75,7 +76,7 @@ export const ActionButton = ({
           size={16}
           divProps={{
             "data-testid": "loading-spinner",
-            style: { padding: 0, margin: 0, paddingRight: 4, paddingLeft: 4 },
+            style: { margin: 0, paddingRight: 5, paddingLeft: 3, paddingBottom: 0, paddingTop: 0 },
             role: "status",
             "aria-label": "Loading",
           }}
