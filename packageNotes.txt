@@ -1,2 +1,3 @@
 sass-loader is fixed at 10.3.1, anything higher breaks the build with getOptions() not found errors
 storybook-addon-mock is fixed at 2.4.1, otherwise you get blank pages. Probably a webpack 4->5 issue
+style-loader is fixed at 2.0.0 getOptions() issues again
