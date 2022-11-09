@@ -78,6 +78,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridPopoverMessage(
         {
           headerName: "Popout message",
+          maxWidth: 200,
           cellRenderer: () => <>Click me!</>,
         },
         {
@@ -91,9 +92,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         },
       ),
       GridPopoverMenu(
-        {
-          headerName: "Menu",
-        },
+        {},
         {
           multiEdit: true,
           editorParams: {
@@ -136,7 +135,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       ),
       GridPopoverMenu(
         {
-          headerName: "Menu disabled",
           editable: false,
         },
         {

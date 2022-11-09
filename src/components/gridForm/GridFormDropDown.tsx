@@ -107,12 +107,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = (optionsConf?.map((item) => {
+      const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
           item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any) as FinalSelectOption<ValueType>[];
+      }) as any as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus

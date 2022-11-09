@@ -9,6 +9,7 @@ export const GridPopoverMessage = <RowType extends GridBaseRow>(
 ): ColDefT<RowType> =>
   GridCell(
     {
+      resizable: false,
       ...colDef,
       cellRendererParams: {
         singleClickEdit: true,
