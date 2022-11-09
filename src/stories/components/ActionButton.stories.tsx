@@ -16,7 +16,12 @@ const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
   const performAction = useCallback(async () => {
     await wait(1000);
   }, []);
-  return <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onAction={performAction} />;
+  return (
+    <>
+      <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onAction={performAction} />
+      <ActionButton icon={"ic_add"} aria-label={"Add new row"} onAction={performAction} />
+    </>
+  );
 };
 
 export const ActionButtonSimple = ActionButtonTemplate.bind({});

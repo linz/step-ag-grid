@@ -9,7 +9,8 @@ import { useStateDeferred } from "./stateDeferredHook";
 
 export interface ActionButtonProps {
   icon: IconName;
-  name: string;
+  name?: string;
+  "aria-label"?: string;
   inProgressName?: string;
   title?: string;
   dataTestId?: string;
@@ -33,6 +34,7 @@ export const ActionButton = ({
   onAction,
   externalSetInProgress,
   size = "sm",
+  "aria-label": ariaLabel,
 }: ActionButtonProps): JSX.Element => {
   const [inProgress, setInProgress] = useState(false);
   const lastInProgress = usePrevious(inProgress ?? false);
@@ -48,8 +50,8 @@ export const ActionButton = ({
       data-testid={dataTestId}
       type={"button"}
       level={"tertiary"}
-      title={title ?? name}
-      aria-label={name}
+      title={title ?? ariaLabel ?? name}
+      aria-label={ariaLabel ?? name}
       className={clsx("lui-button-icon", "ActionButton", className, localInProgress && "ActionButton-inProgress")}
       size={"lg"}
       onClick={async () => {
@@ -70,13 +72,13 @@ export const ActionButton = ({
           size={16}
           divProps={{
             "data-testid": "loading-spinner",
-            style: { padding: 0, margin: 0, paddingRight: 8 },
+            style: { padding: 0, margin: 0, paddingRight: 4, paddingLeft: 4 },
             role: "status",
-            ["aria-label"]: "Loading",
+            "aria-label": "Loading",
           }}
         />
       ) : (
-        <LuiIcon name={icon} alt={name} size={size} />
+        <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
       )}
       <span className={"ActionButton-minimalArea"}>
         <span className={"ActionButton-minimalAreaDisplay"}>{(localInProgress ? inProgressName : name) ?? name}</span>

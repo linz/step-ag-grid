@@ -2,7 +2,7 @@
   "name": "@linzjs/step-ag-grid",
   "repository": "github:linz/step-ag-grid.git",
   "license": "MIT",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "keywords": [
     "aggrid",
     "ag-grid",
