@@ -15,7 +15,7 @@ export interface ActionButtonProps {
   dataTestId?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
   className?: string;
-  onAction: () => Promise<void>;
+  onAction: () => Promise<void> | void;
   // Used for external code to get access to whether action is in progress
   externalSetInProgress?: () => void;
 }
@@ -53,11 +53,15 @@ export const ActionButton = ({
       className={clsx("lui-button-icon", "ActionButton", className, localInProgress && "ActionButton-inProgress")}
       size={"lg"}
       onClick={async () => {
-        setInProgress(true);
-        externalSetInProgress && setInProgress(true);
-        await onAction();
-        externalSetInProgress && setInProgress(false);
-        setInProgress(false);
+        const promise = onAction();
+        const isPromise = typeof promise !== "undefined";
+        if (isPromise) {
+          setInProgress(true);
+          externalSetInProgress && setInProgress(true);
+          if (isPromise) await promise;
+          externalSetInProgress && setInProgress(false);
+          setInProgress(false);
+        }
       }}
       disabled={localInProgress}
     >
