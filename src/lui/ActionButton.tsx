@@ -6,6 +6,7 @@ import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
 import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
 import { usePrevious } from "./reactUtils";
 import { useStateDeferred } from "./stateDeferredHook";
+import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
 
 export interface ActionButtonProps {
   icon: IconName;
@@ -19,6 +20,7 @@ export interface ActionButtonProps {
   onAction: () => Promise<void> | void;
   // Used for external code to get access to whether action is in progress
   externalSetInProgress?: () => void;
+  level?: LuiButtonProps["level"];
 }
 
 // Kept this less than one second, so I don't have issues with waitFor as it defaults to 1s
@@ -34,6 +36,7 @@ export const ActionButton = ({
   onAction,
   externalSetInProgress,
   size = "sm",
+  level = "tertiary",
   "aria-label": ariaLabel,
 }: ActionButtonProps): JSX.Element => {
   const [inProgress, setInProgress] = useState(false);
@@ -49,7 +52,7 @@ export const ActionButton = ({
     <LuiButton
       data-testid={dataTestId}
       type={"button"}
-      level={"tertiary"}
+      level={level}
       title={title ?? ariaLabel ?? name}
       aria-label={ariaLabel ?? name}
       className={clsx("lui-button-icon", "ActionButton", className, localInProgress && "ActionButton-inProgress")}

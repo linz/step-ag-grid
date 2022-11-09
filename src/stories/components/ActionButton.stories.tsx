@@ -19,7 +19,7 @@ const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
   return (
     <>
       <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onAction={performAction} />
-      <ActionButton icon={"ic_add"} aria-label={"Add new row"} onAction={performAction} />
+      <ActionButton icon={"ic_add"} aria-label={"Add new row"} onAction={performAction} level={"primary"} />
     </>
   );
 };
