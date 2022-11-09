@@ -6,18 +6,21 @@ import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
 import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
 import { usePrevious } from "./reactUtils";
 import { useStateDeferred } from "./stateDeferredHook";
+import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
 
 export interface ActionButtonProps {
   icon: IconName;
-  name: string;
+  name?: string;
+  "aria-label"?: string;
   inProgressName?: string;
   title?: string;
   dataTestId?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
   className?: string;
-  onAction: () => Promise<void>;
+  onAction: () => Promise<void> | void;
   // Used for external code to get access to whether action is in progress
   externalSetInProgress?: () => void;
+  level?: LuiButtonProps["level"];
 }
 
 // Kept this less than one second, so I don't have issues with waitFor as it defaults to 1s
@@ -33,6 +36,8 @@ export const ActionButton = ({
   onAction,
   externalSetInProgress,
   size = "sm",
+  level = "tertiary",
+  "aria-label": ariaLabel,
 }: ActionButtonProps): JSX.Element => {
   const [inProgress, setInProgress] = useState(false);
   const lastInProgress = usePrevious(inProgress ?? false);
@@ -47,17 +52,22 @@ export const ActionButton = ({
     <LuiButton
       data-testid={dataTestId}
       type={"button"}
-      level={"tertiary"}
-      title={title ?? name}
-      aria-label={name}
+      level={level}
+      title={title ?? ariaLabel ?? name}
+      aria-label={ariaLabel ?? name}
       className={clsx("lui-button-icon", "ActionButton", className, localInProgress && "ActionButton-inProgress")}
       size={"lg"}
+      style={name == null ? { padding: "8px 5px" } : {}}
       onClick={async () => {
-        setInProgress(true);
-        externalSetInProgress && setInProgress(true);
-        await onAction();
-        externalSetInProgress && setInProgress(false);
-        setInProgress(false);
+        const promise = onAction();
+        const isPromise = typeof promise !== "undefined";
+        if (isPromise) {
+          setInProgress(true);
+          externalSetInProgress && setInProgress(true);
+          if (isPromise) await promise;
+          externalSetInProgress && setInProgress(false);
+          setInProgress(false);
+        }
       }}
       disabled={localInProgress}
     >
@@ -66,13 +76,13 @@ export const ActionButton = ({
           size={16}
           divProps={{
             "data-testid": "loading-spinner",
-            style: { padding: 0, margin: 0, paddingRight: 8 },
+            style: { margin: 0, paddingRight: 5, paddingLeft: 3, paddingBottom: 0, paddingTop: 0 },
             role: "status",
-            ["aria-label"]: "Loading",
+            "aria-label": "Loading",
           }}
         />
       ) : (
-        <LuiIcon name={icon} alt={name} size={size} />
+        <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
       )}
       <span className={"ActionButton-minimalArea"}>
         <span className={"ActionButton-minimalAreaDisplay"}>{(localInProgress ? inProgressName : name) ?? name}</span>

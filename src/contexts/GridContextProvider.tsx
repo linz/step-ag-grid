@@ -273,6 +273,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
+  const redrawRows = (rowNodes?: RowNode[]) => {
+    gridApiOp((gridApi) => {
+      gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+    });
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -293,6 +299,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         sizeColumnsToFit,
         stopEditing,
         updatingCells,
+        redrawRows,
       }}
     >
       {props.children}
