@@ -44,8 +44,12 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
         return node ? JSON.stringify(node.data) : "";
       };
 
-      const copyCurrentSortSettings = (): ColumnState[] =>
-        columnApi.getColumnState().map((row) => ({ colId: row.colId, sort: row.sort, sortIndex: row.sortIndex }));
+      const copyCurrentSortSettings = (): ColumnState[] => {
+        if (!columnApi) return [];
+        return columnApi
+          .getColumnState()
+          .map((row) => ({ colId: row.colId, sort: row.sort, sortIndex: row.sortIndex }));
+      };
 
       const backupSortOrder = () => {
         for (const x in previousRowSortIndex) delete previousRowSortIndex[x];
