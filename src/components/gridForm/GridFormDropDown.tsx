@@ -261,9 +261,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                               ({ optionValue }) => optionValue === item.value,
                             );
                             if ((key === "Enter" || key === "Tab") && subComponentItem) {
-                              selectItemHandler(item.value as ValueType, subComponentItem.subComponentValue);
-                              ref.closeMenu();
+                              return selectItemHandler(
+                                item.value as ValueType,
+                                subComponentItem.subComponentValue,
+                              ).then(() => {
+                                ref.closeMenu();
+                                return true;
+                              });
                             }
+                            return false;
                           },
                           key: `${props.field}-${index}_subcomponent_inner`,
                         },
