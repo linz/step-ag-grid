@@ -18,7 +18,7 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
     {
       maxWidth: 40,
       editable: colDef.editable != null ? colDef.editable : true,
-      cellStyle: { "justify-content": "flex-end" },
+      cellStyle: { justifyContent: "flex-end" },
       cellRenderer: GridRenderPopoutMenuCell,
       cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
