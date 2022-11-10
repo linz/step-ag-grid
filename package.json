@@ -53,7 +53,7 @@
     "css": "sass ./src/styles/index.scss:dist/index.css --no-source-map",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache",
+    "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache --ignore-path .gitignore",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "deploy-storybook": "npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",

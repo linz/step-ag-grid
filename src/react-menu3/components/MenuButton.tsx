@@ -7,7 +7,7 @@ export interface MenuButtonProps extends BaseProps<MenuButtonModifiers> {
   disabled?: boolean;
   children?: ReactNode;
 
-  // FIXME Matt added, seems to be an internal thing
+  // Seems to be an internal thing, wasn't in original code
   isOpen?: boolean;
 }
 

@@ -3,7 +3,7 @@ import "./GridPopoverMenu.scss";
 import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
-import { GridFormPopoutMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoutMenu";
+import { GridFormPopoverMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoverMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
@@ -28,7 +28,7 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
       },
     },
     {
-      editor: GridFormPopoutMenu,
+      editor: GridFormPopoverMenu,
       ...custom,
     },
   );

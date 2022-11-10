@@ -238,12 +238,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
 
     return await gridApiOp(async (gridApi) => {
       const selectedRows = props.selectedRows;
-      //TODO do I need to do this for all rows?
-      /*if (!props.multiEdit) {
-        // You can't use data as it could be an orphaned reference due to updates
-        selectedRows = selectedRows.filter((row) => row.id === props.data.id);
-      }
-*/
+
       let ok = false;
       await modifyUpdating(
         props.field ?? "",

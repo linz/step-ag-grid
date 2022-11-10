@@ -88,7 +88,7 @@ export const ControlledMenuFr = (
       if (!isWithinMenu(ev.target)) {
         ev.preventDefault();
         ev.stopPropagation();
-        // FIXME There's an issue in React17
+        // Note: There's an issue in React17
         // the cell doesn't refresh during update if save is invoked from a native event
         // This doesn't happen in React18
         // To work around it, I invoke the save by clicking on a passed in invisible button ref
