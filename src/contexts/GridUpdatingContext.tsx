@@ -7,10 +7,10 @@ export type GridUpdatingContextType = {
 
 export const GridUpdatingContext = createContext<GridUpdatingContextType>({
   checkUpdating: () => {
-    console.error("Missing UpdatingContext");
+    console.error("Missing GridUpdatingContext");
     return false;
   },
   modifyUpdating: async () => {
-    console.error("Missing UpdatingContext");
+    console.error("Missing GridUpdatingContext");
   },
 });
