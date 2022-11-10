@@ -181,7 +181,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     },
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
-
   const { popoverWrapper } = useGridPopoverHook({ className: props.className });
   return popoverWrapper(
     <>
@@ -210,12 +209,14 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && options.length == filteredValues?.length && <MenuItem>[Empty]</MenuItem>}
+          {options && options.length == filteredValues?.length && (
+            <MenuItem key={`${props.field}-empty`}>[Empty]</MenuItem>
+          )}
           {options?.map((item, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
             ) : item.value === MenuHeaderString ? (
-              <MenuHeader>{item.label}</MenuHeader>
+              <MenuHeader key={`$$headder_${index}`}>{item.label}</MenuHeader>
             ) : filteredValues.includes(item.value) ? null : (
               <>
                 {!item.subComponent ? (
@@ -255,7 +256,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                             const subComponentItem = subComponentValues.find(
                               ({ optionValue }) => optionValue === item.value,
                             );
-                            if (key === "Enter" && subComponentItem) {
+                            if ((key === "Enter" || key === "Tab") && subComponentItem) {
                               selectItemHandler(item.value, subComponentItem.subComponentValue);
                               ref.closeMenu();
                             }

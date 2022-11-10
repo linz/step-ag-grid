@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
+import "../../styles/GridFormSubComponentTextInput.scss";
 
 export interface GridFormSubComponentTextInput {
   setValue: (value: string) => void;
   keyDown: (key: string) => void;
   placeholder?: string;
   className?: string;
+  customHelpText?: string;
 }
 
 export const GridFormSubComponentTextInput = ({
@@ -13,12 +15,20 @@ export const GridFormSubComponentTextInput = ({
   placeholder,
   setValue,
   className,
+  customHelpText,
 }: GridFormSubComponentTextInput) => {
   const placeholderText = placeholder || "Other...";
-  const inputClass = className || "";
+  const helpText = customHelpText || "Press enter or tab to save";
+
+  const inputClass = className || "GridFormSubComponentTextInput-full-width-input";
   const [inputValue, setInputValue] = useState("");
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <TextInputFormatted
         className={inputClass}
         value={inputValue}
@@ -40,6 +50,13 @@ export const GridFormSubComponentTextInput = ({
           },
         }}
       />
-    </>
+      <span
+        style={{
+          fontSize: "0.75rem",
+        }}
+      >
+        {helpText}
+      </span>
+    </div>
   );
 };
