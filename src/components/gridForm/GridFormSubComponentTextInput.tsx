@@ -27,6 +27,8 @@ export const GridFormSubComponentTextInput = ({
       style={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
+        padding: 0,
       }}
     >
       <TextInputFormatted
@@ -52,7 +54,7 @@ export const GridFormSubComponentTextInput = ({
       />
       <span
         style={{
-          fontSize: "0.75rem",
+          fontSize: "0.7rem",
         }}
       >
         {helpText}
