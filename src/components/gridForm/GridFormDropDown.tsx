@@ -107,12 +107,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(props.selectedRows, filter);
       }
 
-      const optionsList = optionsConf?.map((item) => {
+      const optionsList = (optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
-          item = { value: item as ValueType, label: item, disabled: false } as FinalSelectOption<ValueType>;
+          item = ({
+            value: (item as unknown) as ValueType,
+            label: item,
+            disabled: false,
+          } as unknown) as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      }) as any) as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -212,13 +216,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
           {options && options.length == filteredValues?.length && (
             <MenuItem key={`${props.field}-empty`}>[Empty]</MenuItem>
           )}
-          {options?.map((item, index) =>
+          {options?.map((item: FinalSelectOption<ValueType | string>, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
             ) : item.value === MenuHeaderString ? (
-              <MenuHeader key={`$$headder_${index}`}>{item.label}</MenuHeader>
+              <MenuHeader key={`$$header_${index}`}>{item.label}</MenuHeader>
             ) : filteredValues.includes(item.value) ? null : (
-              <>
+              <div key={`menu-wrapper-${index}`}>
                 {!item.subComponent ? (
                   <MenuItem
                     key={`${props.field}-${index}`}
@@ -226,7 +230,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                     title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                     value={item.value}
                     onClick={() => {
-                      selectItemHandler(item.value);
+                      selectItemHandler(item.value as ValueType);
                     }}
                   >
                     {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
@@ -257,17 +261,18 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                               ({ optionValue }) => optionValue === item.value,
                             );
                             if ((key === "Enter" || key === "Tab") && subComponentItem) {
-                              selectItemHandler(item.value, subComponentItem.subComponentValue);
+                              selectItemHandler(item.value as ValueType, subComponentItem.subComponentValue);
                               ref.closeMenu();
                             }
                           },
+                          key: `${props.field}-${index}_subcomponent_inner`,
                         },
                         ref,
                       )
                     }
                   </FocusableItem>
                 )}
-              </>
+              </div>
             ),
           )}
         </>
