@@ -175,7 +175,6 @@ export const SubMenuFr = ({
   const { isParentOpen, isSubmenuOpen, setOpenSubmenuCount, dispatch, updateItems } = useContext(MenuListItemContext);
   const isPortal = parentOverflow !== "visible";
 
-  // FIXME Matt no idea what's going on here
   const [stateProps, toggleMenu, _openMenu] = useMenuStateAndFocus(settings);
 
   const { state } = stateProps;

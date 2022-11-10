@@ -7,7 +7,7 @@ interface useBemProps {
   block: string;
   element?: string;
   modifiers?: useBemModifiers;
-  className?: ClassNameProp<any>; // FIXME Matt any?
+  className?: ClassNameProp<any>;
 }
 
 // Generate className following BEM methodology: http://getbem.com/naming/

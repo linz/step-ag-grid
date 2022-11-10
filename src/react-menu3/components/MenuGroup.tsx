@@ -24,7 +24,6 @@ export const MenuGroupFr = (
   useLayoutEffect(() => {
     let maxHeight;
     if (takeOverflow && overflowAmt != null && overflowAmt >= 0 && ref.current) {
-      // FIXME Matt added && ref.current
       maxHeight = ref.current.getBoundingClientRect().height - overflowAmt;
       if (maxHeight < 0) maxHeight = 0;
     }
@@ -38,7 +37,7 @@ export const MenuGroupFr = (
   return (
     <div
       {...restProps}
-      ref={useCombinedRef(externalRef, ref)} // TODO wierd refs
+      ref={useCombinedRef(externalRef, ref)}
       className={useBEM({ block: menuClass, element: menuGroupClass, className })}
       style={{ ...style, ...overflowStyle }}
     />

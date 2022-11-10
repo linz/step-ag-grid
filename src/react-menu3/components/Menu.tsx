@@ -31,7 +31,7 @@ export interface MenuProps extends RootMenuProps, UncontrolledMenuProps {
 
 export function MenuFr(
   { "aria-label": ariaLabel, menuButton, instanceRef, onMenuChange, ...restProps }: MenuProps,
-  externalRef: ForwardedRef<any>, // FIXME Matt correct type?
+  externalRef: ForwardedRef<ReactElement>,
 ) {
   const [stateProps, toggleMenu, openMenu] = useMenuStateAndFocus(restProps);
   const isOpen = isMenuOpen(stateProps.state);
@@ -69,7 +69,7 @@ export function MenuFr(
     e.preventDefault();
   };
 
-  // FIXME erk! button seems to be many types
+  // Too many mixed types here to figure out what to pick for button.  Bad code.
   const button: any = safeCall(menuButton, { open: isOpen });
   if (!button || !button.type) throw new Error("Menu requires a menuButton prop.");
 

@@ -89,11 +89,16 @@ const MenuItemFr = ({
   const isAnchor = !!href && !isDisabled && !isRadio && !isCheckBox;
   const isChecked = isRadio ? radioGroup.value === value : isCheckBox ? !!checked : false;
 
-  // FIXME handle click seems to be a combination of multiple event types
+  // handle click seems to be a combination of multiple event types, bad code.
   const handleClick = (e: any) => {
     if (isDisabled) {
-      e.stopPropagation();
-      e.preventDefault();
+      if (e.syntheticEvent) {
+        e.syntheticEvent.stopPropagation();
+        e.syntheticEvent.preventDefault();
+      } else {
+        e.stopPropagation();
+        e.preventDefault();
+      }
       return;
     }
 
