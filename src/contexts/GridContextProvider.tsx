@@ -223,7 +223,8 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
    */
   const sizeColumnsToFit = (): void => {
     gridApiOp((gridApi) => {
-      gridApi.sizeColumnsToFit();
+      // Hide size columns to fit errors in tests
+      document.body.clientWidth && gridApi.sizeColumnsToFit();
     });
   };
 
