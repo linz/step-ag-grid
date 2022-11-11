@@ -143,7 +143,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
                 action: async (selectedRows) => {
                   await wait(1500);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
-                  return true;
                 },
                 supportsMultiEdit: true,
               },

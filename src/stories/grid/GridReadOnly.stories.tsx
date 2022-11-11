@@ -12,6 +12,8 @@ import { wait } from "../../utils/util";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
+import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
+import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 
 export default {
   title: "Components / Grids",
@@ -105,7 +107,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   action: async (selectedRows) => {
                     alert(`Single-edit: ${selectedRows.length} rows`);
                     await wait(1500);
-                    return true;
                   },
                   supportsMultiEdit: false,
                 },
@@ -114,7 +115,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   action: async (selectedRows) => {
                     alert(`Multi-edit: ${selectedRows.length} rows`);
                     await wait(1500);
-                    return true;
                   },
                   supportsMultiEdit: true,
                 },
@@ -128,7 +128,18 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   hidden: selectedItems.some((x) => x.position != "Developer"),
                   supportsMultiEdit: true,
                 },
-              ];
+                {
+                  label: "Other",
+                  supportsMultiEdit: true,
+                  action: (_, menuOptionResult) => {
+                    console.log(menuOptionResult);
+                    alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                  },
+                  subComponent: () => (
+                    <GridSubComponentTextArea placeholder={"Other"} maxLength={2} required defaultValue={""} />
+                  ),
+                },
+              ] as MenuOption<ITestRow>[];
             },
           },
         },

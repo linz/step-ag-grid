@@ -34,7 +34,19 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
         <div className="LuiTextAreaInput-wrapper">
           {" "}
           {/* wrapper div used for error styling */}
-          <textarea id={id} value={props.value} onChange={props.onChange} rows={5} {...props.inputProps} />
+          <textarea
+            id={id}
+            value={props.value}
+            onChange={props.onChange}
+            rows={5}
+            {...props.inputProps}
+            onMouseEnter={(e) => {
+              if (document.activeElement != e.currentTarget) {
+                e.currentTarget.focus();
+                e.currentTarget.selectionStart = e.currentTarget.value.length;
+              }
+            }}
+          />
         </div>
       </label>
 

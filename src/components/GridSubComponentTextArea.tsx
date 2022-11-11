@@ -49,12 +49,6 @@ export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): 
       <TextInputFormatted
         className={"free-text-input"}
         value={value}
-        onMouseEnter={(e) => {
-          if (document.activeElement != e.currentTarget) {
-            e.currentTarget.focus();
-            e.currentTarget.selectionStart = e.currentTarget.value.length;
-          }
-        }}
         onChange={(e) => setValue(e.target.value)}
         error={validate(value)}
         inputProps={{

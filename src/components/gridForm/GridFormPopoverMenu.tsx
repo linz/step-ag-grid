@@ -2,9 +2,11 @@ import { GridBaseRow } from "../Grid";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../../contexts/GridContext";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { MenuDivider, MenuItem } from "../../react-menu3";
+import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon, CellParams } from "../GridCell";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
+import { ClickEvent } from "../../react-menu3/types";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
@@ -17,12 +19,17 @@ interface MenuSeparatorType {
   __isMenuSeparator__: boolean;
 }
 
-export interface MenuOption<RowType> {
+export interface SelectedMenuOptionResult<RowType extends GridBaseRow> extends MenuOption<RowType> {
+  subValue: any;
+}
+
+export interface MenuOption<RowType extends GridBaseRow> {
   label: JSX.Element | string | MenuSeparatorType;
-  action?: (selectedRows: RowType[]) => Promise<boolean>;
+  action?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
   disabled?: string | boolean;
   supportsMultiEdit: boolean;
   hidden?: boolean;
+  subComponent?: (props: any) => JSX.Element;
 }
 
 /**
@@ -31,9 +38,16 @@ export interface MenuOption<RowType> {
  */
 export const GridFormPopoverMenu = <RowType extends GridBaseRow>(_props: GridFormPopoutMenuProps<RowType>) => {
   const props = _props as GridFormPopoutMenuProps<RowType> & CellParams<RowType>;
+
   const { updatingCells } = useContext(GridContext);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MenuOption<RowType>[]>();
+
+  // Save triggers during async action processing which triggers another action(), this ref blocks that
+  const actionProcessing = useRef(false);
+  const [subComponentSelected, setSubComponentSelected] = useState<MenuOption<RowType> | null>(null);
+  const subComponentIsValid = useRef(false);
+  const [subSelectedValue, setSubSelectedValue] = useState<any>();
 
   // Load up options list if it's async function
   useEffect(() => {
@@ -53,13 +67,33 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(_props: GridFor
   }, [options, props.options, props.selectedRows]);
 
   const actionClick = useCallback(
-    async (menuOption: MenuOption<any>) => {
-      return await updatingCells({ selectedRows: props.selectedRows, field: props.field }, async (selectedRows) => {
-        menuOption.action && (await menuOption.action(selectedRows));
+    async (menuOption: MenuOption<RowType>) => {
+      actionProcessing.current = true;
+      return updatingCells({ selectedRows: props.selectedRows, field: props.field }, async (selectedRows) => {
+        const result = { ...menuOption, subValue: subSelectedValue };
+        menuOption.action && (await menuOption.action(selectedRows, result));
+        actionProcessing.current = false;
         return true;
       });
     },
-    [props.field, props.selectedRows, updatingCells],
+    [props.field, props.selectedRows, subSelectedValue, updatingCells],
+  );
+
+  const onMenuItemClick = useCallback(
+    (e: ClickEvent, item: MenuOption<RowType>) => {
+      if (item.subComponent) {
+        subComponentIsValid.current = false;
+        setSubSelectedValue(null);
+        setSubComponentSelected(subComponentSelected === item ? null : item);
+        e.keepOpen = true;
+      } else {
+        subComponentIsValid.current = true;
+        setSubSelectedValue(null);
+        setSubComponentSelected(null);
+        actionClick(item).then();
+      }
+    },
+    [actionClick, subComponentSelected],
   );
 
   const selectedRowCount = props.selectedRows.length;
@@ -68,7 +102,22 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(_props: GridFor
     return menuOption.label === PopoutMenuSeparator || selectedRowCount === 1 || menuOption.supportsMultiEdit;
   });
 
-  const { popoverWrapper } = useGridPopoverHook({ className: props.className });
+  const save = useCallback(async () => {
+    // if a subcomponent is open we assume that it's meant to be saved.
+    if (!actionProcessing.current && subComponentSelected) {
+      if (!subComponentIsValid.current) return false;
+      await actionClick(subComponentSelected);
+    }
+    return true;
+  }, [actionClick, subComponentSelected]);
+
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
+
+  const localTriggerSave = async (reason?: string) => {
+    if (!subComponentIsValid.current) return;
+    return triggerSave(reason);
+  };
+
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions} className={"GridFormPopupMenu"}>
       <>
@@ -77,14 +126,38 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(_props: GridFor
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
             !item.hidden && (
-              <MenuItem
-                key={`${item.label}`}
-                onClick={() => actionClick(item)}
-                disabled={!!item.disabled || !filteredOptions?.includes(item)}
-                title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-              >
-                {item.label as JSX.Element | string}
-              </MenuItem>
+              <>
+                <MenuItem
+                  key={`${item.label}`}
+                  onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
+                  disabled={!!item.disabled || !filteredOptions?.includes(item)}
+                  title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                >
+                  {item.label as JSX.Element | string}
+                </MenuItem>
+                {item.subComponent && subComponentSelected === item && (
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                    {(_: any) =>
+                      item.subComponent && (
+                        <GridSubComponentContext.Provider
+                          value={{
+                            value: subSelectedValue,
+                            setValue: (value: any) => {
+                              setSubSelectedValue(value);
+                            },
+                            setValid: (valid: boolean) => {
+                              subComponentIsValid.current = valid;
+                            },
+                            triggerSave: localTriggerSave,
+                          }}
+                        >
+                          <item.subComponent />
+                        </GridSubComponentContext.Provider>
+                      )
+                    }
+                  </FocusableItem>
+                )}
+              </>
             )
           ),
         )}
