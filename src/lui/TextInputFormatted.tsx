@@ -1,12 +1,20 @@
 import "./TextInputFormatted.scss";
 
-import { ChangeEventHandler, DetailedHTMLProps, InputHTMLAttributes } from "react";
+import {
+  ChangeEventHandler,
+  DetailedHTMLProps,
+  FocusEventHandler,
+  InputHTMLAttributes,
+  MouseEventHandler,
+} from "react";
 
 import clsx from "clsx";
 import { LuiIcon } from "@linzjs/lui";
 
 export interface LuiTextInputProps {
   onChange?: ChangeEventHandler<HTMLInputElement>;
+  onFocus?: FocusEventHandler<HTMLInputElement>;
+  onClick?: MouseEventHandler<HTMLInputElement>;
   inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
   error?: string | boolean | null;
   warning?: string | boolean | null;
@@ -38,6 +46,8 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
           spellCheck={true}
           defaultValue={props.value}
           onChange={props.onChange}
+          onFocus={props.onFocus}
+          onClick={props.onClick}
           {...props.inputProps}
         />
         <span className={"LuiTextInput-formatted"}>{props.formatted}</span>
