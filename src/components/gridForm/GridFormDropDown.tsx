@@ -185,6 +185,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     },
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
+  const onSubcomponentKeyDown = useCallback();
   const { popoverWrapper } = useGridPopoverHook({ className: props.className });
   return popoverWrapper(
     <>
@@ -256,11 +257,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                             }
                             setSubComponentValues(localSubComponentValues);
                           },
-                          keyDown: (key: string) => {
+                          keyDown: (key: string, event: KeyboardEvent<HTMLInputElement>) => {
                             const subComponentItem = subComponentValues.find(
                               ({ optionValue }) => optionValue === item.value,
                             );
                             if ((key === "Enter" || key === "Tab") && subComponentItem) {
+                              event.preventDefault();
+                              event.stopPropagation();
                               return selectItemHandler(
                                 item.value as ValueType,
                                 subComponentItem.subComponentValue,
