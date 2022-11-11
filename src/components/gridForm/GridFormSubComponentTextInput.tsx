@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, KeyboardEvent } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import "../../styles/GridFormSubComponentTextInput.scss";
 
 export interface GridFormSubComponentTextInput {
   setValue: (value: string) => void;
-  keyDown: (key: string) => void;
+  keyDown: (key: string, event: KeyboardEvent<HTMLInputElement>) => void;
   placeholder?: string;
   className?: string;
   customHelpText?: string;
@@ -40,7 +40,9 @@ export const GridFormSubComponentTextInput = ({
           setInputValue(value);
         }}
         inputProps={{
-          onKeyDown: (k: any) => keyDown(k.key),
+          onKeyDown: (e) => {
+            return keyDown(e.key, e);
+          },
           placeholder: placeholderText,
           onMouseEnter: (e) => {
             if (document.activeElement != e.currentTarget) {
