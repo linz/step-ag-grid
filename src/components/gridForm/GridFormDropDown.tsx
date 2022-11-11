@@ -185,7 +185,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     },
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
-  const onSubcomponentKeyDown = useCallback();
   const { popoverWrapper } = useGridPopoverHook({ className: props.className });
   return popoverWrapper(
     <>
