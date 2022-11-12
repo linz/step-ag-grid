@@ -75,6 +75,7 @@ export const MenuList = ({
   const focusRef = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLDivElement>(null);
   const prevOpen = useRef(false);
+  const latestWindowSize = useRef({ width: 0, height: 0 });
   const latestMenuSize = useRef({ width: 0, height: 0 });
   const latestHandlePosition = useRef(() => {});
   const { hoverItem, dispatch, updateItems } = useItems(menuRef, focusRef);
@@ -316,6 +317,31 @@ export const MenuList = ({
     });
 
     const observeTarget = menuRef.current;
+    resizeObserver.observe(observeTarget, { box: "border-box" });
+    return () => resizeObserver.unobserve(observeTarget);
+  }, [reposition]);
+
+  // Matt added window resize observer
+  useEffect(() => {
+    if (typeof ResizeObserver !== "function" || reposition === "initial") return;
+
+    const resizeObserver = new ResizeObserver(([]) => {
+      const { width, height } = menuRef.current.ownerDocument.body.getBoundingClientRect();
+      if (width === 0 || height === 0) return;
+      if (
+        floatEqual(width, latestWindowSize.current.width, 1) &&
+        floatEqual(height, latestWindowSize.current.height, 1)
+      ) {
+        return;
+      }
+      latestWindowSize.current = { width, height };
+      flushSync(() => {
+        latestHandlePosition.current();
+        forceReposSubmenu();
+      });
+    });
+
+    const observeTarget = menuRef.current.ownerDocument.body;
     resizeObserver.observe(observeTarget, { box: "border-box" });
     return () => resizeObserver.unobserve(observeTarget);
   }, [reposition]);
