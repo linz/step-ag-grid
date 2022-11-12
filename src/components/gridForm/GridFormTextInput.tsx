@@ -50,8 +50,9 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         console.error("ColDef has no field set");
         return false;
       }
-      // @ts-ignore row[field] row is of type any
-      selectedRows.forEach((row) => (row[field] = trimmedValue));
+      selectedRows.forEach((row) => {
+        row[field] = trimmedValue as any;
+      });
       return true;
     },
     [invalid, value, initValue, props, field],

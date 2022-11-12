@@ -16,7 +16,7 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Cell
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
   const { field, value: initialVale } = useGridPopoverContext<RowType>();
-  const [value, setValue] = useState(initialVale ?? "");
+  const [value, setValue] = useState(initialVale != null ? `${initialVale}` : "");
 
   const invalid = useCallback(() => {
     if (props.required && value.length == 0) {
@@ -45,7 +45,9 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
         console.error("ColDef has no field set");
         return false;
       }
-      selectedRows.forEach((row) => (row[field] = value));
+      selectedRows.forEach((row) => {
+        row[field] = value as any;
+      });
       return true;
     },
     [invalid, initialVale, value, props, field],

@@ -135,7 +135,9 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
             onSelectedItem: async (selected) => {
               await wait(2000);
-              selected.selectedRows.forEach((row) => (row.position3 = selected.value));
+              selected.selectedRows.forEach((row) => {
+                row.position3 = selected.value;
+              });
             },
           },
         },
