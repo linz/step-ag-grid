@@ -81,7 +81,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               {
                 value: "other",
                 label: "Other",
-                subComponent: () => <GridSubComponentTextArea maxLength={2} defaultValue={""} />,
+                subComponent: () => <GridSubComponentTextArea maxLength={5} defaultValue={""} />,
               },
             ],
             initialSelectedValues: () => ({
