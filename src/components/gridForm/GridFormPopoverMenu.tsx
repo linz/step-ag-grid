@@ -6,7 +6,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon } from "../GridCell";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { ClickEvent } from "../../react-menu3/types";
-import { useGridPopoverContext, GridPopoverContextType } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
