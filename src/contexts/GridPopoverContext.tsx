@@ -1,6 +1,4 @@
 import { createContext, RefObject } from "react";
-import { ICellEditorParams } from "ag-grid-community";
-import { GridBaseRow } from "../components/Grid";
 
 export interface PropsType {
   value: any;

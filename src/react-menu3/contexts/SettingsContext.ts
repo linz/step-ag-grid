@@ -1,4 +1,3 @@
-// FIXME hacking a default context in here is probably bad
 import { createContext, MutableRefObject, RefObject } from "react";
 import { ControlledMenuProps, MenuReposition, MenuViewScroll, RectElement, TransitionFieldType } from "../types";
 
@@ -17,4 +16,5 @@ interface SettingsContextType extends ControlledMenuProps {
   viewScroll?: MenuViewScroll;
 }
 
+// FIXME hacking a default context in here is probably bad, but the context is mess
 export const SettingsContext = createContext<SettingsContextType>({} as SettingsContextType);

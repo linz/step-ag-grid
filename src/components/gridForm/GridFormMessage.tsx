@@ -12,6 +12,7 @@ export interface GridFormMessageProps<RowType extends GridBaseRow> extends CellE
 
 export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormMessageProps<RowType>) => {
   const { selectedRows } = useContext(GridPopoverContext);
+
   const [message, setMessage] = useState<string | JSX.Element | null>(null);
   const { popoverWrapper } = useGridPopoverHook({ className: props.className });
 

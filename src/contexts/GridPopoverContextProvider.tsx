@@ -1,5 +1,5 @@
-import { ReactNode, RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { GridPopoverContext, PropsType } from "./GridPopoverContext";
+import { ReactNode, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { GridPopoverContext } from "./GridPopoverContext";
 import { ICellEditorParams } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { sortBy } from "lodash-es";

@@ -26,7 +26,6 @@ export interface SelectedOptionResult<ValueType> extends MultiFinalSelectOption<
 }
 
 export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
-  // This overrides CellEditorCommon to provide some common class options
   className?:
     | "GridMultiSelect-containerSmall"
     | "GridMultiSelect-containerMedium"

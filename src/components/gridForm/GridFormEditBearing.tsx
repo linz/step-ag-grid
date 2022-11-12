@@ -16,7 +16,9 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
 
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
   const { field, value: initialValue } = useContext(GridPopoverContext);
+
   const [value, setValue] = useState<string>(`${initialValue ?? ""}`);
+
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;

@@ -18,6 +18,7 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Cel
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
   const { field, data, value: initialVale } = useContext(GridPopoverContext);
+
   const initValue = initialVale == null ? "" : `${initialVale}`;
   const [value, setValue] = useState(initValue);
 

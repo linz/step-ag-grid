@@ -132,7 +132,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   label: "Other",
                   supportsMultiEdit: true,
                   action: (_, menuOptionResult) => {
-                    console.log(menuOptionResult);
                     alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
                   },
                   subComponent: () => (

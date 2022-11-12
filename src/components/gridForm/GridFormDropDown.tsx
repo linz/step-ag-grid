@@ -57,8 +57,8 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
-  const { selectedRows, field } = useContext(GridPopoverContext);
-  const { updatingCells, stopEditing } = useContext(GridContext);
+  const { selectedRows, field, updateValue } = useContext(GridPopoverContext);
+  const { stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -67,8 +67,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const [subComponentValues, setSubComponentValues] = useState<{ optionValue: any; subComponentValue: any }[]>([]);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
-      return await updatingCells({ selectedRows: selectedRows, field }, async (selectedRows) => {
+    async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> =>
+      updateValue(async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
           if (props.onSelectedItem) {
@@ -78,21 +78,17 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
           }
         }
         return true;
-      });
-    },
-    [field, props, selectedRows, updatingCells],
+      }),
+    [field, props, updateValue],
   );
 
   const selectFilterHandler = useCallback(
-    async (value: string): Promise<boolean> => {
-      return await updatingCells({ selectedRows: selectedRows, field }, async (selectedRows) => {
-        if (props.onSelectFilter) {
-          await props.onSelectFilter({ selectedRows, value });
-        }
+    async (value: string) =>
+      updateValue(async (selectedRows) => {
+        props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
         return true;
-      });
-    },
-    [field, props, selectedRows, updatingCells],
+      }),
+    [props, updateValue],
   );
 
   // Load up options list if it's async function

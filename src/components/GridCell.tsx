@@ -45,6 +45,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
 // This is so that typescript retains the row type to pass to the GridCells
 export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
   _?: RowType;
+  editor?: (editorProps: any) => JSX.Element;
 }
 
 /*
@@ -65,7 +66,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     ...(custom?.editor && {
       cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
       editable: props.editable ?? true,
-      cellEditor: GenericCellEditorComponent(custom.editor),
+      cellEditor: GenericCellEditorComponentWrapper(custom),
     }),
     ...(custom?.editorParams && {
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
@@ -90,19 +91,13 @@ export interface CellEditorCommon {
   className?: string | undefined;
 }
 
-// TODO memo?
-export const GenericCellEditorComponent = (editor: (props: any) => JSX.Element) =>
-  forwardRef(function GenericCellEditorComponentFr(props: ICellEditorParams, _) {
-    return <GenericCellEditorComponentImpl {...{ ...props, editor }} />;
+export const GenericCellEditorComponentWrapper = (custom?: { editor?: (props: any) => JSX.Element }) => {
+  return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
+    return (
+      <GridPopoverContextProvider props={cellEditorParams}>
+        {<cellEditorParams.colDef.cellRenderer {...cellEditorParams} {...cellEditorParams.colDef.cellRendererParams} />}
+        {custom?.editor && <custom.editor {...cellEditorParams} />}
+      </GridPopoverContextProvider>
+    );
   });
-
-const GenericCellEditorComponentImpl = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
-  const { colDef } = props;
-
-  return (
-    <GridPopoverContextProvider props={props}>
-      {<colDef.cellRenderer {...props} />}
-      {props?.editor && <props.editor {...props} />}
-    </GridPopoverContextProvider>
-  );
 };

@@ -1,28 +1,29 @@
-import { useState, useReducer, useEffect, useRef, useMemo, useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { useBEM, useCombinedRef, useLayoutEffect, useItems } from "../hooks";
-import { getPositionHelpers, positionMenu, positionContextMenu } from "../positionUtils";
+import { useBEM, useCombinedRef, useItems, useLayoutEffect } from "../hooks";
+import { getPositionHelpers, positionContextMenu, positionMenu } from "../positionUtils";
 import {
-  mergeProps,
   batchedUpdates,
+  CloseReason,
   commonProps,
   floatEqual,
+  FocusPositions,
   getScrollAncestor,
   getTransition,
-  safeCall,
-  isMenuOpen,
-  menuClass,
-  menuArrowClass,
-  CloseReason,
-  Keys,
-  FocusPositions,
   HoverActionTypes,
+  isMenuOpen,
+  Keys,
+  menuArrowClass,
+  menuClass,
+  mergeProps,
+  safeCall,
 } from "../utils";
 import { ControlledMenuProps, MenuDirection } from "../types";
 import { MenuListItemContext } from "../contexts/MenuListItemContext";
 import { HoverItemContext } from "../contexts/HoverItemContext";
 import { MenuListContext } from "../contexts/MenuListContext";
 import { SettingsContext } from "../contexts/SettingsContext";
+import { debounce } from "lodash-es";
 
 export const MenuList = ({
   ariaLabel,
@@ -325,7 +326,7 @@ export const MenuList = ({
   useEffect(() => {
     if (typeof ResizeObserver !== "function" || reposition === "initial") return;
 
-    const resizeObserver = new ResizeObserver(([]) => {
+    const callback = debounce(() => {
       const { width, height } = menuRef.current.ownerDocument.body.getBoundingClientRect();
       if (width === 0 || height === 0) return;
       if (
@@ -339,11 +340,16 @@ export const MenuList = ({
         latestHandlePosition.current();
         forceReposSubmenu();
       });
-    });
+    }, 250);
+
+    const resizeObserver = new ResizeObserver(callback);
 
     const observeTarget = menuRef.current.ownerDocument.body;
     resizeObserver.observe(observeTarget, { box: "border-box" });
-    return () => resizeObserver.unobserve(observeTarget);
+    return () => {
+      callback.cancel();
+      resizeObserver.unobserve(observeTarget);
+    };
   }, [reposition]);
 
   useEffect(() => {
