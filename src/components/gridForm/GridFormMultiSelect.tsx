@@ -4,7 +4,7 @@ import { MenuItem, MenuDivider, FocusableItem } from "../../react-menu3";
 import { useCallback, useEffect, useRef, useState, KeyboardEvent, useMemo } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay, pick, pickBy } from "lodash-es";
+import { delay, fromPairs, isEqual, omit, pick, toPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
@@ -21,7 +21,7 @@ interface MultiFinalSelectOption<ValueType> {
 export type MultiSelectOption<ValueType> = ValueType | MultiFinalSelectOption<ValueType>;
 
 export interface SelectedOptionResult<ValueType> extends MultiFinalSelectOption<ValueType> {
-  subValue: any;
+  subValue?: any;
 }
 
 export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
@@ -39,7 +39,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
   options:
     | MultiSelectOption<ValueType>[]
     | ((selectedRows: RowType[]) => Promise<MultiSelectOption<ValueType>[]> | MultiSelectOption<ValueType>[]);
-  initialSelectedValues?: (selectedRows: RowType[]) => any[] | Record<string, any>;
+  initialSelectedValues?: (selectedRows: RowType[]) => any[] | Record<string, null | any>;
 }
 
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
@@ -47,20 +47,14 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
 ) => {
   const { selectedRows } = props as unknown as CellParams<RowType>;
 
-  const initialiseValues = useMemo(
-    () => props.initialSelectedValues && props.initialSelectedValues(selectedRows),
-    [props, selectedRows],
-  );
+  const initialiseValues = useMemo(() => {
+    const r = props.initialSelectedValues && props.initialSelectedValues(selectedRows);
+    // convert array of strings to object<value,null>
+    return Array.isArray(r) ? fromPairs(r.map((v) => [v, null])) : r;
+  }, [props, selectedRows]);
 
   const subComponentIsValid = useRef<Record<string, boolean>>({});
-  const [subSelectedValues, setSubSelectedValues] = useState<Record<string, any>>(
-    initialiseValues && !Array.isArray(initialiseValues)
-      ? pickBy(initialiseValues, (value) => typeof value !== "boolean")
-      : {},
-  );
-  const [selectedValues, setSelectedValues] = useState<any[]>(() =>
-    initialiseValues ? (Array.isArray(initialiseValues) ? initialiseValues : Object.keys(initialiseValues)) : [],
-  );
+  const [selectedValues, setSelectedValues] = useState<Record<string, null | any>>(() => initialiseValues ?? {});
 
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
@@ -70,23 +64,33 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (props.onSave) {
-        const validations = pick(subComponentIsValid.current, selectedValues);
+        if (!options) {
+          console.error("options not initialised");
+          return false;
+        }
+
+        const validations = pick(subComponentIsValid.current, Object.keys(selectedValues));
         const notValid = Object.values(validations).some((v) => !v);
         if (notValid) return false;
 
-        const selectedOptions = selectedValues.map((row) => (options ?? []).find((opt) => opt.value == row)) ?? [];
-        const selectedResults = selectedOptions.map(
-          (selectedOption) =>
-            ({
-              ...selectedOption,
-              subValue: subSelectedValues[`${selectedOption?.value}`],
-            } as SelectedOptionResult<ValueType>),
-        );
-        return await props.onSave(selectedRows, selectedResults);
+        const menuOptionSubValueResult = toPairs(selectedValues).map(([value, subValue]) => {
+          const o = {
+            ...options.find((o) => o.value == value),
+          } as SelectedOptionResult<ValueType>;
+          o.subValue = subValue;
+          return o;
+        });
+
+        if (isEqual(initialiseValues, selectedValues)) {
+          // No changes to save
+          return true;
+        }
+
+        return await props.onSave(selectedRows, menuOptionSubValueResult);
       }
       return true;
     },
-    [options, props, selectedValues, subSelectedValues],
+    [options, props, selectedValues],
   );
 
   // Load up options list if it's async function
@@ -101,7 +105,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
       }
 
       const optionsList = optionsConf?.map((item) => {
-        if (item == null || typeof item == "string" || typeof item == "number") {
+        if (item == null || typeof item === "string" || typeof item === "number") {
           item = { value: item as ValueType, label: item } as MultiFinalSelectOption<ValueType>;
         }
         return item;
@@ -133,6 +137,17 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
         .filter((r) => r !== undefined),
     );
   }, [props.filtered, filter, options]);
+
+  const toggleValue = useCallback(
+    (item: MultiFinalSelectOption<ValueType>) => {
+      if (`${item.value}` in selectedValues) {
+        setSelectedValues(omit(selectedValues, [`${item.value}`]));
+      } else {
+        setSelectedValues({ ...selectedValues, [`${item.value}`]: null });
+      }
+    },
+    [selectedValues],
+  );
 
   const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
@@ -167,30 +182,21 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
             ) : filteredValues.includes(item.value) ? null : (
               <div key={`${index}`}>
                 <MenuItem
-                  key={`${index}`}
                   onClick={(e: ClickEvent) => {
                     e.keepOpen = true;
-                    if (selectedValues.includes(item.value)) {
-                      setSelectedValues(selectedValues.filter((value) => value != item.value));
-                    } else {
-                      setSelectedValues([...selectedValues, item.value]);
-                    }
+                    toggleValue(item);
                   }}
                   onKeyDown={async (e: KeyboardEvent) => {
                     if (e.key === "Enter") triggerSave().then();
                     else if (e.key === " ") {
-                      if (selectedValues.includes(item.value)) {
-                        setSelectedValues(selectedValues.filter((value) => value != item.value));
-                      } else {
-                        setSelectedValues([...selectedValues, item.value]);
-                      }
+                      toggleValue(item);
                       e.preventDefault();
                       e.stopPropagation();
                     }
                   }}
                 >
                   <LuiCheckboxInput
-                    isChecked={selectedValues.includes(item.value)}
+                    isChecked={`${item.value}` in selectedValues}
                     value={`${item.value}`}
                     label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                     inputProps={{
@@ -206,16 +212,15 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                   />
                 </MenuItem>
 
-                {selectedValues.includes(item.value) && item.subComponent && (
+                {`${item.value}` in selectedValues && item.subComponent && (
                   <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
                     {(_: any) =>
                       item.subComponent && (
                         <GridSubComponentContext.Provider
                           value={{
-                            value: subSelectedValues[`${item.value}`],
+                            value: selectedValues[`${item.value}`],
                             setValue: (value: any) => {
-                              subSelectedValues[`${item.value}`] = value;
-                              setSubSelectedValues({ ...subSelectedValues });
+                              setSelectedValues({ ...selectedValues, [`${item.value}`]: value });
                             },
                             setValid: (valid: boolean) => {
                               subComponentIsValid.current[`${item.value}`] = valid;
