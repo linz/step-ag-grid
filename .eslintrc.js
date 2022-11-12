@@ -78,7 +78,7 @@ module.exports = {
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-function": ["warn", { allow: ["arrowFunctions"] }],
-        "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }], // prepend var with _ (e.g.. _myVar) to ignore this pattern
+        "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }], // prepend var with _ (e.g.. _myVar) to ignore this pattern
         "@typescript-eslint/no-use-before-define": "off", // We will want to use before define to keep exports at the top
         "@typescript-eslint/ban-ts-comment": "off", // We use explicit overrides
         "@typescript-eslint/naming-convention": "off", // React's convention is to use CamelCase for component file names
