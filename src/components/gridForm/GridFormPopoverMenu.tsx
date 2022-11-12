@@ -6,11 +6,11 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon } from "../GridCell";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { ClickEvent } from "../../react-menu3/types";
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext, GridPopoverContextType } from "../../contexts/GridPopoverContext";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
-  action?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
+  defaultAction?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
 }
 
 /** Menu configuration types **/
@@ -50,8 +50,8 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
 
   const defaultAction = useCallback(
-    async (selectdRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => {
-      if (props.action) await props.action(selectdRows, menuOption);
+    async (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => {
+      if (props.defaultAction) await props.defaultAction(selectedRows, menuOption);
       else console.error(`No action specified for ${menuOption.label} menu options`);
     },
     [props],
@@ -66,7 +66,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     (async () => {
       const newOptions = typeof optionsConf == "function" ? await optionsConf(selectedRows) : optionsConf;
       setOptions(newOptions);
-      if (!props.action) {
+      if (!props.defaultAction) {
         const anyOptionsAreMissingAction = newOptions.some((option) => !option.action);
         if (anyOptionsAreMissingAction) {
           console.error("There's no default action handler and some Menu options are missing an action handler", {
@@ -76,18 +76,14 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
       }
       optionsInitialising.current = false;
     })();
-  }, [options, props.action, props.options, selectedRows]);
+  }, [options, props.defaultAction, props.options, selectedRows]);
 
   const actionClick = useCallback(
     async (menuOption: MenuOption<RowType>) => {
       actionProcessing.current = true;
       return updateValue(async () => {
         const result = { ...menuOption, subValue: subSelectedValue };
-        if (menuOption.action) {
-          await menuOption.action(selectedRows, result);
-        } else {
-          await defaultAction(selectedRows, result);
-        }
+        await (menuOption.action ?? defaultAction)(selectedRows, result);
         actionProcessing.current = false;
         return true;
       });
