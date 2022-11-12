@@ -1,7 +1,7 @@
 import "../../styles/GridFormMultiSelect.scss";
 
 import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
-import { KeyboardEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs, isEqual, omit, pick, toPairs } from "lodash-es";
@@ -11,7 +11,7 @@ import { MenuSeparatorString } from "./GridFormDropDown";
 import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -45,7 +45,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   props: GridFormMultiSelectProps<RowType, ValueType>,
 ) => {
-  const { selectedRows } = useContext(GridPopoverContext);
+  const { selectedRows } = useGridPopoverContext<RowType>();
 
   const initialiseValues = useMemo(() => {
     const r = props.initialSelectedValues && props.initialSelectedValues(selectedRows);

@@ -1,9 +1,9 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
@@ -17,7 +17,7 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Cel
 }
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
-  const { field, data, value: initialVale } = useContext(GridPopoverContext);
+  const { field, data, value: initialVale } = useGridPopoverContext<RowType>();
 
   const initValue = initialVale == null ? "" : `${initialVale}`;
   const [value, setValue] = useState(initValue);

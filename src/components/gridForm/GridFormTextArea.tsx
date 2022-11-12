@@ -1,9 +1,9 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
@@ -15,7 +15,7 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Cell
 }
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
-  const { field, value: initialVale } = useContext(GridPopoverContext);
+  const { field, value: initialVale } = useGridPopoverContext<RowType>();
   const [value, setValue] = useState(initialVale ?? "");
 
   const invalid = useCallback(() => {
@@ -32,7 +32,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
   }, [props, value]);
 
   const save = useCallback(
-    async (selectedRows: any[]): Promise<boolean> => {
+    async (selectedRows: RowType[]): Promise<boolean> => {
       if (invalid()) return false;
 
       if (initialVale === (value ?? "")) return true;

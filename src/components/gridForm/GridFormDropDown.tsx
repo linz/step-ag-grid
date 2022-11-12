@@ -9,7 +9,7 @@ import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
@@ -44,6 +44,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
     | "GridPopoverEditDropDown-containerUnlimited"
     | string
     | undefined;
+  // local means the filter won't change if it's reloaded, reload means it does change
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
@@ -54,10 +55,14 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
   optionsRequestCancel?: () => void;
 }
 
+const fieldToString = (field: any) => {
+  return typeof field == "symbol" ? field.toString() : `${field}`;
+};
+
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
-  const { selectedRows, field, updateValue } = useContext(GridPopoverContext);
+  const { selectedRows, field, updateValue } = useGridPopoverContext<RowType>();
   const { stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
@@ -208,7 +213,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && options.length == filteredValues?.length && <MenuItem key={`${field}-empty`}>[Empty]</MenuItem>}
+          {options && options.length == filteredValues?.length && (
+            <MenuItem key={`${fieldToString(field)}-empty`}>[Empty]</MenuItem>
+          )}
           {options?.map((item: FinalSelectOption<ValueType | string>, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
@@ -218,7 +225,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
               <div key={`menu-wrapper-${index}`}>
                 {!item.subComponent ? (
                   <MenuItem
-                    key={`${field}-${index}`}
+                    key={`${fieldToString(field)}-${index}`}
                     disabled={!!item.disabled}
                     title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                     value={item.value}
@@ -229,12 +236,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                     {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                   </MenuItem>
                 ) : (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${field}-${index}_subcomponent`}>
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${fieldToString(field)}-${index}_subcomponent`}>
                     {(ref: any) =>
-                      item.subComponent &&
-                      item.subComponent(
-                        {
-                          setValue: (value: any) => {
+                      item.subComponent && (
+                        <item.subComponent
+                          setValue={(value: any) => {
                             const localSubComponentValues = [...subComponentValues];
                             const subComponentValueIndex = localSubComponentValues.findIndex(
                               ({ optionValue }) => optionValue === item.value,
@@ -248,8 +254,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                               });
                             }
                             setSubComponentValues(localSubComponentValues);
-                          },
-                          keyDown: (key: string, event: KeyboardEvent<HTMLInputElement>) => {
+                          }}
+                          keyDown={(key: string, event: KeyboardEvent<HTMLInputElement>) => {
                             const subComponentItem = subComponentValues.find(
                               ({ optionValue }) => optionValue === item.value,
                             );
@@ -265,10 +271,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                               });
                             }
                             return false;
-                          },
-                          key: `${field}-${index}_subcomponent_inner`,
-                        },
-                        ref,
+                          }}
+                          key={`${fieldToString(field)}-${index}_subcomponent_inner`}
+                        />
                       )
                     }
                   </FocusableItem>
