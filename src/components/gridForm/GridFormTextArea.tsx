@@ -1,8 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
-import { CellEditorCommon, CellParams } from "../GridCell";
+import { CellEditorCommon } from "../GridCell";
+import { GridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
@@ -13,9 +14,9 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Cell
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
 }
 
-export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTextAreaProps<RowType>) => {
-  const props = _props as GridFormTextAreaProps<RowType> & CellParams<RowType>;
-  const [value, setValue] = useState(props.value ?? "");
+export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
+  const { field, value: initialVale } = useContext(GridPopoverContext);
+  const [value, setValue] = useState(initialVale ?? "");
 
   const invalid = useCallback(() => {
     if (props.required && value.length == 0) {
@@ -34,13 +35,12 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTe
     async (selectedRows: any[]): Promise<boolean> => {
       if (invalid()) return false;
 
-      if (props.value === (value ?? "")) return true;
+      if (initialVale === (value ?? "")) return true;
 
       if (props.onSave) {
         return await props.onSave(selectedRows, value);
       }
 
-      const field = props.field;
       if (field == null) {
         console.error("ColDef has no field set");
         return false;
@@ -48,7 +48,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(_props: GridFormTe
       selectedRows.forEach((row) => (row[field] = value));
       return true;
     },
-    [props, invalid, value],
+    [invalid, initialVale, value, props, field],
   );
   const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(

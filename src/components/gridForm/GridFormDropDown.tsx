@@ -1,14 +1,15 @@
 import "../../styles/GridFormDropDown.scss";
 
-import { MenuItem, MenuDivider, FocusableItem, MenuHeader } from "../../react-menu3";
-import { useCallback, useContext, useEffect, useRef, useState, KeyboardEvent } from "react";
+import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
+import { KeyboardEvent, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
-import { CellEditorCommon, CellParams } from "../GridCell";
+import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
+import { GridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
@@ -54,9 +55,9 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
 }
 
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
-  _props: GridFormPopoutDropDownProps<RowType, ValueType>,
+  props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
-  const props = _props as GridFormPopoutDropDownProps<RowType, ValueType> & CellParams<RowType>;
+  const { selectedRows, field } = useContext(GridPopoverContext);
   const { updatingCells, stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
@@ -67,8 +68,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
   const selectItemHandler = useCallback(
     async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
-      const field = props.field;
-      return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
+      return await updatingCells({ selectedRows: selectedRows, field }, async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
           if (props.onSelectedItem) {
@@ -80,20 +80,19 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         return true;
       });
     },
-    [props, updatingCells],
+    [field, props, selectedRows, updatingCells],
   );
 
   const selectFilterHandler = useCallback(
     async (value: string): Promise<boolean> => {
-      const field = props.field;
-      return await updatingCells({ selectedRows: props.selectedRows, field }, async (selectedRows) => {
+      return await updatingCells({ selectedRows: selectedRows, field }, async (selectedRows) => {
         if (props.onSelectFilter) {
           await props.onSelectFilter({ selectedRows, value });
         }
         return true;
       });
     },
-    [props, updatingCells],
+    [field, props, selectedRows, updatingCells],
   );
 
   // Load up options list if it's async function
@@ -104,19 +103,19 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
     (async () => {
       if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(props.selectedRows, filter);
+        optionsConf = await optionsConf(selectedRows, filter);
       }
 
-      const optionsList = (optionsConf?.map((item) => {
+      const optionsList = optionsConf?.map((item) => {
         if (item == null || typeof item == "string" || typeof item == "number") {
-          item = ({
-            value: (item as unknown) as ValueType,
+          item = {
+            value: item as unknown as ValueType,
             label: item,
             disabled: false,
-          } as unknown) as FinalSelectOption<ValueType>;
+          } as unknown as FinalSelectOption<ValueType>;
         }
         return item;
-      }) as any) as FinalSelectOption<ValueType>[];
+      }) as any as FinalSelectOption<ValueType>[];
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -127,7 +126,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       }
       optionsInitialising.current = false;
     })();
-  }, [filter, options, props]);
+  }, [filter, options, props, selectedRows]);
 
   // Local filtering.
   useEffect(() => {
@@ -213,9 +212,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && options.length == filteredValues?.length && (
-            <MenuItem key={`${props.field}-empty`}>[Empty]</MenuItem>
-          )}
+          {options && options.length == filteredValues?.length && <MenuItem key={`${field}-empty`}>[Empty]</MenuItem>}
           {options?.map((item: FinalSelectOption<ValueType | string>, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
@@ -225,18 +222,18 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
               <div key={`menu-wrapper-${index}`}>
                 {!item.subComponent ? (
                   <MenuItem
-                    key={`${props.field}-${index}`}
+                    key={`${field}-${index}`}
                     disabled={!!item.disabled}
                     title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                     value={item.value}
                     onClick={() => {
-                      selectItemHandler(item.value as ValueType);
+                      selectItemHandler(item.value as ValueType).then();
                     }}
                   >
                     {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                   </MenuItem>
                 ) : (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${props.field}-${index}_subcomponent`}>
+                  <FocusableItem className={"LuiDeprecatedForms"} key={`${field}-${index}_subcomponent`}>
                     {(ref: any) =>
                       item.subComponent &&
                       item.subComponent(
@@ -273,7 +270,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                             }
                             return false;
                           },
-                          key: `${props.field}-${index}_subcomponent_inner`,
+                          key: `${field}-${index}_subcomponent_inner`,
                         },
                         ref,
                       )

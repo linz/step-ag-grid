@@ -1,4 +1,4 @@
-import { ReactNode, RefObject, useCallback, useContext, useRef, useState } from "react";
+import { ReactNode, RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { GridPopoverContext, PropsType } from "./GridPopoverContext";
 import { ICellEditorParams } from "ag-grid-community";
 import { GridContext } from "./GridContext";
@@ -6,36 +6,30 @@ import { sortBy } from "lodash-es";
 import { GridBaseRow } from "../components/Grid";
 
 interface GridPopoverContextProps {
+  props: ICellEditorParams;
   children: ReactNode;
 }
 
-export const GridPopoverContextProvider = (props: GridPopoverContextProps) => {
+export const GridPopoverContextProvider = ({ props, children }: GridPopoverContextProps) => {
   const { getSelectedRows, updatingCells } = useContext(GridContext);
-  const anchorRef = useRef<Element>();
-  const propsRef = useRef<PropsType>({} as PropsType);
+  const anchorRef = useRef<Element>(props.eGridCell);
 
   const [saving, setSaving] = useState(false);
 
-  const setProps = useCallback(
-    (props: ICellEditorParams, multiEdit: boolean) => {
-      // Then item that is clicked on will always be first in the list
-      const selectedRows = multiEdit
-        ? sortBy(getSelectedRows(), (row) => row.id !== props.data.id)
-        : [props.data as GridBaseRow];
-      const field = props.colDef?.field ?? "";
+  const { colDef } = props;
+  const { cellEditorParams } = colDef;
+  const multiEdit = cellEditorParams?.multiEdit ?? false;
+  // Then item that is clicked on will always be first in the list
+  const selectedRows = useMemo(
+    () => (multiEdit ? sortBy(getSelectedRows(), (row) => row.id !== props.data.id) : [props.data as GridBaseRow]),
+    [getSelectedRows, multiEdit, props.data],
+  );
+  const field = props.colDef?.field ?? "";
 
-      anchorRef.current = props.eGridCell;
-      propsRef.current = {
-        value: props.value,
-        data: props.data,
-        field,
-        selectedRows,
-        updateValue: async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> => {
-          return !saving && (await updatingCells({ selectedRows, field }, saveFn, setSaving));
-        },
-      };
-    },
-    [getSelectedRows, saving, updatingCells],
+  const updateValue = useCallback(
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>): Promise<boolean> =>
+      !saving && (await updatingCells({ selectedRows, field }, saveFn, setSaving)),
+    [field, saving, selectedRows, updatingCells],
   );
 
   return (
@@ -44,11 +38,14 @@ export const GridPopoverContextProvider = (props: GridPopoverContextProps) => {
         anchorRef: anchorRef as any as RefObject<Element>,
         saving,
         setSaving,
-        propsRef,
-        setProps,
+        selectedRows,
+        field,
+        data: props.data,
+        value: props.value,
+        updateValue,
       }}
     >
-      {props.children}
+      {children}
     </GridPopoverContext.Provider>
   );
 };

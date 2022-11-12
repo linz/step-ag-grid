@@ -1,5 +1,6 @@
 import { createContext, RefObject } from "react";
 import { ICellEditorParams } from "ag-grid-community";
+import { GridBaseRow } from "../components/Grid";
 
 export interface PropsType {
   value: any;
@@ -13,14 +14,20 @@ export type GridPopoverContextType = {
   anchorRef: RefObject<Element>;
   saving: boolean;
   setSaving: (saving: boolean) => void;
-  setProps: (props: ICellEditorParams, multiEdit: boolean) => void;
-  propsRef: RefObject<PropsType>;
+  field: string;
+  value: any;
+  data: any;
+  selectedRows: any[];
+  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
 };
 
 export const GridPopoverContext = createContext<GridPopoverContextType>({
   anchorRef: { current: null },
   saving: false,
   setSaving: () => {},
-  setProps: () => {},
-  propsRef: { current: null },
+  field: "",
+  value: null,
+  data: null,
+  selectedRows: [],
+  updateValue: async () => false,
 });

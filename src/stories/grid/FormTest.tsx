@@ -1,11 +1,11 @@
 import "./FormTest.scss";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
-import { CellEditorCommon, CellParams } from "../../components/GridCell";
+import { CellEditorCommon } from "../../components/GridCell";
 import { useGridPopoverHook } from "../../components/GridPopoverHook";
-import { GridBaseRow } from "../../components/Grid";
+import { GridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface IFormTestRow {
   id: number;
@@ -16,28 +16,30 @@ export interface IFormTestRow {
   distance: number | null;
 }
 
-export const FormTest = <RowType extends GridBaseRow>(_props: CellEditorCommon): JSX.Element => {
-  const props = _props as CellParams<RowType>;
-  const [v1, ...v2] = props.value.split(" ");
+export const FormTest = (props: CellEditorCommon): JSX.Element => {
+  const { value } = useContext(GridPopoverContext);
+  const [v1, ...v2] = value.split(" ");
 
   const [nameType, setNameType] = useState(v1);
   const [numba, setNumba] = useState(v2.join(" "));
 
-  const save = useCallback(async (): Promise<boolean> => {
-    // eslint-disable-next-line no-console
-    console.log("onSave", props.selectedRows, nameType, numba);
+  const save = useCallback(
+    async (selectedRows: IFormTestRow[]): Promise<boolean> => {
+      // eslint-disable-next-line no-console
+      console.log("onSave", selectedRows, nameType, numba);
 
-    // @ts-ignore
-    props.selectedRows.forEach((row) => (row["name"] = [nameType, numba].join(" ")));
-    await wait(1000);
+      selectedRows.forEach((row) => (row.name = [nameType, numba].join(" ")));
+      await wait(1000);
 
-    // Close form
-    return true;
-  }, [nameType, numba, props.selectedRows]);
+      // Close form
+      return true;
+    },
+    [nameType, numba],
+  );
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { popoverWrapper } = useGridPopoverHook({ className: _props.className, save });
+  const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
 
   return popoverWrapper(
     <>

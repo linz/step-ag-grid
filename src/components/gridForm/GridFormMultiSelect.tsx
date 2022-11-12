@@ -1,16 +1,17 @@
 import "../../styles/GridFormMultiSelect.scss";
 
-import { MenuItem, MenuDivider, FocusableItem } from "../../react-menu3";
-import { useCallback, useEffect, useRef, useState, KeyboardEvent, useMemo } from "react";
+import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
+import { KeyboardEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs, isEqual, omit, pick, toPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
-import { CellEditorCommon, CellParams } from "../GridCell";
+import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
+import { GridPopoverContext } from "../../contexts/GridPopoverContext";
 
 interface MultiFinalSelectOption<ValueType> {
   value: ValueType;
@@ -45,7 +46,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   props: GridFormMultiSelectProps<RowType, ValueType>,
 ) => {
-  const { selectedRows } = props as unknown as CellParams<RowType>;
+  const { selectedRows } = useContext(GridPopoverContext);
 
   const initialiseValues = useMemo(() => {
     const r = props.initialSelectedValues && props.initialSelectedValues(selectedRows);
@@ -90,7 +91,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
       }
       return true;
     },
-    [options, props, selectedValues],
+    [initialiseValues, options, props, selectedValues],
   );
 
   // Load up options list if it's async function
@@ -220,7 +221,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                           value={{
                             value: selectedValues[`${item.value}`],
                             setValue: (value: any) => {
-                              setSelectedValues({ ...selectedValues, [`${item.value}`]: value });
+                              setSelectedValues({
+                                ...selectedValues,
+                                [`${item.value}`]: value,
+                              });
                             },
                             setValid: (valid: boolean) => {
                               subComponentIsValid.current[`${item.value}`] = valid;

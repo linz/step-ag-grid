@@ -1,11 +1,12 @@
 import "../../styles/GridFormEditBearing.scss";
 
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
 import { useGridPopoverHook } from "../GridPopoverHook";
-import { CellEditorCommon, CellParams } from "../GridCell";
+import { CellEditorCommon } from "../GridCell";
+import { GridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeHolder?: string;
@@ -13,22 +14,21 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
   onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends GridBaseRow>(_props: GridFormEditBearingProps<RowType>) => {
-  const props = _props as GridFormEditBearingProps<RowType> & CellParams<RowType>;
-  const [value, setValue] = useState<string>(`${props.value ?? ""}`);
+export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
+  const { field, value: initialValue } = useContext(GridPopoverContext);
+  const [value, setValue] = useState<string>(`${initialValue ?? ""}`);
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
       // Value didn't change so don't save just cancel
-      if (parsedValue === props.value) {
+      if (parsedValue === initialValue) {
         return true;
       }
 
       if (props.onSave) {
         return await props.onSave(selectedRows, parsedValue);
       } else {
-        const field = props.field;
         if (field == null) {
           console.error("field is not defined in ColDef");
         } else {
@@ -37,7 +37,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(_props: GridFor
       }
       return true;
     },
-    [props, value],
+    [field, initialValue, props, value],
   );
   const { triggerSave, popoverWrapper } = useGridPopoverHook({ className: props.className, save });
 

@@ -9,15 +9,14 @@ import {
 } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
-import { GridIcon } from "../components/GridIcon";
+import { GridIcon } from "./GridIcon";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { GridPopoverContext } from "../contexts/GridPopoverContext";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
   editor?: (editorProps: E) => JSX.Element;
-  editorParams?: E; // Omit<E, keyof CellParams<IFormTestRow>>
+  editorParams?: E;
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
@@ -91,37 +90,19 @@ export interface CellEditorCommon {
   className?: string | undefined;
 }
 
-export interface CellParams<RowType extends GridBaseRow> {
-  value: any;
-  data: RowType;
-  field: string | undefined;
-  selectedRows: RowType[];
-}
-
 // TODO memo?
 export const GenericCellEditorComponent = (editor: (props: any) => JSX.Element) =>
-  forwardRef(function GenericCellEditorComponent2(props: ICellEditorParams, _) {
-    return (
-      <GridPopoverContextProvider>
-        <GenericCellEditorComponent3 {...{ ...props, editor }} />
-      </GridPopoverContextProvider>
-    );
+  forwardRef(function GenericCellEditorComponentFr(props: ICellEditorParams, _) {
+    return <GenericCellEditorComponentImpl {...{ ...props, editor }} />;
   });
 
-const GenericCellEditorComponent3 = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
-  const { setProps, propsRef } = useContext(GridPopoverContext);
-
+const GenericCellEditorComponentImpl = (props: ICellEditorParams & { editor: (props: any) => JSX.Element }) => {
   const { colDef } = props;
-  const { cellEditorParams } = colDef;
-  const multiEdit = cellEditorParams?.multiEdit ?? false;
-
-  // TODO don't need all these props in context
-  setProps(props, multiEdit);
 
   return (
-    <>
+    <GridPopoverContextProvider props={props}>
       {<colDef.cellRenderer {...props} />}
-      {props?.editor && <props.editor {...cellEditorParams} {...propsRef.current} />}
-    </>
+      {props?.editor && <props.editor {...props} />}
+    </GridPopoverContextProvider>
   );
 };
