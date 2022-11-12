@@ -1,6 +1,7 @@
+import "../../styles/GridFormSubComponentTextInput.scss";
+
 import { useState, KeyboardEvent } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import "../../styles/GridFormSubComponentTextInput.scss";
 
 export interface GridFormSubComponentTextInput {
   setValue: (value: string) => void;

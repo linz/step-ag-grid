@@ -12,7 +12,7 @@ export interface GridPopoverHookProps<RowType> {
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
   const { stopEditing } = useContext(GridContext);
-  const { anchorRef, saving, propsRef } = useContext(GridPopoverContext);
+  const { anchorRef, saving, updateValue } = useContext(GridPopoverContext);
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 
@@ -22,16 +22,12 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (
-        reason == "cancel" ||
-        !props.save ||
-        (propsRef.current?.updateValue && (await propsRef.current?.updateValue(props.save)))
-      ) {
+      if (reason == "cancel" || !props.save || (updateValue && (await updateValue(props.save)))) {
         setOpen(false);
         stopEditing();
       }
     },
-    [props, stopEditing, propsRef],
+    [props.save, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

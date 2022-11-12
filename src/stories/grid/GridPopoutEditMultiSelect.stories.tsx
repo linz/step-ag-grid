@@ -62,7 +62,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
         {
           field: "position",
           initialWidth: 65,
-          maxWidth: 150,
+          maxWidth: 300,
           headerName: "Position",
         },
         {
@@ -105,7 +105,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           field: "position2",
           initialWidth: 65,
           maxWidth: 150,
-          headerName: "Inital editor values ",
+          headerName: "Initial editor values ",
           valueGetter: (props) => positionTwoMap[props.data.position2],
         },
         {

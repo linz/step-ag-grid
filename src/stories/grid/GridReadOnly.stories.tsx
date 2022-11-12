@@ -86,9 +86,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         {
           multiEdit: true,
           editorParams: {
-            message: async (formParams): Promise<string> => {
+            message: async (selectedRows): Promise<string> => {
               await wait(1000);
-              return `There are ${formParams.selectedRows.length} row(s) selected`;
+              return `There are ${selectedRows.length} row(s) selected`;
             },
           },
         },
@@ -132,7 +132,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   label: "Other",
                   supportsMultiEdit: true,
                   action: (_, menuOptionResult) => {
-                    console.log(menuOptionResult);
                     alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
                   },
                   subComponent: () => (
