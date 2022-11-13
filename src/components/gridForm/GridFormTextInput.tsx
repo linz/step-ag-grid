@@ -14,10 +14,13 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Cel
   // Return null for ok, otherwise an error string
   validate?: (value: string, data: RowType) => string | null;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
+  helpText?: string;
 }
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
   const { field, data, value: initialVale } = useGridPopoverContext<RowType>();
+
+  const helpText = props.helpText ?? "Press enter or tab to save";
 
   const initValue = initialVale == null ? "" : `${initialVale}`;
   const [value, setValue] = useState(initValue);
@@ -69,6 +72,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         style={{ width: "100%" }}
         placeholder={props.placeholder}
         onKeyDown={(e) => e.key === "Enter" && triggerSave().then()}
+        helpText={helpText}
       />
     </div>,
   );

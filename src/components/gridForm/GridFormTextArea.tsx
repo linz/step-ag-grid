@@ -12,11 +12,14 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Cell
   width?: string | number;
   validate?: (value: string) => string | null;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
+  helpText?: string;
 }
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
   const { field, value: initialVale } = useGridPopoverContext<RowType>();
   const [value, setValue] = useState(initialVale != null ? `${initialVale}` : "");
+
+  const helpText = props.helpText ?? "Press ctrl+enter or tab to save";
 
   const invalid = useCallback(() => {
     if (props.required && value.length == 0) {
@@ -52,7 +55,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
     },
     [invalid, initialVale, value, props, field],
   );
-  const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
       <TextAreaInput
@@ -60,6 +63,12 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         placeholder={props.placeholder}
+        helpText={helpText}
+        onKeyDown={(e) => {
+          if ((e.key === "Enter" && e.ctrlKey) || e.key == "Tab") {
+            triggerSave().then();
+          }
+        }}
       />
     </div>,
   );

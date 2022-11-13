@@ -16,7 +16,7 @@ export interface GridFormSubComponentTextInputProps {
 export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInputProps): JSX.Element => {
   const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
-  const helpText = props.helpText || "Press enter or tab to save";
+  const helpText = props.helpText ?? "Press enter or tab to save";
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
