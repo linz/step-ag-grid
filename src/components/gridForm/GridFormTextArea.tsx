@@ -1,9 +1,9 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeholder?: string;
@@ -15,8 +15,8 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Cell
 }
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
-  const { field, value: initialVale } = useContext(GridPopoverContext);
-  const [value, setValue] = useState(initialVale ?? "");
+  const { field, value: initialVale } = useGridPopoverContext<RowType>();
+  const [value, setValue] = useState(initialVale != null ? `${initialVale}` : "");
 
   const invalid = useCallback(() => {
     if (props.required && value.length == 0) {
@@ -32,7 +32,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
   }, [props, value]);
 
   const save = useCallback(
-    async (selectedRows: any[]): Promise<boolean> => {
+    async (selectedRows: RowType[]): Promise<boolean> => {
       if (invalid()) return false;
 
       if (initialVale === (value ?? "")) return true;
@@ -45,7 +45,9 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
         console.error("ColDef has no field set");
         return false;
       }
-      selectedRows.forEach((row) => (row[field] = value));
+      selectedRows.forEach((row) => {
+        row[field] = value as any;
+      });
       return true;
     },
     [invalid, initialVale, value, props, field],

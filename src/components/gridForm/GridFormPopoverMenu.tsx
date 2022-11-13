@@ -1,15 +1,16 @@
 import { GridBaseRow } from "../Grid";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon } from "../GridCell";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { ClickEvent } from "../../react-menu3/types";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
+  defaultAction?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
 }
 
 /** Menu configuration types **/
@@ -37,7 +38,7 @@ export interface MenuOption<RowType extends GridBaseRow> {
  * you need a useMemo around your columnDefs
  */
 export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridFormPopoutMenuProps<RowType>) => {
-  const { selectedRows, updateValue } = useContext(GridPopoverContext);
+  const { selectedRows, updateValue } = useGridPopoverContext<RowType>();
 
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MenuOption<RowType>[]>();
@@ -48,6 +49,14 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   const subComponentIsValid = useRef(false);
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
 
+  const defaultAction = useCallback(
+    async (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => {
+      if (props.defaultAction) await props.defaultAction(selectedRows, menuOption);
+      else console.error(`No action specified for ${menuOption.label} menu options`);
+    },
+    [props],
+  );
+
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
@@ -55,22 +64,31 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     const optionsConf = props.options ?? [];
 
     (async () => {
-      setOptions(typeof optionsConf == "function" ? await optionsConf(selectedRows) : optionsConf);
+      const newOptions = typeof optionsConf == "function" ? await optionsConf(selectedRows) : optionsConf;
+      setOptions(newOptions);
+      if (!props.defaultAction) {
+        const anyOptionsAreMissingAction = newOptions.some((option) => !option.action);
+        if (anyOptionsAreMissingAction) {
+          console.error("There's no default action handler and some Menu options are missing an action handler", {
+            invalidMenuOptions: newOptions.filter((option) => !option.action),
+          });
+        }
+      }
       optionsInitialising.current = false;
     })();
-  }, [options, props.options, selectedRows]);
+  }, [options, props.defaultAction, props.options, selectedRows]);
 
   const actionClick = useCallback(
     async (menuOption: MenuOption<RowType>) => {
       actionProcessing.current = true;
       return updateValue(async () => {
         const result = { ...menuOption, subValue: subSelectedValue };
-        menuOption.action && (await menuOption.action(selectedRows, result));
+        await (menuOption.action ?? defaultAction)(selectedRows, result);
         actionProcessing.current = false;
         return true;
       });
     },
-    [selectedRows, subSelectedValue, updateValue],
+    [defaultAction, selectedRows, subSelectedValue, updateValue],
   );
 
   const onMenuItemClick = useCallback(

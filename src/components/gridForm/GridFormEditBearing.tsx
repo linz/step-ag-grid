@@ -1,12 +1,12 @@
 import "../../styles/GridFormEditBearing.scss";
 
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon } from "../GridCell";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends CellEditorCommon {
   placeHolder?: string;
@@ -15,7 +15,7 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
 }
 
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
-  const { field, value: initialValue } = useContext(GridPopoverContext);
+  const { field, value: initialValue } = useGridPopoverContext<RowType>();
 
   const [value, setValue] = useState<string>(`${initialValue ?? ""}`);
 
@@ -34,7 +34,9 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         if (field == null) {
           console.error("field is not defined in ColDef");
         } else {
-          selectedRows.forEach((row) => ((row as Record<string, any>)[field] = parsedValue));
+          selectedRows.forEach((row) => {
+            row[field] = parsedValue as any;
+          });
         }
       }
       return true;

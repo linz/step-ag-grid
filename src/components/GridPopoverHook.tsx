@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
-import { GridPopoverContext } from "../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../contexts/GridPopoverContext";
 import { MenuCloseEvent } from "../react-menu3/types";
 
 export interface GridPopoverHookProps<RowType> {
@@ -12,7 +12,7 @@ export interface GridPopoverHookProps<RowType> {
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
   const { stopEditing } = useContext(GridContext);
-  const { anchorRef, saving, updateValue } = useContext(GridPopoverContext);
+  const { anchorRef, saving, updateValue } = useGridPopoverContext<RowType>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 

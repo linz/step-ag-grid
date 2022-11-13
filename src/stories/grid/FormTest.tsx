@@ -1,11 +1,11 @@
 import "./FormTest.scss";
 
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from "@linzjs/lui";
 import { wait } from "../../utils/util";
 import { CellEditorCommon } from "../../components/GridCell";
 import { useGridPopoverHook } from "../../components/GridPopoverHook";
-import { GridPopoverContext } from "../../contexts/GridPopoverContext";
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface IFormTestRow {
   id: number;
@@ -17,7 +17,7 @@ export interface IFormTestRow {
 }
 
 export const FormTest = (props: CellEditorCommon): JSX.Element => {
-  const { value } = useContext(GridPopoverContext);
+  const { value } = useGridPopoverContext<IFormTestRow>();
   const [v1, ...v2] = value.split(" ");
 
   const [nameType, setNameType] = useState(v1);
