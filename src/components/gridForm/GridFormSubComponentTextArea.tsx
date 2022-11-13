@@ -1,18 +1,24 @@
 import { useCallback, useContext, useEffect } from "react";
-import { TextInputFormatted } from "../lui/TextInputFormatted";
-import { GridSubComponentContext } from "../contexts/GridSubComponentContext";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
+import { CellEditorCommon } from "../GridCell";
+import clsx from "clsx";
+import { TextAreaInput } from "../../lui/TextAreaInput";
 
-export interface GridSubComponentTextAreaProps {
+export interface GridSubComponentTextAreaProps extends CellEditorCommon {
   placeholder?: string;
   required?: boolean;
   maxLength?: number;
   width?: string | number;
   validate?: (value: string) => string | null;
   defaultValue: string;
+  className?: string;
+  helpText?: string;
 }
 
-export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
+export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
   const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
+
+  const helpText = props.helpText || "Press ctrl+enter or tab to save";
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
@@ -45,16 +51,21 @@ export const GridSubComponentTextArea = (props: GridSubComponentTextAreaProps): 
   }, [setValid, validate, value]);
 
   return (
-    <div className={"FreeTextInput LuiDeprecatedForms"}>
-      <TextInputFormatted
+    <div className={clsx("FreeTextInput LuiDeprecatedForms", props.className)}>
+      <TextAreaInput
         className={"free-text-input"}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={validate(value)}
+        helpText={helpText}
         inputProps={{
           autoFocus: true,
           placeholder: props.placeholder,
-          onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
+          onKeyDown: async (e) => {
+            if ((e.key === "Enter" && e.ctrlKey) || e.key == "Tab") {
+              triggerSave().then();
+            }
+          },
         }}
       />
     </div>

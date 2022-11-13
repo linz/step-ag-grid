@@ -22,9 +22,16 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (reason == "cancel" || !props.save || (updateValue && (await updateValue(props.save)))) {
-        setOpen(false);
-        stopEditing();
+      setOpen(false);
+      stopEditing();
+      if (reason == "cancel") {
+        //setOpen(false);
+        //stopEditing();
+        return;
+      }
+      if (!props.save || (updateValue && (await updateValue(props.save)))) {
+        //setOpen(false);
+        //stopEditing();
       }
     },
     [props.save, stopEditing, updateValue],

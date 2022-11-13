@@ -270,8 +270,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
               {
                 value: "oth",
                 label: "Other",
-                subComponent: (props) => (
-                  <GridFormSubComponentTextInput {...props} placeholder={"Subcomponent value"} />
+                subComponent: () => (
+                  <GridFormSubComponentTextInput placeholder={"Subcomponent value"} defaultValue={""} required={true} />
                 ),
               },
             ],

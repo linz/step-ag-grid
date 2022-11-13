@@ -1,50 +1,54 @@
-import { ChangeEventHandler, InputHTMLAttributes, useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 import clsx from "clsx";
 import { LuiIcon } from "@linzjs/lui";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidVersion4 } from "uuid";
 
 export const useGenerateOrDefaultId = (idFromProps?: string) => {
-  const [id] = useState(idFromProps ? idFromProps : uuidv4());
+  const [id] = useState(idFromProps ? idFromProps : uuidVersion4());
   return id;
 };
 
-export interface LuiTextAreaInputProps {
+export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaElement> {
+  // overrides value in base class to be string type only
+  value: string;
+
+  // Custom fields
   label?: JSX.Element | string;
   mandatory?: boolean;
-  inputProps?: InputHTMLAttributes<HTMLTextAreaElement>;
-  onChange?: ChangeEventHandler<HTMLTextAreaElement>;
-  value: string;
+  wrapperClassName?: string;
+  helpText?: string;
   error?: string | boolean | null;
 }
 
 export const TextAreaInput = (props: LuiTextAreaInputProps) => {
-  const id = useGenerateOrDefaultId(props.inputProps?.id);
+  const id = useGenerateOrDefaultId(props?.id);
 
   return (
     <div
       className={clsx(
         "LuiTextAreaInput Grid-popoverContainer",
-        props.inputProps?.disabled ? "isDisabled" : "",
-        props?.error ? "hasError" : "",
+        props.disabled ? "isDisabled" : "",
+        props.error ? "hasError" : "",
+        props.wrapperClassName,
       )}
     >
       <label htmlFor={id}>
-        {props.mandatory && <span className="LuiTextAreaInput-mandatory">*</span>}
-        {props.label && <span className="LuiTextAreaInput-label">{props.label}</span>}
+        {props.mandatory != null && <span className="LuiTextAreaInput-mandatory">*</span>}
+        {props.label != null && <span className="LuiTextAreaInput-label">{props.label}</span>}
         <div className="LuiTextAreaInput-wrapper">
-          {" "}
           {/* wrapper div used for error styling */}
           <textarea
+            rows={5}
+            {...props}
             id={id}
             value={props.value}
-            onChange={props.onChange}
-            rows={5}
-            {...props.inputProps}
+            spellCheck={true}
             onMouseEnter={(e) => {
               if (document.activeElement != e.currentTarget) {
                 e.currentTarget.focus();
                 e.currentTarget.selectionStart = e.currentTarget.value.length;
               }
+              props.onMouseEnter && props.onMouseEnter(e);
             }}
           />
         </div>
@@ -55,6 +59,16 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
         <span className="LuiTextAreaInput-error">
           <LuiIcon alt="error" name="ic_error" className="LuiTextAreaInput-error-icon" size="sm" status="error" />
           {props.error}
+        </span>
+      )}
+
+      {props.helpText && !props.error && (
+        <span
+          style={{
+            fontSize: "0.7rem",
+          }}
+        >
+          {props.helpText}
         </span>
       )}
     </div>

@@ -36,7 +36,7 @@ export { GridHeaderSelect } from "./components/gridHeader/GridHeaderSelect";
 
 export { TextAreaInput } from "./lui/TextAreaInput";
 export { TextInputFormatted } from "./lui/TextInputFormatted";
-export { GridSubComponentTextArea } from "./components/GridSubComponentTextArea";
+export { GridFormSubComponentTextArea } from "./components/gridForm/GridFormSubComponentTextArea";
 
 export * from "./lui/ActionButton";
 

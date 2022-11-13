@@ -1,67 +1,73 @@
-import "../../styles/GridFormSubComponentTextInput.scss";
-
-import { useState, KeyboardEvent } from "react";
+import { useCallback, useContext, useEffect } from "react";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 
-export interface GridFormSubComponentTextInput {
-  setValue: (value: string) => void;
-  keyDown: (key: string, event: KeyboardEvent<HTMLInputElement>) => void;
+export interface GridFormSubComponentTextInputProps {
   placeholder?: string;
+  required?: boolean;
+  maxLength?: number;
+  width?: string | number;
+  validate?: (value: string) => string | null;
+  defaultValue: string;
   className?: string;
-  customHelpText?: string;
+  wrapperClassName?: string;
+  helpText?: string;
 }
 
-export const GridFormSubComponentTextInput = ({
-  keyDown,
-  placeholder,
-  setValue,
-  className,
-  customHelpText,
-}: GridFormSubComponentTextInput) => {
-  const placeholderText = placeholder || "Other...";
-  const helpText = customHelpText || "Press enter or tab to save";
+export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInputProps): JSX.Element => {
+  const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
-  const inputClass = className || "GridFormSubComponentTextInput-full-width-input";
-  const [inputValue, setInputValue] = useState("");
+  const helpText = props.helpText || "Press enter or tab to save";
+
+  // If is not initialised yet as it's just been created then set the default value
+  useEffect(() => {
+    if (value == null) setValue(props.defaultValue);
+  }, [props.defaultValue, setValue, value]);
+
+  const validate = useCallback(
+    (value: string | null) => {
+      if (value == null) return null;
+      // This can happen because subcomponent is invoked without type safety
+      if (typeof value !== "string") {
+        console.error("Value is not a string", value);
+      }
+      if (props.required && value.length === 0) {
+        return `Some text is required`;
+      }
+      if (props.maxLength && value.length > props.maxLength) {
+        return `Text must be no longer than ${props.maxLength} characters`;
+      }
+      if (props.validate) {
+        return props.validate(value);
+      }
+      return null;
+    },
+    [props],
+  );
+
+  useEffect(() => {
+    setValid(value != null && validate(value) == null);
+  }, [setValid, validate, value]);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        padding: 0,
+    <TextInputFormatted
+      wrapperClassName={props.className}
+      value={value}
+      error={validate(value)}
+      onChange={(e) => setValue(e.target.value)}
+      helpText={helpText}
+      autoFocus={true}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key == "Tab") {
+          e.preventDefault();
+          e.stopPropagation();
+          triggerSave().then();
+        }
       }}
-    >
-      <TextInputFormatted
-        className={inputClass}
-        value={inputValue}
-        onChange={(e) => {
-          const value = e.target.value;
-          setValue(value);
-          setInputValue(value);
-        }}
-        inputProps={{
-          onKeyDown: (e) => {
-            return keyDown(e.key, e);
-          },
-          placeholder: placeholderText,
-          onMouseEnter: (e) => {
-            if (document.activeElement != e.currentTarget) {
-              e.currentTarget.focus();
-            }
-          },
-          style: {
-            width: "100%",
-          },
-        }}
-      />
-      <span
-        style={{
-          fontSize: "0.7rem",
-        }}
-      >
-        {helpText}
-      </span>
-    </div>
+      placeholder={props.placeholder}
+      style={{
+        width: "100%",
+      }}
+    />
   );
 };
