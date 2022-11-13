@@ -66,11 +66,9 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         formatted={props.units}
-        inputProps={{
-          style: { width: "100%" },
-          placeholder: props.placeholder,
-          onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
-        }}
+        style={{ width: "100%" }}
+        placeholder={props.placeholder}
+        onKeyDown={(e) => e.key === "Enter" && triggerSave().then()}
       />
     </div>,
   );

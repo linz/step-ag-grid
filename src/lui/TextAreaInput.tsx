@@ -2,6 +2,7 @@ import { InputHTMLAttributes, useState } from "react";
 import clsx from "clsx";
 import { LuiIcon } from "@linzjs/lui";
 import { v4 as uuidVersion4 } from "uuid";
+import { omit } from "lodash-es";
 
 export const useGenerateOrDefaultId = (idFromProps?: string) => {
   const [id] = useState(idFromProps ? idFromProps : uuidVersion4());
@@ -15,7 +16,6 @@ export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaE
   // Custom fields
   label?: JSX.Element | string;
   mandatory?: boolean;
-  wrapperClassName?: string;
   helpText?: string;
   error?: string | boolean | null;
 }
@@ -29,7 +29,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
         "LuiTextAreaInput Grid-popoverContainer",
         props.disabled ? "isDisabled" : "",
         props.error ? "hasError" : "",
-        props.wrapperClassName,
+        props.className,
       )}
     >
       <label htmlFor={id}>
@@ -39,7 +39,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
           {/* wrapper div used for error styling */}
           <textarea
             rows={5}
-            {...props}
+            {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
             id={id}
             value={props.value}
             spellCheck={true}

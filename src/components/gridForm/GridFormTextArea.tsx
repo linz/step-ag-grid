@@ -59,7 +59,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
-        inputProps={{ placeholder: props.placeholder }}
+        placeholder={props.placeholder}
       />
     </div>,
   );

@@ -10,7 +10,6 @@ export interface GridFormSubComponentTextInputProps {
   validate?: (value: string) => string | null;
   defaultValue: string;
   className?: string;
-  wrapperClassName?: string;
   helpText?: string;
 }
 
@@ -51,7 +50,6 @@ export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInp
 
   return (
     <TextInputFormatted
-      wrapperClassName={props.className}
       value={value}
       error={validate(value)}
       onChange={(e) => setValue(e.target.value)}

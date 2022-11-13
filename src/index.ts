@@ -5,6 +5,8 @@ export * from "./contexts/GridUpdatingContext";
 export * from "./contexts/GridUpdatingContextProvider";
 export * from "./contexts/GridContext";
 export * from "./contexts/GridContextProvider";
+export * from "./contexts/GridPopoverContext";
+export * from "./contexts/GridPopoverContextProvider";
 
 export type { GridBaseRow } from "./components/Grid";
 export { Grid } from "./components/Grid";

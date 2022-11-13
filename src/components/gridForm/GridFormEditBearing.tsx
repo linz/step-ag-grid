@@ -52,13 +52,9 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         onChange={(e) => {
           setValue(e.target.value.trim());
         }}
-        inputProps={{
-          autoFocus: true,
-          placeholder: props.placeHolder,
-          disabled: false,
-          maxLength: 16,
-          onKeyDown: async (e) => e.key === "Enter" && triggerSave().then(),
-        }}
+        autoFocus={true}
+        placeholder={props.placeHolder}
+        onKeyDown={(e) => e.key === "Enter" && triggerSave().then()}
         formatted={bearingStringValidator(value, props.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
         error={bearingStringValidator(value, props.range)}
       />

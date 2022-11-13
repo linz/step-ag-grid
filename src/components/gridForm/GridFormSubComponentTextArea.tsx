@@ -58,14 +58,12 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
         onChange={(e) => setValue(e.target.value)}
         error={validate(value)}
         helpText={helpText}
-        inputProps={{
-          autoFocus: true,
-          placeholder: props.placeholder,
-          onKeyDown: async (e) => {
-            if ((e.key === "Enter" && e.ctrlKey) || e.key == "Tab") {
-              triggerSave().then();
-            }
-          },
+        autoFocus={true}
+        placeholder={props.placeholder}
+        onKeyDown={(e) => {
+          if ((e.key === "Enter" && e.ctrlKey) || e.key == "Tab") {
+            triggerSave().then();
+          }
         }}
       />
     </div>

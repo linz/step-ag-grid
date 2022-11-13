@@ -1,5 +1,5 @@
 import { GridBaseRow } from "../Grid";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
 import { useGridPopoverHook } from "../GridPopoverHook";
@@ -136,7 +136,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
             <MenuDivider key={`$$divider_${index}`} />
           ) : (
             !item.hidden && (
-              <>
+              <Fragment key={`${item.label}`}>
                 <MenuItem
                   key={`${item.label}`}
                   onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
@@ -167,7 +167,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                     }
                   </FocusableItem>
                 )}
-              </>
+              </Fragment>
             )
           ),
         )}

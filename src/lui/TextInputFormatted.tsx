@@ -4,29 +4,29 @@ import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
 import clsx from "clsx";
 import { LuiIcon } from "@linzjs/lui";
+import { omit } from "lodash-es";
 
 export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
-  error?: string | boolean | null;
-
+  // overrides value in base class to be string type only
   value: string;
-  wrapperClassName?: string;
-  helpText?: string;
 
-  placeholder?: string;
+  // Custom fields
+  helpText?: string;
+  error?: string | boolean | null;
   formatted?: string;
 }
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
   return (
-    <div className={clsx("LuiTextInput Grid-popoverContainer", props.error && "hasError", props.wrapperClassName)}>
+    <div className={clsx("LuiTextInput Grid-popoverContainer", props.error && "hasError", props.className)}>
       <span className="LuiTextInput-inputWrapper">
         {/* wrapper div used for error styling */}
         <input
           type={"text"}
           spellCheck={true}
           defaultValue={props.value}
-          {...props}
-          className={clsx("LuiTextInput-input", props.className)}
+          {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
+          className={"LuiTextInput-input"}
           onMouseEnter={(e) => {
             e.currentTarget.focus();
             props.onMouseEnter && props.onMouseEnter(e);
