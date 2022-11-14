@@ -6,7 +6,9 @@ import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
 
-export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends TextInputValidatorProps, CellEditorCommon {
+export interface GridFormTextAreaProps<RowType extends GridBaseRow>
+  extends TextInputValidatorProps<RowType>,
+    CellEditorCommon {
   placeholder?: string;
   width?: string | number;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
@@ -14,12 +16,12 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow> extends Text
 }
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
-  const { field, value: initialVale } = useGridPopoverContext<RowType>();
+  const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
   const [value, setValue] = useState(initialVale != null ? `${initialVale}` : "");
 
   const helpText = props.helpText ?? "Press tab to save";
 
-  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
+  const invalid = useCallback(() => TextInputValidator(props, value, data), [props, value, data]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {

@@ -45,7 +45,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
 export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   props: GridFormMultiSelectProps<RowType, ValueType>,
 ) => {
-  const { selectedRows } = useGridPopoverContext<RowType>();
+  const { selectedRows, data } = useGridPopoverContext<RowType>();
 
   const initialiseValues = useMemo(() => {
     const r = props.initialSelectedValues && props.initialSelectedValues(selectedRows);
@@ -214,6 +214,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                       item.subComponent && (
                         <GridSubComponentContext.Provider
                           value={{
+                            data,
                             value: selectedValues[`${item.value}`],
                             setValue: (value: any) => {
                               setSelectedValues({

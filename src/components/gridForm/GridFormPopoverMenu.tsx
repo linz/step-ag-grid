@@ -38,7 +38,7 @@ export interface MenuOption<RowType extends GridBaseRow> {
  * you need a useMemo around your columnDefs
  */
 export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridFormPopoutMenuProps<RowType>) => {
-  const { selectedRows, updateValue } = useGridPopoverContext<RowType>();
+  const { selectedRows, updateValue, data } = useGridPopoverContext<RowType>();
 
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MenuOption<RowType>[]>();
@@ -148,6 +148,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                       item.subComponent && (
                         <GridSubComponentContext.Provider
                           value={{
+                            data,
                             value: subSelectedValue,
                             setValue: (value: any) => {
                               setSubSelectedValue(value);

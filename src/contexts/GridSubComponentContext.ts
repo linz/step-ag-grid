@@ -2,6 +2,7 @@ import { createContext } from "react";
 
 export interface GridSubComponentContextType {
   value: any;
+  data: any;
   setValue: (value: string) => void;
   setValid: (valid: boolean) => void;
   triggerSave: () => Promise<void>;
@@ -9,6 +10,7 @@ export interface GridSubComponentContextType {
 
 export const GridSubComponentContext = createContext<GridSubComponentContextType>({
   value: "GridSubComponentContext value no context",
+  data: {},
   setValue: () => {
     console.error("GridSubComponentContext setValue no context");
   },
