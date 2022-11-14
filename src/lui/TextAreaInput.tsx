@@ -41,7 +41,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
             rows={5}
             {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
             id={id}
-            value={props.value}
+            value={props.value ?? ""}
             spellCheck={true}
             onMouseEnter={(e) => {
               if (document.activeElement != e.currentTarget) {
@@ -50,7 +50,9 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
               }
               props.onMouseEnter && props.onMouseEnter(e);
             }}
-          />
+          >
+            {props.value}
+          </textarea>
         </div>
       </label>
 

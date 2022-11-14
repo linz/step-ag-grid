@@ -43,7 +43,10 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
     },
     [field, initialValue, props, value],
   );
-  const { triggerSave, popoverWrapper } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
+    className: props.className,
+    save,
+  });
 
   return popoverWrapper(
     <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
@@ -54,7 +57,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         }}
         autoFocus={true}
         placeholder={props.placeHolder}
-        onKeyDown={(e) => e.key === "Enter" && triggerSave().then()}
+        {...onlyInputKeyboardEventHandlers}
         formatted={bearingStringValidator(value, props.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
         error={bearingStringValidator(value, props.range)}
       />

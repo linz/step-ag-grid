@@ -60,7 +60,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
     },
     [invalid, value, initValue, props, field],
   );
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, lastInputKeyboardEventHandlers } = useGridPopoverHook({ className: props.className, save });
 
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
@@ -71,7 +71,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         formatted={props.units}
         style={{ width: "100%" }}
         placeholder={props.placeholder}
-        onKeyDown={(e) => e.key === "Enter" && triggerSave().then()}
+        {...lastInputKeyboardEventHandlers}
         helpText={helpText}
       />
     </div>,

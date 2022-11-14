@@ -149,7 +149,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     [selectedValues],
   );
 
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, lastInputKeyboardEventHandlers, triggerSave } = useGridPopoverHook({
+    className: props.className,
+    save,
+  });
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
       <>
@@ -186,14 +189,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                     e.keepOpen = true;
                     toggleValue(item);
                   }}
-                  onKeyDown={async (e: KeyboardEvent) => {
-                    if (e.key === "Enter") triggerSave().then();
-                    else if (e.key === " ") {
-                      toggleValue(item);
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }
-                  }}
+                  {...lastInputKeyboardEventHandlers}
                 >
                   <LuiCheckboxInput
                     isChecked={`${item.value}` in selectedValues}

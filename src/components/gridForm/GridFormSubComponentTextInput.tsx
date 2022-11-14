@@ -55,8 +55,8 @@ export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInp
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
       autoFocus={true}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key == "Tab") {
+      onKeyUp={(e) => {
+        if (e.key === "Enter" || (e.key == "Tab" && !e.shiftKey)) {
           e.preventDefault();
           e.stopPropagation();
           triggerSave().then();

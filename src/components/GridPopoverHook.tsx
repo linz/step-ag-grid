@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, KeyboardEventHandler, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
@@ -30,6 +30,79 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
     [props.save, stopEditing, updateValue],
   );
 
+  const onlyInputKeyboardEventHandlers: {
+    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
+    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
+  } = {
+    onKeyUp: (e: KeyboardEvent) => {
+      const isTextArea = (e.currentTarget as any).type === "textarea";
+      if (e.key === "Enter" && !isTextArea) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerSave().then();
+      } else if (e.key === "Tab") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    onKeyDown: (e: KeyboardEvent) => {
+      const isTextArea = (e.currentTarget as any).type === "textarea";
+      if (e.key === "Enter" && !isTextArea) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.key === "Tab") {
+        e.preventDefault();
+        e.stopPropagation();
+        !e.shiftKey && triggerSave().then();
+      }
+    },
+  };
+  const firstInputKeyboardEventHandlers: {
+    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
+    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
+  } = {
+    onKeyUp: (e: KeyboardEvent) => {
+      if (e.key === "Tab" && e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    onKeyDown: (e: KeyboardEvent) => {
+      if (e.key === "Tab" && e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+  };
+
+  const lastInputKeyboardEventHandlers: {
+    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
+    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
+  } = {
+    onKeyUp: (e: KeyboardEvent) => {
+      const isTextArea = (e.currentTarget as any).type === "textarea";
+      if (e.key === "Enter" && !isTextArea) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerSave().then();
+      } else if (e.key === "Tab" && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    onKeyDown: (e: KeyboardEvent) => {
+      const isTextArea = (e.currentTarget as any).type === "textarea";
+      if (e.key === "Enter" && !isTextArea) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.key === "Tab" && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerSave().then();
+      }
+    },
+  };
+
   const popoverWrapper = useCallback(
     (children: JSX.Element) => {
       return (
@@ -43,6 +116,8 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               saveButtonRef={saveButtonRef}
               menuClassName={"step-ag-grid-react-menu"}
               onClose={(event: MenuCloseEvent) => {
+                // Prevent menu from closing when modals are invoked
+                if (event.reason === "blur") return;
                 triggerSave(event.reason).then();
               }}
               viewScroll={"auto"}
@@ -76,5 +151,8 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
   return {
     popoverWrapper,
     triggerSave,
+    onlyInputKeyboardEventHandlers,
+    firstInputKeyboardEventHandlers,
+    lastInputKeyboardEventHandlers,
   };
 };

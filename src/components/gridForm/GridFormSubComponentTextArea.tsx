@@ -18,7 +18,7 @@ export interface GridSubComponentTextAreaProps extends CellEditorCommon {
 export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
   const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
-  const helpText = props.helpText ?? "Press ctrl+enter or tab to save";
+  const helpText = props.helpText ?? "Press tab to save";
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
@@ -60,9 +60,11 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
         helpText={helpText}
         autoFocus={true}
         placeholder={props.placeholder}
-        onKeyDown={(e) => {
-          if ((e.key === "Enter" && e.ctrlKey) || e.key == "Tab") {
+        onKeyUp={(e) => {
+          if (e.key === "Tab" && !e.shiftKey) {
             triggerSave().then();
+            e.preventDefault();
+            e.stopPropagation();
           }
         }}
       />
