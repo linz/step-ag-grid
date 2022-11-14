@@ -68,6 +68,11 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
       editable: props.editable ?? true,
       cellEditor: GenericCellEditorComponentWrapper(custom),
     }),
+    suppressKeyboardEvent: (e) => {
+      // It's important that aggrid doesn't trigger edit on enter
+      // as the incorrect selected rows will be returned
+      return e.event.key === "Enter";
+    },
     ...(custom?.editorParams && {
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
