@@ -47,9 +47,9 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
         }}
         onKeyUp={(e) => {
           if (e.key === "Tab") {
-            !e.shiftKey && triggerSave().then();
             e.preventDefault();
             e.stopPropagation();
+            !e.shiftKey && triggerSave().then();
           }
         }}
       />
