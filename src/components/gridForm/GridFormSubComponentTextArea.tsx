@@ -60,9 +60,15 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
         helpText={helpText}
         autoFocus={true}
         placeholder={props.placeholder}
+        onKeyDown={(e) => {
+          if (e.key === "Tab") {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
         onKeyUp={(e) => {
-          if (e.key === "Tab" && !e.shiftKey) {
-            triggerSave().then();
+          if (e.key === "Tab") {
+            !e.shiftKey && triggerSave().then();
             e.preventDefault();
             e.stopPropagation();
           }

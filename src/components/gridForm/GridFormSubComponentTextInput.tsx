@@ -55,11 +55,21 @@ export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInp
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
       autoFocus={true}
-      onKeyUp={(e) => {
-        if (e.key === "Enter" || (e.key == "Tab" && !e.shiftKey)) {
+      onKeyDown={(e) => {
+        if (e.key === "Tab" || e.key === "Enter") {
           e.preventDefault();
           e.stopPropagation();
+        }
+      }}
+      onKeyUp={(e) => {
+        if (e.key === "Tab") {
+          !e.shiftKey && triggerSave().then();
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (e.key === "Enter") {
           triggerSave().then();
+          e.preventDefault();
+          e.stopPropagation();
         }
       }}
       placeholder={props.placeholder}

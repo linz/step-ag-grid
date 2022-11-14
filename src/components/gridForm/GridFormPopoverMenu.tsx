@@ -99,8 +99,8 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
         setSubComponentSelected(subComponentSelected === item ? null : item);
         e.keepOpen = true;
       } else {
-        setSubComponentSelected(null);
         actionClick(item).then();
+        e.keepOpen = true;
       }
     },
     [actionClick, subComponentSelected],
@@ -117,16 +117,13 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     if (!actionProcessing.current && subComponentSelected) {
       if (!subComponentIsValid.current) return false;
       await actionClick(subComponentSelected);
+      return false;
     }
+    // Otherwise assume it's a cancel, either way we close the menu
     return true;
   }, [actionClick, subComponentSelected]);
 
   const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
-
-  const localTriggerSave = async (reason?: string) => {
-    if (!subComponentIsValid.current) return;
-    return triggerSave(reason);
-  };
 
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions} className={"GridFormPopupMenu"}>
@@ -158,7 +155,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                             setValid: (valid: boolean) => {
                               subComponentIsValid.current = valid;
                             },
-                            triggerSave: localTriggerSave,
+                            triggerSave,
                           }}
                         >
                           <item.subComponent />
