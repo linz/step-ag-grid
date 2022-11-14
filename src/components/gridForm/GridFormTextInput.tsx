@@ -15,7 +15,7 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow> extends Tex
 }
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
-  const { field, data, value: initialVale } = useGridPopoverContext<RowType>();
+  const { field, value: initialVale } = useGridPopoverContext<RowType>();
 
   const helpText = props.helpText ?? "Press enter or tab to save";
 

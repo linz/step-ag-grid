@@ -1,7 +1,7 @@
 import "../../styles/GridFormMultiSelect.scss";
 
 import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay, fromPairs, isEqual, omit, pick, toPairs } from "lodash-es";

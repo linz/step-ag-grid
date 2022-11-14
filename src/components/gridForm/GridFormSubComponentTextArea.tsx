@@ -23,7 +23,7 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const invalid = useCallback(() => TextInputValidator(props, value), [props]);
+  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
 
   useEffect(() => {
     setValid(value != null && invalid() == null);
