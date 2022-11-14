@@ -4,15 +4,12 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
 
-export interface GridFormTextInputProps<RowType extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormTextInputProps<RowType extends GridBaseRow> extends TextInputValidatorProps, CellEditorCommon {
   placeholder?: string;
   units?: string;
-  required?: boolean;
-  maxLength?: number;
   width?: string | number;
-  // Return null for ok, otherwise an error string
-  validate?: (value: string, data: RowType) => string | null;
   onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
   helpText?: string;
 }
@@ -25,19 +22,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
   const initValue = initialVale == null ? "" : `${initialVale}`;
   const [value, setValue] = useState(initValue);
 
-  const invalid = useCallback(() => {
-    const trimmedValue = value.trim();
-    if (props.required && trimmedValue.length == 0) {
-      return `Some text is required`;
-    }
-    if (props.maxLength && trimmedValue.length > props.maxLength) {
-      return `Text must be no longer than ${props.maxLength} characters`;
-    }
-    if (props.validate) {
-      return props.validate(trimmedValue, data);
-    }
-    return null;
-  }, [data, props, value]);
+  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {

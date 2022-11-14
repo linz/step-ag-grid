@@ -3,13 +3,11 @@ import { GridSubComponentContext } from "../../contexts/GridSubComponentContext"
 import { CellEditorCommon } from "../GridCell";
 import clsx from "clsx";
 import { TextAreaInput } from "../../lui/TextAreaInput";
+import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
 
-export interface GridSubComponentTextAreaProps extends CellEditorCommon {
+export interface GridSubComponentTextAreaProps extends TextInputValidatorProps, CellEditorCommon {
   placeholder?: string;
-  required?: boolean;
-  maxLength?: number;
   width?: string | number;
-  validate?: (value: string) => string | null;
   defaultValue: string;
   className?: string;
   helpText?: string;
@@ -25,30 +23,11 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const validate = useCallback(
-    (value: string | null) => {
-      if (value == null) return null;
-      // This can happen because subcomponent is invoked without type safety
-      if (typeof value !== "string") {
-        console.error("Value is not a string", value);
-      }
-      if (props.required && value.length === 0) {
-        return `Some text is required`;
-      }
-      if (props.maxLength && value.length > props.maxLength) {
-        return `Text must be no longer than ${props.maxLength} characters`;
-      }
-      if (props.validate) {
-        return props.validate(value);
-      }
-      return null;
-    },
-    [props],
-  );
+  const invalid = useCallback(() => TextInputValidator(props, value), [props]);
 
   useEffect(() => {
-    setValid(value != null && validate(value) == null);
-  }, [setValid, validate, value]);
+    setValid(value != null && invalid() == null);
+  }, [setValid, invalid, value]);
 
   return (
     <div className={clsx("FreeTextInput LuiDeprecatedForms", props.className)}>
@@ -56,7 +35,7 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
         className={"free-text-input"}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        error={validate(value)}
+        error={invalid()}
         helpText={helpText}
         autoFocus={true}
         placeholder={props.placeholder}

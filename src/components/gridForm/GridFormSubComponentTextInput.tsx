@@ -1,15 +1,13 @@
 import { useCallback, useContext, useEffect } from "react";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
+import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
+import { CellEditorCommon } from "../GridCell";
 
-export interface GridFormSubComponentTextInputProps {
+export interface GridFormSubComponentTextInputProps extends TextInputValidatorProps, CellEditorCommon {
   placeholder?: string;
-  required?: boolean;
-  maxLength?: number;
   width?: string | number;
-  validate?: (value: string) => string | null;
   defaultValue: string;
-  className?: string;
   helpText?: string;
 }
 
@@ -23,35 +21,16 @@ export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInp
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const validate = useCallback(
-    (value: string | null) => {
-      if (value == null) return null;
-      // This can happen because subcomponent is invoked without type safety
-      if (typeof value !== "string") {
-        console.error("Value is not a string", value);
-      }
-      if (props.required && value.length === 0) {
-        return `Some text is required`;
-      }
-      if (props.maxLength && value.length > props.maxLength) {
-        return `Text must be no longer than ${props.maxLength} characters`;
-      }
-      if (props.validate) {
-        return props.validate(value);
-      }
-      return null;
-    },
-    [props],
-  );
+  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
 
   useEffect(() => {
-    setValid(value != null && validate(value) == null);
-  }, [setValid, validate, value]);
+    setValid(value != null && invalid() == null);
+  }, [setValid, invalid, value]);
 
   return (
     <TextInputFormatted
       value={value}
-      error={validate(value)}
+      error={invalid()}
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
       autoFocus={true}
