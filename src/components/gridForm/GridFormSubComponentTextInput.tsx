@@ -42,9 +42,9 @@ export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInp
       }}
       onKeyUp={(e) => {
         if (e.key === "Tab") {
-          !e.shiftKey && triggerSave().then();
           e.preventDefault();
           e.stopPropagation();
+          !e.shiftKey && triggerSave().then();
         } else if (e.key === "Enter") {
           triggerSave().then();
           e.preventDefault();
