@@ -67,17 +67,20 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
   const { stopEditing } = useContext(GridContext);
 
+  // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
+  const hasSubmitted = useRef(false);
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption<ValueType>[] | null>(null);
   const subComponentIsValid = useRef(false);
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
-  const [selectedSubComponent, setSelectedSubComponent] = useState<any>();
+  const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption<any> | null>(null);
 
   const selectItemHandler = useCallback(
     async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
-      if (subComponentValue !== undefined && !subComponentIsValid.current) return false;
+      if (hasSubmitted.current || (subComponentValue !== undefined && !subComponentIsValid.current)) return false;
+      hasSubmitted.current = true;
 
       return updateValue(async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
@@ -196,12 +199,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const save = useCallback(async () => {
     // Handler for sub-selected value
     if (!selectedSubComponent) return true;
-    if (!subComponentIsValid.current) return false;
+    if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
     await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
     return true;
   }, [selectItemHandler, selectedSubComponent, subSelectedValue]);
 
-  const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper } = useGridPopoverHook({
+    className: props.className,
+    invalid: () => !!(selectedSubComponent && !subComponentIsValid.current),
+    save,
+  });
   return popoverWrapper(
     <>
       {props.filtered && (
@@ -247,9 +254,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   onClick={(e: ClickEvent) => {
                     if (item.subComponent) {
                       if (selectedSubComponent === item) {
+                        // toggle selection off
                         setSelectedSubComponent(null);
                         subComponentIsValid.current = true;
                       } else {
+                        // toggle selection on
                         setSelectedSubComponent(item);
                       }
                       e.keepOpen = true;
@@ -259,6 +268,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   }}
                 >
                   {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                  {item.subComponent ? "..." : ""}
                 </MenuItem>
 
                 {item.subComponent && selectedSubComponent === item && (

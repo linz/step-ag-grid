@@ -7,6 +7,7 @@ import { MenuCloseEvent } from "../react-menu3/types";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
+  invalid?: () => Promise<boolean | string | null> | boolean | string | null;
   save?: (selectedRows: RowType[]) => Promise<boolean>;
 }
 
@@ -22,12 +23,25 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (reason == "cancel" || !props.save || (updateValue && (await updateValue(props.save)))) {
-        setOpen(false);
+      if (reason == "cancel") {
         stopEditing();
+        return;
+      }
+      if (props.invalid && props.invalid()) {
+        return;
+      }
+
+      if (!props.save) {
+        stopEditing();
+      } else if (props.save) {
+        // forms that don't provide an invalid fn must wait until they have saved to close
+        if (props.invalid) stopEditing();
+        if (await updateValue(props.save)) {
+          if (!props.invalid) stopEditing();
+        }
       }
     },
-    [props.save, stopEditing, updateValue],
+    [props, stopEditing, updateValue],
   );
 
   const onlyInputKeyboardEventHandlers: {
@@ -139,7 +153,13 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
                 />
               )}
               {children}
-              <button ref={saveButtonRef} onClick={() => triggerSave().then()} style={{ display: "none" }} />
+              <button
+                ref={saveButtonRef}
+                onClick={() => {
+                  triggerSave().then();
+                }}
+                style={{ display: "none" }}
+              />
             </ControlledMenu>
           )}
         </>
