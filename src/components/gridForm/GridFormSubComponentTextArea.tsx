@@ -4,8 +4,11 @@ import { CellEditorCommon } from "../GridCell";
 import clsx from "clsx";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
+import { GridBaseRow } from "../Grid";
 
-export interface GridSubComponentTextAreaProps extends TextInputValidatorProps, CellEditorCommon {
+export interface GridSubComponentTextAreaProps<RowType extends GridBaseRow>
+  extends TextInputValidatorProps<RowType>,
+    CellEditorCommon {
   placeholder?: string;
   width?: string | number;
   defaultValue: string;
@@ -13,8 +16,10 @@ export interface GridSubComponentTextAreaProps extends TextInputValidatorProps, 
   helpText?: string;
 }
 
-export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProps): JSX.Element => {
-  const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
+export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
+  props: GridSubComponentTextAreaProps<RowType>,
+): JSX.Element => {
+  const { value, data, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press tab to save";
 
@@ -23,7 +28,7 @@ export const GridFormSubComponentTextArea = (props: GridSubComponentTextAreaProp
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
+  const invalid = useCallback(() => TextInputValidator(props, value, data), [data, props, value]);
 
   useEffect(() => {
     setValid(value != null && invalid() == null);

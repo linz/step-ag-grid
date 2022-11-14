@@ -1,10 +1,16 @@
-export interface TextInputValidatorProps {
+import { GridBaseRow } from "../components/Grid";
+
+export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   required?: boolean;
   maxLength?: number;
-  validate?: (value: string) => string | null;
+  validate?: (value: string, data: RowType) => string | null;
 }
 
-export const TextInputValidator = (props: TextInputValidatorProps, value: string | null) => {
+export const TextInputValidator = <RowType extends GridBaseRow>(
+  props: TextInputValidatorProps<RowType>,
+  value: string | null,
+  data: RowType,
+) => {
   if (value == null) return null;
 
   // This can happen because subcomponent is invoked without type safety
@@ -18,7 +24,7 @@ export const TextInputValidator = (props: TextInputValidatorProps, value: string
     return `Text must be no longer than ${props.maxLength} characters`;
   }
   if (props.validate) {
-    return props.validate(value);
+    return props.validate(value, data);
   }
   return null;
 };

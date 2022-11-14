@@ -64,7 +64,7 @@ const fieldToString = (field: any) => {
 export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
-  const { selectedRows, field, updateValue } = useGridPopoverContext<RowType>();
+  const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
   const { stopEditing } = useContext(GridContext);
 
   const [filter, setFilter] = useState("");
@@ -266,6 +266,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                     {(ref: MenuInstance) => (
                       <GridSubComponentContext.Provider
                         value={{
+                          data,
                           value: subSelectedValue,
                           setValue: (value: any) => {
                             setSubSelectedValue(value);
