@@ -11,7 +11,7 @@ import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
-import { ClickEvent } from "../../react-menu3/types";
+import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
@@ -88,6 +88,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
         }
+        console.log("updateValkue", true);
         return true;
       });
     },
@@ -263,7 +264,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
                 {item.subComponent && selectedSubComponent === item && (
                   <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                    {(_: any) => (
+                    {(ref: MenuInstance) => (
                       <GridSubComponentContext.Provider
                         value={{
                           value: subSelectedValue,
@@ -273,7 +274,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                           setValid: (valid: boolean) => {
                             subComponentIsValid.current = valid;
                           },
-                          triggerSave: async () => {},
+                          triggerSave: async () => {
+                            ref.closeMenu();
+                          },
                         }}
                       >
                         {item.subComponent && (
