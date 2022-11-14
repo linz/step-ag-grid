@@ -39,10 +39,12 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { popoverWrapper, firstInputKeyboardEventHandlers, lastInputKeyboardEventHandlers } = useGridPopoverHook({
-    className: props.className,
-    save,
-  });
+  const { popoverWrapper, firstInputKeyboardEventHandlers, lastInputKeyboardEventHandlers, triggerSave } =
+    useGridPopoverHook({
+      className: props.className,
+      invalid: () => numba.length < 3,
+      save,
+    });
 
   return popoverWrapper(
     <>
@@ -50,7 +52,7 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
         <LuiAlertModal
           data-testid="WarningAlertWithButtons-modal"
           level="warning"
-          // If panel is popped out, append modal to poppped out window DOM, otherwise use default
+          // If panel is popped out, append modal to popped out window DOM, otherwise use default
           //appendToElement={() => (poppedOut && popoutElement) || document.body}
         >
           <h2>Header</h2>
@@ -73,6 +75,7 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
               level="primary"
               onClick={() => {
                 setShowModal(false);
+                triggerSave().then();
               }}
               data-testid="WarningAlertWithButtons-ok"
             >

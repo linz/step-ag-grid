@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
+import { GridContext } from "../../contexts/GridContext";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow>
   extends TextInputValidatorProps<RowType>,
@@ -17,11 +18,12 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow>
 }
 
 export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
+  const { stopEditing } = useContext(GridContext);
   const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
 
   const helpText = props.helpText ?? "Press enter or tab to save";
 
-  const initValue = initialVale == null ? "" : `${initialVale}`;
+  const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);
   const [value, setValue] = useState(initValue);
 
   const invalid = useCallback(() => TextInputValidator<RowType>(props, value, data), [data, props, value]);
@@ -29,6 +31,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (invalid()) return false;
+      stopEditing();
       const trimmedValue = value.trim();
       if (initValue === trimmedValue) return true;
 
@@ -45,9 +48,13 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
       });
       return true;
     },
-    [invalid, value, initValue, props, field],
+    [invalid, stopEditing, value, initValue, props, field],
   );
-  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
+    className: props.className,
+    invalid,
+    save,
+  });
 
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>

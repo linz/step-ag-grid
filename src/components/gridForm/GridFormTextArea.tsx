@@ -25,8 +25,6 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
-      if (invalid()) return false;
-
       if (initialVale === (value ?? "")) return true;
 
       if (props.onSave) {
@@ -42,9 +40,13 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
       });
       return true;
     },
-    [invalid, initialVale, value, props, field],
+    [initialVale, value, props, field],
   );
-  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
+    className: props.className,
+    invalid,
+    save,
+  });
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
       <TextAreaInput

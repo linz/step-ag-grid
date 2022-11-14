@@ -1,6 +1,6 @@
 import "../../styles/GridFormEditBearing.scss";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
 import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
@@ -17,14 +17,21 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
   const { field, value: initialValue } = useGridPopoverContext<RowType>();
 
-  const [value, setValue] = useState<string>(`${initialValue ?? ""}`);
+  // This clears out any scientific precision
+  const defaultValue = useMemo(
+    () => (initialValue == null ? "" : parseFloat(parseFloat(initialValue).toFixed(10)).toString()),
+    [initialValue],
+  );
+
+  const [value, setValue] = useState<string>(defaultValue);
+
+  const invalid = useCallback(() => bearingStringValidator(value, props.range), [props.range, value]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
-      if (bearingStringValidator(value)) return false;
       const parsedValue = bearingNumberParser(value);
       // Value didn't change so don't save just cancel
-      if (parsedValue === initialValue) {
+      if (parsedValue === bearingNumberParser(defaultValue)) {
         return true;
       }
 
@@ -41,17 +48,18 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
       }
       return true;
     },
-    [field, initialValue, props, value],
+    [defaultValue, field, props, value],
   );
   const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
     className: props.className,
+    invalid,
     save,
   });
 
   return popoverWrapper(
     <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
       <TextInputFormatted
-        value={value ?? ""}
+        value={defaultValue}
         onChange={(e) => {
           setValue(e.target.value.trim());
         }}
@@ -60,6 +68,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         {...onlyInputKeyboardEventHandlers}
         formatted={bearingStringValidator(value, props.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
         error={bearingStringValidator(value, props.range)}
+        helpText={"Press enter or tab to save"}
       />
     </div>,
   );

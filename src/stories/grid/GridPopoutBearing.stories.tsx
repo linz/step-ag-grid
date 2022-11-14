@@ -37,7 +37,7 @@ export default {
 
 interface ITestRow {
   id: number;
-  bearing1: number | null;
+  bearing1: string | number | null;
   bearingCorrection: number | null;
 }
 
@@ -85,8 +85,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 
   const [rowData] = useState([
     { id: 1000, bearing1: 1.234, bearingCorrection: 90 },
-    { id: 1001, bearing1: 1.565, bearingCorrection: 240 },
+    { id: 1001, bearing1: "0E-12", bearingCorrection: 240 },
     { id: 1002, bearing1: null, bearingCorrection: 355.1 },
+    { id: 1003, bearing1: null, bearingCorrection: 0 },
   ] as ITestRow[]);
 
   return (
