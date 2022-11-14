@@ -12,8 +12,9 @@ import { wait } from "../../utils/util";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
-import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
 import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
+import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
+import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 
 export default {
   title: "Components / Grids",
@@ -129,13 +130,23 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                   supportsMultiEdit: true,
                 },
                 {
-                  label: "Other",
+                  label: "Other (TextInput)",
                   supportsMultiEdit: true,
                   action: (_, menuOptionResult) => {
                     alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
                   },
                   subComponent: () => (
-                    <GridSubComponentTextArea placeholder={"Other"} maxLength={2} required defaultValue={""} />
+                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={2} required defaultValue={""} />
+                  ),
+                },
+                {
+                  label: "Other (TextArea)",
+                  supportsMultiEdit: true,
+                  action: (_, menuOptionResult) => {
+                    alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                  },
+                  subComponent: () => (
+                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={2} required defaultValue={""} />
                   ),
                 },
               ] as MenuOption<ITestRow>[];
@@ -162,6 +173,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   const [rowData] = useState([
     { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
     { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
+    { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
   ]);
 
   return (

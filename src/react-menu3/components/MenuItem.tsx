@@ -114,7 +114,10 @@ const MenuItemFr = ({
     eventHandlers.handleClick(event, isCheckBox || isRadio);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  /**
+   * Keyboard events are triggered on up, otherwise sub-components get spaces and enters typed in them
+   */
+  const handleKeyUp = (e: KeyboardEvent) => {
     if (!isHovering) return;
 
     switch (e.key) {
@@ -144,7 +147,7 @@ const MenuItemFr = ({
     {
       ...restStateProps,
       onPointerDown: setHover,
-      onKeyDown: handleKeyDown,
+      onKeyUp: handleKeyUp,
       onClick: handleClick,
     },
     restProps,

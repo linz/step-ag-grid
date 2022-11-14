@@ -258,26 +258,29 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
-            options: [
-              {
-                value: "one",
-                label: "One",
-              },
-              {
-                value: "two",
-                label: "Two",
-              },
-              {
-                value: "oth",
-                label: "Other",
-                subComponent: (props) => (
-                  <GridFormSubComponentTextInput {...props} placeholder={"Subcomponent value"} />
-                ),
-              },
-            ],
+            options: () => {
+              return [
+                {
+                  value: "one",
+                  label: "One",
+                },
+                {
+                  value: "two",
+                  label: "Two",
+                },
+                {
+                  value: "oth",
+                  label: "Other",
+                  subComponent: () => (
+                    <GridFormSubComponentTextInput placeholder={"Other..."} defaultValue={""} required={true} />
+                  ),
+                },
+              ];
+            },
             onSelectedItem: async (selected) => {
               // eslint-disable-next-line no-console
               console.log("onSelectedItem", selected);
+              selected.selectedRows.forEach((row) => (row.sub = selected.subComponentValue ?? selected.value));
             },
           },
         },

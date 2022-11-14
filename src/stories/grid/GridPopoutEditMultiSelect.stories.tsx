@@ -10,7 +10,7 @@ import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { wait } from "../../utils/util";
-import { GridSubComponentTextArea } from "../../components/GridSubComponentTextArea";
+import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
 import { partition } from "lodash-es";
@@ -81,7 +81,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               {
                 value: "other",
                 label: "Other",
-                subComponent: () => <GridSubComponentTextArea maxLength={5} defaultValue={""} />,
+                subComponent: () => <GridFormSubComponentTextArea maxLength={5} defaultValue={""} />,
               },
             ],
             initialSelectedValues: () => ({

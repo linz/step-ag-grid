@@ -1,67 +1,60 @@
-import "../../styles/GridFormSubComponentTextInput.scss";
-
-import { useState, KeyboardEvent } from "react";
+import { useCallback, useContext, useEffect } from "react";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
+import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
+import { CellEditorCommon } from "../GridCell";
 
-export interface GridFormSubComponentTextInput {
-  setValue: (value: string) => void;
-  keyDown: (key: string, event: KeyboardEvent<HTMLInputElement>) => void;
+export interface GridFormSubComponentTextInputProps extends TextInputValidatorProps, CellEditorCommon {
   placeholder?: string;
-  className?: string;
-  customHelpText?: string;
+  width?: string | number;
+  defaultValue: string;
+  helpText?: string;
 }
 
-export const GridFormSubComponentTextInput = ({
-  keyDown,
-  placeholder,
-  setValue,
-  className,
-  customHelpText,
-}: GridFormSubComponentTextInput) => {
-  const placeholderText = placeholder || "Other...";
-  const helpText = customHelpText || "Press enter or tab to save";
+export const GridFormSubComponentTextInput = (props: GridFormSubComponentTextInputProps): JSX.Element => {
+  const { value, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
 
-  const inputClass = className || "GridFormSubComponentTextInput-full-width-input";
-  const [inputValue, setInputValue] = useState("");
+  const helpText = props.helpText ?? "Press enter or tab to save";
+
+  // If is not initialised yet as it's just been created then set the default value
+  useEffect(() => {
+    if (value == null) setValue(props.defaultValue);
+  }, [props.defaultValue, setValue, value]);
+
+  const invalid = useCallback(() => TextInputValidator(props, value), [props, value]);
+
+  useEffect(() => {
+    setValid(value != null && invalid() == null);
+  }, [setValid, invalid, value]);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        padding: 0,
+    <TextInputFormatted
+      value={value}
+      error={invalid()}
+      onChange={(e) => setValue(e.target.value)}
+      helpText={helpText}
+      autoFocus={true}
+      onKeyDown={(e) => {
+        if (e.key === "Tab" || e.key === "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }}
-    >
-      <TextInputFormatted
-        className={inputClass}
-        value={inputValue}
-        onChange={(e) => {
-          const value = e.target.value;
-          setValue(value);
-          setInputValue(value);
-        }}
-        inputProps={{
-          onKeyDown: (e) => {
-            return keyDown(e.key, e);
-          },
-          placeholder: placeholderText,
-          onMouseEnter: (e) => {
-            if (document.activeElement != e.currentTarget) {
-              e.currentTarget.focus();
-            }
-          },
-          style: {
-            width: "100%",
-          },
-        }}
-      />
-      <span
-        style={{
-          fontSize: "0.7rem",
-        }}
-      >
-        {helpText}
-      </span>
-    </div>
+      onKeyUp={(e) => {
+        if (e.key === "Tab") {
+          !e.shiftKey && triggerSave().then();
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (e.key === "Enter") {
+          triggerSave().then();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      placeholder={props.placeholder}
+      style={{
+        width: "100%",
+      }}
+    />
   );
 };

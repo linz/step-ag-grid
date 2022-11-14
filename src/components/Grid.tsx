@@ -202,7 +202,7 @@ export const Grid = (params: GridProps): JSX.Element => {
     [startCellEditing],
   );
 
-  const onCellKeyDown = useCallback(
+  const onCellKeyPress = useCallback(
     (e: CellEvent) => {
       if ((e.event as KeyboardEvent).key === "Enter") startCellEditing(e);
     },
@@ -254,7 +254,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         onFirstDataRendered={sizeColumnsToFit}
         onGridSizeChanged={sizeColumnsToFit}
         suppressClickEdit={true}
-        onCellKeyDown={onCellKeyDown}
+        onCellKeyPress={onCellKeyPress}
         onCellClicked={onCellClicked}
         onCellDoubleClicked={onCellDoubleClick}
         onCellEditingStarted={refreshSelectedRows}

@@ -1,55 +1,36 @@
 import "./TextInputFormatted.scss";
 
-import {
-  ChangeEventHandler,
-  DetailedHTMLProps,
-  FocusEventHandler,
-  InputHTMLAttributes,
-  MouseEventHandler,
-} from "react";
+import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
 import clsx from "clsx";
 import { LuiIcon } from "@linzjs/lui";
+import { omit } from "lodash-es";
 
-export interface LuiTextInputProps {
-  onChange?: ChangeEventHandler<HTMLInputElement>;
-  onFocus?: FocusEventHandler<HTMLInputElement>;
-  onClick?: MouseEventHandler<HTMLInputElement>;
-  inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-  error?: string | boolean | null;
-  warning?: string | boolean | null;
-
-  className?: string;
+export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+  // overrides value in base class to be string type only
   value: string;
 
-  placeholder?: string;
+  // Custom fields
+  helpText?: string;
+  error?: string | boolean | null;
   formatted?: string;
 }
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
   return (
-    <div
-      className={clsx(
-        "LuiTextInput Grid-popoverContainer",
-        props.error && "hasError",
-        props.warning && "hasWarning",
-        props.className,
-      )}
-    >
+    <div className={clsx("LuiTextInput Grid-popoverContainer", props.error && "hasError", props.className)}>
       <span className="LuiTextInput-inputWrapper">
+        {/* wrapper div used for error styling */}
         <input
           type={"text"}
-          className={"LuiTextInput-input"}
-          min="0"
           spellCheck={true}
           defaultValue={props.value}
-          onChange={props.onChange}
-          onFocus={props.onFocus}
-          onClick={props.onClick}
+          {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
+          className={"LuiTextInput-input"}
           onMouseEnter={(e) => {
             e.currentTarget.focus();
+            props.onMouseEnter && props.onMouseEnter(e);
           }}
-          {...props.inputProps}
         />
         <span className={"LuiTextInput-formatted"}>{props.formatted}</span>
       </span>
@@ -61,10 +42,13 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
         </span>
       )}
 
-      {props.warning && (
-        <span className="LuiTextInput-warning">
-          <LuiIcon alt="warning" name="ic_warning" className="LuiTextInput-warning-icon" size="sm" status="warning" />
-          {props.warning}
+      {props.helpText && !props.error && (
+        <span
+          style={{
+            fontSize: "0.7rem",
+          }}
+        >
+          {props.helpText}
         </span>
       )}
     </div>
