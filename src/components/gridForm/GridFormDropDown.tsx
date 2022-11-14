@@ -77,6 +77,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
   const selectItemHandler = useCallback(
     async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
+      if (subComponentValue !== undefined && !subComponentIsValid.current) return false;
+
       return updateValue(async (selectedRows) => {
         const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
         if (hasChanged) {
@@ -190,7 +192,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     },
     [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
   );
-  const { popoverWrapper } = useGridPopoverHook({ className: props.className });
+
+  const save = useCallback(async () => {
+    // Handler for sub-selected value
+    if (!selectedSubComponent) return true;
+    if (!subComponentIsValid.current) return false;
+    await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+    return true;
+  }, [selectItemHandler, selectedSubComponent, subSelectedValue]);
+
+  const { popoverWrapper } = useGridPopoverHook({ className: props.className, save });
   return popoverWrapper(
     <>
       {props.filtered && (
@@ -235,7 +246,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   value={item.value}
                   onClick={(e: ClickEvent) => {
                     if (item.subComponent) {
-                      setSelectedSubComponent(item);
+                      if (selectedSubComponent === item) {
+                        setSelectedSubComponent(null);
+                        subComponentIsValid.current = true;
+                      } else {
+                        setSelectedSubComponent(item);
+                      }
                       e.keepOpen = true;
                     } else {
                       selectItemHandler(item.value as ValueType).then();
@@ -247,7 +263,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
 
                 {item.subComponent && selectedSubComponent === item && (
                   <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                    {(ref: any) => (
+                    {(_: any) => (
                       <GridSubComponentContext.Provider
                         value={{
                           value: subSelectedValue,
@@ -257,12 +273,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                           setValid: (valid: boolean) => {
                             subComponentIsValid.current = valid;
                           },
-                          triggerSave: async () => {
-                            selectItemHandler(item.value as ValueType, subSelectedValue).then(() => {
-                              ref.closeMenu();
-                              return true;
-                            });
-                          },
+                          triggerSave: async () => {},
                         }}
                       >
                         {item.subComponent && (
