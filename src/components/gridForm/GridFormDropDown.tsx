@@ -92,7 +92,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
           }
         }
         return true;
-      });
+      }, false);
     },
     [field, props, updateValue],
   );
@@ -102,7 +102,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       updateValue(async (selectedRows) => {
         props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
         return true;
-      }),
+      }, false),
     [props, updateValue],
   );
 

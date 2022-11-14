@@ -6,6 +6,7 @@ import { wait } from "../../utils/util";
 import { CellEditorCommon } from "../../components/GridCell";
 import { useGridPopoverHook } from "../../components/GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { FormError } from "../../lui/FormError";
 
 export interface IFormTestRow {
   id: number;
@@ -37,12 +38,17 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
     [nameType, numba],
   );
 
+  const invalid = useCallback(() => {
+    if (numba.length < 3) return "Number should be at least 3 characters";
+    return null;
+  }, [numba.length]);
+
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const { popoverWrapper, firstInputKeyboardEventHandlers, lastInputKeyboardEventHandlers, triggerSave } =
     useGridPopoverHook({
       className: props.className,
-      invalid: () => numba.length < 3,
+      invalid,
       save,
     });
 
@@ -84,26 +90,31 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
           </LuiAlertModalButtons>
         </LuiAlertModal>
       )}
-      <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest Grid-popoverContainer"}>
-        <div className={"FormTest-textInput"}>
-          <LuiTextInput
-            label={"Name type"}
-            value={nameType}
-            onChange={(e) => setNameType(e.target.value)}
-            inputProps={firstInputKeyboardEventHandlers}
-          />
+      <div className={"Grid-popoverContainer"}>
+        <div className="FormTest">
+          <div className={"FormTest-textInput"}>
+            <LuiTextInput
+              label={"Name type"}
+              value={nameType}
+              onChange={(e) => setNameType(e.target.value)}
+              inputProps={firstInputKeyboardEventHandlers}
+            />
+          </div>
+          <div className={"FormTest-textInput"}>
+            <LuiTextInput
+              label={"Number"}
+              value={numba}
+              onChange={(e) => setNumba(e.target.value)}
+              inputProps={lastInputKeyboardEventHandlers}
+            />
+          </div>
+          <div style={{ marginTop: 25 }}>
+            <LuiButton style={{ height: 48 }} onClick={() => setShowModal(true)}>
+              Show Modal
+            </LuiButton>
+          </div>
         </div>
-        <div className={"FormTest-textInput"}>
-          <LuiTextInput
-            label={"Number"}
-            value={numba}
-            onChange={(e) => setNumba(e.target.value)}
-            inputProps={lastInputKeyboardEventHandlers}
-          />
-        </div>
-        <div className={"FormTest-textInput"}>
-          <LuiButton onClick={() => setShowModal(true)}>Show Modal</LuiButton>
-        </div>
+        <FormError error={invalid()} />
       </div>
     </>,
   );

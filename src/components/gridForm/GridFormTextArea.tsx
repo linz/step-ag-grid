@@ -42,11 +42,13 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
     },
     [initialVale, value, props, field],
   );
+
   const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
     className: props.className,
     invalid,
     save,
   });
+
   return popoverWrapper(
     <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
       <TextAreaInput

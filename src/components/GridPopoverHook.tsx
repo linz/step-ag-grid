@@ -36,7 +36,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       } else if (props.save) {
         // forms that don't provide an invalid fn must wait until they have saved to close
         if (props.invalid) stopEditing();
-        if (await updateValue(props.save)) {
+        if (await updateValue(props.save, reason === "Tab")) {
           if (!props.invalid) stopEditing();
         }
       }
@@ -71,7 +71,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       } else if (e.key === "Tab") {
         e.preventDefault();
         e.stopPropagation();
-        !e.shiftKey && triggerSave().then();
+        !e.shiftKey && triggerSave("Tab").then();
       }
     },
   };
@@ -118,7 +118,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       } else if (e.key === "Tab" && !e.shiftKey) {
         e.preventDefault();
         e.stopPropagation();
-        triggerSave().then();
+        triggerSave("Tab").then();
       }
     },
   };

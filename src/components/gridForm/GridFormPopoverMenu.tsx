@@ -86,7 +86,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
         await (menuOption.action ?? defaultAction)(selectedRows, result);
         actionProcessing.current = false;
         return true;
-      });
+      }, false);
     },
     [defaultAction, selectedRows, subSelectedValue, updateValue],
   );

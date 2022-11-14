@@ -25,6 +25,7 @@ export interface GridContextType {
     setSaving?: (saving: boolean) => void,
   ) => Promise<boolean>;
   redrawRows: (rowNodes?: RowNode[]) => void;
+  selectNextCell: () => void;
 }
 
 export const GridContext = createContext<GridContextType>({
@@ -86,5 +87,8 @@ export const GridContext = createContext<GridContextType>({
   },
   redrawRows: () => {
     console.error("no context provider for redrawRows");
+  },
+  selectNextCell: () => {
+    console.error("no context provider for selectNextCell");
   },
 });
