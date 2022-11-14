@@ -88,7 +88,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
             selectedRows.forEach((row) => (row[field as keyof RowType] = value));
           }
         }
-        console.log("updateValkue", true);
         return true;
       });
     },
