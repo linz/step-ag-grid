@@ -123,7 +123,11 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     return true;
   }, [actionClick, subComponentSelected]);
 
-  const { popoverWrapper, triggerSave } = useGridPopoverHook({ className: props.className, save });
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({
+    className: props.className,
+    invalid: () => subComponentSelected && !subComponentIsValid.current,
+    save,
+  });
 
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!filteredOptions} className={"GridFormPopupMenu"}>
