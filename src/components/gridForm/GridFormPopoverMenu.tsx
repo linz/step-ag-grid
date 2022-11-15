@@ -100,7 +100,6 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
         e.keepOpen = true;
       } else {
         actionClick(item).then();
-        e.keepOpen = true;
       }
     },
     [actionClick, subComponentSelected],
