@@ -114,6 +114,14 @@ const MenuItemFr = ({
     eventHandlers.handleClick(event, isCheckBox || isRadio);
   };
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // if tab is allowed the handleKeyUp event can't process the tab
+    if (e.key === "Tab") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   /**
    * Keyboard events are triggered on up, otherwise sub-components get spaces and enters typed in them
    */
@@ -122,7 +130,10 @@ const MenuItemFr = ({
 
     switch (e.key) {
       case Keys.ENTER:
+      case Keys.TAB:
       case Keys.SPACE:
+        e.preventDefault();
+        e.stopPropagation();
         if (isAnchor) {
           menuItemRef?.current && menuItemRef.current.click();
         } else {
@@ -147,6 +158,7 @@ const MenuItemFr = ({
     {
       ...restStateProps,
       onPointerDown: setHover,
+      onKeyDown: handleKeyDown,
       onKeyUp: handleKeyUp,
       onClick: handleClick,
     },

@@ -19,7 +19,7 @@ export interface GridSubComponentTextAreaProps<RowType extends GridBaseRow>
 export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
   props: GridSubComponentTextAreaProps<RowType>,
 ): JSX.Element => {
-  const { value, data, setValue, setValid, triggerSave } = useContext(GridSubComponentContext);
+  const { value, data, setValue, setValid } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press tab to save";
 
@@ -44,19 +44,6 @@ export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
         helpText={helpText}
         autoFocus={true}
         placeholder={props.placeholder}
-        onKeyDown={(e) => {
-          if (e.key === "Tab") {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }}
-        onKeyUp={(e) => {
-          if (e.key === "Tab") {
-            e.preventDefault();
-            e.stopPropagation();
-            !e.shiftKey && triggerSave().then();
-          }
-        }}
       />
     </div>
   );

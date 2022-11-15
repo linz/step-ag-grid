@@ -45,12 +45,11 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
 
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { popoverWrapper, firstInputKeyboardEventHandlers, lastInputKeyboardEventHandlers, triggerSave } =
-    useGridPopoverHook({
-      className: props.className,
-      invalid,
-      save,
-    });
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({
+    className: props.className,
+    invalid,
+    save,
+  });
 
   return popoverWrapper(
     <>
@@ -93,20 +92,10 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
       <div className={"Grid-popoverContainer"}>
         <div className="FormTest">
           <div className={"FormTest-textInput"}>
-            <LuiTextInput
-              label={"Name type"}
-              value={nameType}
-              onChange={(e) => setNameType(e.target.value)}
-              inputProps={firstInputKeyboardEventHandlers}
-            />
+            <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
           </div>
           <div className={"FormTest-textInput"}>
-            <LuiTextInput
-              label={"Number"}
-              value={numba}
-              onChange={(e) => setNumba(e.target.value)}
-              inputProps={lastInputKeyboardEventHandlers}
-            />
+            <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
           </div>
           <div style={{ marginTop: 25 }}>
             <LuiButton style={{ height: 48 }} onClick={() => setShowModal(true)}>

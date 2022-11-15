@@ -50,7 +50,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
     },
     [invalid, stopEditing, value, initValue, props, field],
   );
-  const { popoverWrapper, onlyInputKeyboardEventHandlers } = useGridPopoverHook({
+  const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid,
     save,
@@ -65,7 +65,6 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         formatted={props.units}
         style={{ width: "100%" }}
         placeholder={props.placeholder}
-        {...onlyInputKeyboardEventHandlers}
         helpText={helpText}
       />
     </div>,

@@ -1,7 +1,7 @@
 import "../../styles/GridFormDropDown.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { KeyboardEvent, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridContext } from "../../contexts/GridContext";
@@ -176,39 +176,37 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     }
   }, [filter, props, researchOnFilterChange]);
 
-  const onFilterKeyDown = useCallback(
-    async (e: KeyboardEvent) => {
-      if (!options) return;
-      if (e.key == "Enter" || e.key == "Tab") {
-        const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
-        if (activeOptions.length == 1) {
-          await selectItemHandler(activeOptions[0].value);
-          stopEditing();
-        } else if (props.onSelectFilter) {
-          await selectFilterHandler(filter);
-          stopEditing();
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }
-    },
-    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
-  );
-
   const save = useCallback(async () => {
-    // Handler for sub-selected value
-    if (!selectedSubComponent) return true;
-    if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
-    await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+    if (!options) return true;
+    const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
+    if (activeOptions.length === 1) {
+      await selectItemHandler(activeOptions[0].value);
+    } else if (activeOptions.length === 0 && props.onSelectFilter) {
+      await selectFilterHandler(filter);
+    } else {
+      // Handler for sub-selected value
+      if (!selectedSubComponent) return true;
+      if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
+      await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+    }
     return true;
-  }, [selectItemHandler, selectedSubComponent, subSelectedValue]);
+  }, [
+    filter,
+    filteredValues,
+    options,
+    props.onSelectFilter,
+    selectFilterHandler,
+    selectItemHandler,
+    selectedSubComponent,
+    subSelectedValue,
+  ]);
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid: () => !!(selectedSubComponent && !subComponentIsValid.current),
     save,
   });
+
   return popoverWrapper(
     <>
       {props.filtered && (
@@ -226,7 +224,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   onChange={(e) => setFilter(e.target.value.toLowerCase())}
-                  onKeyDown={(e) => onFilterKeyDown(e)}
                 />
               </div>
             )}

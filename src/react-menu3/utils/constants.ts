@@ -21,6 +21,7 @@ export interface RMEvent {
 
 export const Keys = Object.freeze({
   ENTER: "Enter",
+  TAB: "Tab",
   ESC: "Escape",
   SPACE: " ",
   HOME: "Home",
@@ -47,6 +48,7 @@ export const CloseReason = Object.freeze({
   CANCEL: "cancel",
   BLUR: "blur",
   SCROLL: "scroll",
+  TAB: "tab",
 });
 
 export const FocusPositions = Object.freeze({
