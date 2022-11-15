@@ -109,7 +109,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     alert(`Single-edit: ${selectedRows.length} rows`);
                     await wait(1500);
                   },
-                  supportsMultiEdit: false,
+                  disabled: selectedItems.length > 1,
                 },
                 {
                   label: "Multi-edit",
@@ -117,21 +117,17 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     alert(`Multi-edit: ${selectedRows.length} rows`);
                     await wait(1500);
                   },
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Disabled item",
                   disabled: "Disabled for test",
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Developer Only",
                   hidden: selectedItems.some((x) => x.position != "Developer"),
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Other (TextInput)",
-                  supportsMultiEdit: true,
                   action: async (_, menuOptionResult) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);

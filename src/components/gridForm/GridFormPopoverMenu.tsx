@@ -28,7 +28,6 @@ export interface MenuOption<RowType extends GridBaseRow> {
   label: JSX.Element | string | MenuSeparatorType;
   action?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
   disabled?: string | boolean;
-  supportsMultiEdit: boolean;
   hidden?: boolean;
   subComponent?: (props: any) => JSX.Element;
 }
@@ -105,12 +104,6 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     [actionClick, subComponentSelected],
   );
 
-  const selectedRowCount = selectedRows.length;
-
-  const filteredOptions = options?.filter((menuOption) => {
-    return menuOption.label === PopoutMenuSeparator || selectedRowCount === 1 || menuOption.supportsMultiEdit;
-  });
-
   const save = useCallback(async () => {
     // if a subcomponent is open we assume that it's meant to be saved.
     if (!actionProcessing.current && subComponentSelected) {
@@ -129,7 +122,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   });
 
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={!filteredOptions} className={"GridFormPopupMenu"}>
+    <ComponentLoadingWrapper loading={!options} className={"GridFormPopupMenu"}>
       <>
         {options?.map((item, index) =>
           item.label === PopoutMenuSeparator ? (
@@ -140,7 +133,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                 <MenuItem
                   key={`${item.label}`}
                   onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
-                  disabled={!!item.disabled || !filteredOptions?.includes(item)}
+                  disabled={!!item.disabled}
                   title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                 >
                   {item.label as JSX.Element | string}
