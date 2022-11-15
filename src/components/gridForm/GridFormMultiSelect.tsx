@@ -61,6 +61,11 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
 
+  const invalid = useCallback(() => {
+    const validations = pick(subComponentIsValid.current, Object.keys(selectedValues));
+    return Object.values(validations).some((v) => !v);
+  }, [selectedValues]);
+
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (props.onSave) {
@@ -149,10 +154,12 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     [selectedValues],
   );
 
-  const { popoverWrapper, lastInputKeyboardEventHandlers, triggerSave } = useGridPopoverHook({
-    className: props.className,
-    save,
-  });
+  const { popoverWrapper, lastInputKeyboardEventHandlers, onlyInputKeyboardEventHandlers, triggerSave } =
+    useGridPopoverHook({
+      className: props.className,
+      invalid,
+      save,
+    });
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
       <>
@@ -201,6 +208,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
                         e.stopPropagation();
                         return false;
                       },
+                      ...onlyInputKeyboardEventHandlers,
                     }}
                     onChange={() => {
                       /*Do nothing, change handled by menuItem*/
