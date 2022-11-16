@@ -156,7 +156,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       ),
       GridPopoverMenu(
         {
-          editable: false,
+          editable: true,
         },
         {
           editorParams: {

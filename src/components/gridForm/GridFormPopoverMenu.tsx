@@ -78,27 +78,27 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   }, [options, props.defaultAction, props.options, selectedRows]);
 
   const actionClick = useCallback(
-    async (menuOption: MenuOption<RowType>) => {
+    async (menuOption: MenuOption<RowType>, reason: string) => {
       actionProcessing.current = true;
       return updateValue(async () => {
         const result = { ...menuOption, subValue: subSelectedValue };
         await (menuOption.action ?? defaultAction)(selectedRows, result);
         actionProcessing.current = false;
         return true;
-      }, false);
+      }, reason === "tab");
     },
     [defaultAction, selectedRows, subSelectedValue, updateValue],
   );
 
   const onMenuItemClick = useCallback(
-    (e: ClickEvent, item: MenuOption<RowType>) => {
+    async (e: ClickEvent, item: MenuOption<RowType>) => {
       if (item.subComponent) {
         subComponentIsValid.current = false;
         setSubSelectedValue(null);
         setSubComponentSelected(subComponentSelected === item ? null : item);
         e.keepOpen = true;
       } else {
-        actionClick(item).then();
+        await actionClick(item, e.key === "Tab" ? "tab" : "click").then();
       }
     },
     [actionClick, subComponentSelected],
@@ -108,8 +108,8 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
     // if a subcomponent is open we assume that it's meant to be saved.
     if (!actionProcessing.current && subComponentSelected) {
       if (!subComponentIsValid.current) return false;
-      await actionClick(subComponentSelected);
-      return false;
+      await actionClick(subComponentSelected, "click");
+      return true;
     }
     // Otherwise assume it's a cancel, either way we close the menu
     return true;

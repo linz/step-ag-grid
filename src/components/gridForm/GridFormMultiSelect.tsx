@@ -192,8 +192,11 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
               <div key={`${index}`}>
                 <MenuItem
                   onClick={(e: ClickEvent) => {
-                    e.keepOpen = true;
-                    toggleValue(item);
+                    // Global react-menu MenuItem handler handles tabs
+                    if (e.key !== "Tab") {
+                      e.keepOpen = true;
+                      toggleValue(item);
+                    }
                   }}
                 >
                   <LuiCheckboxInput
