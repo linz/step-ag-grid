@@ -125,7 +125,7 @@ export const ControlledMenuFr = (
         return;
       }
 
-      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
+      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea,button");
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
       inputEls = inputEls.filter((el) => !(el as any).disabled);
@@ -144,6 +144,7 @@ export const ControlledMenuFr = (
 
       const isTextArea = activeElement.nodeName === "TEXTAREA";
       switch (activeElement.nodeName) {
+        case "BUTTON":
         case "TEXTAREA":
         case "INPUT": {
           if (activeElement === lastInputEl && activeElement === firstInputEl) {
@@ -221,8 +222,8 @@ export const ControlledMenuFr = (
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
       thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
-        thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
-        thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
+        thisDocument.removeEventListener("keydown", handleKeydownTabAndEnter, true);
+        thisDocument.removeEventListener("keyup", handleKeyupTabAndEnter, true);
         thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
         thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
