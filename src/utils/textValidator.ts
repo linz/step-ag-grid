@@ -4,7 +4,7 @@ export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   required?: boolean;
   maxLength?: number;
   maxBytes?: number;
-  validate?: (value: string, data: RowType) => string | null;
+  invalid?: (value: string, data: RowType) => string | null;
 }
 
 export const TextInputValidator = <RowType extends GridBaseRow>(
@@ -27,8 +27,8 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
   if (props.maxBytes && new TextEncoder().encode(value).length > props.maxBytes) {
     return `Text must be no longer than ${props.maxLength} bytes`;
   }
-  if (props.validate) {
-    return props.validate(value, data);
+  if (props.invalid) {
+    return props.invalid(value, data);
   }
   return null;
 };

@@ -63,7 +63,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             required: true,
             maxLength: 12,
             placeholder: "Enter some text...",
-            validate: (value: string) => {
+            invalid: (value: string) => {
               if (value === "never") return "The value 'never' is not allowed";
               return null;
             },
@@ -91,7 +91,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             maxLength: 12,
             placeholder: "Enter distance...",
             units: "m",
-            validate: (value: string) => {
+            invalid: (value: string) => {
               if (value.length && !isFloat(value)) return "Value must be a number";
               return null;
             },
@@ -118,7 +118,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             maxLength: 32,
             placeholder: "Enter some text...",
 
-            validate: (value: string) => {
+            invalid: (value: string) => {
               if (value === "never") return "The value 'never' is not allowed";
               return null;
             },

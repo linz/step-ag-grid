@@ -223,8 +223,8 @@ export const ControlledMenuFr = (
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
       thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
-        thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
-        thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
+        thisDocument.removeEventListener("keydown", handleKeydownTabAndEnter, true);
+        thisDocument.removeEventListener("keyup", handleKeyupTabAndEnter, true);
         thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
         thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
