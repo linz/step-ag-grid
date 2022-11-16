@@ -264,7 +264,13 @@ export const ControlledMenuFr = (
           safeCall(onClose, {
             value: event.value,
             key: event.key,
-            reason: CloseReason.CLICK,
+            shiftKey: event.shiftKey,
+            reason:
+              event.key === "Tab"
+                ? event.shiftKey
+                  ? CloseReason.TAB_BACKWARD
+                  : CloseReason.TAB_FORWARD
+                : CloseReason.CLICK,
           });
         }
       },
