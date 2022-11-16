@@ -98,9 +98,7 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
             <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
           </div>
           <div style={{ marginTop: 25 }}>
-            <LuiButton style={{ height: 48 }} onClick={() => setShowModal(true)}>
-              Show Modal
-            </LuiButton>
+            <input type="button" style={{ height: 48 }} onClick={() => setShowModal(true)} value="Show Modal" />
           </div>
         </div>
         <FormError error={invalid()} />

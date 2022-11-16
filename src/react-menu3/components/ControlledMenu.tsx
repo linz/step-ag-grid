@@ -125,11 +125,11 @@ export const ControlledMenuFr = (
         return;
       }
 
-      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea,button");
+      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
+      
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
       inputEls = inputEls.filter((el) => !(el as any).disabled);
-
       if (inputEls.length === 0) return;
       const firstInputEl = inputEls[0];
       const lastInputEl = inputEls[inputEls.length - 1];
@@ -141,10 +141,10 @@ export const ControlledMenuFr = (
         saveButtonRef.current?.setAttribute("data-reason", reason);
         saveButtonRef?.current?.click();
       };
-
+      
       const isTextArea = activeElement.nodeName === "TEXTAREA";
+      const isButton = activeElement.attributes.getNamedItem("type")?.value == "button";
       switch (activeElement.nodeName) {
-        case "BUTTON":
         case "TEXTAREA":
         case "INPUT": {
           if (activeElement === lastInputEl && activeElement === firstInputEl) {
@@ -159,7 +159,7 @@ export const ControlledMenuFr = (
                   invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
               }
             }
-            if (ev.key === "Enter" && !isTextArea) {
+            if (ev.key === "Enter" && !isTextArea && !isButton) {
               ev.preventDefault();
               ev.stopPropagation();
               if (isDown) {
@@ -180,7 +180,7 @@ export const ControlledMenuFr = (
                 lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_FORWARD);
               }
             }
-            if (ev.key === "Enter" && !isTextArea) {
+            if (ev.key === "Enter" && !isTextArea && !isButton) {
               ev.preventDefault();
               ev.stopPropagation();
               if (isDown) {
