@@ -1,4 +1,4 @@
-import { Ref, useContext, useMemo } from "react";
+import { KeyboardEvent, Ref, useContext, useMemo } from "react";
 import { useBEM, useItemState, useCombinedRef } from "../hooks";
 import { mergeProps, commonProps, safeCall, menuClass, menuItemClass, withHovering, Keys, RMEvent } from "../utils";
 import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
@@ -106,12 +106,25 @@ const MenuItemFr = ({
       value,
       syntheticEvent: e,
     };
-    if (e.key !== undefined) event.key = e.key;
+
+    if (e.key !== undefined) {
+      const ke = e as KeyboardEvent;
+      event.key = ke.key;
+      event.shiftKey = ke.shiftKey;
+    }
     if (isCheckBox) event.checked = !isChecked;
     if (isRadio) event.name = radioGroup.name;
     safeCall(onClick, event);
     if (isRadio) safeCall(radioGroup.onRadioChange, event);
     eventHandlers.handleClick(event, isCheckBox || isRadio);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // if tab is allowed the handleKeyUp event can't process the tab
+    if (e.key === "Tab") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
 
   /**
@@ -122,7 +135,10 @@ const MenuItemFr = ({
 
     switch (e.key) {
       case Keys.ENTER:
+      case Keys.TAB:
       case Keys.SPACE:
+        e.preventDefault();
+        e.stopPropagation();
         if (isAnchor) {
           menuItemRef?.current && menuItemRef.current.click();
         } else {
@@ -147,6 +163,7 @@ const MenuItemFr = ({
     {
       ...restStateProps,
       onPointerDown: setHover,
+      onKeyDown: handleKeyDown,
       onKeyUp: handleKeyUp,
       onClick: handleClick,
     },

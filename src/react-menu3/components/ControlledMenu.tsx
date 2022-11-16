@@ -1,14 +1,4 @@
-import {
-  forwardRef,
-  useRef,
-  useMemo,
-  useCallback,
-  useEffect,
-  KeyboardEvent,
-  FocusEvent,
-  MutableRefObject,
-  ForwardedRef,
-} from "react";
+import { forwardRef, useRef, useMemo, useCallback, useEffect, FocusEvent, MutableRefObject, ForwardedRef } from "react";
 import { createPortal } from "react-dom";
 import { MenuList } from "./MenuList";
 import { useBEM } from "../hooks";
@@ -120,14 +110,119 @@ export const ControlledMenuFr = (
     [isWithinMenu],
   );
 
+  const lastTabDownEl = useRef<Element>();
+  const lastEnterDownEl = useRef<Element>();
+  const handleKeyboardTabAndEnter = useCallback(
+    (isDown: boolean) => (ev: KeyboardEvent) => {
+      const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
+      const activeElement = thisDocument.activeElement;
+      if (!anchorRef?.current || !activeElement) return;
+      if (ev.key !== "Tab" && ev.key !== "Enter") return;
+
+      if (ev.repeat) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        return;
+      }
+
+      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
+      let inputEls: HTMLElement[] = [];
+      inputElsIterator.forEach((el) => inputEls.push(el));
+      inputEls = inputEls.filter((el) => !(el as any).disabled);
+
+      if (inputEls.length === 0) return;
+      const firstInputEl = inputEls[0];
+      const lastInputEl = inputEls[inputEls.length - 1];
+      if (activeElement !== firstInputEl && activeElement !== lastInputEl) return;
+
+      const suppressAutoSaveEvents = activeElement.getAttribute("data-suppressAutoSaveEvents");
+      const invokeSave = (reason: string) => {
+        if (!saveButtonRef?.current || suppressAutoSaveEvents) return;
+        saveButtonRef.current?.setAttribute("data-reason", reason);
+        saveButtonRef?.current?.click();
+      };
+
+      const isTextArea = activeElement.nodeName === "TEXTAREA";
+      switch (activeElement.nodeName) {
+        case "TEXTAREA":
+        case "INPUT": {
+          if (activeElement === lastInputEl && activeElement === firstInputEl) {
+            if (ev.key === "Tab") {
+              // Can't forward/backwards tab out of popup
+              ev.preventDefault();
+              ev.stopPropagation();
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement &&
+                  invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
+              }
+            }
+            if (ev.key === "Enter" && !isTextArea) {
+              ev.preventDefault();
+              ev.stopPropagation();
+              if (isDown) {
+                lastEnterDownEl.current = activeElement;
+              } else {
+                lastEnterDownEl.current == activeElement && invokeSave(CloseReason.CLICK);
+              }
+            }
+          } else if (activeElement === lastInputEl) {
+            if (ev.key === "Tab" && !ev.shiftKey) {
+              // Can't backward tab out of popup
+              ev.preventDefault();
+              ev.stopPropagation();
+
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_FORWARD);
+              }
+            }
+            if (ev.key === "Enter" && !isTextArea) {
+              ev.preventDefault();
+              ev.stopPropagation();
+              if (isDown) {
+                lastEnterDownEl.current = activeElement;
+              } else {
+                lastEnterDownEl.current == activeElement && invokeSave(CloseReason.CLICK);
+              }
+            }
+          } else if (activeElement === firstInputEl) {
+            if (ev.key === "Tab" && ev.shiftKey) {
+              // Can't backward tab out of popup
+              ev.preventDefault();
+              ev.stopPropagation();
+
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_BACKWARD);
+              }
+            }
+          }
+          break;
+        }
+      }
+    },
+    [anchorRef, saveButtonRef],
+  );
+
+  const handleKeydownTabAndEnter = useMemo(() => handleKeyboardTabAndEnter(true), [handleKeyboardTabAndEnter]);
+  const handleKeyupTabAndEnter = useMemo(() => handleKeyboardTabAndEnter(false), [handleKeyboardTabAndEnter]);
+
   useEffect(() => {
     if (isMenuOpen(state)) {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
+      thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
+      thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
       thisDocument.addEventListener("mousedown", handleScreenEventForSave, true);
       thisDocument.addEventListener("mouseup", handleScreenEventForCancel, true);
       thisDocument.addEventListener("click", handleScreenEventForCancel, true);
       thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
+        thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
+        thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
         thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
         thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
         thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
@@ -135,7 +230,14 @@ export const ControlledMenuFr = (
       };
     }
     return () => {};
-  }, [handleScreenEventForSave, handleScreenEventForCancel, state, anchorRef]);
+  }, [
+    handleScreenEventForSave,
+    handleScreenEventForCancel,
+    state,
+    anchorRef,
+    handleKeydownTabAndEnter,
+    handleKeyupTabAndEnter,
+  ]);
 
   const itemSettings = useMemo(
     () => ({

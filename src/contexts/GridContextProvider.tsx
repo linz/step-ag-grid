@@ -275,6 +275,13 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
+  const selectNextCell = (tabDirection: -1 | 0 | 1 = 0) => {
+    gridApiOp((gridApi) => {
+      if (tabDirection == 1) gridApi.tabToNextCell();
+      if (tabDirection == -1) gridApi.tabToPreviousCell();
+    });
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -296,6 +303,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         stopEditing,
         updatingCells,
         redrawRows,
+        selectNextCell,
       }}
     >
       {props.children}

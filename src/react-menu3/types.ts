@@ -49,6 +49,8 @@ export interface Event {
    *  Indicates the key if the event is triggered by keyboard. Can be 'Enter', ' '(Space) or 'Escape'.
    */
   key?: string;
+
+  shiftKey?: boolean;
 }
 
 export interface MenuCloseEvent extends Event {

@@ -61,6 +61,11 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
 
+  const invalid = useCallback(() => {
+    const validations = pick(subComponentIsValid.current, Object.keys(selectedValues));
+    return Object.values(validations).some((v) => !v);
+  }, [selectedValues]);
+
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (props.onSave) {
@@ -149,8 +154,9 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
     [selectedValues],
   );
 
-  const { popoverWrapper, lastInputKeyboardEventHandlers, triggerSave } = useGridPopoverHook({
+  const { popoverWrapper, triggerSave } = useGridPopoverHook({
     className: props.className,
+    invalid,
     save,
   });
   return popoverWrapper(
@@ -186,10 +192,12 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
               <div key={`${index}`}>
                 <MenuItem
                   onClick={(e: ClickEvent) => {
-                    e.keepOpen = true;
-                    toggleValue(item);
+                    // Global react-menu MenuItem handler handles tabs
+                    if (e.key !== "Tab") {
+                      e.keepOpen = true;
+                      toggleValue(item);
+                    }
                   }}
-                  {...lastInputKeyboardEventHandlers}
                 >
                   <LuiCheckboxInput
                     isChecked={`${item.value}` in selectedValues}

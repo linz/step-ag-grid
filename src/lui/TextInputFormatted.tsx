@@ -3,8 +3,8 @@ import "./TextInputFormatted.scss";
 import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
 import clsx from "clsx";
-import { LuiIcon } from "@linzjs/lui";
 import { omit } from "lodash-es";
+import { FormError } from "./FormError";
 
 export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   // overrides value in base class to be string type only
@@ -35,22 +35,7 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
         <span className={"LuiTextInput-formatted"}>{props.formatted}</span>
       </span>
 
-      {props.error && (
-        <span className="LuiTextInput-error">
-          <LuiIcon alt="error" name="ic_error" className="LuiTextInput-error-icon" size="sm" status="error" />
-          {props.error}
-        </span>
-      )}
-
-      {props.helpText && !props.error && (
-        <span
-          style={{
-            fontSize: "0.7rem",
-          }}
-        >
-          {props.helpText}
-        </span>
-      )}
+      <FormError error={props.error} helpText={props.helpText} />
     </div>
   );
 };

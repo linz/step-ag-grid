@@ -109,7 +109,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     alert(`Single-edit: ${selectedRows.length} rows`);
                     await wait(1500);
                   },
-                  supportsMultiEdit: false,
+                  disabled: selectedItems.length > 1,
                 },
                 {
                   label: "Multi-edit",
@@ -117,36 +117,36 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     alert(`Multi-edit: ${selectedRows.length} rows`);
                     await wait(1500);
                   },
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Disabled item",
                   disabled: "Disabled for test",
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Developer Only",
                   hidden: selectedItems.some((x) => x.position != "Developer"),
-                  supportsMultiEdit: true,
                 },
                 {
                   label: "Other (TextInput)",
-                  supportsMultiEdit: true,
-                  action: (_, menuOptionResult) => {
-                    alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                  action: async (_, menuOptionResult) => {
+                    // eslint-disable-next-line no-console
+                    console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                    await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={2} required defaultValue={""} />
+                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={5} required defaultValue={""} />
                   ),
                 },
                 {
                   label: "Other (TextArea)",
                   supportsMultiEdit: true,
-                  action: (_, menuOptionResult) => {
-                    alert(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                  action: async (_, menuOptionResult) => {
+                    // eslint-disable-next-line no-console
+                    console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                    await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={2} required defaultValue={""} />
+                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
                   ),
                 },
               ] as MenuOption<ITestRow>[];

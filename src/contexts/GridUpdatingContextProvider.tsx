@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { castArray, flatten, remove } from "lodash-es";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
@@ -15,6 +15,7 @@ type UpdatingBlock = Record<FieldName, IdList[]>;
 export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps) => {
   const updatingBlocks = useRef<UpdatingBlock>({});
   const updating = useRef<GridUpdatingContextStatus>({});
+  const [updatedDep, setUpdatedDep] = useState(0);
 
   const resetUpdating = () => {
     const mergedUpdatingBlocks: GridUpdatingContextStatus = {};
@@ -22,15 +23,25 @@ export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps)
       mergedUpdatingBlocks[key] = flatten(updatingBlocks.current[key]);
     }
     updating.current = mergedUpdatingBlocks;
+    setUpdatedDep((updatedDep) => updatedDep + 1);
   };
 
-  const modifyUpdating = async (field: string, ids: (number | string)[], fn: () => void | Promise<void>) => {
-    const fieldUpdatingIds = updatingBlocks.current[field] ?? (updatingBlocks.current[field] = []);
+  const modifyUpdating = async (
+    fields: string | string[],
+    ids: (number | string)[],
+    fn: () => void | Promise<void>,
+  ) => {
     const idRef = [...ids];
-    fieldUpdatingIds.push(idRef);
+    castArray(fields).forEach((field) => {
+      const fieldUpdatingIds = updatingBlocks.current[field] ?? (updatingBlocks.current[field] = []);
+      fieldUpdatingIds.push(idRef);
+    });
     resetUpdating();
     await fn();
-    remove(fieldUpdatingIds, (idList) => idList === idRef);
+    castArray(fields).forEach((field) => {
+      const fieldUpdatingIds = updatingBlocks.current[field];
+      remove(fieldUpdatingIds, (idList) => idList === idRef);
+    });
     resetUpdating();
   };
 
@@ -38,7 +49,7 @@ export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps)
     castArray(fields).some((f) => updating.current[f]?.includes(id));
 
   return (
-    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating }}>
+    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating, updatedDep }}>
       {props.children}
     </GridUpdatingContext.Provider>
   );

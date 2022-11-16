@@ -2,7 +2,12 @@ import { createContext } from "react";
 
 export type GridUpdatingContextType = {
   checkUpdating: (fields: string | string[], id: number | string) => boolean;
-  modifyUpdating: (field: string, ids: (number | string)[], fn: () => void | Promise<void>) => Promise<void>;
+  modifyUpdating: (
+    fields: string | string[],
+    ids: (number | string)[],
+    fn: () => void | Promise<void>,
+  ) => Promise<void>;
+  updatedDep: number;
 };
 
 export const GridUpdatingContext = createContext<GridUpdatingContextType>({
@@ -13,4 +18,5 @@ export const GridUpdatingContext = createContext<GridUpdatingContextType>({
   modifyUpdating: async () => {
     console.error("Missing GridUpdatingContext");
   },
+  updatedDep: 0,
 });

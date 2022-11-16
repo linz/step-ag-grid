@@ -17,10 +17,12 @@ export interface RMEvent {
   checked?: boolean;
   name?: string;
   key?: string;
+  shiftKey?: boolean;
 }
 
 export const Keys = Object.freeze({
   ENTER: "Enter",
+  TAB: "Tab",
   ESC: "Escape",
   SPACE: " ",
   HOME: "Home",
@@ -47,6 +49,8 @@ export const CloseReason = Object.freeze({
   CANCEL: "cancel",
   BLUR: "blur",
   SCROLL: "scroll",
+  TAB_FORWARD: "tab_forward",
+  TAB_BACKWARD: "tab_backward",
 });
 
 export const FocusPositions = Object.freeze({

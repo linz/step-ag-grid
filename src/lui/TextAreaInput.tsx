@@ -1,8 +1,8 @@
 import { InputHTMLAttributes, useState } from "react";
 import clsx from "clsx";
-import { LuiIcon } from "@linzjs/lui";
 import { v4 as uuidVersion4 } from "uuid";
 import { omit } from "lodash-es";
+import { FormError } from "./FormError";
 
 export const useGenerateOrDefaultId = (idFromProps?: string) => {
   const [id] = useState(idFromProps ? idFromProps : uuidVersion4());
@@ -56,23 +56,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
         </div>
       </label>
 
-      {/* Error message */}
-      {props.error && (
-        <span className="LuiTextAreaInput-error">
-          <LuiIcon alt="error" name="ic_error" className="LuiTextAreaInput-error-icon" size="sm" status="error" />
-          {props.error}
-        </span>
-      )}
-
-      {props.helpText && !props.error && (
-        <span
-          style={{
-            fontSize: "0.7rem",
-          }}
-        >
-          {props.helpText}
-        </span>
-      )}
+      <FormError error={props.error} helpText={props.helpText} />
     </div>
   );
 };

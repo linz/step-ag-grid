@@ -13,6 +13,7 @@ import { wait } from "../../utils/util";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
+import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 
 export default {
   title: "Components / Grids",
@@ -280,8 +281,17 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             onSelectedItem: async (selected) => {
               // eslint-disable-next-line no-console
               console.log("onSelectedItem", selected);
+              await wait(500);
               selected.selectedRows.forEach((row) => (row.sub = selected.subComponentValue ?? selected.value));
             },
+          },
+        },
+      ),
+      GridPopoverMenu(
+        {},
+        {
+          editorParams: {
+            options: async () => [{ label: "Hello", action: async () => {}, supportsMultiEdit: true }],
           },
         },
       ),

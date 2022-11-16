@@ -1,10 +1,9 @@
 import "../../styles/GridFormDropDown.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { KeyboardEvent, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
@@ -12,6 +11,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
+import { CloseReason } from "../../react-menu3/utils";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
@@ -65,7 +65,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
   const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
-  const { stopEditing } = useContext(GridContext);
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const hasSubmitted = useRef(false);
@@ -78,21 +77,23 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption<any> | null>(null);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
+    async (value: ValueType, subComponentValue?: ValueType, reason?: string): Promise<boolean> => {
       if (hasSubmitted.current || (subComponentValue !== undefined && !subComponentIsValid.current)) return false;
       hasSubmitted.current = true;
-
-      return updateValue(async (selectedRows) => {
-        const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
-        if (hasChanged) {
-          if (props.onSelectedItem) {
-            await props.onSelectedItem({ selectedRows, value, subComponentValue });
-          } else {
-            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+      return updateValue(
+        async (selectedRows) => {
+          const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
+          if (hasChanged) {
+            if (props.onSelectedItem) {
+              await props.onSelectedItem({ selectedRows, value, subComponentValue });
+            } else {
+              selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+            }
           }
-        }
-        return true;
-      });
+          return true;
+        },
+        reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+      );
     },
     [field, props, updateValue],
   );
@@ -102,7 +103,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       updateValue(async (selectedRows) => {
         props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
         return true;
-      }),
+      }, 0),
     [props, updateValue],
   );
 
@@ -176,39 +177,37 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     }
   }, [filter, props, researchOnFilterChange]);
 
-  const onFilterKeyDown = useCallback(
-    async (e: KeyboardEvent) => {
-      if (!options) return;
-      if (e.key == "Enter" || e.key == "Tab") {
-        const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
-        if (activeOptions.length == 1) {
-          await selectItemHandler(activeOptions[0].value);
-          stopEditing();
-        } else if (props.onSelectFilter) {
-          await selectFilterHandler(filter);
-          stopEditing();
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }
-    },
-    [filteredValues, options, selectItemHandler, selectFilterHandler, stopEditing, filter, props],
-  );
-
   const save = useCallback(async () => {
-    // Handler for sub-selected value
-    if (!selectedSubComponent) return true;
-    if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
-    await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+    if (!options) return true;
+    const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
+    if (activeOptions.length === 1) {
+      await selectItemHandler(activeOptions[0].value);
+    } else if (activeOptions.length === 0 && props.onSelectFilter) {
+      await selectFilterHandler(filter);
+    } else {
+      // Handler for sub-selected value
+      if (!selectedSubComponent) return true;
+      if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
+      await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+    }
     return true;
-  }, [selectItemHandler, selectedSubComponent, subSelectedValue]);
+  }, [
+    filter,
+    filteredValues,
+    options,
+    props.onSelectFilter,
+    selectFilterHandler,
+    selectItemHandler,
+    selectedSubComponent,
+    subSelectedValue,
+  ]);
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid: () => !!(selectedSubComponent && !subComponentIsValid.current),
     save,
   });
+
   return popoverWrapper(
     <>
       {props.filtered && (
@@ -226,7 +225,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   onChange={(e) => setFilter(e.target.value.toLowerCase())}
-                  onKeyDown={(e) => onFilterKeyDown(e)}
                 />
               </div>
             )}
@@ -263,7 +261,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                       }
                       e.keepOpen = true;
                     } else {
-                      selectItemHandler(item.value as ValueType).then();
+                      selectItemHandler(
+                        item.value as ValueType,
+                        undefined,
+                        e.key === "Tab"
+                          ? e.shiftKey
+                            ? CloseReason.TAB_BACKWARD
+                            : CloseReason.TAB_FORWARD
+                          : CloseReason.CLICK,
+                      ).then();
                     }
                   }}
                 >

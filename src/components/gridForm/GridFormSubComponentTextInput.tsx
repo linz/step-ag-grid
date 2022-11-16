@@ -17,7 +17,7 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
 export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
   props: GridFormSubComponentTextInputProps<RowType>,
 ): JSX.Element => {
-  const { value, setValue, setValid, triggerSave, data } = useContext(GridSubComponentContext);
+  const { value, setValue, setValid, data } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press enter or tab to save";
 
@@ -39,23 +39,6 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
       autoFocus={true}
-      onKeyDown={(e) => {
-        if (e.key === "Tab" || e.key === "Enter") {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }}
-      onKeyUp={(e) => {
-        if (e.key === "Tab") {
-          e.preventDefault();
-          e.stopPropagation();
-          !e.shiftKey && triggerSave().then();
-        } else if (e.key === "Enter") {
-          triggerSave().then();
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }}
       placeholder={props.placeholder}
       style={{
         width: "100%",

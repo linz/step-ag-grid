@@ -1,9 +1,10 @@
-import { KeyboardEvent, KeyboardEventHandler, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
 import { useGridPopoverContext } from "../contexts/GridPopoverContext";
 import { MenuCloseEvent } from "../react-menu3/types";
+import { CloseReason } from "../react-menu3/utils";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
@@ -36,86 +37,18 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       } else if (props.save) {
         // forms that don't provide an invalid fn must wait until they have saved to close
         if (props.invalid) stopEditing();
-        if (await updateValue(props.save)) {
+        if (
+          await updateValue(
+            props.save,
+            reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+          )
+        ) {
           if (!props.invalid) stopEditing();
         }
       }
     },
     [props, stopEditing, updateValue],
   );
-
-  const onlyInputKeyboardEventHandlers: {
-    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
-    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
-  } = {
-    onKeyUp: (e: KeyboardEvent) => {
-      const isTextArea = (e.currentTarget as any).type === "textarea";
-      if (e.key === "Enter" && !isTextArea) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerSave().then();
-      } else if (e.key === "Tab") {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    },
-    onKeyDown: (e: KeyboardEvent) => {
-      const isTextArea = (e.currentTarget as any).type === "textarea";
-      if (e.key === "Enter" && !isTextArea) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.key === "Tab") {
-        e.preventDefault();
-        e.stopPropagation();
-        !e.shiftKey && triggerSave().then();
-      }
-    },
-  };
-  const firstInputKeyboardEventHandlers: {
-    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
-    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
-  } = {
-    onKeyUp: (e: KeyboardEvent) => {
-      if (e.key === "Tab" && e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    },
-    onKeyDown: (e: KeyboardEvent) => {
-      if (e.key === "Tab" && e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    },
-  };
-
-  const lastInputKeyboardEventHandlers: {
-    onKeyUp?: KeyboardEventHandler<HTMLElement> | undefined;
-    onKeyDown?: KeyboardEventHandler<HTMLElement> | undefined;
-  } = {
-    onKeyUp: (e: KeyboardEvent) => {
-      const isTextArea = (e.currentTarget as any).type === "textarea";
-      if (e.key === "Enter" && !isTextArea) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerSave().then();
-      } else if (e.key === "Tab" && !e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    },
-    onKeyDown: (e: KeyboardEvent) => {
-      const isTextArea = (e.currentTarget as any).type === "textarea";
-      if (e.key === "Enter" && !isTextArea) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.key === "Tab" && !e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerSave().then();
-      }
-    },
-  };
 
   const popoverWrapper = useCallback(
     (children: JSX.Element) => {
@@ -155,8 +88,9 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               {children}
               <button
                 ref={saveButtonRef}
-                onClick={() => {
-                  triggerSave().then();
+                data-reason={""}
+                onClick={(e) => {
+                  triggerSave(e.currentTarget.getAttribute("data-reason") ?? undefined).then();
                 }}
                 style={{ display: "none" }}
               />
@@ -171,8 +105,5 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
   return {
     popoverWrapper,
     triggerSave,
-    onlyInputKeyboardEventHandlers,
-    firstInputKeyboardEventHandlers,
-    lastInputKeyboardEventHandlers,
   };
 };
