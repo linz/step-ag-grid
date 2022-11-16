@@ -126,7 +126,7 @@ export const ControlledMenuFr = (
       }
 
       const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
-      
+
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
       inputEls = inputEls.filter((el) => !(el as any).disabled);
@@ -141,7 +141,7 @@ export const ControlledMenuFr = (
         saveButtonRef.current?.setAttribute("data-reason", reason);
         saveButtonRef?.current?.click();
       };
-      
+
       const isTextArea = activeElement.nodeName === "TEXTAREA";
       const isButton = activeElement.attributes.getNamedItem("type")?.value == "button";
       switch (activeElement.nodeName) {
