@@ -13,15 +13,15 @@ import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 import { CloseReason } from "../../react-menu3/utils";
 
-export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
+export interface GridPopoutEditDropDownSelectedItem<RowType> {
   // Note the row that was clicked on will be first
   selectedRows: RowType[];
-  value: ValueType;
-  subComponentValue?: ValueType;
+  value: any;
+  subComponentValue?: any;
 }
 
-interface FinalSelectOption<ValueType> {
-  value: ValueType;
+interface FinalSelectOption {
+  value: any;
   label?: JSX.Element | string;
   disabled?: boolean | string;
   subComponent?: (props: any, ref: any) => any;
@@ -35,9 +35,9 @@ export const MenuHeaderItem = (title: string) => {
   return { label: title, value: MenuHeaderString };
 };
 
-export type SelectOption<ValueType> = ValueType | FinalSelectOption<ValueType>;
+export type SelectOption = null | string | FinalSelectOption;
 
-export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
+export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options
   className?:
     | "GridPopoverEditDropDown-containerSmall"
@@ -49,11 +49,9 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow, ValueT
   // local means the filter won't change if it's reloaded, reload means it does change
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
-  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType, ValueType>) => Promise<void>;
-  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType, string>) => Promise<void>;
-  options:
-    | SelectOption<ValueType>[]
-    | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption<ValueType>[]> | SelectOption<ValueType>[]);
+  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
+  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
+  options: SelectOption[] | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption[]> | SelectOption[]);
   optionsRequestCancel?: () => void;
 }
 
@@ -61,41 +59,44 @@ const fieldToString = (field: any) => {
   return typeof field == "symbol" ? field.toString() : `${field}`;
 };
 
-export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
-  props: GridFormPopoutDropDownProps<RowType, ValueType>,
-) => {
+export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPopoutDropDownProps<RowType>) => {
   const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
-  const hasSubmitted = useRef(false);
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>([]);
   const optionsInitialising = useRef(false);
-  const [options, setOptions] = useState<FinalSelectOption<ValueType>[] | null>(null);
+  const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
-  const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption<any> | null>(null);
+  const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption | null>(null);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType, subComponentValue?: ValueType, reason?: string): Promise<boolean> => {
-      if (hasSubmitted.current || (subComponentValue !== undefined && !subComponentIsValid.current)) return false;
-      hasSubmitted.current = true;
+    async (value: any, subComponentValue?: any): Promise<boolean> => {
+      const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
+      if (hasChanged) {
+        if (props.onSelectedItem) {
+          await props.onSelectedItem({ selectedRows, value, subComponentValue });
+        } else {
+          selectedRows.forEach((row) => (row[field] = value as any));
+        }
+      }
+      return true;
+    },
+    [field, props, selectedRows],
+  );
+
+  const clickItemHandler = useCallback(
+    async (value: any, subComponentValue?: any, reason?: string): Promise<boolean> => {
+      if (subComponentValue !== undefined && !subComponentIsValid.current) return false;
       return updateValue(
-        async (selectedRows) => {
-          const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
-          if (hasChanged) {
-            if (props.onSelectedItem) {
-              await props.onSelectedItem({ selectedRows, value, subComponentValue });
-            } else {
-              selectedRows.forEach((row) => (row[field as keyof RowType] = value));
-            }
-          }
-          return true;
+        async () => {
+          return await selectItemHandler(value, subComponentValue);
         },
         reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
       );
     },
-    [field, props, updateValue],
+    [selectItemHandler, updateValue],
   );
 
   const selectFilterHandler = useCallback(
@@ -118,16 +119,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
         optionsConf = await optionsConf(selectedRows, filter);
       }
 
-      const optionsList = optionsConf?.map((item) => {
-        if (item == null || typeof item == "string" || typeof item == "number") {
-          item = {
-            value: item as unknown as ValueType,
-            label: item,
-            disabled: false,
-          } as unknown as FinalSelectOption<ValueType>;
-        }
-        return item;
-      }) as any as FinalSelectOption<ValueType>[];
+      const optionsList = optionsConf?.map((item) =>
+        item == null || typeof item == "string"
+          ? ({
+              value: item,
+              label: item,
+              disabled: false,
+            } as FinalSelectOption)
+          : item,
+      );
 
       if (props.filtered) {
         // This is needed otherwise when filter input is rendered and sets autofocus
@@ -177,6 +177,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     }
   }, [filter, props, researchOnFilterChange]);
 
+  /**
+   * Saves are wrapped in updateValue and triggered by blur events
+   */
   const save = useCallback(async () => {
     if (!options) return true;
     const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
@@ -188,7 +191,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       // Handler for sub-selected value
       if (!selectedSubComponent) return true;
       if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
-      await selectItemHandler(selectedSubComponent.value as ValueType, subSelectedValue);
+      await selectItemHandler(selectedSubComponent.value, subSelectedValue);
     }
     return true;
   }, [
@@ -237,7 +240,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
           {options && options.length == filteredValues?.length && (
             <MenuItem key={`${fieldToString(field)}-empty`}>[Empty]</MenuItem>
           )}
-          {options?.map((item: FinalSelectOption<ValueType | string>, index) =>
+          {options?.map((item: FinalSelectOption, index) =>
             item.value === MenuSeparatorString ? (
               <MenuDivider key={`$$divider_${index}`} />
             ) : item.value === MenuHeaderString ? (
@@ -261,8 +264,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                       }
                       e.keepOpen = true;
                     } else {
-                      selectItemHandler(
-                        item.value as ValueType,
+                      clickItemHandler(
+                        item.value,
                         undefined,
                         e.key === "Tab"
                           ? e.shiftKey

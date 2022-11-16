@@ -66,7 +66,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       "Scrum Master",
       "Tester",
       MenuSeparatorString,
-      "(other)",
+      "Custom",
     ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
   }, []);
 
@@ -86,20 +86,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverEditDropDown(
-        {
-          field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Position",
-        },
-        {
-          multiEdit: false,
-          editorParams: {
-            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-          },
-        },
-      ),
       GridPopoverEditDropDown(
         {
           field: "position2",
@@ -133,7 +119,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           multiEdit: true,
           editorParams: {
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester"],
             onSelectedItem: async (selected) => {
               await wait(2000);
               selected.selectedRows.forEach((row) => {
@@ -178,7 +164,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester", "(other)"],
+            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester"],
           },
         },
       ),
@@ -206,28 +192,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           field: "code",
           initialWidth: 65,
           maxWidth: 150,
-          headerName: "Max height",
-          valueGetter: (params) => params.data.code,
-        },
-        {
-          multiEdit: true,
-          editorParams: {
-            className: "GridPopoverEditDropDown-containerSmall",
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            options: Array.from(Array(30).keys()).map((o) => {
-              return { value: o, label: `${o}` };
-            }),
-          },
-        },
-      ),
-      GridPopoverEditDropDown(
-        {
-          field: "code",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filter Selectable",
-          valueGetter: (params) => params.data.code,
         },
         {
           multiEdit: true,
@@ -291,7 +256,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {},
         {
           editorParams: {
-            options: async () => [{ label: "Hello", action: async () => {}, supportsMultiEdit: true }],
+            options: async () => [{ label: "Hello", action: async () => {} }],
           },
         },
       ),

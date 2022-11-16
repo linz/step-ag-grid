@@ -82,8 +82,10 @@ export const ControlledMenuFr = (
         // the cell doesn't refresh during update if save is invoked from a native event
         // This doesn't happen in React18
         // To work around it, I invoke the save by clicking on a passed in invisible button ref
-        if (saveButtonRef?.current) saveButtonRef.current.click();
-        else safeCall(onClose, { reason: CloseReason.BLUR });
+        if (saveButtonRef?.current) {
+          saveButtonRef.current.setAttribute("data-reason", CloseReason.BLUR);
+          saveButtonRef.current.click();
+        } else safeCall(onClose, { reason: CloseReason.BLUR });
 
         // If a user clicks on the menu button when a menu is open, we need to close the menu.
         // However, a blur event will be fired prior to the click event on menu button,
