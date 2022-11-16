@@ -1,10 +1,9 @@
 import "../../styles/GridFormDropDown.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridContext } from "../../contexts/GridContext";
 import { delay } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
@@ -65,7 +64,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   props: GridFormPopoutDropDownProps<RowType, ValueType>,
 ) => {
   const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
-  const { stopEditing } = useContext(GridContext);
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const hasSubmitted = useRef(false);
@@ -78,7 +76,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
   const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption<any> | null>(null);
 
   const selectItemHandler = useCallback(
-    async (value: ValueType, subComponentValue?: ValueType): Promise<boolean> => {
+    async (value: ValueType, subComponentValue?: ValueType, reason?: string): Promise<boolean> => {
       if (hasSubmitted.current || (subComponentValue !== undefined && !subComponentIsValid.current)) return false;
       hasSubmitted.current = true;
 
@@ -92,7 +90,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
           }
         }
         return true;
-      }, false);
+      }, reason === "tab");
     },
     [field, props, updateValue],
   );
@@ -260,7 +258,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                       }
                       e.keepOpen = true;
                     } else {
-                      selectItemHandler(item.value as ValueType).then();
+                      selectItemHandler(item.value as ValueType, undefined, e.key === "Tab" ? "tab" : "click").then();
                     }
                   }}
                 >

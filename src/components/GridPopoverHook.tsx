@@ -84,7 +84,6 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
                 ref={saveButtonRef}
                 data-reason={""}
                 onClick={(e) => {
-                  console.log("reason", e.currentTarget.getAttribute("data-reason"));
                   triggerSave(e.currentTarget.getAttribute("data-reason") ?? undefined).then();
                 }}
                 style={{ display: "none" }}
