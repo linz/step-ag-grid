@@ -7,6 +7,7 @@ import { CellEditorCommon } from "../GridCell";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { ClickEvent } from "../../react-menu3/types";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { CloseReason } from "../../react-menu3/utils";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
@@ -80,12 +81,15 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   const actionClick = useCallback(
     async (menuOption: MenuOption<RowType>, reason: string) => {
       actionProcessing.current = true;
-      return updateValue(async () => {
-        const result = { ...menuOption, subValue: subSelectedValue };
-        await (menuOption.action ?? defaultAction)(selectedRows, result);
-        actionProcessing.current = false;
-        return true;
-      }, reason === "tab");
+      return updateValue(
+        async () => {
+          const result = { ...menuOption, subValue: subSelectedValue };
+          await (menuOption.action ?? defaultAction)(selectedRows, result);
+          actionProcessing.current = false;
+          return true;
+        },
+        reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+      );
     },
     [defaultAction, selectedRows, subSelectedValue, updateValue],
   );

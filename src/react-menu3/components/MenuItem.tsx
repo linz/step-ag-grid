@@ -1,4 +1,4 @@
-import { Ref, useContext, useMemo } from "react";
+import { KeyboardEvent, Ref, useContext, useMemo } from "react";
 import { useBEM, useItemState, useCombinedRef } from "../hooks";
 import { mergeProps, commonProps, safeCall, menuClass, menuItemClass, withHovering, Keys, RMEvent } from "../utils";
 import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
@@ -106,7 +106,12 @@ const MenuItemFr = ({
       value,
       syntheticEvent: e,
     };
-    if (e.key !== undefined) event.key = e.key;
+
+    if (e.key !== undefined) {
+      const ke = e as KeyboardEvent;
+      event.key = ke.key;
+      event.shiftKey = ke.shiftKey;
+    }
     if (isCheckBox) event.checked = !isChecked;
     if (isRadio) event.name = radioGroup.name;
     safeCall(onClick, event);

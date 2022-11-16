@@ -275,9 +275,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
-  const selectNextCell = () => {
+  const selectNextCell = (tabDirection: -1 | 0 | 1 = 0) => {
     gridApiOp((gridApi) => {
-      gridApi.tabToNextCell();
+      if (tabDirection == 1) gridApi.tabToNextCell();
+      if (tabDirection == -1) gridApi.tabToPreviousCell();
     });
   };
 

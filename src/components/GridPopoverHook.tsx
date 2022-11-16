@@ -4,6 +4,7 @@ import { GridBaseRow } from "./Grid";
 import { ControlledMenu } from "../react-menu3";
 import { useGridPopoverContext } from "../contexts/GridPopoverContext";
 import { MenuCloseEvent } from "../react-menu3/types";
+import { CloseReason } from "../react-menu3/utils";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
@@ -36,7 +37,12 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       } else if (props.save) {
         // forms that don't provide an invalid fn must wait until they have saved to close
         if (props.invalid) stopEditing();
-        if (await updateValue(props.save, reason === "tab")) {
+        if (
+          await updateValue(
+            props.save,
+            reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+          )
+        ) {
           if (!props.invalid) stopEditing();
         }
       }

@@ -151,12 +151,11 @@ export const ControlledMenuFr = (
               // Can't forward/backwards tab out of popup
               ev.preventDefault();
               ev.stopPropagation();
-              if (!ev.shiftKey) {
-                if (isDown) {
-                  lastTabDownEl.current = activeElement;
-                } else {
-                  lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB);
-                }
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement &&
+                  invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
               }
             }
             if (ev.key === "Enter" && !isTextArea) {
@@ -169,16 +168,15 @@ export const ControlledMenuFr = (
               }
             }
           } else if (activeElement === lastInputEl) {
-            if (ev.key === "Tab") {
-              if (!ev.shiftKey) {
-                // Can't forward tab out of popup
-                ev.preventDefault();
-                ev.stopPropagation();
-                if (isDown) {
-                  lastTabDownEl.current = activeElement;
-                } else {
-                  lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB);
-                }
+            if (ev.key === "Tab" && !ev.shiftKey) {
+              // Can't backward tab out of popup
+              ev.preventDefault();
+              ev.stopPropagation();
+
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_FORWARD);
               }
             }
             if (ev.key === "Enter" && !isTextArea) {
@@ -191,11 +189,15 @@ export const ControlledMenuFr = (
               }
             }
           } else if (activeElement === firstInputEl) {
-            if (ev.key === "Tab") {
-              if (ev.shiftKey) {
-                // Can't backward tab out of popup
-                ev.preventDefault();
-                ev.stopPropagation();
+            if (ev.key === "Tab" && ev.shiftKey) {
+              // Can't backward tab out of popup
+              ev.preventDefault();
+              ev.stopPropagation();
+
+              if (isDown) {
+                lastTabDownEl.current = activeElement;
+              } else {
+                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_BACKWARD);
               }
             }
           }

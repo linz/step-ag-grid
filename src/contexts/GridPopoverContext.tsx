@@ -17,7 +17,7 @@ export interface GridPopoverContextType<RowType extends GridBaseRow> {
   value: any;
   data: RowType;
   selectedRows: RowType[];
-  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>, tabToNextCell: boolean) => Promise<boolean>;
+  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1) => Promise<boolean>;
 }
 
 export const GridPopoverContext = createContext<GridPopoverContextType<any>>({

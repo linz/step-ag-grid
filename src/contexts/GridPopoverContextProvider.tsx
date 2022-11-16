@@ -27,13 +27,13 @@ export const GridPopoverContextProvider = ({ props, children }: GridPopoverConte
   const field = props.colDef?.field ?? "";
 
   const updateValue = useCallback(
-    async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabToNextCell: boolean): Promise<boolean> => {
+    async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {
       let result = false;
       if (!saving) {
         result = await updatingCells({ selectedRows, field }, saveFn, setSaving);
         if (result) {
           stopEditing();
-          tabToNextCell && selectNextCell();
+          tabDirection && selectNextCell(tabDirection);
         }
       }
 

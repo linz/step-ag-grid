@@ -11,6 +11,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
+import { CloseReason } from "../../react-menu3/utils";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType, ValueType> {
   // Note the row that was clicked on will be first
@@ -79,18 +80,20 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
     async (value: ValueType, subComponentValue?: ValueType, reason?: string): Promise<boolean> => {
       if (hasSubmitted.current || (subComponentValue !== undefined && !subComponentIsValid.current)) return false;
       hasSubmitted.current = true;
-
-      return updateValue(async (selectedRows) => {
-        const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
-        if (hasChanged) {
-          if (props.onSelectedItem) {
-            await props.onSelectedItem({ selectedRows, value, subComponentValue });
-          } else {
-            selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+      return updateValue(
+        async (selectedRows) => {
+          const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
+          if (hasChanged) {
+            if (props.onSelectedItem) {
+              await props.onSelectedItem({ selectedRows, value, subComponentValue });
+            } else {
+              selectedRows.forEach((row) => (row[field as keyof RowType] = value));
+            }
           }
-        }
-        return true;
-      }, reason === "tab");
+          return true;
+        },
+        reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+      );
     },
     [field, props, updateValue],
   );
@@ -100,7 +103,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
       updateValue(async (selectedRows) => {
         props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
         return true;
-      }, false),
+      }, 0),
     [props, updateValue],
   );
 
@@ -258,7 +261,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow, ValueType>(
                       }
                       e.keepOpen = true;
                     } else {
-                      selectItemHandler(item.value as ValueType, undefined, e.key === "Tab" ? "tab" : "click").then();
+                      selectItemHandler(
+                        item.value as ValueType,
+                        undefined,
+                        e.key === "Tab"
+                          ? e.shiftKey
+                            ? CloseReason.TAB_BACKWARD
+                            : CloseReason.TAB_FORWARD
+                          : CloseReason.CLICK,
+                      ).then();
                     }
                   }}
                 >
