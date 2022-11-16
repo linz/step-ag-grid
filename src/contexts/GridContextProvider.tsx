@@ -234,10 +234,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     props: { selectedRows: GridBaseRow[]; field?: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
     setSaving?: (saving: boolean) => void,
+    tabDirection?: 1 | 0 | -1,
   ): Promise<boolean> => {
     setSaving && setSaving(true);
-
     return await gridApiOp(async (gridApi) => {
+      const preOpCell = gridApi.getFocusedCell();
+
       const selectedRows = props.selectedRows;
 
       let ok = false;
@@ -265,6 +267,19 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         // Don't set saving if ok as the form has already closed
         setSaving && setSaving(false);
       }
+
+      // Only focus next cell if user hasn't already manually changed focus
+      const postOpCell = gridApi.getFocusedCell();
+      if (
+        tabDirection &&
+        preOpCell &&
+        postOpCell &&
+        preOpCell.rowIndex == postOpCell.rowIndex &&
+        preOpCell.column.getColId() == postOpCell.column.getColId()
+      ) {
+        selectNextCell(tabDirection);
+      }
+
       return ok;
     });
   };
@@ -303,7 +318,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         stopEditing,
         updatingCells,
         redrawRows,
-        selectNextCell,
       }}
     >
       {props.children}

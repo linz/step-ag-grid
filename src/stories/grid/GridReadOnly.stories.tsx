@@ -139,7 +139,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                 },
                 {
                   label: "Other (TextArea)",
-                  supportsMultiEdit: true,
                   action: async (_, menuOptionResult) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);

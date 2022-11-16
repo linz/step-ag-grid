@@ -24,7 +24,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      if (reason == "cancel") {
+      if (reason == CloseReason.CANCEL) {
         stopEditing();
         return;
       }
@@ -64,7 +64,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               menuClassName={"step-ag-grid-react-menu"}
               onClose={(event: MenuCloseEvent) => {
                 // Prevent menu from closing when modals are invoked
-                if (event.reason === "blur") return;
+                if (event.reason === CloseReason.BLUR) return;
                 triggerSave(event.reason).then();
               }}
               viewScroll={"auto"}

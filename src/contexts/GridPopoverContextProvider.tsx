@@ -11,9 +11,10 @@ interface GridPopoverContextProps {
 }
 
 export const GridPopoverContextProvider = ({ props, children }: GridPopoverContextProps) => {
-  const { getSelectedRows, updatingCells, stopEditing, selectNextCell } = useContext(GridContext);
+  const { getSelectedRows, updatingCells } = useContext(GridContext);
   const anchorRef = useRef<Element>(props.eGridCell);
 
+  const hasSaved = useRef(false);
   const [saving, setSaving] = useState(false);
 
   const { colDef } = props;
@@ -28,18 +29,13 @@ export const GridPopoverContextProvider = ({ props, children }: GridPopoverConte
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {
-      let result = false;
-      if (!saving) {
-        result = await updatingCells({ selectedRows, field }, saveFn, setSaving);
-        if (result) {
-          stopEditing();
-          tabDirection && selectNextCell(tabDirection);
-        }
-      }
-
-      return result;
+      if (hasSaved.current) return true;
+      hasSaved.current = true;
+      const r = saving ? false : await updatingCells({ selectedRows, field }, saveFn, setSaving, tabDirection);
+      //if (r) stopEditing();
+      return r;
     },
-    [field, saving, selectNextCell, selectedRows, stopEditing, updatingCells],
+    [field, saving, selectedRows, updatingCells],
   );
 
   return (
