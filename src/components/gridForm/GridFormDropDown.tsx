@@ -68,12 +68,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
-  const [subSelectedValue, setSubSelectedValue] = useState<any>();
+  const subComponentInitialValue = useRef<string | null>(null);
+  const [subSelectedValue, setSubSelectedValue] = useState<any>(null);
   const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption | null>(null);
 
   const selectItemHandler = useCallback(
     async (value: any, subComponentValue?: any): Promise<boolean> => {
-      const hasChanged = selectedRows.some((row) => row[field as keyof RowType] !== value);
+      const hasChanged =
+        selectedRows.some((row) => row[field as keyof RowType] !== value) ||
+        (subComponentValue !== undefined && subComponentInitialValue.current !== JSON.stringify(subComponentValue));
       if (hasChanged) {
         if (props.onSelectedItem) {
           await props.onSelectedItem({ selectedRows, value, subComponentValue });
@@ -182,6 +185,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
    */
   const save = useCallback(async () => {
     if (!options) return true;
+
     const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
     if (activeOptions.length === 1) {
       await selectItemHandler(activeOptions[0].value);
@@ -254,14 +258,10 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   value={item.value}
                   onClick={(e: ClickEvent) => {
                     if (item.subComponent) {
-                      if (selectedSubComponent === item) {
-                        // toggle selection off
-                        setSelectedSubComponent(null);
-                        subComponentIsValid.current = true;
-                      } else {
-                        // toggle selection on
-                        setSelectedSubComponent(item);
-                      }
+                      // toggle selection
+                      setSelectedSubComponent(selectedSubComponent === item ? null : item);
+                      subComponentIsValid.current = true;
+                      subComponentInitialValue.current = null;
                       e.keepOpen = true;
                     } else {
                       clickItemHandler(
@@ -289,6 +289,10 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                           value: subSelectedValue,
                           setValue: (value: any) => {
                             setSubSelectedValue(value);
+                            if (subComponentInitialValue.current === null) {
+                              // copy the default value of the sub-component so we can change detect on save
+                              subComponentInitialValue.current = JSON.stringify(value);
+                            }
                           },
                           setValid: (valid: boolean) => {
                             subComponentIsValid.current = valid;
