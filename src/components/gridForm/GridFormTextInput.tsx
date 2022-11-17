@@ -31,19 +31,14 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
       if (invalid()) return false;
 
       const trimmedValue = value.trim();
+      // No change, so don't save
       if (initValue === trimmedValue) return true;
 
       if (props.onSave) {
         return await props.onSave(selectedRows, trimmedValue);
       }
 
-      if (field == null) {
-        console.error("ColDef has no field set");
-        return false;
-      }
-      selectedRows.forEach((row) => {
-        row[field] = trimmedValue as any;
-      });
+      selectedRows.forEach((row) => (row[field] = trimmedValue as any));
       return true;
     },
     [invalid, value, initValue, props, field],

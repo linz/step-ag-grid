@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { TextAreaInput } from "../../lui/TextAreaInput";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { GridBaseRow } from "../Grid";
@@ -17,7 +17,9 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow>
 
 export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
   const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
-  const [value, setValue] = useState(initialVale != null ? `${initialVale}` : "");
+
+  const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);
+  const [value, setValue] = useState(initValue);
 
   const helpText = props.helpText ?? "Press tab to save";
 
@@ -25,22 +27,20 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
-      if (initialVale === (value ?? "")) return true;
+      if (invalid()) return false;
+
+      const trimmedValue = value.trim();
+      // No change, so don't save
+      if (initValue === trimmedValue) return true;
 
       if (props.onSave) {
-        return await props.onSave(selectedRows, value);
+        return await props.onSave(selectedRows, trimmedValue);
       }
 
-      if (field == null) {
-        console.error("ColDef has no field set");
-        return false;
-      }
-      selectedRows.forEach((row) => {
-        row[field] = value as any;
-      });
+      selectedRows.forEach((row) => (row[field] = trimmedValue as any));
       return true;
     },
-    [initialVale, value, props, field],
+    [invalid, value, initValue, props, field],
   );
 
   const { popoverWrapper } = useGridPopoverHook({

@@ -8,12 +8,13 @@ import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextP
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
+import { MenuHeaderItem, MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { wait } from "../../utils/util";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
 import { partition } from "lodash-es";
+import { MultiFinalSelectOption } from "../../components/gridForm/GridFormMultiSelect";
 
 export default {
   title: "Components / Grids",
@@ -37,7 +38,7 @@ export default {
 
 interface ITestRow {
   id: number;
-  position: string | null;
+  position: string[] | null;
   position2: string | null;
   position3: string | null;
 }
@@ -46,6 +47,14 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(() => {
+    const positionMap: Record<string, string> = {
+      a: "Architect",
+      b: "Developer",
+      c: "Product Owner",
+      d: "Scrum Master",
+      e: "Tester",
+      other: "Other",
+    };
     const positionTwoMap: Record<string, string> = {
       "1": "One",
       "2": "Two",
@@ -62,8 +71,12 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
         {
           field: "position",
           initialWidth: 65,
-          maxWidth: 300,
+          maxWidth: 250,
           headerName: "Position",
+          valueFormatter: ({ value }) => {
+            if (value == null) return "";
+            return value.map((v: string) => positionMap[v] ?? v).join(", ");
+          },
         },
         {
           multiEdit: true,
@@ -72,6 +85,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             filterPlaceholder: "Filter position",
             className: "GridMultiSelect-containerUnlimited",
             options: [
+              MenuHeaderItem("Header item"),
               { value: "a", label: "Architect" },
               { value: "b", label: "Developer" },
               { value: "c", label: "Product Owner" },
@@ -84,16 +98,69 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
                 subComponent: () => <GridFormSubComponentTextArea required={true} maxLength={5} defaultValue={""} />,
               },
             ],
-            initialSelectedValues: () => ({
-              other: "Hello",
-            }),
             onSave: async (selectedRows, selectedOptions) => {
               // eslint-disable-next-line no-console
               console.log("multiSelect result", { selectedRows, selectedOptions });
 
               await wait(1000);
               const [subValues, normalValues] = partition(selectedOptions, (o) => o.subComponent);
-              const newValue = [...normalValues.map((o) => o.label), ...subValues.map((o) => o.subValue)].join(", ");
+              const newValue = [...normalValues.map((o) => o.value), ...subValues.map((o) => o.subValue)];
+              selectedRows.forEach((row) => (row.position = newValue));
+              return true;
+            },
+          },
+        },
+      ),
+      GridPopoutEditMultiSelect(
+        {
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 250,
+          headerName: "Parcel picker",
+          valueFormatter: ({ value }) => {
+            if (value == null) return "";
+            return value.map((v: string) => positionMap[v] ?? v).join(", ");
+          },
+        },
+        {
+          multiEdit: true,
+          editorParams: {
+            filtered: true,
+            filterPlaceholder: "Filter/add custom parcel...",
+            onSelectFilter: async (filter, options) => {
+              if (options.find((o) => o.label === filter)) return;
+              options.push({ value: filter, label: filter, filter: "freeText", checked: true });
+            },
+            className: "GridMultiSelect-containerLarge",
+            headers: [{ header: "Parcels" }, { header: "Free text", filter: "freeText" }],
+            options: (selectedRows) => {
+              const firstRow = selectedRows[0];
+              const r: MultiFinalSelectOption[] = [
+                { value: "a", label: "Architect" },
+                { value: "b", label: "Developer" },
+                { value: "c", label: "Product Owner" },
+                { value: "d", label: "Scrum Master" },
+                { value: "e", label: "Tester" },
+              ].map((r) => ({ ...r, checked: firstRow.position?.includes(r.value) }));
+              firstRow.position?.forEach(
+                (p) =>
+                  !(p in positionMap) &&
+                  r.push({
+                    value: p,
+                    label: p,
+                    checked: true,
+                    filter: "freeText",
+                  }),
+              );
+              return r;
+            },
+            onSave: async (selectedRows, selectedOptions) => {
+              // eslint-disable-next-line no-console
+              console.log("multiSelect result", { selectedRows, selectedOptions });
+
+              await wait(1000);
+              const [subValues, normalValues] = partition(selectedOptions, (o) => o.subComponent);
+              const newValue = [...normalValues.map((o) => o.value), ...subValues.map((o) => o.subValue)];
               selectedRows.forEach((row) => (row.position = newValue));
               return true;
             },
@@ -113,7 +180,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           editorParams: {
             filtered: true,
             filterPlaceholder: "Filter position",
-            initialSelectedValues: (selectedRows) => [selectedRows[0].position2],
             options: Object.entries(positionTwoMap).map(([k, v]) => ({ value: k, label: v })),
             onSave: async (selectedRows, selectedOptions) => {
               // eslint-disable-next-line no-console
@@ -128,8 +194,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   }, []);
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", position2: "1", position3: "Tester" },
-    { id: 1001, position: "Developer", position2: "2", position3: "Developer" },
+    { id: 1000, position: ["a", "b"], position2: "1", position3: "Tester" },
+    { id: 1001, position: ["c"], position2: "2", position3: "Developer" },
   ] as ITestRow[]);
 
   return (

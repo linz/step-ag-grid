@@ -17,6 +17,7 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
   // This can happen because subcomponent is invoked without type safety
   if (typeof value !== "string") {
     console.error("Value is not a string", value);
+    return null;
   }
   if (props.required && value.length === 0) {
     return `Some text is required`;
