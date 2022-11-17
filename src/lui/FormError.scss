@@ -1,0 +1,7 @@
+@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+
+.helpText {
+  font-size: 0.75rem;
+  color: colors.$fuscous;
+  font-weight: 400;
+}
