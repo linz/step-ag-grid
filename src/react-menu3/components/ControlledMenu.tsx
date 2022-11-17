@@ -131,20 +131,19 @@ export const ControlledMenuFr = (
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
       inputEls = inputEls.filter((el) => !(el as any).disabled);
-
       if (inputEls.length === 0) return;
       const firstInputEl = inputEls[0];
       const lastInputEl = inputEls[inputEls.length - 1];
       if (activeElement !== firstInputEl && activeElement !== lastInputEl) return;
 
-      const suppressAutoSaveEvents = activeElement.getAttribute("data-suppressAutoSaveEvents");
+      const isTextArea = activeElement.nodeName === "TEXTAREA";
+      const suppressEnterAutoSave = activeElement.getAttribute("data-disableEnterAutoSave") || isTextArea;
       const invokeSave = (reason: string) => {
-        if (!saveButtonRef?.current || suppressAutoSaveEvents) return;
+        if (!saveButtonRef?.current) return;
         saveButtonRef.current?.setAttribute("data-reason", reason);
         saveButtonRef?.current?.click();
       };
 
-      const isTextArea = activeElement.nodeName === "TEXTAREA";
       switch (activeElement.nodeName) {
         case "TEXTAREA":
         case "INPUT": {
@@ -160,7 +159,7 @@ export const ControlledMenuFr = (
                   invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
               }
             }
-            if (ev.key === "Enter" && !isTextArea) {
+            if (ev.key === "Enter" && !suppressEnterAutoSave) {
               ev.preventDefault();
               ev.stopPropagation();
               if (isDown) {
@@ -181,7 +180,7 @@ export const ControlledMenuFr = (
                 lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_FORWARD);
               }
             }
-            if (ev.key === "Enter" && !isTextArea) {
+            if (ev.key === "Enter" && !suppressEnterAutoSave) {
               ev.preventDefault();
               ev.stopPropagation();
               if (isDown) {
