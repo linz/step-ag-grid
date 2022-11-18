@@ -285,6 +285,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                     {(ref: MenuInstance) => (
                       <GridSubComponentContext.Provider
                         value={{
+                          context: { options },
                           data,
                           value: subSelectedValue,
                           setValue: (value: any) => {

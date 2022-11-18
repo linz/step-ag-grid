@@ -2,7 +2,7 @@ import "./FormError.scss";
 
 export interface FormErrorProps {
   helpText?: string;
-  error?: string | boolean | null;
+  error?: JSX.Element | string | boolean | null;
 }
 
 export const FormError = (props: FormErrorProps) => {

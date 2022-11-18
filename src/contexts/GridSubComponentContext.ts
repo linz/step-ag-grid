@@ -6,6 +6,7 @@ export interface GridSubComponentContextType {
   setValue: (value: string) => void;
   setValid: (valid: boolean) => void;
   triggerSave: () => Promise<void>;
+  context: any;
 }
 
 export const GridSubComponentContext = createContext<GridSubComponentContextType>({
@@ -20,4 +21,5 @@ export const GridSubComponentContext = createContext<GridSubComponentContextType
   triggerSave: async () => {
     console.error("GridSubComponentContext triggerSave no context");
   },
+  context: null,
 });

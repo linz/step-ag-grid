@@ -9,12 +9,12 @@ import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
 import { MenuHeaderItem, MenuSeparator } from "../../components/gridForm/GridFormDropDown";
-import { wait } from "../../utils/util";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
-import { partition } from "lodash-es";
+import { isEmpty, partition } from "lodash-es";
 import { MultiFinalSelectOption } from "../../components/gridForm/GridFormMultiSelect";
+import { wait } from "../../utils/util";
 
 export default {
   title: "Components / Grids",
@@ -48,11 +48,11 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(() => {
     const positionMap: Record<string, string> = {
-      a: "Architect",
-      b: "Developer",
-      c: "Product Owner",
-      d: "Scrum Master",
-      e: "Tester",
+      lot1: "Lot 1",
+      lot2: "Lot 2",
+      lot3: "Lot 3",
+      appA: "A",
+      appB: "B",
       other: "Other",
     };
     const positionTwoMap: Record<string, string> = {
@@ -86,11 +86,12 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             className: "GridMultiSelect-containerUnlimited",
             options: [
               MenuHeaderItem("Header item"),
-              { value: "a", label: "Architect" },
-              { value: "b", label: "Developer" },
-              { value: "c", label: "Product Owner" },
-              { value: "d", label: "Scrum Master" },
-              { value: "e", label: "Tester" },
+              { value: "lot1", label: "Lot 1" },
+              { value: "lot2", label: "Lot 2" },
+              { value: "lot3", label: "Lot 3" },
+              { value: "lot11", label: "Lot 11" },
+              { value: "appA", label: "A" },
+              { value: "appB", label: "B" },
               MenuSeparator,
               {
                 value: "other",
@@ -127,20 +128,26 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           editorParams: {
             filtered: true,
             filterPlaceholder: "Filter/add custom parcel...",
+            filterHelpText: (filter, options) =>
+              isEmpty(filter) || options.find((o) => o.label && o.label.toLowerCase() === filter.toLowerCase())
+                ? undefined
+                : "Press enter to add free text",
             onSelectFilter: async (filter, options) => {
-              if (options.find((o) => o.label === filter)) return;
+              if (isEmpty(filter) || options.find((o) => o.label && o.label.toLowerCase() === filter.toLowerCase()))
+                return;
               options.push({ value: filter, label: filter, filter: "freeText", checked: true });
             },
             className: "GridMultiSelect-containerLarge",
-            headers: [{ header: "Parcels" }, { header: "Free text", filter: "freeText" }],
+            headers: [{ header: "Free text", filter: "freeText" }, { header: "Parcels" }],
             options: (selectedRows) => {
               const firstRow = selectedRows[0];
               const r: MultiFinalSelectOption[] = [
-                { value: "a", label: "Architect" },
-                { value: "b", label: "Developer" },
-                { value: "c", label: "Product Owner" },
-                { value: "d", label: "Scrum Master" },
-                { value: "e", label: "Tester" },
+                { value: "lot1", label: "Lot 1" },
+                { value: "lot2", label: "Lot 2" },
+                { value: "lot3", label: "Lot 3" },
+                { value: "lot11", label: "Lot 11" },
+                { value: "appA", label: "A" },
+                { value: "appB", label: "B" },
               ].map((r) => ({ ...r, checked: firstRow.position?.includes(r.value) }));
               firstRow.position?.forEach(
                 (p) =>
@@ -194,8 +201,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   }, []);
 
   const [rowData] = useState([
-    { id: 1000, position: ["a", "b"], position2: "1", position3: "Tester" },
-    { id: 1001, position: ["c"], position2: "2", position3: "Developer" },
+    { id: 1000, position: ["lot1", "lot2"], position2: "lot1", position3: "Tester" },
+    { id: 1001, position: ["appA"], position2: "lot2", position3: "Developer" },
   ] as ITestRow[]);
 
   return (

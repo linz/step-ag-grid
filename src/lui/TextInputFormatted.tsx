@@ -12,7 +12,7 @@ export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes
 
   // Custom fields
   helpText?: string;
-  error?: string | boolean | null;
+  error?: JSX.Element | string | boolean | null;
   formatted?: string;
 }
 

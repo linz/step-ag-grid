@@ -19,7 +19,7 @@ export interface GridSubComponentTextAreaProps<RowType extends GridBaseRow>
 export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
   props: GridSubComponentTextAreaProps<RowType>,
 ): JSX.Element => {
-  const { value, data, setValue, setValid } = useContext(GridSubComponentContext);
+  const { value, data, setValue, setValid, context } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press tab to save";
 
@@ -28,7 +28,7 @@ export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const invalid = useCallback(() => TextInputValidator(props, value, data), [data, props, value]);
+  const invalid = useCallback(() => TextInputValidator(props, value, data, context), [data, props, value, context]);
 
   useEffect(() => {
     setValid(value != null && invalid() == null);

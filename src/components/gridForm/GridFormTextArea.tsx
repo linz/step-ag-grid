@@ -23,7 +23,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
 
   const helpText = props.helpText ?? "Press tab to save";
 
-  const invalid = useCallback(() => TextInputValidator(props, value, data), [props, value, data]);
+  const invalid = useCallback(() => TextInputValidator(props, value, data, {}), [props, value, data]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {

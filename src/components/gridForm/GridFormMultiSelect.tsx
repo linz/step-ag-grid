@@ -12,10 +12,13 @@ import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { isNotEmpty } from "../../utils/util";
+import { matcher } from "matcher";
+import { FormError } from "../../lui/FormError";
 
 export interface MultiFinalSelectOption {
   value: any;
-  label?: JSX.Element | string;
+  label?: string;
   subComponent?: (props: any) => JSX.Element;
   subValue?: any;
   filter?: string;
@@ -39,6 +42,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends C
     | undefined;
   filtered?: boolean;
   filterPlaceholder?: string;
+  filterHelpText?: string | ((filter: string, options: MultiFinalSelectOption[]) => string | undefined);
   onSelectFilter?: (filter: string, options: MultiFinalSelectOption[]) => void;
   onSave?: (selectedRows: RowType[], selectedOptions: MultiFinalSelectOption[]) => Promise<boolean>;
   headers?: GridFormMultiSelectGroup[];
@@ -112,7 +116,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
       setOptions(optionsList);
       optionsInitialising.current = false;
     })();
-  }, [props.filtered, props.options, options, selectedRows]);
+  }, [props.options, options, selectedRows]);
 
   const toggleValue = useCallback(
     (item: MultiFinalSelectOption) => {
@@ -131,21 +135,17 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
   const headerGroups = useMemo(() => {
     if (options == null) return undefined;
 
-    const filterString = filter.trim().toLowerCase();
+    let filterFn = (_: string | undefined) => true;
+    if (props.filtered) {
+      filterFn = (value) => {
+        if (value === undefined) return true;
+        const subFilters = filter.split(/\s+/).map((s) => ["*" + s, s + "*"]);
+        return subFilters.every((subFilter) => isNotEmpty(matcher(value, subFilter)));
+      };
+    }
     const filteredOutValues =
       props.filtered &&
-      new Set(
-        options
-          .map((option) => {
-            if (option.label != null && typeof option.label !== "string") {
-              console.error("Cannot filter non-string labels", option);
-              return undefined;
-            }
-            const str = (option.label as string) || "";
-            return str.toLowerCase().indexOf(filterString) === -1 ? option.value : undefined;
-          })
-          .filter((r) => r !== undefined),
-      );
+      new Set(options.map((option) => (filterFn(option.label) ? undefined : option.value)).filter((r) => r));
 
     const result: Record<string, MultiFinalSelectOption[]> = {};
     const headers = props?.headers ?? [{ filter: undefined, header: undefined }];
@@ -166,29 +166,43 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
           <>
             <FocusableItem className={"filter-item"} key={"filter"}>
               {(_: any) => (
-                <div style={{ display: "flex", width: "100%" }} className={"GridFormMultiSelect-filter"}>
-                  <input
-                    className={"free-text-input"}
-                    style={{ border: "0px" }}
-                    type="text"
-                    placeholder={props.filterPlaceholder ?? "Placeholder"}
-                    data-testid={"filteredMenu-free-text-input"}
-                    value={filter}
-                    data-disableEnterAutoSave={true}
-                    onChange={(e) => setFilter(e.target.value)}
-                    onKeyUp={(e) => {
-                      if (e.key === "Enter" && props.onSelectFilter) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        props.onSelectFilter(filter, options);
-                        setOptions([...options]);
-                        setFilter(() => "");
-                        // Scroll to new option?
-                        // scrollIntoView(ref)
-                      }
-                    }}
-                  />
-                </div>
+                <>
+                  <div style={{ width: "100%" }} className={"GridFormMultiSelect-filter"}>
+                    <input
+                      className={"LuiTextInput-input"}
+                      type="text"
+                      placeholder={props.filterPlaceholder ?? "Placeholder"}
+                      data-testid={"filteredMenu-free-text-input"}
+                      value={filter}
+                      data-disableEnterAutoSave={true}
+                      onChange={(e) => setFilter(e.target.value)}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && props.onSelectFilter) {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          const preFilterOptions = JSON.stringify(options);
+                          props.onSelectFilter(filter.trim(), options);
+                          if (preFilterOptions === JSON.stringify(options)) {
+                            // Nothing changed
+                            return;
+                          }
+                          setOptions([...options]);
+                          setFilter(() => "");
+                        }
+                      }}
+                    />
+                    {props.filterHelpText && (
+                      <FormError
+                        error={null}
+                        helpText={
+                          typeof props.filterHelpText === "function"
+                            ? props.filterHelpText(filter.trim(), options)
+                            : props.filterHelpText
+                        }
+                      />
+                    )}
+                  </div>
+                </>
               )}
             </FocusableItem>
             <MenuDivider key={`$$divider_filter`} />
@@ -242,6 +256,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                               item.subComponent && (
                                 <GridSubComponentContext.Provider
                                   value={{
+                                    context: { options },
                                     data,
                                     value: item.subValue,
                                     setValue: (value: any) => {

@@ -17,7 +17,7 @@ export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaE
   label?: JSX.Element | string;
   mandatory?: boolean;
   helpText?: string;
-  error?: string | boolean | null;
+  error?: JSX.Element | string | boolean | null;
 }
 
 export const TextAreaInput = (props: LuiTextAreaInputProps) => {

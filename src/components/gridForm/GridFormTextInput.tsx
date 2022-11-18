@@ -24,7 +24,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
   const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);
   const [value, setValue] = useState(initValue);
 
-  const invalid = useCallback(() => TextInputValidator<RowType>(props, value, data), [data, props, value]);
+  const invalid = useCallback(() => TextInputValidator<RowType>(props, value, data, {}), [data, props, value]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {

@@ -8,7 +8,7 @@ import { CloseReason } from "../react-menu3/utils";
 
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
-  invalid?: () => Promise<boolean | string | null> | boolean | string | null;
+  invalid?: () => Promise<JSX.Element | boolean | string | null> | JSX.Element | boolean | string | null;
   save?: (selectedRows: RowType[]) => Promise<boolean>;
 }
 
