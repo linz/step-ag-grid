@@ -18,7 +18,7 @@ export const textMatch = (text: string | undefined | null, filter: string) => {
     .split(",")
     .map((sf) => sf.trim())
     .filter((sf) => sf);
-  const values = text.trim().split(/\s+/);
+  const values = text.replaceAll(",", " ").trim().split(/\s+/);
   return (
     isEmpty(superFilters) || // Not filtered
     superFilters.some((superFilter) => {
