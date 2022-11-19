@@ -41,6 +41,13 @@
 }
 
 .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
-  display: none !important;
+  display: none;
 }
 
+.ag-cell:hover .Grid-displayWhenCellFocused {
+  display: inherit;
+}
+
+.ag-cell-wrapper {
+  width: 100%;
+}
