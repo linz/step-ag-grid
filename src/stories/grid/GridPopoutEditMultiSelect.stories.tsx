@@ -51,6 +51,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       lot1: "Lot 1",
       lot2: "Lot 2",
       lot3: "Lot 3",
+      lot4: "Lot A 482392",
       appA: "A",
       appB: "B",
       other: "Other",
@@ -90,6 +91,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               { value: "lot2", label: "Lot 2" },
               { value: "lot3", label: "Lot 3" },
               { value: "lot11", label: "Lot 11" },
+              { value: "lot4", label: "Lot A 482392" },
               { value: "appA", label: "A" },
               { value: "appB", label: "B" },
               MenuSeparator,
@@ -146,6 +148,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
                 { value: "lot2", label: "Lot 2" },
                 { value: "lot3", label: "Lot 3" },
                 { value: "lot11", label: "Lot 11" },
+                { value: "lot4", label: "Lot A 482392" },
                 { value: "appA", label: "A" },
                 { value: "appB", label: "B" },
               ].map((r) => ({ ...r, checked: firstRow.position?.includes(r.value) }));

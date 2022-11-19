@@ -10,8 +10,10 @@ import { isMatch } from "matcher";
  * "*L" => *L
  * "A B" => A* and B*
  * "A B, C" => (A* and B*) or C*
+ *
+ * Returns ture if there's a text match.
  */
-export const textMatch = (text: string | undefined | null, filter: string) => {
+export const textMatch = (text: string | undefined | null, filter: string): boolean => {
   if (text == null) return true;
 
   const superFilters = filter
