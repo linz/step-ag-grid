@@ -41,11 +41,11 @@
 }
 
 .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
-  display: none;
+  visibility: hidden;
 }
 
 .ag-cell:hover .Grid-displayWhenCellFocused {
-  display: inherit;
+  visibility: inherit;
 }
 
 .ag-cell-wrapper {
