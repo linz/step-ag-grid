@@ -4,7 +4,7 @@ import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-me
 import { useCallback, useEffect, useMemo, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { isEmpty, pick } from "lodash-es";
+import { isEmpty, pick, toPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuHeaderString, MenuSeparatorString } from "./GridFormDropDown";
@@ -234,6 +234,9 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
             </FocusableItem>
             <MenuDivider key={`$$divider_filter`} />
           </>
+        )}
+        {props.filtered && headerGroups && !toPairs(headerGroups).some(([_, options]) => !isEmpty(options)) && (
+          <div className={"szh-menu__item"}>[No items match the filter]</div>
         )}
         {headerGroups && (
           <div className={"GridFormMultiSelect-options"}>
