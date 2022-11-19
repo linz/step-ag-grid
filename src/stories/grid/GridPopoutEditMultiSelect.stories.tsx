@@ -13,8 +13,8 @@ import { GridFormSubComponentTextArea } from "../../components/gridForm/GridForm
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
 import { isEmpty, partition } from "lodash-es";
-import { MultiFinalSelectOption } from "../../components/gridForm/GridFormMultiSelect";
 import { wait } from "../../utils/util";
+import { MultiSelectOption } from "../../components/gridForm/GridFormMultiSelect";
 
 export default {
   title: "Components / Grids",
@@ -143,7 +143,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             headers: [{ header: "Free text", filter: "freeText" }, { header: "Parcels" }],
             options: (selectedRows) => {
               const firstRow = selectedRows[0];
-              const r: MultiFinalSelectOption[] = [
+              const r: MultiSelectOption[] = [
                 { value: "lot1", label: "Lot 1" },
                 { value: "lot2", label: "Lot 2" },
                 { value: "lot3", label: "Lot 3" },

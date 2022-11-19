@@ -1,7 +1,17 @@
 import "../../styles/GridFormMultiSelect.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useMemo, useRef, useState, KeyboardEvent, SetStateAction, Dispatch } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  KeyboardEvent,
+  SetStateAction,
+  Dispatch,
+  Fragment,
+} from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { groupBy, isEmpty, pick, toPairs } from "lodash-es";
@@ -59,7 +69,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
 
   const invalid = useCallback(() => {
     if (!options) return true;
-    const selectedValues = options?.filter((o) => o.checked).map((o) => o.value);
+    const selectedValues = options.filter((o) => o.checked).map((o) => o.value);
     const subValidations = pick(subComponentIsValidRef.current, selectedValues);
     if (Object.values(subValidations).some((v) => !v)) return true;
     return (
@@ -112,6 +122,8 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
     [filter, options],
   );
 
+  const headers: GridFormMultiSelectGroup[] = useMemo(() => props.headers ?? [{ header: "" }], [props.headers]);
+
   const { popoverWrapper, triggerSave } = useGridPopoverHook({
     className: props.className,
     invalid,
@@ -120,54 +132,49 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
 
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
-      <>
-        {options && props.filtered && (
-          <FilterInput
-            headerGroups={headerGroups}
-            options={options}
-            setOptions={setOptions}
-            filter={filter}
-            setFilter={setFilter}
-            filterHelpText={props.filterHelpText}
-            onSelectFilter={props.onSelectFilter}
-            filterPlaceholder={props.filterPlaceholder}
-          />
-        )}
+      {options && (
+        <>
+          {props.filtered && (
+            <FilterInput
+              {...{ headerGroups, options, setOptions, filter, setFilter }}
+              filterHelpText={props.filterHelpText}
+              onSelectFilter={props.onSelectFilter}
+              filterPlaceholder={props.filterPlaceholder}
+            />
+          )}
 
-        {headerGroups && options && (
-          <div className={"GridFormMultiSelect-options"}>
-            {(props.headers ?? [{ filter: undefined, header: undefined }]).map((header) => (
-              <>
-                {header?.header && !isEmpty(headerGroups[`${header.filter}`]) && (
-                  <MenuHeader>{header.header}</MenuHeader>
-                )}
-                {headerGroups[`${header.filter}`]?.map(
-                  (item, index) =>
-                    item.filter === header.filter &&
-                    (item.value === MenuSeparatorString ? (
-                      <MenuDivider key={`$$divider_${index}`} />
-                    ) : (
-                      <div key={`${item.value}`}>
-                        <MenuRadioItem item={item} options={options} setOptions={setOptions} />
+          {headerGroups && (
+            <div className={"GridFormMultiSelect-options"}>
+              {headers.map((header) => {
+                const subOptions = headerGroups[`${header.filter}`];
+                return (
+                  !isEmpty(subOptions) && (
+                    <>
+                      {header.header && <MenuHeader>{header.header}</MenuHeader>}
+                      {subOptions.map((item, index) =>
+                        item.value === MenuSeparatorString ? (
+                          <MenuDivider key={`div_${index}`} />
+                        ) : (
+                          <Fragment key={`val_${item.value}`}>
+                            <MenuRadioItem item={item} options={options} setOptions={setOptions} />
 
-                        {item.checked && item.subComponent && (
-                          <MenuSubComponent
-                            item={item}
-                            options={options}
-                            setOptions={setOptions}
-                            data={data}
-                            triggerSave={triggerSave}
-                            subComponentIsValid={subComponentIsValidRef.current}
-                          />
-                        )}
-                      </div>
-                    )),
-                )}
-              </>
-            ))}
-          </div>
-        )}
-      </>
+                            {item.checked && item.subComponent && (
+                              <MenuSubComponent
+                                {...{ item, options, setOptions, data, triggerSave }}
+                                subComponentIsValid={subComponentIsValidRef.current}
+                              />
+                            )}
+                          </Fragment>
+                        ),
+                      )}
+                    </>
+                  )
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </ComponentLoadingWrapper>,
   );
 };
@@ -190,16 +197,16 @@ const FilterInput = (props: {
 
     if (isEmpty(filter.trim())) {
       // Toggle off if any items are checked otherwise on
-      const anyChecked = options.some((option) => option.checked);
+      const anyChecked = options.some((o) => o.checked);
       options.forEach((o) => (o.checked = !anyChecked));
     } else {
       // Toggle on if any filtered items are checked otherwise off
       const anyChecked = Object.values(headerGroups).some((headerOptions) =>
-        headerOptions.some((option) => option.checked === false),
+        headerOptions.some((o) => o.checked === false),
       );
       Object.values(headerGroups).forEach((headerOptions) => {
-        headerOptions.forEach((option) => {
-          if (option.checked !== undefined) option.checked = anyChecked;
+        headerOptions.forEach((o) => {
+          if (o.checked !== undefined) o.checked = anyChecked;
         });
       });
     }
@@ -215,7 +222,7 @@ const FilterInput = (props: {
     if (preFilterOptions === JSON.stringify(options)) return;
 
     setOptions([...options]);
-    setFilter(() => "");
+    setFilter("");
   }, [filter, onSelectFilter, options, setFilter, setOptions]);
 
   const handleKeyUp = useCallback(
@@ -237,7 +244,6 @@ const FilterInput = (props: {
         {(_: any) => (
           <div style={{ width: "100%" }} className={"GridFormMultiSelect-filter"}>
             <input
-              tabIndex={1}
               className={"LuiTextInput-input"}
               type="text"
               placeholder={filterPlaceholder ?? "Placeholder"}
@@ -298,9 +304,9 @@ const MenuRadioItem = (props: {
         label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
         inputProps={{
           onClick: (e) => {
+            // Click is handled by MenuItem onClick
             e.preventDefault();
             e.stopPropagation();
-            return false;
           },
         }}
         onChange={() => {
@@ -331,7 +337,7 @@ const MenuSubComponent = (props: {
               value: item.subValue,
               setValue: (value: any) => {
                 item.subValue = value;
-                options && setOptions([...options]);
+                setOptions([...options]);
               },
               setValid: (valid: boolean) => {
                 subComponentIsValid[`${item.value}`] = valid;
