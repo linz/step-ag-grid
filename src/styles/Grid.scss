@@ -39,3 +39,8 @@
   padding: 4px 8px;
   max-width: 400px;
 }
+
+.ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
+  display: none !important;
+}
+
