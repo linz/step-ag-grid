@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, MutableRefObject } from "react";
-import { HoverActionTypes, indexOfNode } from "../utils";
+import { focusFirstInput, HoverActionTypes, indexOfNode } from "../utils";
 import { FocusPosition } from "../types";
 
 export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObject<any> | undefined) => {
@@ -84,16 +84,19 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
           index++;
           if (index >= items.length) index = 0;
           newItem = items[index];
+          focusFirstInput(newItem);
           break;
 
-        case HoverActionTypes.DECREASE:
+        case HoverActionTypes.DECREASE: {
           sortItems();
           index = hoverIndex;
           if (index < 0) index = items.indexOf(item);
           index--;
           if (index < 0) index = items.length - 1;
           newItem = items[index];
+          focusFirstInput(newItem);
           break;
+        }
 
         default:
           if (process.env.NODE_ENV !== "production")

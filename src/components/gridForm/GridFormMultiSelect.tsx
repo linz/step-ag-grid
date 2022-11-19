@@ -1,7 +1,7 @@
 import "../../styles/GridFormMultiSelect.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, KeyboardEvent } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { isEmpty, pick } from "lodash-es";
@@ -12,9 +12,8 @@ import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { isNotEmpty } from "../../utils/util";
-import { matcher } from "matcher";
 import { FormError } from "../../lui/FormError";
+import { textMatch } from "../../utils/textMatcher";
 
 export interface MultiFinalSelectOption {
   value: any;
@@ -137,11 +136,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
 
     let filterFn = (_: string | undefined) => true;
     if (props.filtered) {
-      filterFn = (value) => {
-        if (value === undefined) return true;
-        const subFilters = filter.split(/\s+/).map((s) => ["*" + s, s + "*"]);
-        return subFilters.every((subFilter) => isNotEmpty(matcher(value, subFilter)));
-      };
+      filterFn = (value) => textMatch(value, filter);
     }
     const filteredOutValues =
       props.filtered &&
@@ -159,6 +154,49 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
     return result;
   }, [filter, options, props.filtered, props?.headers]);
 
+  const toggleSelectAllVisible = useCallback(() => {
+    if (!options || !headerGroups) return;
+
+    // Toggle if all items are checked
+    const checkAll = Object.values(headerGroups).some((headerOptions) =>
+      headerOptions.some((option) => option.checked === false),
+    );
+    Object.values(headerGroups).forEach((headerOptions) => {
+      headerOptions.forEach((option) => {
+        if (option.checked !== undefined) option.checked = checkAll;
+      });
+    });
+    setOptions([...options]);
+  }, [headerGroups, options]);
+
+  const addCustomFilterValue = useCallback(() => {
+    if (!options || !props.onSelectFilter) return;
+
+    const preFilterOptions = JSON.stringify(options);
+    props.onSelectFilter(filter.trim(), options);
+    // Detect if options list changed and update
+    if (preFilterOptions === JSON.stringify(options)) return;
+
+    setOptions([...options]);
+    setFilter(() => "");
+  }, [filter, options, props]);
+
+  const handleKeyUp = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.ctrlKey) {
+          toggleSelectAllVisible();
+        } else if (props.onSelectFilter) {
+          addCustomFilterValue();
+        }
+      }
+    },
+    [addCustomFilterValue, props.onSelectFilter, toggleSelectAllVisible],
+  );
+
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
       <>
@@ -169,27 +207,16 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                 <>
                   <div style={{ width: "100%" }} className={"GridFormMultiSelect-filter"}>
                     <input
+                      tabIndex={1}
                       className={"LuiTextInput-input"}
                       type="text"
                       placeholder={props.filterPlaceholder ?? "Placeholder"}
                       data-testid={"filteredMenu-free-text-input"}
                       value={filter}
-                      data-disableEnterAutoSave={true}
+                      data-disableenterautosave={true}
+                      data-allowtabtoSave={true}
                       onChange={(e) => setFilter(e.target.value)}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && props.onSelectFilter) {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          const preFilterOptions = JSON.stringify(options);
-                          props.onSelectFilter(filter.trim(), options);
-                          if (preFilterOptions === JSON.stringify(options)) {
-                            // Nothing changed
-                            return;
-                          }
-                          setOptions([...options]);
-                          setFilter(() => "");
-                        }
-                      }}
+                      onKeyUp={handleKeyUp}
                     />
                     {props.filterHelpText && (
                       <FormError

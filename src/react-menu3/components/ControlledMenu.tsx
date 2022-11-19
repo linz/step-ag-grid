@@ -137,7 +137,8 @@ export const ControlledMenuFr = (
       if (activeElement !== firstInputEl && activeElement !== lastInputEl) return;
 
       const isTextArea = activeElement.nodeName === "TEXTAREA";
-      const suppressEnterAutoSave = activeElement.getAttribute("data-disableEnterAutoSave") || isTextArea;
+      const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautoSave") || isTextArea;
+      const allowTabToSave = activeElement.getAttribute("data-allowtabtoSave");
       const invokeSave = (reason: string) => {
         if (!saveButtonRef?.current) return;
         saveButtonRef.current?.setAttribute("data-reason", reason);
@@ -147,7 +148,7 @@ export const ControlledMenuFr = (
       switch (activeElement.nodeName) {
         case "TEXTAREA":
         case "INPUT": {
-          if (activeElement === lastInputEl && activeElement === firstInputEl) {
+          if ((activeElement === lastInputEl && activeElement === firstInputEl) || allowTabToSave) {
             if (ev.key === "Tab") {
               // Can't forward/backwards tab out of popup
               ev.preventDefault();

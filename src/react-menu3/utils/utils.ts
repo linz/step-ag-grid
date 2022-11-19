@@ -86,3 +86,18 @@ export function commonProps(isDisabled?: boolean, isHovering?: boolean) {
 }
 
 export const indexOfNode = (nodeList: NodeListOf<Node>, node: Node) => findIndex(nodeList, node);
+
+export const focusFirstInput = (container: any) => {
+  if (!(container instanceof Element)) return false;
+  const inputs = container.querySelectorAll("input[type='text'],textarea");
+  const input = inputs[0];
+  if (input instanceof HTMLElement) {
+    input.focus();
+    // Text areas should start at end
+    if (input instanceof HTMLTextAreaElement) {
+      input.selectionStart = input.value.length;
+    }
+    return true;
+  }
+  return false;
+};
