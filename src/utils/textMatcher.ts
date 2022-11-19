@@ -24,12 +24,7 @@ export const textMatch = (text: string | undefined | null, filter: string): bool
   return (
     isEmpty(superFilters) || // Not filtered
     superFilters.some((superFilter) => {
-      const subFilters = superFilter.split(/\s+/).map((s) =>
-        s.includes("*")
-          ? s // * or ! implies user entered a wildcard expression
-          : s.replaceAll(/([*?])/g, "\\$1"),
-      );
-
+      const subFilters = superFilter.split(/\s+/).map((s) => s.replaceAll(/([!?])/g, "\\$1"));
       return subFilters.every((subFilter) => values.some((value) => isMatch(value, subFilter)));
     })
   );
