@@ -99,7 +99,7 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
           </div>
           <div style={{ marginTop: 25 }}>
             <input
-              data-disableEnterAutoSave
+              data-disableenterautosave
               type="button"
               style={{ height: 48 }}
               onClick={() => setShowModal(true)}
