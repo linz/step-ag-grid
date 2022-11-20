@@ -1,10 +1,20 @@
 import "../../styles/GridFormMultiSelect.scss";
 
-import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  KeyboardEvent,
+  SetStateAction,
+  Dispatch,
+  Fragment,
+} from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay, fromPairs, isEqual, omit, pick, toPairs } from "lodash-es";
+import { groupBy, isEmpty, pick, toPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
@@ -12,20 +22,24 @@ import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
+import { FormError } from "../../lui/FormError";
+import { textMatch } from "../../utils/textMatcher";
 
-interface MultiFinalSelectOption<ValueType> {
-  value: ValueType;
-  label?: JSX.Element | string;
+export interface MultiSelectOption {
+  value: any;
+  label?: string;
   subComponent?: (props: any) => JSX.Element;
-}
-
-export type MultiSelectOption<ValueType> = ValueType | MultiFinalSelectOption<ValueType>;
-
-export interface SelectedOptionResult<ValueType> extends MultiFinalSelectOption<ValueType> {
   subValue?: any;
+  filter?: string;
+  checked?: boolean;
 }
 
-export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType> extends CellEditorCommon {
+export interface GridFormMultiSelectGroup {
+  header: string;
+  filter?: string;
+}
+
+export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends CellEditorCommon {
   className?:
     | "GridMultiSelect-containerSmall"
     | "GridMultiSelect-containerMedium"
@@ -35,218 +49,306 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow, ValueType
     | undefined;
   filtered?: boolean;
   filterPlaceholder?: string;
-  onSave?: (selectedRows: RowType[], selectedOptions: SelectedOptionResult<ValueType>[]) => Promise<boolean>;
-  options:
-    | MultiSelectOption<ValueType>[]
-    | ((selectedRows: RowType[]) => Promise<MultiSelectOption<ValueType>[]> | MultiSelectOption<ValueType>[]);
-  initialSelectedValues?: (selectedRows: RowType[]) => any[] | Record<string, null | any>;
+  filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
+  onSelectFilter?: (filter: string, options: MultiSelectOption[]) => void;
+  onSave?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => Promise<boolean>;
+  headers?: GridFormMultiSelectGroup[];
+  options: MultiSelectOption[] | ((selectedRows: RowType[]) => Promise<MultiSelectOption[]> | MultiSelectOption[]);
+  invalid?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => boolean;
 }
 
-export const GridFormMultiSelect = <RowType extends GridBaseRow, ValueType>(
-  props: GridFormMultiSelectProps<RowType, ValueType>,
-) => {
+export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridFormMultiSelectProps<RowType>) => {
   const { selectedRows, data } = useGridPopoverContext<RowType>();
 
-  const initialiseValues = useMemo(() => {
-    const r = props.initialSelectedValues && props.initialSelectedValues(selectedRows);
-    // convert array of strings to object<value,null>
-    return Array.isArray(r) ? fromPairs(r.map((v) => [v, null])) : r;
-  }, [props, selectedRows]);
-
-  const subComponentIsValid = useRef<Record<string, boolean>>({});
-  const [selectedValues, setSelectedValues] = useState<Record<string, null | any>>(() => initialiseValues ?? {});
+  const subComponentIsValidRef = useRef<Record<string, boolean>>({});
+  const optionsInitialising = useRef(false);
 
   const [filter, setFilter] = useState("");
-  const [filteredValues, setFilteredValues] = useState<any[]>([]);
-  const optionsInitialising = useRef(false);
-  const [options, setOptions] = useState<MultiFinalSelectOption<ValueType>[]>();
+  const [initialValues, setInitialValues] = useState("");
+  const [options, setOptions] = useState<MultiSelectOption[]>();
 
   const invalid = useCallback(() => {
-    const validations = pick(subComponentIsValid.current, Object.keys(selectedValues));
-    return Object.values(validations).some((v) => !v);
-  }, [selectedValues]);
+    if (!options) return true;
+    const selectedValues = options.filter((o) => o.checked).map((o) => o.value);
+    const subValidations = pick(subComponentIsValidRef.current, selectedValues);
+    if (Object.values(subValidations).some((v) => !v)) return true;
+    return (
+      props.invalid &&
+      props.invalid(
+        selectedRows,
+        options.filter((o) => o.checked),
+      )
+    );
+  }, [options, props, selectedRows]);
 
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
-      if (props.onSave) {
-        if (!options) {
-          console.error("options not initialised");
-          return false;
-        }
+      if (!options || !props.onSave) return true;
 
-        const validations = pick(subComponentIsValid.current, Object.keys(selectedValues));
-        const notValid = Object.values(validations).some((v) => !v);
-        if (notValid) return false;
+      // Any changes to save?
+      if (initialValues === JSON.stringify(options)) return true;
 
-        const menuOptionSubValueResult = toPairs(selectedValues).map(([value, subValue]) => {
-          const o = {
-            ...options.find((o) => o.value == value),
-          } as SelectedOptionResult<ValueType>;
-          o.subValue = subValue;
-          return o;
-        });
-
-        if (isEqual(initialiseValues, selectedValues)) {
-          // No changes to save
-          return true;
-        }
-
-        return await props.onSave(selectedRows, menuOptionSubValueResult);
-      }
-      return true;
+      return props.onSave(
+        selectedRows,
+        options.filter((o) => o.checked),
+      );
     },
-    [initialiseValues, options, props, selectedValues],
+    [initialValues, options, props],
   );
 
   // Load up options list if it's async function
   useEffect(() => {
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
-    let optionsConf = props.options ?? [];
 
     (async () => {
-      if (typeof optionsConf == "function") {
-        optionsConf = await optionsConf(selectedRows);
-      }
-
-      const optionsList = optionsConf?.map((item) => {
-        if (item == null || typeof item === "string" || typeof item === "number") {
-          item = { value: item as ValueType, label: item } as MultiFinalSelectOption<ValueType>;
-        }
-        return item;
-      }) as any as MultiFinalSelectOption<ValueType>[];
-
-      if (props.filtered) {
-        // This is needed otherwise when filter input is rendered and sets autofocus
-        // the mouse up of the double click edit triggers the cell to cancel editing
-        delay(() => setOptions(optionsList), 100);
-      } else {
-        setOptions(optionsList);
-      }
+      const optionsList = typeof props.options === "function" ? await props.options(selectedRows) : props.options;
+      setInitialValues(JSON.stringify(optionsList));
+      setOptions(optionsList);
       optionsInitialising.current = false;
     })();
-  }, [props.filtered, props.options, options, selectedRows]);
+  }, [options, props, selectedRows]);
 
-  useEffect(() => {
-    if (!props.filtered || options == null) return;
-    setFilteredValues(
-      options
-        .map((option) => {
-          if (option.label != null && typeof option.label !== "string") {
-            console.error("Cannot filter non-string labels", option);
-            return undefined;
-          }
-          const str = (option.label as string) || "";
-          return str.toLowerCase().indexOf(filter.trim()) === -1 ? option.value : undefined;
-        })
-        .filter((r) => r !== undefined),
-    );
-  }, [props.filtered, filter, options]);
-
-  const toggleValue = useCallback(
-    (item: MultiFinalSelectOption<ValueType>) => {
-      if (`${item.value}` in selectedValues) {
-        setSelectedValues(omit(selectedValues, [`${item.value}`]));
-      } else {
-        setSelectedValues({ ...selectedValues, [`${item.value}`]: null });
-      }
-    },
-    [selectedValues],
+  /**
+   * Groups options into their header groups
+   */
+  const headerGroups = useMemo(
+    () =>
+      options &&
+      groupBy(
+        options.filter((o) => textMatch(o.label, filter) && o.value),
+        "filter",
+      ),
+    [filter, options],
   );
+
+  const headers: GridFormMultiSelectGroup[] = useMemo(() => props.headers ?? [{ header: "" }], [props.headers]);
 
   const { popoverWrapper, triggerSave } = useGridPopoverHook({
     className: props.className,
     invalid,
     save,
   });
+
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
-      <>
-        {options && props.filtered && (
-          <>
-            <FocusableItem className={"filter-item"} key={"filter"}>
-              {({ ref }: any) => (
-                <div style={{ display: "flex", width: "100%" }} className={"GridFormMultiSelect-filter"}>
-                  <input
-                    autoFocus
-                    className={"free-text-input"}
-                    style={{ border: "0px" }}
-                    ref={ref}
-                    type="text"
-                    placeholder={props.filterPlaceholder ?? "Placeholder"}
-                    data-testid={"filteredMenu-free-text-input"}
-                    defaultValue={""}
-                    onChange={(e) => setFilter(e.target.value.toLowerCase())}
-                  />
-                </div>
-              )}
-            </FocusableItem>
-            <MenuDivider key={`$$divider_filter`} />
-          </>
-        )}
-        <div className={"GridFormMultiSelect-options"}>
-          {options?.map((item, index) =>
-            item.value === MenuSeparatorString ? (
-              <MenuDivider key={`$$divider_${index}`} />
-            ) : filteredValues.includes(item.value) ? null : (
-              <div key={`${index}`}>
-                <MenuItem
-                  onClick={(e: ClickEvent) => {
-                    // Global react-menu MenuItem handler handles tabs
-                    if (e.key !== "Tab") {
-                      e.keepOpen = true;
-                      toggleValue(item);
-                    }
-                  }}
-                >
-                  <LuiCheckboxInput
-                    isChecked={`${item.value}` in selectedValues}
-                    value={`${item.value}`}
-                    label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                    inputProps={{
-                      onClick: (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
-                      },
-                    }}
-                    onChange={() => {
-                      /*Do nothing, change handled by menuItem*/
-                    }}
-                  />
-                </MenuItem>
-
-                {`${item.value}` in selectedValues && item.subComponent && (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-                    {(_: any) =>
-                      item.subComponent && (
-                        <GridSubComponentContext.Provider
-                          value={{
-                            data,
-                            value: selectedValues[`${item.value}`],
-                            setValue: (value: any) => {
-                              setSelectedValues({
-                                ...selectedValues,
-                                [`${item.value}`]: value,
-                              });
-                            },
-                            setValid: (valid: boolean) => {
-                              subComponentIsValid.current[`${item.value}`] = valid;
-                            },
-                            triggerSave,
-                          }}
-                        >
-                          <item.subComponent />
-                        </GridSubComponentContext.Provider>
-                      )
-                    }
-                  </FocusableItem>
-                )}
-              </div>
-            ),
+      {options && (
+        <>
+          {props.filtered && (
+            <FilterInput
+              {...{ headerGroups, options, setOptions, filter, setFilter }}
+              filterHelpText={props.filterHelpText}
+              onSelectFilter={props.onSelectFilter}
+              filterPlaceholder={props.filterPlaceholder}
+            />
           )}
-        </div>
-      </>
+
+          {headerGroups && (
+            <div className={"GridFormMultiSelect-options"}>
+              {headers.map((header) => {
+                const subOptions = headerGroups[`${header.filter}`];
+                return (
+                  !isEmpty(subOptions) && (
+                    <>
+                      {header.header && <MenuHeader>{header.header}</MenuHeader>}
+                      {subOptions.map((item, index) =>
+                        item.value === MenuSeparatorString ? (
+                          <MenuDivider key={`div_${index}`} />
+                        ) : (
+                          <Fragment key={`val_${item.value}`}>
+                            <MenuRadioItem item={item} options={options} setOptions={setOptions} />
+
+                            {item.checked && item.subComponent && (
+                              <MenuSubComponent
+                                {...{ item, options, setOptions, data, triggerSave }}
+                                subComponentIsValid={subComponentIsValidRef.current}
+                              />
+                            )}
+                          </Fragment>
+                        ),
+                      )}
+                    </>
+                  )
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </ComponentLoadingWrapper>,
+  );
+};
+
+const FilterInput = (props: {
+  options: MultiSelectOption[];
+  setOptions: (options: MultiSelectOption[]) => void;
+  onSelectFilter?: (filter: string, options: MultiSelectOption[]) => void;
+  filter: string;
+  setFilter: Dispatch<SetStateAction<string>>;
+  headerGroups: Record<string, MultiSelectOption[]> | undefined;
+  filterPlaceholder?: string;
+  filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
+}) => {
+  const { options, setOptions, onSelectFilter, filter, setFilter, headerGroups, filterPlaceholder, filterHelpText } =
+    props;
+
+  const toggleSelectAllVisible = useCallback(() => {
+    if (!options || !headerGroups) return;
+
+    if (isEmpty(filter.trim())) {
+      // Toggle off if any items are checked otherwise on
+      const anyChecked = options.some((o) => o.checked);
+      options.forEach((o) => (o.checked = !anyChecked));
+    } else {
+      // Toggle on if any filtered items are checked otherwise off
+      const anyChecked = Object.values(headerGroups).some((headerOptions) =>
+        headerOptions.some((o) => o.checked === false),
+      );
+      Object.values(headerGroups).forEach((headerOptions) => {
+        headerOptions.forEach((o) => {
+          if (o.checked !== undefined) o.checked = anyChecked;
+        });
+      });
+    }
+    setOptions([...options]);
+  }, [filter, headerGroups, options, setOptions]);
+
+  const addCustomFilterValue = useCallback(() => {
+    if (!options || !onSelectFilter) return;
+
+    const preFilterOptions = JSON.stringify(options);
+    onSelectFilter(filter.trim(), options);
+    // Detect if options list changed and update
+    if (preFilterOptions === JSON.stringify(options)) return;
+
+    setOptions([...options]);
+    setFilter("");
+  }, [filter, onSelectFilter, options, setFilter, setOptions]);
+
+  const handleKeyUp = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (e.ctrlKey) toggleSelectAllVisible();
+        else if (onSelectFilter) addCustomFilterValue();
+      }
+    },
+    [addCustomFilterValue, onSelectFilter, toggleSelectAllVisible],
+  );
+
+  return (
+    <>
+      <FocusableItem className={"filter-item"} key={"filter"}>
+        {(_: any) => (
+          <div style={{ width: "100%" }} className={"GridFormMultiSelect-filter"}>
+            <input
+              className={"LuiTextInput-input"}
+              type="text"
+              placeholder={filterPlaceholder ?? "Placeholder"}
+              data-testid={"filteredMenu-free-text-input"}
+              value={filter}
+              data-disableenterautosave={true}
+              data-allowtabtoSave={true}
+              onChange={(e) => setFilter(e.target.value)}
+              onKeyUp={handleKeyUp}
+            />
+            {filterHelpText && (
+              <FormError
+                error={null}
+                helpText={
+                  typeof filterHelpText === "function" ? filterHelpText(filter.trim(), options) : filterHelpText
+                }
+              />
+            )}
+          </div>
+        )}
+      </FocusableItem>
+      <MenuDivider key={`$$divider_filter`} />
+      {headerGroups && !toPairs(headerGroups).some(([_, options]) => !isEmpty(options)) && (
+        <div className={"szh-menu__item"}>[No items match the filter]</div>
+      )}
+    </>
+  );
+};
+
+const MenuRadioItem = (props: {
+  item: MultiSelectOption;
+  options: MultiSelectOption[];
+  setOptions: (options: MultiSelectOption[]) => void;
+}) => {
+  const { item, options, setOptions } = props;
+
+  const toggleValue = useCallback(
+    (item: MultiSelectOption) => {
+      item.checked = !item.checked;
+      setOptions([...options]);
+    },
+    [options, setOptions],
+  );
+
+  return (
+    <MenuItem
+      onClick={(e: ClickEvent) => {
+        // Global react-menu MenuItem handler handles tabs
+        if (e.key !== "Tab") {
+          e.keepOpen = true;
+          toggleValue(item);
+        }
+      }}
+    >
+      <LuiCheckboxInput
+        isChecked={item.checked ?? false}
+        value={`${item.value}`}
+        label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+        inputProps={{
+          onClick: (e) => {
+            // Click is handled by MenuItem onClick
+            e.preventDefault();
+            e.stopPropagation();
+          },
+        }}
+        onChange={() => {
+          /*Do nothing, change handled by menuItem*/
+        }}
+      />
+    </MenuItem>
+  );
+};
+
+const MenuSubComponent = (props: {
+  data: any;
+  item: MultiSelectOption;
+  options: MultiSelectOption[];
+  setOptions: (options: MultiSelectOption[]) => void;
+  subComponentIsValid: Record<string, boolean>;
+  triggerSave: () => Promise<void>;
+}) => {
+  const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
+  return (
+    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+      {(_: any) =>
+        item.subComponent && (
+          <GridSubComponentContext.Provider
+            value={{
+              context: { options },
+              data,
+              value: item.subValue,
+              setValue: (value: any) => {
+                item.subValue = value;
+                setOptions([...options]);
+              },
+              setValid: (valid: boolean) => {
+                subComponentIsValid[`${item.value}`] = valid;
+              },
+              triggerSave,
+            }}
+          >
+            <item.subComponent />
+          </GridSubComponentContext.Provider>
+        )
+      }
+    </FocusableItem>
   );
 };

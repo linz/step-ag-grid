@@ -17,7 +17,7 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
 export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
   props: GridFormSubComponentTextInputProps<RowType>,
 ): JSX.Element => {
-  const { value, setValue, setValid, data } = useContext(GridSubComponentContext);
+  const { value, setValue, setValid, data, context } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press enter or tab to save";
 
@@ -26,7 +26,7 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
     if (value == null) setValue(props.defaultValue);
   }, [props.defaultValue, setValue, value]);
 
-  const invalid = useCallback(() => TextInputValidator(props, value, data), [data, props, value]);
+  const invalid = useCallback(() => TextInputValidator(props, value, data, context), [context, data, props, value]);
 
   useEffect(() => {
     setValid(value != null && invalid() == null);
@@ -40,9 +40,7 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
       helpText={helpText}
       autoFocus={true}
       placeholder={props.placeholder}
-      style={{
-        width: "100%",
-      }}
+      style={{ width: "100%" }}
     />
   );
 };

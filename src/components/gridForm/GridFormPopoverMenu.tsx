@@ -137,6 +137,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                       item.subComponent && (
                         <GridSubComponentContext.Provider
                           value={{
+                            context: {},
                             data,
                             value: subSelectedValue,
                             setValue: (value: any) => {

@@ -7,6 +7,7 @@ import {
   CloseReason,
   commonProps,
   floatEqual,
+  focusFirstInput,
   FocusPositions,
   getScrollAncestor,
   getTransition,
@@ -380,18 +381,7 @@ export const MenuList = ({
           if (!menuRef.current.contains(document.activeElement)) {
             // Handle popover portal focus
             const popupElement = focusRef.current?.nextSibling;
-            if (popupElement instanceof Element) {
-              const input = popupElement.querySelectorAll("input,textarea")[0] as HTMLElement;
-              if (input) {
-                input.focus();
-                // Text areas should start at end
-                if (input instanceof HTMLTextAreaElement) {
-                  input.selectionStart = input.value.length;
-                }
-              } else {
-                focusRef.current?.focus();
-              }
-            } else {
+            if (!focusFirstInput(popupElement)) {
               focusRef.current?.focus();
             }
             setItemFocus();
