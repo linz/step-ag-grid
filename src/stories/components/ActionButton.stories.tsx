@@ -28,6 +28,8 @@ const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
         onAction={performAction}
         iconPosition={"right"}
         level={"secondary"}
+        className={"ActionButton-fill"}
+        style={{ maxWidth: 160 }}
       />
     </>
   );

@@ -5,6 +5,10 @@
   align-items: center;
 }
 
+.ActionButton-minimal {
+  padding-right: 38px !important;
+}
+
 .ActionButton .LuiIcon {
   margin: 0 4px !important;
 }
@@ -30,3 +34,9 @@
     fill: transparent !important;
   }
 }
+
+.ActionButton-fill {
+  width: 100%;
+  justify-content: center;
+}
+

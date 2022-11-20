@@ -17,11 +17,12 @@ export interface ActionButtonProps {
   dataTestId?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
   iconPosition?: "left" | "right";
-  className?: string;
+  className?: "ActionButton-fill" | string;
   onAction: () => Promise<void> | void;
   // Used for external code to get access to whether action is in progress
   externalSetInProgress?: () => void;
   level?: LuiButtonProps["level"];
+  style?: React.CSSProperties;
 }
 
 // Kept this less than one second, so I don't have issues with waitFor as it defaults to 1s
@@ -32,6 +33,7 @@ export const ActionButton = ({
   name,
   inProgressName,
   dataTestId,
+  style,
   className,
   title,
   onAction,
@@ -65,9 +67,15 @@ export const ActionButton = ({
       level={level}
       title={title ?? ariaLabel ?? name}
       aria-label={ariaLabel ?? name}
-      className={clsx("lui-button-icon-right", "ActionButton", className, localInProgress && "ActionButton-inProgress")}
+      className={clsx(
+        "lui-button-icon-right",
+        "ActionButton",
+        className,
+        localInProgress && "ActionButton-inProgress",
+        name != null && !className?.includes("ActionButton-fill") && "ActionButton-minimal",
+      )}
       size={"lg"}
-      style={name == null ? { padding: "8px 5px" } : {}}
+      style={{ ...(name == null && { padding: "8px 5px" }), ...style }}
       onClick={async () => {
         const promise = onAction();
         const isPromise = typeof promise !== "undefined";
