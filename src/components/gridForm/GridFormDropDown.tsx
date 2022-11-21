@@ -224,8 +224,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
               <div style={{ display: "flex", width: "100%" }}>
                 <input
                   autoFocus
-                  className={"free-text-input"}
-                  style={{ border: "0px" }}
+                  className={"LuiTextInput-input"}
                   ref={ref}
                   type="text"
                   placeholder={props.filterPlaceholder ?? "Placeholder"}
@@ -242,7 +241,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
           {options && options.length == filteredValues?.length && (
-            <MenuItem key={`${fieldToString(field)}-empty`}>[Empty]</MenuItem>
+            <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
+              No Options
+            </MenuItem>
           )}
           {options?.map((item: FinalSelectOption, index) =>
             item.value === MenuSeparatorString ? (
