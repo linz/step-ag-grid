@@ -49,6 +49,7 @@ export const GridPopoverContextProvider = ({ props, children }: GridPopoverConte
         data: props.data,
         value: props.value,
         updateValue,
+        formatValue: props.formatValue,
       }}
     >
       {children}

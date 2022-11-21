@@ -3,7 +3,7 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 export const bearingValueFormatter = (params: ValueFormatterParams): string => {
   const value = typeof params.value == "string" ? parseFloat(params.value) : params.value;
   if (value == null) {
-    return "-";
+    return "–";
   }
   return convertDDToDMS(value, false, false);
 };
@@ -11,7 +11,7 @@ export const bearingValueFormatter = (params: ValueFormatterParams): string => {
 export const bearingCorrectionValueFormatter = (params: ValueFormatterParams): string => {
   const value = params.value;
   if (value == null) {
-    return "-";
+    return "–";
   }
   if (typeof value === "string") {
     return convertDDToDMS(bearingNumberParser(value), true, true);

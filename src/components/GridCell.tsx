@@ -78,7 +78,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     }),
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value == null) return "-";
+      if (params.value == null) return "–";
       const types = ["number", "boolean", "string"];
       if (types.includes(typeof params.value)) return `${params.value}`;
       else return JSON.stringify(params.value);

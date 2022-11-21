@@ -3,7 +3,7 @@ import "../../styles/GridFormEditBearing.scss";
 import { useCallback, useMemo, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { bearingNumberParser, bearingStringValidator, convertDDToDMS } from "../../utils/bearing";
+import { bearingNumberParser, bearingStringValidator } from "../../utils/bearing";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
@@ -15,7 +15,7 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
 }
 
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
-  const { field, value: initialValue } = useGridPopoverContext<RowType>();
+  const { field, value: initialValue, formatValue } = useGridPopoverContext<RowType>();
 
   // This clears out any scientific precision
   const defaultValue = useMemo(
@@ -65,7 +65,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         }}
         autoFocus={true}
         placeholder={props.placeHolder}
-        formatted={bearingStringValidator(value, props.range) ? "?" : convertDDToDMS(bearingNumberParser(value))}
+        formatted={bearingStringValidator(value, props.range) ? "?" : formatValue(bearingNumberParser(value))}
         error={bearingStringValidator(value, props.range)}
         helpText={"Press enter or tab to save"}
       />

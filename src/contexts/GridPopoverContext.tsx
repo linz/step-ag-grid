@@ -18,6 +18,7 @@ export interface GridPopoverContextType<RowType extends GridBaseRow> {
   data: RowType;
   selectedRows: RowType[];
   updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1) => Promise<boolean>;
+  formatValue: (value: any) => any;
 }
 
 export const GridPopoverContext = createContext<GridPopoverContextType<any>>({
@@ -29,6 +30,7 @@ export const GridPopoverContext = createContext<GridPopoverContextType<any>>({
   data: {} as GridBaseRow,
   selectedRows: [],
   updateValue: async () => false,
+  formatValue: () => "! No gridPopoverContextProvider !",
 });
 
 export const useGridPopoverContext = <RowType extends GridBaseRow>() =>
