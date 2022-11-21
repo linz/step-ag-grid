@@ -114,6 +114,12 @@ export const typeOtherInput = async (value: string): Promise<void> => {
   userEvent.type(otherInput, value);
 };
 
+export const typeOtherTextArea = async (value: string): Promise<void> => {
+  const openMenu = await findOpenMenu();
+  const otherTextArea = await findQuick({ tagName: "textarea" }, openMenu);
+  userEvent.type(otherTextArea, value);
+};
+
 export const closeMenu = (): void => {
   userEvent.click(document.body);
 };
