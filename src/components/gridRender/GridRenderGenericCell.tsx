@@ -5,7 +5,6 @@ import { GridUpdatingContext } from "../../contexts/GridUpdatingContext";
 import { GridLoadableCell } from "../GridLoadableCell";
 import { GridIcon } from "../GridIcon";
 import { ColDef, ICellRendererParams } from "ag-grid-community";
-import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
 
@@ -33,13 +32,9 @@ export const GridRendererGenericCell = <RowType extends GridBaseRow>(props: ICel
   const infoFn = cellRendererParams?.info;
   const infoText = infoFn ? infoFn(props) : undefined;
 
-  const defaultFormatter = (props: ValueFormatterParams): string => props.value;
-  const formatter = colDef.valueFormatter ?? defaultFormatter;
-  if (typeof formatter === "string") {
-    console.error("valueFormatter must be a function");
-    return <span>valueFormatter must be a function</span>;
-  }
-  const formatted = formatter(props as ValueFormatterParams);
+  const defaultFormatter = (value: any): string => value;
+  const formatter = props.formatValue ?? defaultFormatter;
+  const formatted = formatter(props.value);
 
   return (
     <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>

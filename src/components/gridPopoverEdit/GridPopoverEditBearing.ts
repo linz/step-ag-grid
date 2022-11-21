@@ -12,7 +12,6 @@ export const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
     {
       initialWidth: 65,
       maxWidth: 150,
-      valueFormatter: bearingValueFormatter,
       ...colDef,
     },
     {

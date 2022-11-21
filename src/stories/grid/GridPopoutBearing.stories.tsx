@@ -37,8 +37,8 @@ export default {
 
 interface ITestRow {
   id: number;
-  bearing1: string | number | null;
   bearingCorrection: number | null;
+  bearing: string | number | null;
 }
 
 const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
@@ -51,29 +51,29 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         initialWidth: 65,
         maxWidth: 85,
       }),
-      GridPopoverEditBearing(
+      GridPopoverEditBearingCorrection(
         {
-          field: "bearing1",
-          headerName: "Bearing GCE",
+          field: "bearingCorrection",
+          headerName: "Bearing correction",
           cellRendererParams: {
-            warning: (props: any) => props.data.id == 1002 && "Testers are testing",
-            info: (props: any) => props.data.id == 1001 && "Developers are developing",
+            warning: (props) => props.data.id == 1002 && "Testers are testing",
+            info: (props) => props.data.id == 1001 && "Developers are developing",
           },
         },
         {
           multiEdit: false,
         },
       ),
-      GridPopoverEditBearingCorrection(
+      GridPopoverEditBearing(
         {
-          field: "bearingCorrection",
-          headerName: "Bearing Correction",
+          field: "bearing",
+          headerName: "Bearing",
         },
         {
           editorParams: {
-            onSave: async (selectedRows, value: ITestRow["bearingCorrection"]) => {
+            onSave: async (selectedRows, value: ITestRow["bearing"]) => {
               await wait(1000);
-              selectedRows.forEach((row) => (row["bearingCorrection"] = value));
+              selectedRows.forEach((row) => (row["bearing"] = value));
               return true;
             },
           },
@@ -84,10 +84,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 
   const [rowData] = useState([
-    { id: 1000, bearing1: 1.234, bearingCorrection: 90 },
-    { id: 1001, bearing1: "0E-12", bearingCorrection: 240 },
-    { id: 1002, bearing1: null, bearingCorrection: 355.1 },
-    { id: 1003, bearing1: null, bearingCorrection: 0 },
+    { id: 1000, bearing: 1.234, bearingCorrection: null },
+    { id: 1001, bearing: "0E-12", bearingCorrection: 240 },
+    { id: 1002, bearing: null, bearingCorrection: 355.1 },
+    { id: 1003, bearing: null, bearingCorrection: 0 },
   ] as ITestRow[]);
 
   return (
