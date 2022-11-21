@@ -199,13 +199,18 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
+            filterHelpText: "Press enter to save custom value",
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
             onSelectedItem: async (selected) => {
+              // eslint-disable-next-line no-console
+              console.log("onSelectedItem selected", selected);
               selected.selectedRows.forEach((row) => (row.code = selected.value.code));
             },
             onSelectFilter: async (selected) => {
+              // eslint-disable-next-line no-console
+              console.log("onSelectFilter selected", selected);
               selected.selectedRows.forEach((row) => (row.code = selected.value));
             },
           },

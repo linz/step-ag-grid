@@ -1,7 +1,7 @@
 import "../../styles/GridFormDropDown.scss";
 
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { delay } from "lodash-es";
@@ -12,6 +12,10 @@ import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 import { CloseReason } from "../../react-menu3/utils";
+import { GridContext } from "../../contexts/GridContext";
+import { MultiSelectOption } from "./GridFormMultiSelect";
+import { FormError } from "../../lui/FormError";
+import { isNotEmpty } from "../../utils/util";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType> {
   // Note the row that was clicked on will be first
@@ -49,6 +53,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extend
   // local means the filter won't change if it's reloaded, reload means it does change
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
+  filterHelpText?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
   onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
   options: SelectOption[] | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption[]> | SelectOption[]);
@@ -60,6 +65,7 @@ const fieldToString = (field: any) => {
 };
 
 export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPopoutDropDownProps<RowType>) => {
+  const { stopEditing } = useContext(GridContext);
   const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
@@ -103,11 +109,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   );
 
   const selectFilterHandler = useCallback(
-    async (value: string) =>
-      updateValue(async (selectedRows) => {
+    async (value: string) => {
+      await updateValue(async (selectedRows) => {
         props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
         return true;
-      }, 0),
+      }, 0);
+    },
     [props, updateValue],
   );
 
@@ -155,7 +162,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
               return undefined;
             }
             const str = (option.label as string) || "";
-            return str.toLowerCase().indexOf(filter) === -1 ? option.value : undefined;
+            return str.toLowerCase().indexOf(filter.toLowerCase()) === -1 ? option.value : undefined;
           })
           .filter((r) => r !== undefined),
       );
@@ -186,28 +193,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   const save = useCallback(async () => {
     if (!options) return true;
 
-    const activeOptions = options.filter((option) => !filteredValues.includes(option.value));
-    if (activeOptions.length === 1) {
-      await selectItemHandler(activeOptions[0].value);
-    } else if (activeOptions.length === 0 && props.onSelectFilter) {
-      await selectFilterHandler(filter);
-    } else {
-      // Handler for sub-selected value
-      if (!selectedSubComponent) return true;
-      if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
-      await selectItemHandler(selectedSubComponent.value, subSelectedValue);
-    }
+    // Handler for sub-selected value
+    if (!selectedSubComponent) return true;
+    if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
+    await selectItemHandler(selectedSubComponent.value, subSelectedValue);
+
     return true;
-  }, [
-    filter,
-    filteredValues,
-    options,
-    props.onSelectFilter,
-    selectFilterHandler,
-    selectItemHandler,
-    selectedSubComponent,
-    subSelectedValue,
-  ]);
+  }, [options, selectItemHandler, selectedSubComponent, subSelectedValue]);
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
@@ -215,13 +207,38 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
     save,
   });
 
+  const enterKeyPressedRef = useRef(false);
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.stopPropagation();
+      e.preventDefault();
+      enterKeyPressedRef.current = true;
+    }
+  }, []);
+
+  const handleKeyUp = useCallback(
+    async (e: KeyboardEvent) => {
+      if (!options) return;
+
+      if (e.key === "Enter") {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!enterKeyPressedRef.current) return;
+
+        props.onSelectFilter && (await selectFilterHandler(filter));
+        stopEditing();
+      }
+    },
+    [filter, options, props.onSelectFilter, selectFilterHandler, stopEditing],
+  );
+
   return popoverWrapper(
     <>
       {props.filtered && (
         <div className={"GridFormDropDown-filter"}>
           <FocusableItem className={"filter-item"}>
             {({ ref }: any) => (
-              <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <input
                   autoFocus
                   className={"LuiTextInput-input"}
@@ -230,8 +247,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   placeholder={props.filterPlaceholder ?? "Placeholder"}
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
-                  onChange={(e) => setFilter(e.target.value.toLowerCase())}
+                  data-disableenterautosave={true}
+                  data-allowtabtoSave={true}
+                  onChange={(e) => setFilter(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onKeyUp={handleKeyUp}
                 />
+                {props.filterHelpText && isNotEmpty(filter) && (
+                  <FormError error={null} helpText={props.filterHelpText} />
+                )}
               </div>
             )}
           </FocusableItem>
