@@ -13,7 +13,6 @@ import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 import { CloseReason } from "../../react-menu3/utils";
 import { GridContext } from "../../contexts/GridContext";
-import { MultiSelectOption } from "./GridFormMultiSelect";
 import { FormError } from "../../lui/FormError";
 import { isNotEmpty } from "../../utils/util";
 
