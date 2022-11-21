@@ -1,14 +1,6 @@
 import { createContext, RefObject, useContext } from "react";
 import { GridBaseRow } from "../components/Grid";
 
-export interface PropsType {
-  value: any;
-  data: any;
-  field: string;
-  selectedRows: any[];
-  updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>) => Promise<boolean>;
-}
-
 export interface GridPopoverContextType<RowType extends GridBaseRow> {
   anchorRef: RefObject<Element>;
   saving: boolean;
