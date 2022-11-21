@@ -247,7 +247,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   data-disableenterautosave={true}
-                  data-allowtabtoSave={true}
+                  data-allowtabtosave={true}
                   onChange={(e) => setFilter(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onKeyUp={handleKeyUp}
