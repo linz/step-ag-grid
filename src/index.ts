@@ -45,3 +45,4 @@ export * from "./lui/ActionButton";
 
 export * from "./utils/bearing";
 export * from "./utils/util";
+export * from "./utils/testUtil";

@@ -138,7 +138,7 @@ export const ControlledMenuFr = (
 
       const isTextArea = activeElement.nodeName === "TEXTAREA";
       const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") || isTextArea;
-      const allowTabToSave = activeElement.getAttribute("data-allowtabtoSave");
+      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave");
       const invokeSave = (reason: string) => {
         if (!saveButtonRef?.current) return;
         saveButtonRef.current?.setAttribute("data-reason", reason);

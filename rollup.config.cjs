@@ -44,7 +44,7 @@ module.exports = {
   ],
   plugins: [
     peerDepsExternal(),
-    resolve(),
+    resolve({ preferBuiltins: true }),
     commonjs(),
     typescript({
       exclude: ["src/stories/**/*.*"],

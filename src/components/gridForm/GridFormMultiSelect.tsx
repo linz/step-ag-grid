@@ -250,7 +250,7 @@ const FilterInput = (props: {
               data-testid={"filteredMenu-free-text-input"}
               value={filter}
               data-disableenterautosave={true}
-              data-allowtabtoSave={true}
+              data-allowtabtosave={true}
               onChange={(e) => setFilter(e.target.value)}
               onKeyUp={handleKeyUp}
             />
