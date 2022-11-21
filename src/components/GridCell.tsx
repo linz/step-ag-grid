@@ -71,7 +71,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     suppressKeyboardEvent: (e) => {
       // It's important that aggrid doesn't trigger edit on enter
       // as the incorrect selected rows will be returned
-      return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", "Space"].includes(e.event.key);
+      return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " "].includes(e.event.key);
     },
     ...(custom?.editorParams && {
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
