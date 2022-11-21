@@ -13,6 +13,9 @@ import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 import { CloseReason } from "../../react-menu3/utils";
 import { GridContext } from "../../contexts/GridContext";
+import { MultiSelectOption } from "./GridFormMultiSelect";
+import { FormError } from "../../lui/FormError";
+import { isNotEmpty } from "../../utils/util";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType> {
   // Note the row that was clicked on will be first
@@ -50,6 +53,7 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extend
   // local means the filter won't change if it's reloaded, reload means it does change
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
+  filterHelpText?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
   onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
   options: SelectOption[] | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption[]> | SelectOption[]);
@@ -234,7 +238,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
         <div className={"GridFormDropDown-filter"}>
           <FocusableItem className={"filter-item"}>
             {({ ref }: any) => (
-              <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <input
                   autoFocus
                   className={"LuiTextInput-input"}
@@ -249,6 +253,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   onKeyDown={handleKeyDown}
                   onKeyUp={handleKeyUp}
                 />
+                {props.filterHelpText && isNotEmpty(filter) && (
+                  <FormError error={null} helpText={props.filterHelpText} />
+                )}
               </div>
             )}
           </FocusableItem>

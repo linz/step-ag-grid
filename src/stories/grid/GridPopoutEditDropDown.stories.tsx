@@ -199,6 +199,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
           editorParams: {
             filtered: "local",
             filterPlaceholder: "Filter this",
+            filterHelpText: "Press enter to save custom value",
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
