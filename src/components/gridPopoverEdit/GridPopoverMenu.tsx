@@ -1,6 +1,5 @@
 import "./GridPopoverMenu.scss";
 
-import { GenericMultiEditCellClass } from "../GenericCellClass";
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormPopoverMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoverMenu";
@@ -18,9 +17,8 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
     {
       maxWidth: 40,
       editable: colDef.editable != null ? colDef.editable : true,
-      cellStyle: { justifyContent: "flex-end" },
+      cellStyle: { justifyContent: "center" },
       cellRenderer: GridRenderPopoutMenuCell,
-      cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
       ...colDef,
       cellRendererParams: {
         // Menus open on single click, this parameter is picked up in Grid.tsx
