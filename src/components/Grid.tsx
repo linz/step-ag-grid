@@ -29,6 +29,8 @@ export interface GridProps {
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
+  animateRows?: boolean;
+  rowClassRules?: GridOptions["rowClassRules"];
 }
 
 /**
@@ -246,6 +248,9 @@ export const Grid = (params: GridProps): JSX.Element => {
         </div>
       )}
       <AgGridReact
+        animateRows={params.animateRows}
+        rowClassRules={params.rowClassRules}
+        defaultColDef={params.defaultColDef}
         getRowId={(params) => `${params.data.id}`}
         suppressRowClickSelection={true}
         rowSelection={"multiple"}
