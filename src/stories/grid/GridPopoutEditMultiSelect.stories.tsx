@@ -145,7 +145,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               const firstRow = selectedRows[0];
               const r: MultiSelectOption[] = [
                 { value: "lot1", label: "Lot 1" },
-                { value: "lot2", label: "Lot 2" },
+                { value: "lot2", label: "Lot 2", warning: "Don't select me" },
                 { value: "lot3", label: "Lot 3" },
                 { value: "lot11", label: "Lot 11" },
                 { value: "lot4", label: "Lot A 482392" },
