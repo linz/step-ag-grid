@@ -11,8 +11,8 @@ export const GridPopoverEditDropDown = <RowType extends GridBaseRow>(
     editor: GridFormDropDown,
     ...props,
     editorParams: {
-      // Defaults to medium size container
-      className: "GridPopoverEditDropDown-containerMedium",
+      // Defaults to large size container
+      className: "GridPopoverEditDropDown-containerLarge",
       ...(props.editorParams as GridFormPopoutDropDownProps<RowType>),
     },
   });
