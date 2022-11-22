@@ -8,7 +8,7 @@ import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextP
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
 import { useMemo, useState } from "react";
-import { MenuHeaderItem, MenuSeparator } from "../../components/gridForm/GridFormDropDown";
+import { MenuSeparator } from "../../components/gridForm/GridFormDropDown";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoutEditMultiSelect } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelect";
@@ -85,8 +85,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             filtered: true,
             filterPlaceholder: "Filter position",
             className: "GridMultiSelect-containerUnlimited",
+            headers: [{ header: "Header item" }],
             options: [
-              MenuHeaderItem("Header item"),
               { value: "lot1", label: "Lot 1" },
               { value: "lot2", label: "Lot 2" },
               { value: "lot3", label: "Lot 3" },
