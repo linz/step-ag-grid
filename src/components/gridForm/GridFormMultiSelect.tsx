@@ -225,6 +225,7 @@ const FilterInput = (props: {
     setFilter("");
   }, [filter, onSelectFilter, options, setFilter, setOptions]);
 
+  const lastKeyWasEnter = useRef(false);
   const handleKeyUp = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -233,6 +234,12 @@ const FilterInput = (props: {
 
         if (e.ctrlKey) toggleSelectAllVisible();
         else if (onSelectFilter) addCustomFilterValue();
+        lastKeyWasEnter.current = true;
+      } else if (e.key === "Control") {
+        lastKeyWasEnter.current && setFilter("");
+        lastKeyWasEnter.current = false;
+      } else {
+        lastKeyWasEnter.current = false;
       }
     },
     [addCustomFilterValue, onSelectFilter, toggleSelectAllVisible],
