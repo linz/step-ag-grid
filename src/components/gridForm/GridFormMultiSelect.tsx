@@ -24,6 +24,7 @@ import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { FormError } from "../../lui/FormError";
 import { textMatch } from "../../utils/textMatcher";
+import { GridIcon } from "../GridIcon";
 
 type HeaderGroupType = Record<string, MultiSelectOption[]> | undefined;
 
@@ -34,6 +35,7 @@ export interface MultiSelectOption {
   subValue?: any;
   filter?: string;
   checked?: boolean;
+  warning?: string | undefined;
 }
 
 export interface GridFormMultiSelectGroup {
@@ -363,7 +365,12 @@ const MenuRadioItem = (props: {
       <LuiCheckboxInput
         isChecked={item.checked ?? false}
         value={`${item.value}`}
-        label={item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+        label={
+          <>
+            {item.warning && <GridIcon icon={"ic_warning"} title={item.warning} />}
+            {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+          </>
+        }
         inputProps={{
           onClick: (e) => {
             // Click is handled by MenuItem onClick
