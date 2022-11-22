@@ -85,8 +85,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
             filtered: true,
             filterPlaceholder: "Filter position",
             className: "GridMultiSelect-containerUnlimited",
+            headers: [{ header: "Header item" }],
             options: [
-              MenuHeaderItem("Header item"),
               { value: "lot1", label: "Lot 1" },
               { value: "lot2", label: "Lot 2" },
               { value: "lot3", label: "Lot 3" },

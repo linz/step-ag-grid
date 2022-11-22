@@ -14,7 +14,7 @@ import {
 } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { groupBy, isEmpty, pick, toPairs } from "lodash-es";
+import { fromPairs, groupBy, isEmpty, pick, toPairs } from "lodash-es";
 import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
@@ -24,6 +24,8 @@ import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { FormError } from "../../lui/FormError";
 import { textMatch } from "../../utils/textMatcher";
+
+type HeaderGroupType = Record<string, MultiSelectOption[]> | undefined;
 
 export interface MultiSelectOption {
   value: any;
@@ -112,15 +114,34 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
   /**
    * Groups options into their header groups
    */
-  const headerGroups = useMemo(
-    () =>
-      options &&
-      groupBy(
-        options.filter((o) => textMatch(o.label, filter) && o.value),
-        "filter",
-      ),
-    [filter, options],
-  );
+  const headerGroups = useMemo(() => {
+    if (!options) return undefined;
+    const result = groupBy(
+      options.filter((o) => textMatch(o.label, filter) && o.value),
+      "filter",
+    );
+    // remove leading/trailing/duplicate dividers
+    return fromPairs(
+      toPairs(result).map(([key, arr]) => {
+        let lastWasDivider = true;
+        return [
+          key,
+          arr
+            .map((row, index) => {
+              if (row.value === MenuSeparatorString) {
+                if (lastWasDivider) return null;
+                if (index === arr.length - 1) return null;
+                lastWasDivider = true;
+              } else {
+                lastWasDivider = false;
+              }
+              return row;
+            })
+            .filter((r) => r),
+        ];
+      }),
+    ) as HeaderGroupType;
+  }, [filter, options]);
 
   const headers: GridFormMultiSelectGroup[] = useMemo(() => props.headers ?? [{ header: "" }], [props.headers]);
 
@@ -136,7 +157,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
         <>
           {props.filtered && (
             <FilterInput
-              {...{ headerGroups, options, setOptions, filter, setFilter }}
+              {...{ headerGroups, options, setOptions, filter, setFilter, triggerSave }}
               filterHelpText={props.filterHelpText}
               onSelectFilter={props.onSelectFilter}
               filterPlaceholder={props.filterPlaceholder}
@@ -185,12 +206,25 @@ const FilterInput = (props: {
   onSelectFilter?: (filter: string, options: MultiSelectOption[]) => void;
   filter: string;
   setFilter: Dispatch<SetStateAction<string>>;
-  headerGroups: Record<string, MultiSelectOption[]> | undefined;
+  headerGroups: HeaderGroupType;
   filterPlaceholder?: string;
   filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
+  triggerSave: () => Promise<void>;
 }) => {
-  const { options, setOptions, onSelectFilter, filter, setFilter, headerGroups, filterPlaceholder, filterHelpText } =
-    props;
+  const {
+    options,
+    setOptions,
+    onSelectFilter,
+    filter,
+    setFilter,
+    headerGroups,
+    filterPlaceholder,
+    filterHelpText,
+    triggerSave,
+  } = props;
+
+  const enterHasBeenPressed = useRef(false);
+  const lastKeyWasEnter = useRef(false);
 
   const toggleSelectAllVisible = useCallback(() => {
     if (!options || !headerGroups) return;
@@ -198,7 +232,9 @@ const FilterInput = (props: {
     if (isEmpty(filter.trim())) {
       // Toggle off if any items are checked otherwise on
       const anyChecked = options.some((o) => o.checked);
-      options.forEach((o) => (o.checked = !anyChecked));
+      options.forEach((o) => {
+        if (o.label !== undefined) o.checked = !anyChecked;
+      });
     } else {
       // Toggle on if any filtered items are checked otherwise off
       const anyChecked = Object.values(headerGroups).some((headerOptions) =>
@@ -206,7 +242,7 @@ const FilterInput = (props: {
       );
       Object.values(headerGroups).forEach((headerOptions) => {
         headerOptions.forEach((o) => {
-          if (o.checked !== undefined) o.checked = anyChecked;
+          if (o.label !== undefined) o.checked = anyChecked;
         });
       });
     }
@@ -216,16 +252,27 @@ const FilterInput = (props: {
   const addCustomFilterValue = useCallback(() => {
     if (!options || !onSelectFilter) return;
 
+    const filterTrimmed = filter.trim();
+    if (isEmpty(filterTrimmed)) {
+      triggerSave().then();
+      return;
+    }
+
     const preFilterOptions = JSON.stringify(options);
-    onSelectFilter(filter.trim(), options);
+    onSelectFilter(filterTrimmed, options);
     // Detect if options list changed and update
     if (preFilterOptions === JSON.stringify(options)) return;
 
     setOptions([...options]);
     setFilter("");
-  }, [filter, onSelectFilter, options, setFilter, setOptions]);
+  }, [filter, onSelectFilter, options, setFilter, setOptions, triggerSave]);
 
-  const lastKeyWasEnter = useRef(false);
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      enterHasBeenPressed.current = true;
+    }
+  }, []);
+
   const handleKeyUp = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -233,7 +280,14 @@ const FilterInput = (props: {
         e.preventDefault();
 
         if (e.ctrlKey) toggleSelectAllVisible();
-        else if (onSelectFilter) addCustomFilterValue();
+        else if (enterHasBeenPressed.current) {
+          const filterTrimmed = filter.trim();
+          if (isEmpty(filterTrimmed)) {
+            triggerSave().then();
+            return;
+          }
+          onSelectFilter && addCustomFilterValue();
+        }
         lastKeyWasEnter.current = true;
       } else if (e.key === "Control") {
         lastKeyWasEnter.current && setFilter("");
@@ -242,7 +296,7 @@ const FilterInput = (props: {
         lastKeyWasEnter.current = false;
       }
     },
-    [addCustomFilterValue, onSelectFilter, toggleSelectAllVisible],
+    [addCustomFilterValue, filter, onSelectFilter, setFilter, toggleSelectAllVisible, triggerSave],
   );
 
   return (
@@ -259,6 +313,7 @@ const FilterInput = (props: {
               data-disableenterautosave={true}
               data-allowtabtosave={true}
               onChange={(e) => setFilter(e.target.value)}
+              onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
             />
             {filterHelpText && (
@@ -274,7 +329,7 @@ const FilterInput = (props: {
       </FocusableItem>
       <MenuDivider key={`$$divider_filter`} />
       {headerGroups && !toPairs(headerGroups).some(([_, options]) => !isEmpty(options)) && (
-        <div className={"szh-menu__item"}>[No items match the filter]</div>
+        <div className={"szh-menu__item GridPopoverEditDropDown-noOptions"}>No Options</div>
       )}
     </>
   );
