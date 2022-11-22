@@ -1,7 +1,7 @@
 import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
-import { GenericMultiEditCellClass } from "./GenericCellClass";
+import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
 import {
   GenericCellColDef,
   GenericCellRendererParams,
@@ -64,7 +64,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(custom?.editor && {
-      cellClass: custom?.multiEdit ? GenericMultiEditCellClass : undefined,
+      cellClassRules: GridCellMultiSelectClassRules,
       editable: props.editable ?? true,
       cellEditor: GenericCellEditorComponentWrapper(custom),
     }),

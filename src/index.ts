@@ -14,7 +14,7 @@ export { Grid } from "./components/Grid";
 export * from "./components/GridCell";
 export { GridIcon } from "./components/GridIcon";
 export { ComponentLoadingWrapper } from "./components/ComponentLoadingWrapper";
-export { GenericMultiEditCellClass } from "./components/GenericCellClass";
+export { GenericMultiEditCellClass } from "./components/GridCellMultiSelectClassRules";
 export { GridLoadableCell } from "./components/GridLoadableCell";
 export { useGridPopoverHook } from "./components/GridPopoverHook";
 export { usePostSortRowsHook } from "./components/PostSortRowsHook";
