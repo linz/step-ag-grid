@@ -56,11 +56,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       appB: "B",
       other: "Other",
     };
-    const positionTwoMap: Record<string, string> = {
-      "1": "One",
-      "2": "Two",
-      "3": "Three",
-    };
     return [
       GridCell({
         field: "id",
