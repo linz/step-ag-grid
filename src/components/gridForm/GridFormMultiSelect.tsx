@@ -414,7 +414,9 @@ const MenuSubComponent = (props: {
               triggerSave,
             }}
           >
-            <item.subComponent />
+            <div className={"subComponent"}>
+              <item.subComponent />
+            </div>
           </GridSubComponentContext.Provider>
         )
       }

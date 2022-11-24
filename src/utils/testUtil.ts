@@ -1,6 +1,7 @@
 import { act, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
+import { wait } from "./util";
 
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
   return findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
@@ -58,8 +59,8 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
     userEvent.dblClick(cell);
-    await findOpenMenu();
   });
+  await findOpenMenu();
 };
 
 const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
@@ -73,13 +74,16 @@ export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<
 };
 
 export const findMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement> => {
-  return await waitFor(async () => {
-    const menuOption = await queryMenuOption(menuOptionText);
-    if (menuOption == null) {
-      throw Error(`Unable to find menu option ${menuOptionText}`);
-    }
-    return menuOption;
-  });
+  return await waitFor(
+    async () => {
+      const menuOption = await queryMenuOption(menuOptionText);
+      if (menuOption == null) {
+        throw Error(`Unable to find menu option ${menuOptionText}`);
+      }
+      return menuOption;
+    },
+    { timeout: 10000 },
+  );
 };
 
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
@@ -96,6 +100,7 @@ export const openAndClickMenuOption = async (
   within?: HTMLElement,
 ): Promise<void> => {
   await editCell(rowId, colId, within);
+  await wait(100);
   await clickMenuOption(menuOptionText);
 };
 
@@ -123,13 +128,13 @@ export const clickMultiSelectOption = async (value: string): Promise<void> => {
 
 export const typeOtherInput = async (value: string): Promise<void> => {
   const openMenu = await findOpenMenu();
-  const otherInput = await findQuick({ tagName: "input[type='text']" }, openMenu);
+  const otherInput = await findQuick({ classes: ".subComponent", child: { tagName: "input[type='text']" } }, openMenu);
   userEvent.type(otherInput, value);
 };
 
 export const typeOtherTextArea = async (value: string): Promise<void> => {
   const openMenu = await findOpenMenu();
-  const otherTextArea = await findQuick({ tagName: "textarea" }, openMenu);
+  const otherTextArea = await findQuick({ classes: ".subComponent", child: { tagName: "textarea" } }, openMenu);
   userEvent.type(otherTextArea, value);
 };
 
