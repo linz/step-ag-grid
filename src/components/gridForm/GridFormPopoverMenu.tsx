@@ -149,7 +149,9 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                             triggerSave,
                           }}
                         >
-                          <item.subComponent />
+                          <div className={"subComponent"}>
+                            <item.subComponent />
+                          </div>
                         </GridSubComponentContext.Provider>
                       )
                     }

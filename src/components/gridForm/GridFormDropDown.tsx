@@ -328,7 +328,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                         }}
                       >
                         {item.subComponent && (
-                          <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                          <div className={"subComponent"}>
+                            <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                          </div>
                         )}
                       </GridSubComponentContext.Provider>
                     )}
