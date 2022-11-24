@@ -17,8 +17,7 @@ const queryAllBySelector = <T extends HTMLElement>(selector: string, container: 
 export interface IQueryQuick {
   testId?: string;
   tagName?: "button" | "span" | "div" | "input" | "textarea" | any;
-  textEquals?: string;
-  textContains?: string;
+  text?: string | RegExp;
   icon?: IconName;
   ariaLabel?: string;
   role?: string;
@@ -27,6 +26,14 @@ export interface IQueryQuick {
 }
 
 const escapeSelectorParam = (param: string): string => param.replace(/["\\]/g, "\\$&");
+
+export const getMatcher = (matcherText: string | RegExp) => {
+  const textMatcher =
+    typeof matcherText === "string"
+      ? (text?: string) => text != null && text.toLowerCase() === matcherText.toLowerCase()
+      : (text?: string) => text != null && matcherText.test(text);
+  return (e: HTMLElement) => textMatcher(e.innerHTML?.trim()) || textMatcher(e.innerText?.trim());
+};
 
 /**
  * Build selector for quick operations.
@@ -57,17 +64,9 @@ const quickSelector = <T extends HTMLElement>(
 
   let els = queryAllBySelector<T>(selector, container);
 
-  const textMatch = lastIQueryQuick.textEquals?.toLowerCase();
-  if (textMatch != null) {
-    els = els.filter((el) => el.innerHTML.toLowerCase() === textMatch || el.innerText.toLowerCase() === textMatch);
-  }
-  const textContains = lastIQueryQuick.textContains?.toLowerCase();
-  if (textContains != null) {
-    els = els.filter(
-      (el) =>
-        el.innerHTML.toLowerCase().indexOf(textContains) != -1 ||
-        el.innerText.toLowerCase().indexOf(textContains) != -1,
-    );
+  if (lastIQueryQuick.text != null) {
+    const matcher = getMatcher(lastIQueryQuick.text);
+    els = els.filter(matcher);
   }
 
   return { selector, els };
@@ -83,7 +82,9 @@ const quickSelector = <T extends HTMLElement>(
 export const queryQuick = <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): T | null => {
   const { els, selector } = quickSelector<T>(filter, container);
   if (els.length > 1) {
-    throw `Found multiple(${els.length}) elements by selector ${selector}`;
+    throw `Found multiple(${els.length}) elements by selector ${selector}\n${els.map(
+      (el, index) => `${index}: ${el.parentElement?.innerHTML}\n\n`,
+    )}`;
   }
   return els[0] ?? null;
 };
