@@ -42,10 +42,13 @@ export const cellContains = async (
   text: string | RegExp,
   within?: HTMLElement,
 ) => {
-  return await waitFor(async () => {
-    const row = await findRow(rowId, within);
-    return await findQuick({ tagName: `[col-id='${colId}']`, text }, row);
-  });
+  return await waitFor(
+    async () => {
+      const row = await findRow(rowId, within);
+      return await findQuick({ tagName: `[col-id='${colId}']`, text }, row);
+    },
+    { timeout: 10000 },
+  );
 };
 
 export const selectCell = async (rowId: string | number, colId: string, within?: HTMLElement): Promise<void> => {
@@ -129,12 +132,14 @@ export const clickMultiSelectOption = async (value: string): Promise<void> => {
 export const typeOtherInput = async (value: string): Promise<void> => {
   const openMenu = await findOpenMenu();
   const otherInput = await findQuick({ classes: ".subComponent", child: { tagName: "input[type='text']" } }, openMenu);
+  userEvent.clear(otherInput);
   userEvent.type(otherInput, value);
 };
 
 export const typeOtherTextArea = async (value: string): Promise<void> => {
   const openMenu = await findOpenMenu();
   const otherTextArea = await findQuick({ classes: ".subComponent", child: { tagName: "textarea" } }, openMenu);
+  userEvent.clear(otherTextArea);
   userEvent.type(otherTextArea, value);
 };
 

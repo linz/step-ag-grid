@@ -15,7 +15,7 @@ export interface GridContextType {
   selectRowsByIdWithFlash: (rowIds?: number[]) => void;
   flashRows: (rowIds?: number[]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  ensureRowVisible: (id: number) => void;
+  ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   sizeColumnsToFit: () => void;
   stopEditing: () => void;
@@ -67,6 +67,7 @@ export const GridContext = createContext<GridContextType>({
   },
   ensureRowVisible: () => {
     console.error("no context provider for ensureRowVisible");
+    return true;
   },
   ensureSelectedRowIsVisible: () => {
     console.error("no context provider for ensureSelectedRowIsVisible");
