@@ -200,10 +200,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     );
   };
 
-  const ensureRowVisible = (id: number): void => {
-    gridApiOp((gridApi) => {
+  const ensureRowVisible = (id: number | string): boolean => {
+    return gridApiOp((gridApi) => {
       const node = gridApi.getRowNode(`${id}`);
-      node && gridApi.ensureNodeVisible(node);
+      if (!node) return false;
+      gridApi.ensureNodeVisible(node);
+      return true;
     });
   };
 

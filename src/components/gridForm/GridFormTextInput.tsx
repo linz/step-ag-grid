@@ -50,7 +50,10 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
   });
 
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }} className={"FormTest"}>
+    <div
+      style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}
+      className={"FormTest subComponent"}
+    >
       <TextInputFormatted
         value={value}
         onChange={(e) => setValue(e.target.value)}
