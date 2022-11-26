@@ -3,6 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
 import { wait } from "./util";
 
+export const countRows = async (within?: HTMLElement): Promise<number> => {
+  return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
+};
+
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
   return findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
 };
@@ -36,7 +40,7 @@ export const findCell = async (rowId: number | string, colId: string, within?: H
   return await findQuick({ tagName: `[col-id='${colId}']` }, row);
 };
 
-export const cellContains = async (
+export const findCellContains = async (
   rowId: number | string,
   colId: string,
   text: string | RegExp,
