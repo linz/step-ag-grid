@@ -18,9 +18,7 @@ export interface ActionButtonProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
   iconPosition?: "left" | "right";
   className?: "ActionButton-fill" | string;
-  onAction: () => Promise<void> | void;
-  // Used for external code to get access to whether action is in progress
-  externalSetInProgress?: () => void;
+  onClick: () => Promise<void> | void;
   level?: LuiButtonProps["level"];
   style?: React.CSSProperties;
 }
@@ -36,8 +34,7 @@ export const ActionButton = ({
   style,
   className,
   title,
-  onAction,
-  externalSetInProgress,
+  onClick,
   size = "sm",
   iconPosition = "left",
   level = "tertiary",
@@ -77,13 +74,11 @@ export const ActionButton = ({
       size={"lg"}
       style={{ ...(name == null && { padding: "8px 5px" }), ...style }}
       onClick={async () => {
-        const promise = onAction();
+        const promise = onClick();
         const isPromise = typeof promise !== "undefined";
         if (isPromise) {
           setInProgress(true);
-          externalSetInProgress && setInProgress(true);
           if (isPromise) await promise;
-          externalSetInProgress && setInProgress(false);
           setInProgress(false);
         }
       }}
