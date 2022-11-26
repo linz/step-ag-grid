@@ -169,7 +169,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         rowData={rowData}
         domLayout={"autoHeight"}
       />
-      <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onAction={addRowAction} />
+      <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onClick={addRowAction} />
     </>
   );
 };

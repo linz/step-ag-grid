@@ -12,6 +12,16 @@ export const isFloat = (value: string) => {
   return regexp.test(value);
 };
 
+export const findParentWithClass = function (className: string, child: Node): HTMLElement | null {
+  for (let node: Node | null = child; node; node = node.parentNode) {
+    // When nodes are in portals they aren't type node anymore hence treating it as any here
+    if ((node as any).classList && (node as any).classList.contains(className)) {
+      return node as HTMLElement;
+    }
+  }
+  return null;
+};
+
 export const hasParentClass = function (className: string, child: Node) {
   for (let node: Node | null = child; node; node = node.parentNode) {
     // When nodes are in portals they aren't type node anymore hence treating it as any here
