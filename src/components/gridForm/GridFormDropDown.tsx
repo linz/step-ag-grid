@@ -300,8 +300,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                     }
                   }}
                 >
-                  {(item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)) +
-                    (item.subComponent ? "..." : "")}
+                  {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                  {item.subComponent ? "..." : ""}
                 </MenuItem>
 
                 {item.subComponent && selectedSubComponent === item && (
