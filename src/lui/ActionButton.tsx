@@ -1,7 +1,7 @@
 import "./ActionButton.scss";
 
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, CSSProperties } from "react";
 import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
 import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
 import { usePrevious } from "./reactUtils";
@@ -17,10 +17,10 @@ export interface ActionButtonProps {
   dataTestId?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
   iconPosition?: "left" | "right";
-  className?: "ActionButton-fill" | string;
+  className?: "ActionButton-fill" | "ActionButton-tight" | string;
   onClick: () => Promise<void> | void;
   level?: LuiButtonProps["level"];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 // Kept this less than one second, so I don't have issues with waitFor as it defaults to 1s
@@ -70,9 +70,10 @@ export const ActionButton = ({
         className,
         localInProgress && "ActionButton-inProgress",
         name != null && !className?.includes("ActionButton-fill") && "ActionButton-minimal",
+        name == null && "ActionButton-iconOnly",
       )}
       size={"lg"}
-      style={{ ...(name == null && { padding: "8px 5px" }), ...style }}
+      style={style}
       onClick={async () => {
         const promise = onClick();
         const isPromise = typeof promise !== "undefined";
@@ -102,12 +103,7 @@ export const ActionButton = ({
           }}
         />
       ) : (
-        <LuiIcon
-          name={icon}
-          alt={ariaLabel ?? name ?? ""}
-          size={size}
-          spanProps={{ style: iconPosition === "right" ? { transform: "scaleX(-1)" } : {} }}
-        />
+        <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
       )}
       {iconPosition === "left" && buttonText}
     </LuiButton>

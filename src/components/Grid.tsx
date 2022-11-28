@@ -17,7 +17,7 @@ export interface GridBaseRow {
 
 export interface GridProps {
   selectable?: boolean;
-  dataTestId?: string;
+  ["data-testid"]?: string;
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
   quickFilterValue?: string;
@@ -230,7 +230,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   return (
     <div
-      data-testid={params.dataTestId}
+      data-testid={params["data-testid"]}
       className={clsx("Grid-container", "ag-theme-alpine", staleGrid && "Grid-sortIsStale")}
     >
       {params.quickFilter && (
