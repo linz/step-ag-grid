@@ -136,7 +136,7 @@
     "sass-loader": "10.3.1",
     "semantic-release": "^19.0.5",
     "storybook-addon-mock": "^2.4.1",
-    "style-loader": "2.0.0",
+    "style-loader": "3.3.1",
     "stylelint": "^14.14.1",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-recommended-scss": "^8.0.0",
