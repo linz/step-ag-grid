@@ -92,6 +92,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 
   return (
     <Grid
+      data-testid={"bearingsTestTable"}
       {...props}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
