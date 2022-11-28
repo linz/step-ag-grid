@@ -23,7 +23,15 @@ const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
       <ActionButton icon={"ic_add"} aria-label={"Add new row"} onClick={performAction} level={"primary"} />
       <br />
       <ActionButton
-        icon={"ic_arrow_back"}
+        icon={"ic_add"}
+        aria-label={"Add new row"}
+        onClick={performAction}
+        level={"primary"}
+        className={"ActionButton-tight"}
+      />
+      <br />
+      <ActionButton
+        icon={"ic_arrow_forward_right"}
         name={"Continue"}
         onClick={performAction}
         iconPosition={"right"}

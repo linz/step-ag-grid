@@ -5,12 +5,24 @@
   align-items: center;
 }
 
-.ActionButton-minimal {
-  padding-right: 38px !important;
+.ActionButton-minimal.lui-button-lg.lui-button-icon-right {
+  padding-right: 38px;
 }
 
-.ActionButton .LuiIcon {
-  margin: 0 4px !important;
+.ActionButton.lui-button-lg.lui-button-icon-right:not(.ActionButton-tight) .LuiIcon {
+  margin: 0 4px;
+}
+
+.ActionButton.ActionButton-tight.lui-button-lg.lui-button-icon-right .LuiIcon {
+  margin: 0;
+}
+
+.ActionButton-iconOnly.lui-button-lg.lui-button-icon-right:not(.ActionButton-tight) {
+  padding: 8px 5px;
+}
+
+.ActionButton-iconOnly.lui-button-lg.lui-button-icon-right.ActionButton-tight {
+  padding: 0;
 }
 
 .ActionButton-minimalArea {
@@ -25,13 +37,13 @@
   visibility: hidden;
 }
 
-.ActionButton-inProgress {
+.ActionButton-inProgress.lui-button-lg.lui-button-icon-right {
   cursor: progress;
-  color: #007198 !important;
-  background-color: colors.$polar !important;
+  color: #007198;
+  background-color: colors.$polar;
 
   svg * {
-    fill: transparent !important;
+    fill: transparent;
   }
 }
 
