@@ -1,5 +1,3 @@
-import "./GridPopoverMenu.scss";
-
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormPopoverMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoverMenu";
