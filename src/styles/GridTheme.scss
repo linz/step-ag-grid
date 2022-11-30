@@ -24,6 +24,7 @@
       border-color: lui.$lily,
       secondary-border-color: lui.$lily,
       cell-horizontal-border: solid ag-derived(secondary-border-color),
+      cell-horizontal-padding: 12,
       row-hover-color: lui.$lily,
       font-family: (
         "Open Sans",
@@ -59,7 +60,7 @@
 
   .ag-header-cell {
     font-weight: 600;
-    padding: 7px 0 7px 8px;
+    padding: 7px 11px;
 
     .LuiIcon {
       fill: lui.$surfie;
@@ -67,16 +68,16 @@
   }
 
   .ag-cell {
-    padding-left: 7px;
-    padding-right: 4px;
+    padding-left: 11px;
+    padding-right: 11px;
     display: flex;
     align-items: center;
   }
 
-  .ag-cell-more {
-    padding: 0;
-    display: flex;
-    justify-content: center;
+  .ag-cell.ag-cell-inline-editing {
+    padding-left: 9px;
+    padding-right: 9px;
+    bottom: 0;
   }
 
   .ag-cell-wrap-text {

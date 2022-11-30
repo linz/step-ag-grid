@@ -102,9 +102,18 @@ export interface CellEditorCommon {
 
 export const GenericCellEditorComponentWrapper = (custom?: { editor?: (props: any) => JSX.Element }) => {
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
+    const valueFormatted = cellEditorParams.formatValue
+      ? cellEditorParams.formatValue(cellEditorParams.value)
+      : "Missing formatter";
     return (
       <GridPopoverContextProvider props={cellEditorParams}>
-        {<cellEditorParams.colDef.cellRenderer {...cellEditorParams} {...cellEditorParams.colDef.cellRendererParams} />}
+        {
+          <cellEditorParams.colDef.cellRenderer
+            {...cellEditorParams}
+            valueFormatted={valueFormatted}
+            {...cellEditorParams.colDef.cellRendererParams}
+          />
+        }
         {custom?.editor && <custom.editor {...cellEditorParams} />}
       </GridPopoverContextProvider>
     );
