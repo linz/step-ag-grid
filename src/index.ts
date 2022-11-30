@@ -45,4 +45,5 @@ export * from "./lui/ActionButton";
 
 export * from "./utils/bearing";
 export * from "./utils/util";
+export * from "./utils/deferredPromise";
 export * from "./utils/testUtil";

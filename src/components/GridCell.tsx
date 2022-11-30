@@ -2,16 +2,13 @@ import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
-import {
-  GenericCellColDef,
-  GenericCellRendererParams,
-  GridRendererGenericCell,
-} from "./gridRender/GridRenderGenericCell";
+import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
+import { fnOrVar } from "../utils/util";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -29,16 +26,23 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   const infoFn = rendererParams?.info;
   const infoText = infoFn ? infoFn(props) : undefined;
 
-  return colDef?.cellRendererParams?.originalCellRenderer ? (
+  return (
     <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
       <>
         {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
         {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}
-        <colDef.cellRendererParams.originalCellRenderer {...props} />
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          {colDef?.cellRendererParams?.originalCellRenderer ? (
+            <colDef.cellRendererParams.originalCellRenderer {...props} />
+          ) : (
+            <span title={props.valueFormatted}>{props.valueFormatted}</span>
+          )}
+        </div>
+        {fnOrVar(props.colDef?.editable, props) && rendererParams?.editableIcon && (
+          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.editableIcon}</div>
+        )}
       </>
     </GridLoadableCell>
-  ) : (
-    <GridRendererGenericCell {...props} />
   );
 };
 

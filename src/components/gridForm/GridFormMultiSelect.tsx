@@ -1,5 +1,3 @@
-import "../../styles/GridFormMultiSelect.scss";
-
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
 import {
   useCallback,

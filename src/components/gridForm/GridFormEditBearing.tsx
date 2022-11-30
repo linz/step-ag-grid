@@ -1,5 +1,3 @@
-import "../../styles/GridFormEditBearing.scss";
-
 import { useCallback, useMemo, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";

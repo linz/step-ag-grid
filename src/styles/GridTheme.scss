@@ -23,13 +23,14 @@
       header-background-color: lui.$white,
       border-color: lui.$lily,
       secondary-border-color: lui.$lily,
+      cell-horizontal-border: solid ag-derived(secondary-border-color),
       row-hover-color: lui.$lily,
       font-family: (
         "Open Sans",
         system-ui,
         sans-serif,
       ),
-      font-size: 0.875rem !important,
+      font-size: 1rem !important,
       borders: false,
       borders-critical: true,
       borders-secondary: false,
@@ -47,7 +48,7 @@
   }
 
   .ag-row:last-of-type {
-    border-bottom: none;
+    border-bottom: 1px solid lui.$lily;
   }
 
   // ag-grid-community 27.x.x needs this vs 28 using the selected-row-background-color above
