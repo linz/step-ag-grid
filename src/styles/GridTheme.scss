@@ -75,8 +75,6 @@
   }
 
   .ag-cell.ag-cell-inline-editing {
-    padding-left: 9px;
-    padding-right: 9px;
     bottom: 0;
   }
 
@@ -84,9 +82,11 @@
     word-break: break-word;
   }
 
-  .ag-cell-popup-editing,
-  .ag-selected-for-edit,
+  .ag-cell.ag-cell-popup-editing,
+  .ag-cell.ag-selected-for-edit,
   .ag-cell-inline-editing {
+    padding-left: 9px;
+    padding-right: 9px;
     background: rgb(72 160 244 / 20%);
     // These are important, it needs to override ag-grid to work
     border: 3px solid #48a0f4 !important;
