@@ -8,6 +8,7 @@ export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   invalid?: (value: string, data: RowType, context: any) => JSX.Element | string | null;
   numberFormat?: {
     precision?: number;
+    scale?: number;
     gtMin?: number;
     geMin?: number;
     ltMax?: number;
@@ -41,22 +42,31 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
     if (value != "" && !isFloat(value)) {
       return `Must be a valid number`;
     }
-    const number = parseFloat(value);
-    if (nf.gtMin != null && number <= nf.gtMin) {
-      return `Must be greater than ${nf.gtMin}`;
-    }
-    if (nf.geMin != null && number < nf.geMin) {
-      return `Must not be less than ${nf.geMin}`;
-    }
-    if (nf.ltMax != null && number >= nf.ltMax) {
-      return `Must be less than ${nf.ltMax}`;
-    }
-    if (nf.leMax != null && number > nf.leMax) {
-      return `Must not be greater than ${nf.leMax}`;
-    }
-    if (nf.precision != null && value != "") {
-      if (parseFloat(number.toPrecision(nf.precision + 1)) != number) {
-        return nf.precision == 0 ? `Must be a whole number` : `Must have no more than ${nf.precision} decimal places`;
+    if (value != "") {
+      const number = parseFloat(value);
+      if (nf.gtMin != null && number <= nf.gtMin) {
+        return `Must be greater than ${nf.gtMin}`;
+      }
+      if (nf.geMin != null && number < nf.geMin) {
+        return `Must not be less than ${nf.geMin}`;
+      }
+      if (nf.ltMax != null && number >= nf.ltMax) {
+        return `Must be less than ${nf.ltMax}`;
+      }
+      if (nf.leMax != null && number > nf.leMax) {
+        return `Must not be greater than ${nf.leMax}`;
+      }
+
+      if (nf.precision != null && value != "") {
+        if (parseFloat(number.toPrecision(nf.precision)) != number) {
+          return `Must have no more than ${nf.precision} digits precision`;
+        }
+      }
+
+      if (nf.scale != null && value != "") {
+        if (parseFloat(number.toFixed(nf.scale)) != number) {
+          return nf.scale == 0 ? `Must be a whole number` : `Must have no more than ${nf.scale} decimal places`;
+        }
       }
     }
   }

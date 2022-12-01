@@ -41,16 +41,28 @@ describe("TextInputValidator", () => {
         ],
       },
       {
-        numberFormat: { precision: 2 },
+        numberFormat: { precision: 3 },
         tests: [
           ["x", "Must be a valid number"],
           ["", null],
           ["1.22", null],
+          ["0.122", null],
+          ["1.123", "Must have no more than 3 digits precision"],
+          ["0.1234", "Must have no more than 3 digits precision"],
+        ],
+      },
+      {
+        numberFormat: { scale: 2 },
+        tests: [
+          ["x", "Must be a valid number"],
+          ["", null],
+          ["1.22", null],
+          ["0.122", "Must have no more than 2 decimal places"],
           ["1.123", "Must have no more than 2 decimal places"],
         ],
       },
       {
-        numberFormat: { precision: 0 },
+        numberFormat: { scale: 0 },
         tests: [
           ["1", null],
           ["1.1", "Must be a whole number"],
