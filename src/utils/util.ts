@@ -8,7 +8,7 @@ export const wait = (timeoutMs: number) =>
   });
 
 export const isFloat = (value: string) => {
-  const regexp = /^-?\d+(\.\d+)?$/;
+  const regexp = /^-?\d*(\.\d+)?$/;
   return regexp.test(value);
 };
 
