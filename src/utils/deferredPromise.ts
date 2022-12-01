@@ -1,8 +1,15 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export const useDeferredPromise = <T>() => {
   const promiseResolve = useRef<((value: T | PromiseLike<T>) => void) | undefined>();
   const promiseReject = useRef<() => void>();
+
+  // End promise on unload
+  useEffect(() => {
+    return () => {
+      promiseReject.current && promiseReject.current();
+    };
+  }, []);
 
   return {
     invoke: () =>
