@@ -38,8 +38,8 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
             <span title={props.valueFormatted}>{props.valueFormatted}</span>
           )}
         </div>
-        {fnOrVar(props.colDef?.editable, props) && rendererParams?.editableIcon && (
-          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.editableIcon}</div>
+        {fnOrVar(props.colDef?.editable, props) && rendererParams?.rightHoverElement && (
+          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
         )}
       </>
     </GridLoadableCell>
@@ -73,6 +73,12 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
       cellEditor: GenericCellEditorComponentWrapper(custom),
     }),
     suppressKeyboardEvent: (e) => {
+      const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
+      const exec = shortcutKeys[e.event.key];
+      if (!e.editing && !e.event.repeat && e.event.type === "keypress" && exec) {
+        const editable = fnOrVar(e.colDef?.editable, e);
+        return editable ? exec(e) ?? true : true;
+      }
       // It's important that aggrid doesn't trigger edit on enter
       // as the incorrect selected rows will be returned
       return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " "].includes(e.event.key);

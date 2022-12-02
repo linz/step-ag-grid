@@ -101,9 +101,16 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         editable: true,
         valueFormatter: () => "Double click me!",
         cellRendererParams: {
-          editableIcon: <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />,
+          rightHoverElement: (
+            <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
+          ),
           editAction: (selectedRows) => {
             alert(`Custom edit ${selectedRows.length} row(s) selected`);
+          },
+          shortcutKeys: {
+            e: () => {
+              alert("Hi");
+            },
           },
         },
       }),

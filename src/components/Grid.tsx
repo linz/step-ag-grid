@@ -200,15 +200,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const onCellDoubleClick = useCallback(
     (event: CellEvent) => {
-      const editable = fnOrVar(event.colDef?.editable, event);
-      if (!editable) return;
-      const editAction = event.colDef?.cellRendererParams?.editAction;
-      if (editAction) {
-        // Clicked row comes first in selected rows
-        editAction([event.data, ...event.api.getSelectedRows().filter((row) => row.id !== event.data.id)]);
-      } else if (!event.colDef?.cellRendererParams?.singleClickEdit) {
-        startCellEditing(event);
-      }
+      if (!invokeEditAction(event)) startCellEditing(event);
     },
     [startCellEditing],
   );
@@ -222,9 +214,19 @@ export const Grid = (params: GridProps): JSX.Element => {
     [startCellEditing],
   );
 
+  const invokeEditAction = (e: CellEvent): boolean => {
+    const editAction = e.colDef?.cellRendererParams?.editAction;
+    if (!editAction) return false;
+    const editable = fnOrVar(e.colDef?.editable, e);
+    editable && editAction([e.data, ...e.api.getSelectedRows().filter((row) => row.id !== e.data.id)]);
+    return true;
+  };
+
   const onCellKeyPress = useCallback(
     (e: CellEvent) => {
-      if ((e.event as KeyboardEvent).key === "Enter") startCellEditing(e);
+      if ((e.event as KeyboardEvent).key === "Enter") {
+        if (!invokeEditAction(e)) startCellEditing(e);
+      }
     },
     [startCellEditing],
   );
