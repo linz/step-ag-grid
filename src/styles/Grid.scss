@@ -35,8 +35,13 @@
   padding: 4px 8px;
 }
 
-.GridCell-editableIcon {
+.ag-cell .GridCell-editableIcon {
   fill: colors.$silver;
+  visibility: hidden;
+}
+
+.ag-cell:hover .GridCell-editableIcon, .ag-cell.ag-cell-focus .GridCell-editableIcon {
+  visibility: visible;
 }
 
 .GridFormMessage-container {
