@@ -5,7 +5,7 @@
 ## Features
 
 - [ag-grid-community](https://www.npmjs.com/package/ag-grid-community) based grid with custom popover components
-implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/react-menu).
+  implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/react-menu).
 - Default components
   - Text input
   - Text area
@@ -15,7 +15,7 @@ implemented using a modified [react-menu](https://www.npmjs.com/package/@szhsin/
   - Popover message
   - Custom form
 
-*Please note this requires React >=17, ag-grid-community >=27, and sass.*
+_Please note this requires React >=17, ag-grid-community >=27, and sass._
 
 ## Install
 
@@ -44,7 +44,7 @@ Storybook demo deployed at: https://linz.github.io/step-ag-grid/
 ```tsx
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/step-ag-grid/dist/index.css"
+import "@linzjs/step-ag-grid/dist/index.css";
 // Only required for LINZ themes otherwise import the default theme from ag-grid
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 
@@ -55,7 +55,7 @@ import {
   ColDefT,
   GridCell,
   GridPopoverMessage,
-  GridPopoverEditDropDown
+  GridPopoverEditDropDown,
 } from "@linzjs/step-ag-grid";
 
 const GridDemo = () => {
@@ -63,9 +63,10 @@ const GridDemo = () => {
     id: number;
     name: number;
     position: string;
-  };
-  
-  const columnDefs: ColDefT<ITestRow>[] = useMemo(() => [
+  }
+
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
+    () => [
       GridCell({
         field: "id",
         headerName: "Id",
@@ -116,8 +117,8 @@ const GridDemo = () => {
 
   const rowData: ITestRow[] = useMemo(
     () => [
-        { id: 1000, name: "Tom", position: "Tester" },
-        { id: 1001, name: "Sue", position: "Developer" },
+      { id: 1000, name: "Tom", position: "Tester" },
+      { id: 1001, name: "Sue", position: "Developer" },
     ],
     [],
   );
@@ -125,13 +126,11 @@ const GridDemo = () => {
   return (
     <GridUpdatingContextProvider>
       <GridContextProvider>
-        <Grid
-          selectable={true}
-          columnDefs={columnDefs}
-          rowData={rowData}
-        />
+        <Grid selectable={true} columnDefs={columnDefs} rowData={rowData} />
       </GridContextProvider>
     </GridUpdatingContextProvider>
   );
 };
 ```
+
+Check `src\stories` for more usage examples

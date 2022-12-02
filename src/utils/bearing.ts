@@ -16,7 +16,7 @@ export const bearingCorrectionValueFormatter = (params: ValueFormatterParams): s
   if (typeof value === "string") {
     return convertDDToDMS(bearingNumberParser(value), true, true);
   }
-  return convertDDToDMS(value, true, true);
+  return convertDDToDMS(value, true, false);
 };
 
 export const bearingNumberParser = (value: string): number | null => {
