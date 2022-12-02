@@ -15,7 +15,7 @@ export interface GenericCellRendererParams<RowType extends GridBaseRow> {
   singleClickEdit?: boolean;
   rightHoverElement?: JSX.Element | undefined;
   editAction?: (selectedRows: RowType[]) => void;
-  shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | undefined) | undefined>;
+  shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | void) | undefined>;
   warning?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
   info?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
 }
