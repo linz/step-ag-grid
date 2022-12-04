@@ -1,5 +1,3 @@
-import "../../styles/GridFormMultiSelect.scss";
-
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
 import {
   useCallback,
@@ -414,7 +412,9 @@ const MenuSubComponent = (props: {
               triggerSave,
             }}
           >
-            <item.subComponent />
+            <div className={"subComponent"}>
+              <item.subComponent />
+            </div>
           </GridSubComponentContext.Provider>
         )
       }

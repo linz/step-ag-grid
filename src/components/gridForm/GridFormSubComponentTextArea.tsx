@@ -35,7 +35,7 @@ export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
   }, [setValid, invalid, value]);
 
   return (
-    <div className={clsx("FreeTextInput LuiDeprecatedForms", props.className)}>
+    <div className={clsx("FreeTextInput", props.className)}>
       <TextAreaInput
         className={"free-text-input"}
         value={value}

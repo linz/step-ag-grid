@@ -50,7 +50,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
   });
 
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
+    <div className={"subComponent"} style={{ display: "flex", flexDirection: "row", width: props.width ?? 240 }}>
       <TextAreaInput
         value={value}
         onChange={(e) => setValue(e.target.value)}

@@ -200,10 +200,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     );
   };
 
-  const ensureRowVisible = (id: number): void => {
-    gridApiOp((gridApi) => {
+  const ensureRowVisible = (id: number | string): boolean => {
+    return gridApiOp((gridApi) => {
       const node = gridApi.getRowNode(`${id}`);
-      node && gridApi.ensureNodeVisible(node);
+      if (!node) return false;
+      gridApi.ensureNodeVisible(node);
+      return true;
     });
   };
 
@@ -249,7 +251,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         async () => {
           // Need to refresh to get spinners to work on all rows
           gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
-          ok = await fnUpdate(selectedRows);
+          ok = await fnUpdate(selectedRows).catch((ex) => {
+            console.error("Exception during modifyUpdating", ex);
+            return false;
+          });
         },
       );
 

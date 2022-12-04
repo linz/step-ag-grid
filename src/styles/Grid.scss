@@ -35,19 +35,36 @@
   padding: 4px 8px;
 }
 
+.ag-cell .GridCell-editableIcon {
+  fill: colors.$silver;
+  visibility: hidden;
+}
+
+.ag-cell:hover .GridCell-editableIcon, .ag-cell.ag-cell-focus .GridCell-editableIcon {
+  visibility: visible;
+}
+
 .GridFormMessage-container {
   padding: 4px 8px;
   max-width: 400px;
 }
 
-.ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
+.GridCell-readonly {
+  color: colors.$gray;
+}
+
+.Grid-container.ag-theme-alpine .ag-cell {
+  font-weight: 400;
+}
+
+.Grid-container.ag-theme-alpine .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
   visibility: hidden;
 }
 
-.ag-cell:hover .Grid-displayWhenCellFocused {
+.Grid-container.ag-theme-alpine .ag-cell:hover .Grid-displayWhenCellFocused {
   visibility: inherit;
 }
 
-.ag-cell-wrapper {
+.Grid-container.ag-theme-alpine .ag-cell-wrapper {
   width: 100%;
 }

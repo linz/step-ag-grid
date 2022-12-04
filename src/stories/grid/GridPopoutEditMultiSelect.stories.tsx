@@ -56,11 +56,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       appB: "B",
       other: "Other",
     };
-    const positionTwoMap: Record<string, string> = {
-      "1": "One",
-      "2": "Two",
-      "3": "Three",
-    };
     return [
       GridCell({
         field: "id",
@@ -177,29 +172,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
           },
         },
       ),
-      GridPopoutEditMultiSelect(
-        {
-          field: "position2",
-          initialWidth: 65,
-          maxWidth: 150,
-          headerName: "Initial editor values ",
-          valueGetter: (props) => positionTwoMap[props.data.position2],
-        },
-        {
-          multiEdit: false,
-          editorParams: {
-            filtered: true,
-            filterPlaceholder: "Filter position",
-            options: Object.entries(positionTwoMap).map(([k, v]) => ({ value: k, label: v })),
-            onSave: async (selectedRows, selectedOptions) => {
-              // eslint-disable-next-line no-console
-              console.log("multiSelect result", { selectedRows, selectedOptions });
-              await wait(1000);
-              return true;
-            },
-          },
-        },
-      ),
     ];
   }, []);
 
@@ -211,6 +183,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
   return (
     <Grid
       {...props}
+      animateRows={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}

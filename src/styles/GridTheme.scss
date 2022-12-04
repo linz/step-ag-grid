@@ -23,13 +23,15 @@
       header-background-color: lui.$white,
       border-color: lui.$lily,
       secondary-border-color: lui.$lily,
+      cell-horizontal-border: solid ag-derived(secondary-border-color),
+      cell-horizontal-padding: 12,
       row-hover-color: lui.$lily,
       font-family: (
         "Open Sans",
         system-ui,
         sans-serif,
       ),
-      font-size: 0.875rem !important,
+      font-size: 1rem !important,
       borders: false,
       borders-critical: true,
       borders-secondary: false,
@@ -47,7 +49,7 @@
   }
 
   .ag-row:last-of-type {
-    border-bottom: none;
+    border-bottom: 1px solid lui.$lily;
   }
 
   // ag-grid-community 27.x.x needs this vs 28 using the selected-row-background-color above
@@ -58,7 +60,7 @@
 
   .ag-header-cell {
     font-weight: 600;
-    padding: 7px 0 7px 8px;
+    padding: 7px 11px;
 
     .LuiIcon {
       fill: lui.$surfie;
@@ -66,25 +68,25 @@
   }
 
   .ag-cell {
-    padding-left: 7px;
-    padding-right: 4px;
+    padding-left: 11px;
+    padding-right: 11px;
     display: flex;
     align-items: center;
   }
 
-  .ag-cell-more {
-    padding: 0;
-    display: flex;
-    justify-content: center;
+  .ag-cell.ag-cell-inline-editing {
+    bottom: 0;
   }
 
   .ag-cell-wrap-text {
     word-break: break-word;
   }
 
-  .ag-cell-popup-editing,
-  .ag-selected-for-edit,
+  .ag-cell.ag-cell-popup-editing,
+  .ag-cell.ag-selected-for-edit,
   .ag-cell-inline-editing {
+    padding-left: 9px;
+    padding-right: 9px;
     background: rgb(72 160 244 / 20%);
     // These are important, it needs to override ag-grid to work
     border: 3px solid #48a0f4 !important;

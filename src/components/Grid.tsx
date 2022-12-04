@@ -7,17 +7,19 @@ import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
-import { isNotEmpty } from "../utils/util";
+import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
+import { CellClassParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 export interface GridBaseRow {
   id: string | number;
 }
 
 export interface GridProps {
+  readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   selectable?: boolean;
-  dataTestId?: string;
+  ["data-testid"]?: string;
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
   quickFilterValue?: string;
@@ -125,26 +127,35 @@ export const Grid = (params: GridProps): JSX.Element => {
     synchroniseExternallySelectedItemsToGrid();
   }, [synchroniseExternallySelectedItemsToGrid]);
 
-  const columnDefs = useMemo(
-    (): GridOptions["columnDefs"] =>
-      params.selectable
-        ? [
-            {
-              colId: "selection",
-              editable: false,
-              initialWidth: 35,
-              minWidth: 35,
-              maxWidth: 35,
-              suppressSizeToFit: true,
-              checkboxSelection: true,
-              headerComponent: GridHeaderSelect,
-              onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
-            },
-            ...(params.columnDefs as ColDef[]),
-          ]
-        : [...(params.columnDefs as ColDef[])],
-    [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs, params.selectable],
-  );
+  const columnDefs = useMemo((): GridOptions["columnDefs"] => {
+    const adjustColDefs = (params.columnDefs as ColDef[]).map((colDef) => {
+      return {
+        ...colDef,
+        editable: params.readOnly ? false : colDef.editable,
+        cellClassRules: {
+          ...colDef.cellClassRules,
+          "GridCell-readonly": (ccp: CellClassParams) =>
+            params.readOnly != null && !params.readOnly && !fnOrVar(colDef.editable, ccp),
+        },
+      };
+    });
+    return params.selectable
+      ? [
+          {
+            colId: "selection",
+            editable: false,
+            initialWidth: 35,
+            minWidth: 35,
+            maxWidth: 35,
+            suppressSizeToFit: true,
+            checkboxSelection: true,
+            headerComponent: GridHeaderSelect,
+            onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
+          },
+          ...adjustColDefs,
+        ]
+      : adjustColDefs;
+  }, [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs, params.selectable, params.readOnly]);
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
@@ -177,6 +188,7 @@ export const Grid = (params: GridProps): JSX.Element => {
       if (checkUpdating([event.colDef.field ?? ""], event.data.id)) {
         return;
       }
+
       if (event.rowIndex !== null) {
         event.api.startEditingCell({
           rowIndex: event.rowIndex,
@@ -189,9 +201,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const onCellDoubleClick = useCallback(
     (event: CellEvent) => {
-      if (!event.colDef?.cellRendererParams?.singleClickEdit) {
-        startCellEditing(event);
-      }
+      if (!invokeEditAction(event)) startCellEditing(event);
     },
     [startCellEditing],
   );
@@ -205,9 +215,19 @@ export const Grid = (params: GridProps): JSX.Element => {
     [startCellEditing],
   );
 
+  const invokeEditAction = (e: CellEvent): boolean => {
+    const editAction = e.colDef?.cellRendererParams?.editAction;
+    if (!editAction) return false;
+    const editable = fnOrVar(e.colDef?.editable, e);
+    editable && editAction([e.data, ...e.api.getSelectedRows().filter((row) => row.id !== e.data.id)]);
+    return true;
+  };
+
   const onCellKeyPress = useCallback(
     (e: CellEvent) => {
-      if ((e.event as KeyboardEvent).key === "Enter") startCellEditing(e);
+      if ((e.event as KeyboardEvent).key === "Enter") {
+        if (!invokeEditAction(e)) startCellEditing(e);
+      }
     },
     [startCellEditing],
   );
@@ -231,7 +251,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   return (
     <div
-      data-testid={params.dataTestId}
+      data-testid={params["data-testid"]}
       className={clsx("Grid-container", "ag-theme-alpine", staleGrid && "Grid-sortIsStale")}
     >
       {params.quickFilter && (

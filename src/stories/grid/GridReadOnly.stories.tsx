@@ -15,6 +15,7 @@ import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopover
 import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
+import { GridIcon } from "../../components/GridIcon";
 
 export default {
   title: "Components / Grids",
@@ -81,8 +82,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridPopoverMessage(
         {
           headerName: "Popout message",
-          maxWidth: 200,
-          cellRenderer: () => <>Click me!</>,
+          maxWidth: 150,
+          cellRenderer: () => <>Single Click me!</>,
         },
         {
           multiEdit: true,
@@ -94,6 +95,25 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       ),
+      GridCell({
+        headerName: "Custom edit",
+        maxWidth: 100,
+        editable: true,
+        valueFormatter: () => "Double click me!",
+        cellRendererParams: {
+          rightHoverElement: (
+            <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
+          ),
+          editAction: (selectedRows) => {
+            alert(`Custom edit ${selectedRows.length} row(s) selected`);
+          },
+          shortcutKeys: {
+            e: () => {
+              alert("Hi");
+            },
+          },
+        },
+      }),
       GridPopoverMenu(
         {},
         {
@@ -155,7 +175,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       ),
       GridPopoverMenu(
         {
-          editable: false,
+          editable: () => false,
         },
         {
           editorParams: {

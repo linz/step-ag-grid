@@ -2,16 +2,13 @@ import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
-import {
-  GenericCellColDef,
-  GenericCellRendererParams,
-  GridRendererGenericCell,
-} from "./gridRender/GridRenderGenericCell";
+import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridRenderGenericCell";
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
+import { fnOrVar } from "../utils/util";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -29,16 +26,23 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   const infoFn = rendererParams?.info;
   const infoText = infoFn ? infoFn(props) : undefined;
 
-  return colDef?.cellRendererParams?.originalCellRenderer ? (
+  return (
     <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
       <>
         {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
         {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}
-        <colDef.cellRendererParams.originalCellRenderer {...props} />
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          {colDef?.cellRendererParams?.originalCellRenderer ? (
+            <colDef.cellRendererParams.originalCellRenderer {...props} />
+          ) : (
+            <span title={props.valueFormatted}>{props.valueFormatted}</span>
+          )}
+        </div>
+        {fnOrVar(props.colDef?.editable, props) && rendererParams?.rightHoverElement && (
+          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
+        )}
       </>
     </GridLoadableCell>
-  ) : (
-    <GridRendererGenericCell {...props} />
   );
 };
 
@@ -64,11 +68,17 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(custom?.editor && {
-      cellClassRules: GridCellMultiSelectClassRules,
+      cellClassRules: custom.multiEdit ? GridCellMultiSelectClassRules : undefined,
       editable: props.editable ?? true,
       cellEditor: GenericCellEditorComponentWrapper(custom),
     }),
     suppressKeyboardEvent: (e) => {
+      const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
+      const exec = shortcutKeys[e.event.key];
+      if (!e.editing && !e.event.repeat && e.event.type === "keypress" && exec) {
+        const editable = fnOrVar(e.colDef?.editable, e);
+        return editable ? exec(e) ?? true : true;
+      }
       // It's important that aggrid doesn't trigger edit on enter
       // as the incorrect selected rows will be returned
       return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " "].includes(e.event.key);
@@ -98,9 +108,18 @@ export interface CellEditorCommon {
 
 export const GenericCellEditorComponentWrapper = (custom?: { editor?: (props: any) => JSX.Element }) => {
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
+    const valueFormatted = cellEditorParams.formatValue
+      ? cellEditorParams.formatValue(cellEditorParams.value)
+      : "Missing formatter";
     return (
       <GridPopoverContextProvider props={cellEditorParams}>
-        {<cellEditorParams.colDef.cellRenderer {...cellEditorParams} {...cellEditorParams.colDef.cellRendererParams} />}
+        {
+          <cellEditorParams.colDef.cellRenderer
+            {...cellEditorParams}
+            valueFormatted={valueFormatted}
+            {...cellEditorParams.colDef.cellRendererParams}
+          />
+        }
         {custom?.editor && <custom.editor {...cellEditorParams} />}
       </GridPopoverContextProvider>
     );

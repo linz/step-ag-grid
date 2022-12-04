@@ -1,11 +1,19 @@
 import { GridBaseRow } from "../components/Grid";
-import { stringByteLengthIsInvalid } from "./util";
+import { isFloat, stringByteLengthIsInvalid } from "./util";
 
 export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   required?: boolean;
   maxLength?: number;
   maxBytes?: number;
   invalid?: (value: string, data: RowType, context: any) => JSX.Element | string | null;
+  numberFormat?: {
+    precision?: number;
+    scale?: number;
+    gtMin?: number;
+    geMin?: number;
+    ltMax?: number;
+    leMax?: number;
+  };
 }
 
 export const TextInputValidator = <RowType extends GridBaseRow>(
@@ -18,17 +26,49 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
 
   // This can happen because subcomponent is invoked without type safety
   if (typeof value !== "string") {
-    console.error("Value is not a string", value);
-    return null;
+    return "Value is not a string";
   }
-  if (props.required && value.length === 0) {
-    return `Some text is required`;
+  if (props.required && value == "") {
+    return "Must not be empty";
   }
   if (props.maxLength && value.length > props.maxLength) {
-    return `Text must be no longer than ${props.maxLength} characters`;
+    return `Must be no longer than ${props.maxLength} characters`;
   }
   if (props.maxBytes && stringByteLengthIsInvalid(value, props.maxBytes)) {
-    return `Text must be no longer than ${props.maxLength} bytes`;
+    return `Must be no longer than ${props.maxBytes} bytes`;
+  }
+  const nf = props.numberFormat;
+  if (nf) {
+    if (value != "" && !isFloat(value)) {
+      return `Must be a valid number`;
+    }
+    if (value != "") {
+      const number = parseFloat(value);
+      if (nf.gtMin != null && number <= nf.gtMin) {
+        return `Must be greater than ${nf.gtMin}`;
+      }
+      if (nf.geMin != null && number < nf.geMin) {
+        return `Must not be less than ${nf.geMin}`;
+      }
+      if (nf.ltMax != null && number >= nf.ltMax) {
+        return `Must be less than ${nf.ltMax}`;
+      }
+      if (nf.leMax != null && number > nf.leMax) {
+        return `Must not be greater than ${nf.leMax}`;
+      }
+
+      if (nf.precision != null && value != "") {
+        if (parseFloat(number.toPrecision(nf.precision)) != number) {
+          return `Must have no more than ${nf.precision} digits precision`;
+        }
+      }
+
+      if (nf.scale != null && value != "") {
+        if (parseFloat(number.toFixed(nf.scale)) != number) {
+          return nf.scale == 0 ? `Must be a whole number` : `Must have no more than ${nf.scale} decimal places`;
+        }
+      }
+    }
   }
   if (props.invalid) {
     return props.invalid(value, data, context);
