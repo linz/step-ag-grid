@@ -25,6 +25,7 @@ export default {
     quickFilterValue: "",
     quickFilterPlaceholder: "Quick filter...",
     selectable: false,
+    rowSelection: "single",
   },
   decorators: [
     (Story) => (
@@ -105,7 +106,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
           ),
           editAction: (selectedRows) => {
-            alert(`Custom edit ${selectedRows.length} row(s) selected`);
+            alert(`Custom edit ${selectedRows.map((r) => r.id)} rowId(s) selected`);
           },
           shortcutKeys: {
             e: () => {
@@ -126,7 +127,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                 {
                   label: "Single edit only",
                   action: async (selectedRows) => {
-                    alert(`Single-edit: ${selectedRows.length} rows`);
+                    alert(`Single-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
                     await wait(1500);
                   },
                   disabled: selectedItems.length > 1,
@@ -134,7 +135,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                 {
                   label: "Multi-edit",
                   action: async (selectedRows) => {
-                    alert(`Multi-edit: ${selectedRows.length} rows`);
+                    alert(`Multi-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
                     await wait(1500);
                   },
                 },
@@ -204,7 +205,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       columnDefs={columnDefs}
       rowData={rowData}
       domLayout={"autoHeight"}
-      rowSelection={"single"}
     />
   );
 };

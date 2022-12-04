@@ -219,7 +219,12 @@ export const Grid = (params: GridProps): JSX.Element => {
     const editAction = e.colDef?.cellRendererParams?.editAction;
     if (!editAction) return false;
     const editable = fnOrVar(e.colDef?.editable, e);
-    editable && editAction([e.data, ...e.api.getSelectedRows().filter((row) => row.id !== e.data.id)]);
+    if (editable) {
+      if (!e.node.isSelected()) {
+        e.node.setSelected(true, true);
+      }
+      editAction([e.data, ...e.api.getSelectedRows().filter((row) => row.id !== e.data.id)]);
+    }
     return true;
   };
 
