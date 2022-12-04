@@ -33,6 +33,7 @@ export interface GridProps {
   postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowClassRules?: GridOptions["rowClassRules"];
+  rowSelection?: "single" | "multiple";
 }
 
 /**
@@ -273,7 +274,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         defaultColDef={params.defaultColDef}
         getRowId={(params) => `${params.data.id}`}
         suppressRowClickSelection={true}
-        rowSelection={"multiple"}
+        rowSelection={params.rowSelection ?? "multiple"}
         suppressBrowserResizeObserver={true}
         colResizeDefault={"shift"}
         onFirstDataRendered={sizeColumnsToFit}

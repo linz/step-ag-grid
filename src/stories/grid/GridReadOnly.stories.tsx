@@ -204,8 +204,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       columnDefs={columnDefs}
       rowData={rowData}
       domLayout={"autoHeight"}
+      rowSelection={"single"}
     />
   );
 };
 
-export const ReadOnly = GridReadOnlyTemplate.bind({});
+export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
