@@ -3,7 +3,7 @@ import { GridApi, RowNode } from "ag-grid-community";
 import { GridBaseRow } from "../components/Grid";
 
 export interface GridContextType {
-  gridReady: () => boolean;
+  gridReady: boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
@@ -29,10 +29,7 @@ export interface GridContextType {
 }
 
 export const GridContext = createContext<GridContextType>({
-  gridReady: () => {
-    console.error("no context provider for gridReady");
-    return false;
-  },
+  gridReady: false,
   setGridApi: () => {
     console.error("no context provider for setGridApi");
   },

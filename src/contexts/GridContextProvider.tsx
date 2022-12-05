@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useContext, useRef } from "react";
+import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
@@ -17,21 +17,13 @@ interface GridContextProps {
  */
 export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(GridUpdatingContext);
-  const gridApiRef = useRef<GridApi>();
+  const [gridApi, _setGridApi] = useState<GridApi>();
+  const [gridReady, setGridReady] = useState(false);
   const idsBeforeUpdate = useRef<number[]>([]);
 
-  /**
-   * Has Grid api has been set?
-   * Some ops in components may occur before onGridReady has been called,
-   * and thus will need to check grid is ready before calling.
-   */
-  const gridReady = () => gridApiRef.current != null;
-
-  /**
-   * Set current ref to grid api.
-   */
-  const setGridApi = (_gridApi: GridApi | undefined) => {
-    gridApiRef.current = _gridApi;
+  const setGridApi = (gridApi: GridApi | undefined) => {
+    _setGridApi(gridApi);
+    setGridReady(!!gridApi);
   };
 
   /**
@@ -47,7 +39,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     if (!noApiFn) {
       noApiFn = (() => {}) as () => R;
     }
-    const gridApi = gridApiRef.current;
     return gridApi ? hasApiFn(gridApi) : noApiFn();
   };
 
@@ -121,9 +112,13 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     rowIds: number[] | undefined,
     select: boolean,
     flash: boolean,
-    retryCount = 5, // We retry for approximately 5x200ms=1s
+    retryCount = 15, // We retry for approximately 5x200ms=1s
   ) => {
+    if (rowIds.length == 0) console.log(Error().stack);
+    console.log("_selectRowsWithOptionalFlash", [...rowIds], select, flash, retryCount);
+
     return gridApiOp((gridApi) => {
+      console.log("gridApiOp");
       const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
       const gridRowIdsNotUpdatedYet = rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
       const gridRowIdsNotChangedYet = !rowIds && isEmpty(rowNodes); // rowIds are from beforeUpdate
@@ -142,6 +137,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
       firstNode && gridApi.ensureNodeVisible(firstNode);
       if (select) {
         // Select rows that shouldn't be selected
+        console.log("set selected", rowsThatNeedSelecting);
         rowsThatNeedSelecting.forEach((node) => node.setSelected(true));
         // Unselect rows that shouldn't be selected
         gridApi.getSelectedNodes()?.forEach((node) => {

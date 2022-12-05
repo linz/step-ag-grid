@@ -34,6 +34,7 @@ export interface GridProps {
   animateRows?: boolean;
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
+  autoSelectFirstRow?: boolean;
 }
 
 /**
@@ -55,6 +56,22 @@ export const Grid = (params: GridProps): JSX.Element => {
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
+
+  /**
+   * On data load select the first row of the grid if required.
+   */
+  const hasSelectedFirstItem = useRef(false);
+  useEffect(() => {
+    if (!gridReady || !params.autoSelectFirstRow || hasSelectedFirstItem.current || !params.rowData) return;
+    hasSelectedFirstItem.current = true;
+    if (isNotEmpty(params.rowData)) {
+      if (params.setExternalSelectedItems) {
+        params.setExternalSelectedItems([params.rowData[0]]);
+      } else {
+        selectRowsById([params.rowData[0].id]);
+      }
+    }
+  }, [gridReady, params.autoSelectFirstRow, params.rowData, selectRowsById]);
 
   /**
    * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
@@ -90,8 +107,10 @@ export const Grid = (params: GridProps): JSX.Element => {
    * If new ids are selected scroll them into view.
    */
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
-    if (!gridReady()) return;
-    if (!params.externalSelectedItems) return;
+    if (!gridReady) return;
+    if (!params.externalSelectedItems) {
+      return;
+    }
 
     const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
     const lastNewId = last(difference(selectedIds, lastSelectedIds.current));
@@ -104,7 +123,7 @@ export const Grid = (params: GridProps): JSX.Element => {
    * Synchronise quick filter to grid
    */
   const updateQuickFilter = useCallback(() => {
-    if (!gridReady()) return;
+    if (!gridReady) return;
     if (params.quickFilter) {
       setQuickFilter(internalQuickFilter);
       return;

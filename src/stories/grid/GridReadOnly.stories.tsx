@@ -205,6 +205,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       columnDefs={columnDefs}
       rowData={rowData}
       domLayout={"autoHeight"}
+      autoSelectFirstRow={true}
     />
   );
 };
