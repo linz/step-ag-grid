@@ -89,6 +89,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     { id: 1002, bearing: null, bearingCorrection: 355.1 },
     { id: 1003, bearing: null, bearingCorrection: 0 },
     { id: 1004, bearing: 5.0, bearingCorrection: "1.00500" },
+    { id: 1001, bearing: null, bearingCorrection: "0E-12" },
   ] as ITestRow[]);
 
   return (
