@@ -114,11 +114,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     flash: boolean,
     retryCount = 15, // We retry for approximately 5x200ms=1s
   ) => {
-    if (rowIds.length == 0) console.log(Error().stack);
-    console.log("_selectRowsWithOptionalFlash", [...rowIds], select, flash, retryCount);
-
     return gridApiOp((gridApi) => {
-      console.log("gridApiOp");
       const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
       const gridRowIdsNotUpdatedYet = rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
       const gridRowIdsNotChangedYet = !rowIds && isEmpty(rowNodes); // rowIds are from beforeUpdate
@@ -137,7 +133,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
       firstNode && gridApi.ensureNodeVisible(firstNode);
       if (select) {
         // Select rows that shouldn't be selected
-        console.log("set selected", rowsThatNeedSelecting);
         rowsThatNeedSelecting.forEach((node) => node.setSelected(true));
         // Unselect rows that shouldn't be selected
         gridApi.getSelectedNodes()?.forEach((node) => {
