@@ -1,8 +1,8 @@
-import { ReactElement, ReactNode, useContext, useRef } from "react";
+import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
-import { isNotEmpty } from "../utils/util";
+import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
 
@@ -17,21 +17,14 @@ interface GridContextProps {
  */
 export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(GridUpdatingContext);
-  const gridApiRef = useRef<GridApi>();
+  const [gridApi, _setGridApi] = useState<GridApi>();
+  const [gridReady, setGridReady] = useState(false);
   const idsBeforeUpdate = useRef<number[]>([]);
+  const externallySelectedItemsAreInSync = useRef(false);
 
-  /**
-   * Has Grid api has been set?
-   * Some ops in components may occur before onGridReady has been called,
-   * and thus will need to check grid is ready before calling.
-   */
-  const gridReady = () => gridApiRef.current != null;
-
-  /**
-   * Set current ref to grid api.
-   */
-  const setGridApi = (_gridApi: GridApi | undefined) => {
-    gridApiRef.current = _gridApi;
+  const setGridApi = (gridApi: GridApi | undefined) => {
+    _setGridApi(gridApi);
+    setGridReady(!!gridApi);
   };
 
   /**
@@ -47,7 +40,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     if (!noApiFn) {
       noApiFn = (() => {}) as () => R;
     }
-    const gridApi = gridApiRef.current;
     return gridApi ? hasApiFn(gridApi) : noApiFn();
   };
 
@@ -121,7 +113,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     rowIds: number[] | undefined,
     select: boolean,
     flash: boolean,
-    retryCount = 5, // We retry for approximately 5x200ms=1s
+    retryCount = 15, // We retry for approximately 5x200ms=1s
   ) => {
     return gridApiOp((gridApi) => {
       const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
@@ -302,6 +294,17 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
+  const setExternallySelectedItemsAreInSync = (inSync: boolean) => {
+    externallySelectedItemsAreInSync.current = inSync;
+  };
+
+  const waitForExternallySelectedItemsToBeInSync = async () => {
+    // Wait for up to 5 seconds
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync.current; i++) {
+      await wait(200);
+    }
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -323,6 +326,8 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         stopEditing,
         updatingCells,
         redrawRows,
+        setExternallySelectedItemsAreInSync,
+        waitForExternallySelectedItemsToBeInSync,
       }}
     >
       {props.children}

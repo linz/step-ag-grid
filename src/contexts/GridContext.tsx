@@ -3,7 +3,7 @@ import { GridApi, RowNode } from "ag-grid-community";
 import { GridBaseRow } from "../components/Grid";
 
 export interface GridContextType {
-  gridReady: () => boolean;
+  gridReady: boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
@@ -26,13 +26,12 @@ export interface GridContextType {
     tabDirection?: 1 | 0 | -1,
   ) => Promise<boolean>;
   redrawRows: (rowNodes?: RowNode[]) => void;
+  setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
+  waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
 }
 
 export const GridContext = createContext<GridContextType>({
-  gridReady: () => {
-    console.error("no context provider for gridReady");
-    return false;
-  },
+  gridReady: false,
   setGridApi: () => {
     console.error("no context provider for setGridApi");
   },
@@ -88,5 +87,11 @@ export const GridContext = createContext<GridContextType>({
   },
   redrawRows: () => {
     console.error("no context provider for redrawRows");
+  },
+  setExternallySelectedItemsAreInSync: () => {
+    console.error("no context provider for setExternallySelectedItemsAreInSync");
+  },
+  waitForExternallySelectedItemsToBeInSync: async () => {
+    console.error("no context provider for waitForExternallySelectedItemsToBeInSync");
   },
 });
