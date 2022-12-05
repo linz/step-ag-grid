@@ -26,6 +26,8 @@ export interface GridContextType {
     tabDirection?: 1 | 0 | -1,
   ) => Promise<boolean>;
   redrawRows: (rowNodes?: RowNode[]) => void;
+  setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
+  waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
 }
 
 export const GridContext = createContext<GridContextType>({
@@ -85,5 +87,11 @@ export const GridContext = createContext<GridContextType>({
   },
   redrawRows: () => {
     console.error("no context provider for redrawRows");
+  },
+  setExternallySelectedItemsAreInSync: () => {
+    console.error("no context provider for setExternallySelectedItemsAreInSync");
+  },
+  waitForExternallySelectedItemsToBeInSync: async () => {
+    console.error("no context provider for waitForExternallySelectedItemsToBeInSync");
   },
 });

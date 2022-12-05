@@ -2,7 +2,7 @@ import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
-import { isNotEmpty } from "../utils/util";
+import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
 
@@ -20,6 +20,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const [gridApi, _setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
   const idsBeforeUpdate = useRef<number[]>([]);
+  const externallySelectedItemsAreInSync = useRef(false);
 
   const setGridApi = (gridApi: GridApi | undefined) => {
     _setGridApi(gridApi);
@@ -293,6 +294,17 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   };
 
+  const setExternallySelectedItemsAreInSync = (inSync: boolean) => {
+    externallySelectedItemsAreInSync.current = inSync;
+  };
+
+  const waitForExternallySelectedItemsToBeInSync = async () => {
+    // Wait for up to 5 seconds
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync.current; i++) {
+      await wait(200);
+    }
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -314,6 +326,8 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         stopEditing,
         updatingCells,
         redrawRows,
+        setExternallySelectedItemsAreInSync,
+        waitForExternallySelectedItemsToBeInSync,
       }}
     >
       {props.children}

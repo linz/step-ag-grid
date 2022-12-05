@@ -49,6 +49,7 @@ export const Grid = (params: GridProps): JSX.Element => {
     selectRowsById,
     ensureSelectedRowIsVisible,
     sizeColumnsToFit,
+    setExternallySelectedItemsAreInSync,
   } = useContext(GridContext);
   const { checkUpdating } = useContext(GridUpdatingContext);
 
@@ -71,7 +72,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         selectRowsById([params.rowData[0].id]);
       }
     }
-  }, [gridReady, params.autoSelectFirstRow, params.rowData, selectRowsById]);
+  }, [gridReady, params, params.autoSelectFirstRow, params.rowData, selectRowsById]);
 
   /**
    * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
@@ -88,7 +89,10 @@ export const Grid = (params: GridProps): JSX.Element => {
    */
   const synchroniseExternalStateToGridSelection = useCallback(
     ({ api }: SelectionChangedEvent) => {
-      if (!params.externalSelectedItems || !params.setExternalSelectedItems) return;
+      if (!params.externalSelectedItems || !params.setExternalSelectedItems) {
+        setExternallySelectedItemsAreInSync(true);
+        return;
+      }
 
       const selectedRows = api.getSelectedRows();
       // We don't want to update selected Items if it hasn't changed to prevent excess renders
@@ -96,10 +100,13 @@ export const Grid = (params: GridProps): JSX.Element => {
         params.externalSelectedItems.length != selectedRows.length ||
         isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
       ) {
+        setExternallySelectedItemsAreInSync(false);
         params.setExternalSelectedItems([...selectedRows]);
+      } else {
+        setExternallySelectedItemsAreInSync(true);
       }
     },
-    [params],
+    [params, setExternallySelectedItemsAreInSync],
   );
 
   /**
@@ -109,6 +116,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
     if (!gridReady) return;
     if (!params.externalSelectedItems) {
+      setExternallySelectedItemsAreInSync(true);
       return;
     }
 
@@ -117,7 +125,8 @@ export const Grid = (params: GridProps): JSX.Element => {
     if (lastNewId != null) ensureRowVisible(lastNewId);
     lastSelectedIds.current = selectedIds;
     selectRowsById(selectedIds);
-  }, [params.externalSelectedItems, ensureRowVisible, gridReady, selectRowsById]);
+    setExternallySelectedItemsAreInSync(true);
+  }, [gridReady, params.externalSelectedItems, ensureRowVisible, selectRowsById, setExternallySelectedItemsAreInSync]);
 
   /**
    * Synchronise quick filter to grid
