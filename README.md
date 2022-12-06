@@ -41,6 +41,8 @@ Storybook demo deployed at: https://linz.github.io/step-ag-grid/
 
 ## Usage
 
+Check `src\stories` for more usage examples
+
 ```tsx
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
@@ -133,4 +135,49 @@ const GridDemo = () => {
 };
 ```
 
-Check `src\stories` for more usage examples
+## Writing tests
+
+The following testing calls can be imported from step-ag-grid:
+
+- findRow
+- queryRow
+- selectRow
+- deselectRow
+- findCell
+- selectCell
+- editCell
+- findOpenMenu
+- queryMenuOption
+- findMenuOption
+- clickMenuOption
+- openAndClickMenuOption
+- getMultiSelectOptions
+- findMultiSelectOption
+- clickMultiSelectOption
+- typeOtherInput
+- typeOtherTextArea
+- closeMenu
+- findActionButton
+- clickActionButton
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
+import { findRow, GridUpdatingContextProvider, openAndClickMenuOption } from "@linzjs/step-ag-grid";
+
+const TestComponent = (): JSX.Element => {
+  return (
+    <GridUpdatingContextProvider>
+      <MyGrid />
+    </GridUpdatingContextProvider>
+  );
+};
+
+test("click Delete menu option removes row from the table", async () => {
+  await render(<TestComponent />);
+  await screen.findByText("My component header");
+  expect((await findRow(12345)).getAttribute("row-index")).toBe("1");
+  await openAndClickMenuOption(12345, "actions", "Delete");
+  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined());
+});
+```
