@@ -1,7 +1,6 @@
 import { act, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
-import { wait } from "./util";
 
 export const countRows = async (within?: HTMLElement): Promise<number> => {
   return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
