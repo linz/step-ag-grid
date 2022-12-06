@@ -68,7 +68,6 @@ export const selectCell = async (rowId: string | number, colId: string, within?:
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
-  await selectRow(rowId, within);
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
     userEvent.dblClick(cell);
