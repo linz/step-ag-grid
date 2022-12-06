@@ -285,7 +285,12 @@ export const Grid = (params: GridProps): JSX.Element => {
   return (
     <div
       data-testid={params["data-testid"]}
-      className={clsx("Grid-container", "ag-theme-alpine", staleGrid && "Grid-sortIsStale")}
+      className={clsx(
+        "Grid-container",
+        "ag-theme-alpine",
+        staleGrid && "Grid-sortIsStale",
+        gridReady && params.rowData && "Grid-ready",
+      )}
     >
       {params.quickFilter && (
         <div className="Grid-quickFilter">

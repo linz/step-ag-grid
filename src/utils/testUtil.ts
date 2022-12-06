@@ -22,9 +22,15 @@ const _selectRow = async (
 ): Promise<void> => {
   await act(async () => {
     const row = await findRow(rowId, within);
-    const isSelected = !row.className.includes("ag-row-selected");
+    const isSelected = row.className.includes("ag-row-selected");
     if (select === "toggle" || (select === "select" && !isSelected) || (select === "deselect" && isSelected)) {
-      userEvent.click(row);
+      const cell = await findCell(rowId, "selection", within);
+      userEvent.click(cell);
+      await waitFor(async () => {
+        const row = await findRow(rowId, within);
+        const nowSelected = row.className.includes("ag-row-selected");
+        if (nowSelected == isSelected) throw `Row ${rowId} won't select`;
+      });
     }
   });
 };
@@ -63,11 +69,12 @@ export const selectCell = async (rowId: string | number, colId: string, within?:
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
+  await selectRow(rowId, within);
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
     userEvent.dblClick(cell);
   });
-  await findOpenMenu();
+  await waitFor(findOpenMenu);
 };
 
 const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
@@ -89,14 +96,14 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
       }
       return menuOption;
     },
-    { timeout: 10000 },
+    { timeout: 5000 },
   );
 };
 
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
+  const menuOption = await findMenuOption(menuOptionText);
   await act(async () => {
-    const menuOption = await findMenuOption(menuOptionText);
-    menuOption && userEvent.click(menuOption);
+    userEvent.click(menuOption);
   });
 };
 
@@ -107,7 +114,6 @@ export const openAndClickMenuOption = async (
   within?: HTMLElement,
 ): Promise<void> => {
   await editCell(rowId, colId, within);
-  await wait(100);
   await clickMenuOption(menuOptionText);
 };
 
