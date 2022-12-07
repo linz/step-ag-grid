@@ -88,16 +88,17 @@ export function commonProps(isDisabled?: boolean, isHovering?: boolean) {
 export const indexOfNode = (nodeList: NodeListOf<Node>, node: Node) => findIndex(nodeList, node);
 
 export const focusFirstInput = (container: any) => {
-  if (!(container instanceof Element)) return false;
+  // We can't use instanceof Element in portals, so I use querySelectorAll as a proxy here
+  if (!container || !("querySelectorAll" in container)) return false;
   const inputs = container.querySelectorAll("input[type='text'],textarea");
   const input = inputs[0];
-  if (input instanceof HTMLElement) {
-    input.focus();
-    // Text areas should start at end
-    if (input instanceof HTMLTextAreaElement) {
-      input.selectionStart = input.value.length;
-    }
-    return true;
+  // Using focus as proxy for HTMLElement
+  if (!input || !("focus" in input)) return false;
+  input.focus();
+  // Text areas should start at end
+  // this is a proxy for instanceof HTMLTextAreaElement
+  if (input.type === "textarea") {
+    input.selectionStart = input.value.length;
   }
-  return false;
+  return true;
 };
