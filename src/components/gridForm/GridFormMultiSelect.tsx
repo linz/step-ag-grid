@@ -354,7 +354,7 @@ const MenuRadioItem = (props: {
     <MenuItem
       onClick={(e: ClickEvent) => {
         // Global react-menu MenuItem handler handles tabs
-        if (e.key !== "Tab") {
+        if (e.key !== "Tab" && e.key !== "Enter") {
           e.keepOpen = true;
           toggleValue(item);
         }
