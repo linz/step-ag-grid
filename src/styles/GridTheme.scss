@@ -74,7 +74,7 @@
     align-items: center;
   }
 
-  .ag-cell.ag-cell-inline-editing {
+  .ag-cell.ag-cell-inline-editing:not(.ag-cell-auto-height) {
     bottom: 0;
   }
 
