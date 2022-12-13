@@ -64,3 +64,4 @@ _Please note that React-Menu v3 requires React 16.14.0 or higher. If you are not
 ## License
 
 [MIT](https://github.com/szhsin/react-menu/blob/master/LICENSE) Licensed.
+
