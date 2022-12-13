@@ -7,7 +7,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { IFormTestRow } from "./FormTest";
 import { isFloat, wait } from "../../utils/util";
@@ -15,6 +15,7 @@ import { GridPopoverTextArea } from "../../components/gridPopoverEdit/GridPopove
 import { GridPopoverTextInput } from "../../components/gridPopoverEdit/GridPopoverTextInput";
 import { ActionButton } from "../../lui/ActionButton";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
+import { GridContext } from "../../contexts/GridContext";
 
 export default {
   title: "Components / Grids",
@@ -37,6 +38,7 @@ export default {
 } as ComponentMeta<typeof Grid>;
 
 const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+  const { selectRowsWithFlashDiff } = useContext(GridContext);
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const [rowData, setRowData] = useState([
     { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345", distance: 10 },
@@ -155,9 +157,12 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
 
   const addRowAction = useCallback(async () => {
     await wait(1000);
+
     const lastRow = rowData[rowData.length - 1];
-    setRowData([...rowData, { id: lastRow.id + 1, name: "?", nameType: "?", numba: "?", plan: "", distance: null }]);
-  }, [rowData]);
+    await selectRowsWithFlashDiff(async () => {
+      setRowData([...rowData, { id: lastRow.id + 1, name: "?", nameType: "?", numba: "?", plan: "", distance: null }]);
+    });
+  }, [rowData, selectRowsWithFlashDiff]);
 
   return (
     <>
