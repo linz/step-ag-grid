@@ -139,7 +139,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
           const rowIndex = firstNode.rowIndex;
           if (rowIndex != null && col != null) {
             const colId = col.colId;
-            colId && setTimeout(() => gridApi.setFocusedCell(rowIndex, colId), 100);
+            colId != null && setTimeout(() => gridApi.setFocusedCell(rowIndex, colId), 100);
           }
         }
       }
