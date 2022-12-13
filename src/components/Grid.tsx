@@ -178,6 +178,18 @@ export const Grid = (params: GridProps): JSX.Element => {
             suppressSizeToFit: true,
             checkboxSelection: true,
             headerComponent: GridHeaderSelect,
+            suppressHeaderKeyboardEvent: (e) => {
+              if (e.event.key === "Enter" && !e.event.repeat) {
+                const selectedNodeCount = e.api.getSelectedRows().length;
+                if (selectedNodeCount == 0) {
+                  e.api.selectAllFiltered();
+                } else {
+                  e.api.deselectAll();
+                }
+                return false;
+              }
+              return true;
+            },
             onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
           },
           ...adjustColDefs,

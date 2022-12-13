@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
-import { GridApi, RowNode } from "ag-grid-community";
+import { ColDef, GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
@@ -131,7 +131,18 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         (node) => node.data.id,
       );
       const firstNode = rowsThatNeedSelecting[0];
-      firstNode && gridApi.ensureNodeVisible(firstNode);
+      if (firstNode) {
+        gridApi.ensureNodeVisible(firstNode);
+        const colDefs = gridApi.getColumnDefs();
+        if (colDefs && colDefs.length) {
+          const col = colDefs[0] as ColDef; // We don't support ColGroupDef
+          const rowIndex = firstNode.rowIndex;
+          if (rowIndex != null && col != null) {
+            const colId = col.colId;
+            colId != null && setTimeout(() => gridApi.setFocusedCell(rowIndex, colId), 100);
+          }
+        }
+      }
       if (select) {
         // Select rows that shouldn't be selected
         rowsThatNeedSelecting.forEach((node) => node.setSelected(true));
