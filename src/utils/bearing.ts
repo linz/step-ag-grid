@@ -32,7 +32,7 @@ export const bearingStringValidator = (
   value = value.trim();
   if (value === "") return null;
   const match = value.match(validMaskForDmsBearing);
-  if (!match) return "Bearing must be a positive number in D.MMSSS format";
+  if (!match) return "Bearing must be a number in D.MMSSS format";
   const decimalPart = match[4];
   if (decimalPart != null && decimalPart.length > 5) {
     return "Bearing has a maximum of 5 decimal places";
