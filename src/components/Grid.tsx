@@ -186,9 +186,9 @@ export const Grid = (params: GridProps): JSX.Element => {
                 } else {
                   e.api.deselectAll();
                 }
-                return false;
+                return true;
               }
-              return true;
+              return false;
             },
             onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
           },

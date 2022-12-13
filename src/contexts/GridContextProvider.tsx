@@ -1,7 +1,7 @@
 import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
 import { ColDef, GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
-import { delay, difference, isEmpty, last, sortBy } from "lodash-es";
+import { defer, delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
@@ -139,7 +139,9 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
           const rowIndex = firstNode.rowIndex;
           if (rowIndex != null && col != null) {
             const colId = col.colId;
-            colId != null && setTimeout(() => gridApi.setFocusedCell(rowIndex, colId), 100);
+            // We need to make sure we aren't currently editing a cell otherwise tests will fail
+            // as they will start to edit the cell before this stuff has a chance to run
+            colId != null && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
           }
         }
       }
