@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useContext, useRef, useState } from "react";
+import { ReactElement, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import { ColDef, GridApi, RowNode } from "ag-grid-community";
 import { GridContext } from "./GridContext";
 import { defer, delay, difference, isEmpty, last, sortBy } from "lodash-es";
@@ -22,10 +22,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const idsBeforeUpdate = useRef<number[]>([]);
   const externallySelectedItemsAreInSync = useRef(false);
 
-  const setGridApi = (gridApi: GridApi | undefined) => {
+  const setGridApi = useCallback((gridApi: GridApi | undefined) => {
     _setGridApi(gridApi);
     setGridReady(!!gridApi);
-  };
+  }, []);
 
   /**
    * Wraps things that require gridApi in common handling, for when gridApi not present.
@@ -33,27 +33,30 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
    * @param hasApiFn Execute when api is ready.
    * @param noApiFn Execute if api is not ready.
    */
-  const gridApiOp = <T extends unknown, R extends unknown>(
-    hasApiFn: (gridApi: GridApi) => T,
-    noApiFn?: () => R,
-  ): T | R => {
-    if (!noApiFn) {
-      noApiFn = (() => {}) as () => R;
-    }
-    return gridApi ? hasApiFn(gridApi) : noApiFn();
-  };
+  const gridApiOp = useCallback(
+    <T extends unknown, R extends unknown>(hasApiFn: (gridApi: GridApi) => T, noApiFn?: () => R): T | R => {
+      if (!noApiFn) {
+        noApiFn = (() => {}) as () => R;
+      }
+      return gridApi ? hasApiFn(gridApi) : noApiFn();
+    },
+    [gridApi],
+  );
 
   /**
    * Set the quick filter value to grid.
    */
-  const setQuickFilter = (quickFilter: string) => {
-    gridApiOp((gridApi) => gridApi.setQuickFilter(quickFilter));
-  };
+  const setQuickFilter = useCallback(
+    (quickFilter: string) => {
+      gridApiOp((gridApi) => gridApi.setQuickFilter(quickFilter));
+    },
+    [gridApiOp],
+  );
 
   /**
    * Get all row id's in grid.
    */
-  const _getAllRowIds = () => {
+  const _getAllRowIds = useCallback(() => {
     const result: number[] = [];
     return gridApiOp(
       (gridApi) => {
@@ -62,20 +65,20 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
       },
       () => result,
     );
-  };
+  }, [gridApiOp]);
 
   /**
    * Record all row id's before update so that we can select/flash the new rows after update.
    */
-  const beforeUpdate = () => {
+  const beforeUpdate = useCallback(() => {
     idsBeforeUpdate.current = _getAllRowIds();
-  };
+  }, [_getAllRowIds]);
 
   /**
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = (): RowNode[] => {
+  const _getNewNodes = useCallback((): RowNode[] => {
     return gridApiOp(
       (gridApi) =>
         difference(_getAllRowIds(), idsBeforeUpdate.current)
@@ -83,7 +86,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
           .filter((r) => r) as RowNode[],
       () => [],
     );
-  };
+  }, [_getAllRowIds, gridApiOp]);
 
   /**
    * Get grid nodes via rowIds.  If rowIds has no matching node the result may be smaller than expected.
@@ -91,15 +94,18 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
    *
    * @param rowIds Row ids to get from grid.
    */
-  const _rowIdsToNodes = (rowIds: number[]): RowNode[] => {
-    return gridApiOp(
-      (gridApi) =>
-        rowIds
-          .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
-      () => [] as RowNode[],
-    );
-  };
+  const _rowIdsToNodes = useCallback(
+    (rowIds: number[]): RowNode[] => {
+      return gridApiOp(
+        (gridApi) =>
+          rowIds
+            .map((rowId) => gridApi.getRowNode("" + rowId)) //
+            .filter((r) => r) as RowNode[],
+        () => [] as RowNode[],
+      );
+    },
+    [gridApiOp],
+  );
 
   /**
    * Internal method for selecting and flashing rows.
@@ -109,214 +115,251 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
    * @param flash Whether to flash rows
    * @param retryCount Table updates may not be present when this is called, so retry is needed.
    */
-  const _selectRowsWithOptionalFlash = (
-    rowIds: number[] | undefined,
-    select: boolean,
-    flash: boolean,
-    retryCount = 15, // We retry for approximately 5x200ms=1s
-  ) => {
-    return gridApiOp((gridApi) => {
-      const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
-      const gridRowIdsNotUpdatedYet = rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
-      const gridRowIdsNotChangedYet = !rowIds && isEmpty(rowNodes); // rowIds are from beforeUpdate
-      const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
-      // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
-      if (gridHasNotUpdated && retryCount > 0) {
-        delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
-        return;
-      }
+  const _selectRowsWithOptionalFlash = useCallback(
+    (
+      rowIds: number[] | undefined,
+      select: boolean,
+      flash: boolean,
+      retryCount = 15, // We retry for approximately 5x200ms=1s
+    ) => {
+      return gridApiOp((gridApi) => {
+        const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
+        const gridRowIdsNotUpdatedYet = rowIds && rowNodes.length !== rowIds.length; // rowIds are specified
+        const gridRowIdsNotChangedYet = !rowIds && isEmpty(rowNodes); // rowIds are from beforeUpdate
+        const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
+        // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
+        if (gridHasNotUpdated && retryCount > 0) {
+          delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
+          return;
+        }
 
-      const rowsThatNeedSelecting = sortBy(
-        rowNodes.filter((node) => !node.isSelected()),
-        (node) => node.data.id,
-      );
-      const firstNode = rowsThatNeedSelecting[0];
-      if (firstNode) {
-        gridApi.ensureNodeVisible(firstNode);
-        const colDefs = gridApi.getColumnDefs();
-        if (colDefs && colDefs.length) {
-          const col = colDefs[0] as ColDef; // We don't support ColGroupDef
-          const rowIndex = firstNode.rowIndex;
-          if (rowIndex != null && col != null) {
-            const colId = col.colId;
-            // We need to make sure we aren't currently editing a cell otherwise tests will fail
-            // as they will start to edit the cell before this stuff has a chance to run
-            colId != null && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+        const rowsThatNeedSelecting = sortBy(
+          rowNodes.filter((node) => !node.isSelected()),
+          (node) => node.data.id,
+        );
+        const firstNode = rowsThatNeedSelecting[0];
+        if (firstNode) {
+          gridApi.ensureNodeVisible(firstNode);
+          const colDefs = gridApi.getColumnDefs();
+          if (colDefs && colDefs.length) {
+            const col = colDefs[0] as ColDef; // We don't support ColGroupDef
+            const rowIndex = firstNode.rowIndex;
+            if (rowIndex != null && col != null) {
+              const colId = col.colId;
+              // We need to make sure we aren't currently editing a cell otherwise tests will fail
+              // as they will start to edit the cell before this stuff has a chance to run
+              colId != null &&
+                defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+            }
           }
         }
-      }
-      if (select) {
-        // Select rows that shouldn't be selected
-        rowsThatNeedSelecting.forEach((node) => node.setSelected(true));
-        // Unselect rows that shouldn't be selected
-        gridApi.getSelectedNodes()?.forEach((node) => {
-          if (node && !rowNodes.includes(node)) {
-            node.setSelected(false);
-          }
-        });
-      }
-      if (flash) {
-        delay(() => {
-          try {
-            gridApi.flashCells({ rowNodes });
-          } catch {
-            // ignore, flash cells sometimes throws errors as nodes have gone out of scope
-          }
-        }, 250);
-      }
-    });
-  };
+        if (select) {
+          // Select rows that shouldn't be selected
+          rowsThatNeedSelecting.forEach((node) => node.setSelected(true));
+          // Unselect rows that shouldn't be selected
+          gridApi.getSelectedNodes()?.forEach((node) => {
+            if (node && !rowNodes.includes(node)) {
+              node.setSelected(false);
+            }
+          });
+        }
+        if (flash) {
+          delay(() => {
+            try {
+              gridApi.flashCells({ rowNodes });
+            } catch {
+              // ignore, flash cells sometimes throws errors as nodes have gone out of scope
+            }
+          }, 250);
+        }
+      });
+    },
+    [_getNewNodes, _rowIdsToNodes, gridApiOp],
+  );
 
-  const selectRowsById = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false);
-  const selectRowsByIdWithFlash = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true);
-  const flashRows = (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true);
+  const selectRowsById = useCallback(
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false),
+    [_selectRowsWithOptionalFlash],
+  );
+  const selectRowsByIdWithFlash = useCallback(
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true),
+    [_selectRowsWithOptionalFlash],
+  );
+  const flashRows = useCallback(
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true),
+    [_selectRowsWithOptionalFlash],
+  );
 
-  const selectRowsDiff = async (fn: () => Promise<any>) => {
-    beforeUpdate();
-    await fn();
-    _selectRowsWithOptionalFlash(undefined, true, false);
-  };
+  const selectRowsDiff = useCallback(
+    async (fn: () => Promise<any>) => {
+      beforeUpdate();
+      await fn();
+      _selectRowsWithOptionalFlash(undefined, true, false);
+    },
+    [_selectRowsWithOptionalFlash, beforeUpdate],
+  );
 
-  const selectRowsWithFlashDiff = async (fn: () => Promise<any>) => {
-    beforeUpdate();
-    await fn();
-    _selectRowsWithOptionalFlash(undefined, true, true);
-  };
+  const selectRowsWithFlashDiff = useCallback(
+    async (fn: () => Promise<any>) => {
+      beforeUpdate();
+      await fn();
+      _selectRowsWithOptionalFlash(undefined, true, true);
+    },
+    [_selectRowsWithOptionalFlash, beforeUpdate],
+  );
 
-  const flashRowsDiff = async (fn: () => Promise<any>) => {
-    beforeUpdate();
-    await fn();
-    _selectRowsWithOptionalFlash(undefined, false, true);
-  };
+  const flashRowsDiff = useCallback(
+    async (fn: () => Promise<any>) => {
+      beforeUpdate();
+      await fn();
+      _selectRowsWithOptionalFlash(undefined, false, true);
+    },
+    [_selectRowsWithOptionalFlash, beforeUpdate],
+  );
 
-  const getSelectedRows = <T extends unknown>(): T[] => {
+  const getSelectedRows = useCallback(<T extends unknown>(): T[] => {
     return gridApiOp(
       (gridApi) => gridApi.getSelectedRows(),
       () => [],
     );
-  };
+  }, [gridApiOp]);
 
-  const getSelectedRowIds = (): number[] => getSelectedRows().map((row) => (row as any).id as number);
+  const getSelectedRowIds = useCallback(
+    (): number[] => getSelectedRows().map((row) => (row as any).id as number),
+    [getSelectedRows],
+  );
 
-  const editingCells = (): boolean => {
+  const editingCells = useCallback((): boolean => {
     return gridApiOp(
       (gridApi) => isNotEmpty(gridApi.getEditingCells()),
       () => false,
     );
-  };
+  }, [gridApiOp]);
 
-  const ensureRowVisible = (id: number | string): boolean => {
-    return gridApiOp((gridApi) => {
-      const node = gridApi.getRowNode(`${id}`);
-      if (!node) return false;
-      gridApi.ensureNodeVisible(node);
-      return true;
-    });
-  };
+  const ensureRowVisible = useCallback(
+    (id: number | string): boolean => {
+      return gridApiOp((gridApi) => {
+        const node = gridApi.getRowNode(`${id}`);
+        if (!node) return false;
+        gridApi.ensureNodeVisible(node);
+        return true;
+      });
+    },
+    [gridApiOp],
+  );
 
   /**
    * Scroll last selected row into view on grid sort change
    */
-  const ensureSelectedRowIsVisible = (): void => {
+  const ensureSelectedRowIsVisible = useCallback((): void => {
     gridApiOp((gridApi) => {
       const selectedNodes = gridApi.getSelectedNodes();
       if (isEmpty(selectedNodes)) return;
       gridApi.ensureNodeVisible(last(selectedNodes));
     });
-  };
+  }, [gridApiOp]);
 
   /**
    * Resize columns to fit container
    */
-  const sizeColumnsToFit = (): void => {
+  const sizeColumnsToFit = useCallback((): void => {
     gridApiOp((gridApi) => {
       // Hide size columns to fit errors in tests
       document.body.clientWidth && gridApi.sizeColumnsToFit();
     });
-  };
+  }, [gridApiOp]);
 
-  const stopEditing = (): void => gridApiOp((gridApi) => gridApi.stopEditing());
+  const stopEditing = useCallback((): void => gridApiOp((gridApi) => gridApi.stopEditing()), [gridApiOp]);
 
-  const updatingCells = async (
-    props: { selectedRows: GridBaseRow[]; field?: string },
-    fnUpdate: (selectedRows: any[]) => Promise<boolean>,
-    setSaving?: (saving: boolean) => void,
-    tabDirection?: 1 | 0 | -1,
-  ): Promise<boolean> => {
-    setSaving && setSaving(true);
-    return await gridApiOp(async (gridApi) => {
-      const preOpCell = gridApi.getFocusedCell();
+  const selectNextCell = useCallback(
+    (tabDirection: -1 | 0 | 1 = 0) => {
+      gridApiOp((gridApi) => {
+        if (tabDirection == 1) gridApi.tabToNextCell();
+        if (tabDirection == -1) gridApi.tabToPreviousCell();
+      });
+    },
+    [gridApiOp],
+  );
 
-      const selectedRows = props.selectedRows;
+  const updatingCells = useCallback(
+    async (
+      props: { selectedRows: GridBaseRow[]; field?: string },
+      fnUpdate: (selectedRows: any[]) => Promise<boolean>,
+      setSaving?: (saving: boolean) => void,
+      tabDirection?: 1 | 0 | -1,
+    ): Promise<boolean> => {
+      setSaving && setSaving(true);
+      return await gridApiOp(async (gridApi) => {
+        const preOpCell = gridApi.getFocusedCell();
 
-      let ok = false;
-      await modifyUpdating(
-        props.field ?? "",
-        selectedRows.map((data) => data.id),
-        async () => {
-          // Need to refresh to get spinners to work on all rows
-          gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
-          ok = await fnUpdate(selectedRows).catch((ex) => {
-            console.error("Exception during modifyUpdating", ex);
-            return false;
-          });
-        },
-      );
+        const selectedRows = props.selectedRows;
 
-      // async processes need to refresh their own rows
-      gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+        let ok = false;
+        await modifyUpdating(
+          props.field ?? "",
+          selectedRows.map((data) => data.id),
+          async () => {
+            // Need to refresh to get spinners to work on all rows
+            gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+            ok = await fnUpdate(selectedRows).catch((ex) => {
+              console.error("Exception during modifyUpdating", ex);
+              return false;
+            });
+          },
+        );
 
-      if (ok) {
-        const cell = gridApi.getFocusedCell();
-        if (cell && gridApi.getFocusedCell() == null) {
-          gridApi.setFocusedCell(cell.rowIndex, cell.column);
+        // async processes need to refresh their own rows
+        gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+
+        if (ok) {
+          const cell = gridApi.getFocusedCell();
+          if (cell && gridApi.getFocusedCell() == null) {
+            gridApi.setFocusedCell(cell.rowIndex, cell.column);
+          }
+          // This is needed to trigger postSortRowsHook
+          gridApi.refreshClientSideRowModel();
+        } else {
+          // Don't set saving if ok as the form has already closed
+          setSaving && setSaving(false);
         }
-        // This is needed to trigger postSortRowsHook
-        gridApi.refreshClientSideRowModel();
-      } else {
-        // Don't set saving if ok as the form has already closed
-        setSaving && setSaving(false);
-      }
 
-      // Only focus next cell if user hasn't already manually changed focus
-      const postOpCell = gridApi.getFocusedCell();
-      if (
-        tabDirection &&
-        preOpCell &&
-        postOpCell &&
-        preOpCell.rowIndex == postOpCell.rowIndex &&
-        preOpCell.column.getColId() == postOpCell.column.getColId()
-      ) {
-        selectNextCell(tabDirection);
-      }
+        // Only focus next cell if user hasn't already manually changed focus
+        const postOpCell = gridApi.getFocusedCell();
+        if (
+          tabDirection &&
+          preOpCell &&
+          postOpCell &&
+          preOpCell.rowIndex == postOpCell.rowIndex &&
+          preOpCell.column.getColId() == postOpCell.column.getColId()
+        ) {
+          selectNextCell(tabDirection);
+        }
 
-      return ok;
-    });
-  };
+        return ok;
+      });
+    },
+    [gridApiOp, modifyUpdating, selectNextCell],
+  );
 
-  const redrawRows = (rowNodes?: RowNode[]) => {
-    gridApiOp((gridApi) => {
-      gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-    });
-  };
+  const redrawRows = useCallback(
+    (rowNodes?: RowNode[]) => {
+      gridApiOp((gridApi) => {
+        gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+      });
+    },
+    [gridApiOp],
+  );
 
-  const selectNextCell = (tabDirection: -1 | 0 | 1 = 0) => {
-    gridApiOp((gridApi) => {
-      if (tabDirection == 1) gridApi.tabToNextCell();
-      if (tabDirection == -1) gridApi.tabToPreviousCell();
-    });
-  };
-
-  const setExternallySelectedItemsAreInSync = (inSync: boolean) => {
+  const setExternallySelectedItemsAreInSync = useCallback((inSync: boolean) => {
     externallySelectedItemsAreInSync.current = inSync;
-  };
+  }, []);
 
-  const waitForExternallySelectedItemsToBeInSync = async () => {
+  const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
     // Wait for up to 5 seconds
     for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync.current; i++) {
       await wait(200);
     }
-  };
+  }, []);
 
   return (
     <GridContext.Provider
