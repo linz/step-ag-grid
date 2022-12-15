@@ -137,8 +137,8 @@ export const ControlledMenuFr = (
       if (activeElement !== firstInputEl && activeElement !== lastInputEl) return;
 
       const isTextArea = activeElement.nodeName === "TEXTAREA";
-      const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") != "false" || isTextArea;
-      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") != "false";
+      const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") == "true" || isTextArea;
+      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") == "true";
       const invokeSave = (reason: string) => {
         if (!saveButtonRef?.current) return;
         saveButtonRef.current?.setAttribute("data-reason", reason);
