@@ -230,7 +230,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && filteredValues && isEmpty(filteredValues) && (
+          {options && (isEmpty(options) || (filteredValues && isEmpty(filteredValues))) && (
             <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
               No Options
             </MenuItem>
