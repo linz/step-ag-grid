@@ -4,7 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import { CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { difference, last, xorBy } from "lodash-es";
+import { difference, isEmpty, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { fnOrVar, isNotEmpty } from "../utils/util";
@@ -65,12 +65,8 @@ export const Grid = (params: GridProps): JSX.Element => {
   useEffect(() => {
     if (!gridReady || !params.autoSelectFirstRow || hasSelectedFirstItem.current || !params.rowData) return;
     hasSelectedFirstItem.current = true;
-    if (isNotEmpty(params.rowData)) {
-      if (params.setExternalSelectedItems) {
-        params.setExternalSelectedItems([params.rowData[0]]);
-      } else {
-        selectRowsById([params.rowData[0].id]);
-      }
+    if (isNotEmpty(params.rowData) && isEmpty(params.externalSelectedItems)) {
+      selectRowsById([params.rowData[0].id]);
     }
   }, [gridReady, params, params.autoSelectFirstRow, params.rowData, selectRowsById]);
 
