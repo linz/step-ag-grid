@@ -64,7 +64,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const [filter, setFilter] = useState("");
-  const [filteredValues, setFilteredValues] = useState<any[]>([]);
+  const [filteredValues, setFilteredValues] = useState<any[]>();
   const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
@@ -172,7 +172,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
         await onSelectFilter({ selectedRows, value: filter });
         return true;
       } else {
-        if (filteredValues.length === 1) {
+        if (filteredValues && filteredValues.length === 1) {
           if (filteredValues[0].subComponent) return false;
           return await selectItemHandler(filteredValues[0].value, null);
         }
@@ -214,7 +214,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   defaultValue={filter}
                   data-allowtabtosave={true}
                   data-disableenterautosave={
-                    !props.onSelectFilter && !(filteredValues.length === 1 && !filteredValues[0].subComponent)
+                    !props.onSelectFilter &&
+                    !(filteredValues && filteredValues.length === 1 && !filteredValues[0].subComponent)
                   }
                   onChange={(e) => setFilter(e.target.value)}
                 />
@@ -229,7 +230,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && isEmpty(filteredValues) && (
+          {options && filteredValues && isEmpty(filteredValues) && (
             <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
               No Options
             </MenuItem>
@@ -240,7 +241,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
             ) : item.value === MenuHeaderString ? (
               <MenuHeader key={`$$header_${index}`}>{item.label}</MenuHeader>
             ) : (
-              filteredValues.includes(item) && (
+              (!filteredValues || filteredValues.includes(item)) && (
                 <div key={`menu-wrapper-${index}`}>
                   <MenuItem
                     key={`${fieldToString(field)}-${index}`}
@@ -264,21 +265,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                       }
                     }}
                   >
-                    {/*onClick={(e: ClickEvent) => {
-                    if (item.subComponent) {
-                      e.keepOpen = true;
-                    } else {
-                      clickItemHandler(
-                        item.value,
-                        undefined,
-                        e.key === "Tab"
-                          ? e.shiftKey
-                            ? CloseReason.TAB_BACKWARD
-                            : CloseReason.TAB_FORWARD
-                          : CloseReason.CLICK,
-                      ).then();
-                    }
-                  }*/}
                     {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                     {item.subComponent ? "..." : ""}
                   </MenuItem>
