@@ -11,7 +11,7 @@ interface GridPopoverContextProps {
 }
 
 export const GridPopoverContextProvider = ({ props, children }: GridPopoverContextProps) => {
-  const { getSelectedRows, updatingCells, waitForExternallySelectedItemsToBeInSync } = useContext(GridContext);
+  const { getSelectedRows, updatingCells } = useContext(GridContext);
   const anchorRef = useRef<Element>(props.eGridCell);
 
   const hasSaved = useRef(false);
