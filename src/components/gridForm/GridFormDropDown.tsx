@@ -1,16 +1,14 @@
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { KeyboardEvent, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay } from "lodash-es";
+import { delay, isEmpty } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
-import { CloseReason } from "../../react-menu3/utils";
-import { GridContext } from "../../contexts/GridContext";
 import { FormError } from "../../lui/FormError";
 import { isNotEmpty } from "../../utils/util";
 
@@ -62,8 +60,7 @@ const fieldToString = (field: any) => {
 };
 
 export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPopoutDropDownProps<RowType>) => {
-  const { stopEditing } = useContext(GridContext);
-  const { selectedRows, field, updateValue, data } = useGridPopoverContext<RowType>();
+  const { selectedRows, field, data } = useGridPopoverContext<RowType>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const [filter, setFilter] = useState("");
@@ -73,7 +70,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   const subComponentIsValid = useRef(false);
   const subComponentInitialValue = useRef<string | null>(null);
   const [subSelectedValue, setSubSelectedValue] = useState<any>(null);
-  const [selectedSubComponent, setSelectedSubComponent] = useState<FinalSelectOption | null>(null);
+  // Note: null is assumed to be the filter
+  const [selectedItem, setSelectedItem] = useState<FinalSelectOption | null>(null);
 
   const selectItemHandler = useCallback(
     async (value: any, subComponentValue?: any): Promise<boolean> => {
@@ -90,29 +88,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       return true;
     },
     [field, props, selectedRows],
-  );
-
-  const clickItemHandler = useCallback(
-    async (value: any, subComponentValue?: any, reason?: string): Promise<boolean> => {
-      if (subComponentValue !== undefined && !subComponentIsValid.current) return false;
-      return updateValue(
-        async () => {
-          return await selectItemHandler(value, subComponentValue);
-        },
-        reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
-      );
-    },
-    [selectItemHandler, updateValue],
-  );
-
-  const selectFilterHandler = useCallback(
-    async (value: string) => {
-      await updateValue(async (selectedRows) => {
-        props.onSelectFilter && (await props.onSelectFilter({ selectedRows, value }));
-        return true;
-      }, 0);
-    },
-    [props, updateValue],
   );
 
   // Load up options list if it's async function
@@ -159,7 +134,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
               return undefined;
             }
             const str = (option.label as string) || "";
-            return str.toLowerCase().indexOf(filter.toLowerCase()) === -1 ? option.value : undefined;
+            return str.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ? option : undefined;
           })
           .filter((r) => r !== undefined),
       );
@@ -190,65 +165,58 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   const save = useCallback(async () => {
     if (!options) return true;
 
-    // Handler for sub-selected value
-    if (!selectedSubComponent) return true;
-    if (selectedSubComponent.subComponent && !subComponentIsValid.current) return false;
-    await selectItemHandler(selectedSubComponent.value, subSelectedValue);
+    // Filter saved
+    if (selectedItem === null) {
+      if (props.onSelectFilter) {
+        const { onSelectFilter } = props;
+        await onSelectFilter({ selectedRows, value: filter });
+        return true;
+      } else {
+        if (filteredValues.length === 1) {
+          if (filteredValues[0].subComponent) return false;
+          return await selectItemHandler(filteredValues[0].value, null);
+        }
+      }
+      return false;
+    }
+    if (selectedItem.subComponent && !subComponentIsValid.current) return false;
+    await selectItemHandler(selectedItem.value, subSelectedValue);
 
     return true;
-  }, [options, selectItemHandler, selectedSubComponent, subSelectedValue]);
+  }, [filter, filteredValues, options, props, selectItemHandler, selectedItem, selectedRows, subSelectedValue]);
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
-    invalid: () => !!(selectedSubComponent && !subComponentIsValid.current),
+    invalid: () => !!(selectedItem && !subComponentIsValid.current),
     save,
   });
-
-  const enterKeyPressedRef = useRef(false);
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.stopPropagation();
-      e.preventDefault();
-      enterKeyPressedRef.current = true;
-    }
-  }, []);
-
-  const handleKeyUp = useCallback(
-    async (e: KeyboardEvent) => {
-      if (!options) return;
-
-      if (e.key === "Enter") {
-        e.stopPropagation();
-        e.preventDefault();
-        if (!enterKeyPressedRef.current) return;
-
-        props.onSelectFilter && (await selectFilterHandler(filter));
-        stopEditing();
-      }
-    },
-    [filter, options, props.onSelectFilter, selectFilterHandler, stopEditing],
-  );
 
   return popoverWrapper(
     <>
       {props.filtered && (
         <div className={"GridFormDropDown-filter"}>
-          <FocusableItem className={"filter-item"}>
+          <FocusableItem
+            className={"filter-item"}
+            onFocus={() => {
+              setSelectedItem(null);
+              setSubSelectedValue(null);
+              subComponentIsValid.current = true;
+            }}
+          >
             {({ ref }: any) => (
               <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <input
-                  autoFocus
                   className={"LuiTextInput-input"}
                   ref={ref}
                   type="text"
                   placeholder={props.filterPlaceholder ?? "Placeholder"}
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
-                  data-disableenterautosave={true}
                   data-allowtabtosave={true}
+                  data-disableenterautosave={
+                    !props.onSelectFilter && !(filteredValues.length === 1 && !filteredValues[0].subComponent)
+                  }
                   onChange={(e) => setFilter(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onKeyUp={handleKeyUp}
                 />
                 {props.filterHelpText && isNotEmpty(filter) && (
                   <FormError error={null} helpText={props.filterHelpText} />
@@ -261,7 +229,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       )}
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
-          {options && options.length == filteredValues?.length && (
+          {options && isEmpty(filteredValues) && (
             <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
               No Options
             </MenuItem>
@@ -271,19 +239,33 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
               <MenuDivider key={`$$divider_${index}`} />
             ) : item.value === MenuHeaderString ? (
               <MenuHeader key={`$$header_${index}`}>{item.label}</MenuHeader>
-            ) : filteredValues.includes(item.value) ? null : (
-              <div key={`menu-wrapper-${index}`}>
-                <MenuItem
-                  key={`${fieldToString(field)}-${index}`}
-                  disabled={!!item.disabled}
-                  title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                  value={item.value}
-                  onClick={(e: ClickEvent) => {
+            ) : (
+              filteredValues.includes(item) && (
+                <div key={`menu-wrapper-${index}`}>
+                  <MenuItem
+                    key={`${fieldToString(field)}-${index}`}
+                    disabled={!!item.disabled}
+                    title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                    value={item.value}
+                    onFocus={() => {
+                      setSelectedItem(item);
+                      if (item.subComponent) {
+                        setSelectedItem(item);
+                        subComponentIsValid.current = true;
+                        subComponentInitialValue.current = null;
+                      } else {
+                        setSubSelectedValue(null);
+                        subComponentIsValid.current = true;
+                      }
+                    }}
+                    onClick={(e: ClickEvent) => {
+                      if (item.subComponent) {
+                        e.keepOpen = true;
+                      }
+                    }}
+                  >
+                    {/*onClick={(e: ClickEvent) => {
                     if (item.subComponent) {
-                      // toggle selection
-                      setSelectedSubComponent(selectedSubComponent === item ? null : item);
-                      subComponentIsValid.current = true;
-                      subComponentInitialValue.current = null;
                       e.keepOpen = true;
                     } else {
                       clickItemHandler(
@@ -296,45 +278,45 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                           : CloseReason.CLICK,
                       ).then();
                     }
-                  }}
-                >
-                  {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                  {item.subComponent ? "..." : ""}
-                </MenuItem>
+                  }*/}
+                    {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                    {item.subComponent ? "..." : ""}
+                  </MenuItem>
 
-                {item.subComponent && selectedSubComponent === item && (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                    {(ref: MenuInstance) => (
-                      <GridSubComponentContext.Provider
-                        value={{
-                          context: { options },
-                          data,
-                          value: subSelectedValue,
-                          setValue: (value: any) => {
-                            setSubSelectedValue(value);
-                            if (subComponentInitialValue.current === null) {
-                              // copy the default value of the sub-component so we can change detect on save
-                              subComponentInitialValue.current = JSON.stringify(value);
-                            }
-                          },
-                          setValid: (valid: boolean) => {
-                            subComponentIsValid.current = valid;
-                          },
-                          triggerSave: async () => {
-                            ref.closeMenu();
-                          },
-                        }}
-                      >
-                        {item.subComponent && (
-                          <div className={"subComponent"}>
-                            <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
-                          </div>
-                        )}
-                      </GridSubComponentContext.Provider>
-                    )}
-                  </FocusableItem>
-                )}
-              </div>
+                  {item.subComponent && selectedItem === item && (
+                    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                      {(ref: MenuInstance) => (
+                        <GridSubComponentContext.Provider
+                          value={{
+                            context: { options },
+                            data,
+                            value: subSelectedValue,
+                            setValue: (value: any) => {
+                              setSubSelectedValue(value);
+                              if (subComponentInitialValue.current === null) {
+                                // copy the default value of the sub-component so we can change detect on save
+                                subComponentInitialValue.current = JSON.stringify(value);
+                              }
+                            },
+                            setValid: (valid: boolean) => {
+                              subComponentIsValid.current = valid;
+                            },
+                            triggerSave: async () => {
+                              ref.closeMenu();
+                            },
+                          }}
+                        >
+                          {item.subComponent && (
+                            <div className={"subComponent"}>
+                              <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                            </div>
+                          )}
+                        </GridSubComponentContext.Provider>
+                      )}
+                    </FocusableItem>
+                  )}
+                </div>
+              )
             ),
           )}
         </>
