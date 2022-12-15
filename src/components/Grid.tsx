@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { CellClickedEvent, ColDef } from "ag-grid-community";
-import { CellEvent, ColumnMovedEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
@@ -35,7 +35,7 @@ export interface GridProps {
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
-  onColumnMoved?: (event: ColumnMovedEvent) => void;
+  onColumnMoved?: GridOptions["onColumnMoved"];
 }
 
 /**
@@ -340,7 +340,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         onSortChanged={ensureSelectedRowIsVisible}
         postSortRows={params.postSortRows ?? postSortRows}
         onSelectionChanged={synchroniseExternalStateToGridSelection}
-        onColumnMoved={params.onColumnMoved || undefined}
+        onColumnMoved={params.onColumnMoved}
       />
     </div>
   );
