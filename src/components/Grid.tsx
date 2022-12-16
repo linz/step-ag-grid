@@ -35,6 +35,7 @@ export interface GridProps {
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
+  onColumnMoved?: GridOptions["onColumnMoved"];
 }
 
 /**
@@ -339,6 +340,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         onSortChanged={ensureSelectedRowIsVisible}
         postSortRows={params.postSortRows ?? postSortRows}
         onSelectionChanged={synchroniseExternalStateToGridSelection}
+        onColumnMoved={params.onColumnMoved}
       />
     </div>
   );
