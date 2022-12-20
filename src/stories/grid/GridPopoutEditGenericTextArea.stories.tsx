@@ -16,6 +16,10 @@ import { GridPopoverTextInput } from "../../components/gridPopoverEdit/GridPopov
 import { ActionButton } from "../../lui/ActionButton";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { GridContext } from "../../contexts/GridContext";
+import { Editor, GridCellMultiEditor } from "../../components/GridCellMultiEditor";
+import { GridFormTextArea } from "../../components/gridForm/GridFormTextArea";
+import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
+import { GridFormDropDown } from "../../components/gridForm/GridFormDropDown";
 
 export default {
   title: "Components / Grids",
@@ -88,7 +92,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           },
         },
         {
-          multiEdit: true,
+          multiEdit: false,
           editorParams: {
             maxLength: 12,
             placeholder: "Enter distance...",
@@ -119,7 +123,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             required: true,
             maxLength: 32,
             placeholder: "Enter some text...",
-
             invalid: (value: string) => {
               if (value === "never") return "The value 'never' is not allowed";
               return null;
@@ -131,6 +134,32 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             },
           },
         },
+      ),
+      GridCellMultiEditor(
+        {
+          colId: "plan2",
+          field: "plan",
+          headerName: "Multi-editor",
+          maxWidth: 140,
+        },
+        (_params: ICellEditorParams) =>
+          _params.rowIndex == 0
+            ? Editor({
+                multiEdit: true,
+                editor: GridFormTextArea,
+                editorParams: {
+                  required: true,
+                  maxLength: 32,
+                  placeholder: "Enter some text...",
+                },
+              })
+            : Editor({
+                multiEdit: false,
+                editor: GridFormDropDown,
+                editorParams: {
+                  options: [{ label: "One", value: 1 }],
+                },
+              }),
       ),
       GridPopoverMenu(
         {
@@ -160,7 +189,17 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
 
     const lastRow = rowData[rowData.length - 1];
     await selectRowsWithFlashDiff(async () => {
-      setRowData([...rowData, { id: lastRow.id + 1, name: "?", nameType: "?", numba: "?", plan: "", distance: null }]);
+      setRowData([
+        ...rowData,
+        {
+          id: lastRow.id + 1,
+          name: "?",
+          nameType: "?",
+          numba: "?",
+          plan: "",
+          distance: null,
+        },
+      ]);
     });
   }, [rowData, selectRowsWithFlashDiff]);
 
