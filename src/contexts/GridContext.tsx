@@ -15,6 +15,7 @@ export interface GridContextType {
   selectRowsByIdWithFlash: (rowIds?: number[]) => void;
   flashRows: (rowIds?: number[]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
+  focusByRowById: (rowId: number) => void;
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   sizeColumnsToFit: () => void;
@@ -26,12 +27,14 @@ export interface GridContextType {
     tabDirection?: 1 | 0 | -1,
   ) => Promise<boolean>;
   redrawRows: (rowNodes?: RowNode[]) => void;
+  externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
 }
 
 export const GridContext = createContext<GridContextType>({
   gridReady: false,
+  externallySelectedItemsAreInSync: false,
   setGridApi: () => {
     console.error("no context provider for setGridApi");
   },
@@ -63,6 +66,9 @@ export const GridContext = createContext<GridContextType>({
   },
   flashRowsDiff: async () => {
     console.error("no context provider for flashRows");
+  },
+  focusByRowById: async () => {
+    console.error("no context provider for focusByRowById");
   },
   ensureRowVisible: () => {
     console.error("no context provider for ensureRowVisible");

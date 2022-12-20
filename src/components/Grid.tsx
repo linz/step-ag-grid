@@ -48,8 +48,10 @@ export const Grid = (params: GridProps): JSX.Element => {
     setQuickFilter,
     ensureRowVisible,
     selectRowsById,
+    focusByRowById,
     ensureSelectedRowIsVisible,
     sizeColumnsToFit,
+    externallySelectedItemsAreInSync,
     setExternallySelectedItemsAreInSync,
   } = useContext(GridContext);
   const { checkUpdating } = useContext(GridUpdatingContext);
@@ -64,12 +66,25 @@ export const Grid = (params: GridProps): JSX.Element => {
    */
   const hasSelectedFirstItem = useRef(false);
   useEffect(() => {
-    if (!gridReady || !params.autoSelectFirstRow || hasSelectedFirstItem.current || !params.rowData) return;
+    if (!gridReady || hasSelectedFirstItem.current || !params.rowData || !externallySelectedItemsAreInSync) return;
     hasSelectedFirstItem.current = true;
     if (isNotEmpty(params.rowData) && isEmpty(params.externalSelectedItems)) {
-      selectRowsById([params.rowData[0].id]);
+      const firstRowId = params.rowData[0].id;
+      if (params.autoSelectFirstRow) {
+        selectRowsById([firstRowId]);
+      } else {
+        focusByRowById(firstRowId);
+      }
     }
-  }, [gridReady, params, params.autoSelectFirstRow, params.rowData, selectRowsById]);
+  }, [
+    externallySelectedItemsAreInSync,
+    focusByRowById,
+    gridReady,
+    params,
+    params.autoSelectFirstRow,
+    params.rowData,
+    selectRowsById,
+  ]);
 
   /**
    * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
@@ -176,7 +191,7 @@ export const Grid = (params: GridProps): JSX.Element => {
             checkboxSelection: true,
             headerComponent: GridHeaderSelect,
             suppressHeaderKeyboardEvent: (e) => {
-              if (e.event.key === "Enter" && !e.event.repeat) {
+              if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
                 const selectedNodeCount = e.api.getSelectedRows().length;
                 if (selectedNodeCount == 0) {
                   e.api.selectAllFiltered();
