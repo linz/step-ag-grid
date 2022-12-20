@@ -15,7 +15,7 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow>
   helpText?: string;
 }
 
-export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>) => {
+export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>): JSX.Element => {
   const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
 
   const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);

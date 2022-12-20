@@ -6,7 +6,7 @@ import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridR
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
-import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { fnOrVar } from "../utils/util";
 
@@ -52,6 +52,20 @@ export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
   editor?: (editorProps: any) => JSX.Element;
 }
 
+export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
+  const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
+  const exec = shortcutKeys[e.event.key];
+  if (!e.editing && !e.event.repeat && e.event.type === "keypress" && exec) {
+    const editable = fnOrVar(e.colDef?.editable, e);
+    return editable ? exec(e) ?? true : true;
+  }
+  // It's important that aggrid doesn't trigger edit on enter
+  // as the incorrect selected rows will be returned
+  return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " ", "Home", "End", "PageUp", "PageDown"].includes(
+    e.event.key,
+  );
+};
+
 /*
  * All cells should use this
  */
@@ -68,21 +82,11 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     ...(custom?.editor && {
-      cellClassRules: custom.multiEdit ? GridCellMultiSelectClassRules : undefined,
+      cellClassRules: GridCellMultiSelectClassRules,
       editable: props.editable ?? true,
-      cellEditor: GenericCellEditorComponentWrapper(custom),
+      cellEditor: GenericCellEditorComponentWrapper(custom?.editor),
     }),
-    suppressKeyboardEvent: (e) => {
-      const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
-      const exec = shortcutKeys[e.event.key];
-      if (!e.editing && !e.event.repeat && e.event.type === "keypress" && exec) {
-        const editable = fnOrVar(e.colDef?.editable, e);
-        return editable ? exec(e) ?? true : true;
-      }
-      // It's important that aggrid doesn't trigger edit on enter
-      // as the incorrect selected rows will be returned
-      return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " "].includes(e.event.key);
-    },
+    suppressKeyboardEvent: suppressCellKeyboardEvents,
     ...(custom?.editorParams && {
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
@@ -106,7 +110,8 @@ export interface CellEditorCommon {
   className?: string | undefined;
 }
 
-export const GenericCellEditorComponentWrapper = (custom?: { editor?: (props: any) => JSX.Element }) => {
+export const GenericCellEditorComponentWrapper = (editor?: (props: any) => JSX.Element) => {
+  const obj = { editor };
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
     const valueFormatted = cellEditorParams.formatValue
       ? cellEditorParams.formatValue(cellEditorParams.value)
@@ -120,7 +125,7 @@ export const GenericCellEditorComponentWrapper = (custom?: { editor?: (props: an
             {...cellEditorParams.colDef.cellRendererParams}
           />
         }
-        {custom?.editor && <custom.editor {...cellEditorParams} />}
+        {obj.editor && <obj.editor {...cellEditorParams} />}
       </GridPopoverContextProvider>
     );
   });

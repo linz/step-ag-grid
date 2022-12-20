@@ -20,7 +20,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const [gridApi, _setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
   const idsBeforeUpdate = useRef<number[]>([]);
-  const externallySelectedItemsAreInSync = useRef(false);
+  const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
 
   const setGridApi = useCallback((gridApi: GridApi | undefined) => {
     _setGridApi(gridApi);
@@ -181,10 +181,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false),
     [_selectRowsWithOptionalFlash],
   );
+
   const selectRowsByIdWithFlash = useCallback(
     (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true),
     [_selectRowsWithOptionalFlash],
   );
+
   const flashRows = useCallback(
     (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true),
     [_selectRowsWithOptionalFlash],
@@ -215,6 +217,11 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
       _selectRowsWithOptionalFlash(undefined, false, true);
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
+  );
+
+  const focusByRowById = useCallback(
+    (rowId: number) => _selectRowsWithOptionalFlash([rowId], false, false),
+    [_selectRowsWithOptionalFlash],
   );
 
   const getSelectedRows = useCallback(<T extends unknown>(): T[] => {
@@ -350,16 +357,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     [gridApiOp],
   );
 
-  const setExternallySelectedItemsAreInSync = useCallback((inSync: boolean) => {
-    externallySelectedItemsAreInSync.current = inSync;
-  }, []);
-
   const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
     // Wait for up to 5 seconds
-    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync.current; i++) {
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync; i++) {
       await wait(200);
     }
-  }, []);
+  }, [externallySelectedItemsAreInSync]);
 
   return (
     <GridContext.Provider
@@ -373,6 +376,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         selectRowsWithFlashDiff,
         flashRows,
         flashRowsDiff,
+        focusByRowById,
         getSelectedRows,
         getSelectedRowIds,
         editingCells,
@@ -382,6 +386,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         stopEditing,
         updatingCells,
         redrawRows,
+        externallySelectedItemsAreInSync,
         setExternallySelectedItemsAreInSync,
         waitForExternallySelectedItemsToBeInSync,
       }}
