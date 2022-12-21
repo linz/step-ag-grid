@@ -18,7 +18,6 @@ import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMen
 import { GridContext } from "../../contexts/GridContext";
 import { Editor, GridCellMultiEditor } from "../../components/GridCellMultiEditor";
 import { GridFormTextArea } from "../../components/gridForm/GridFormTextArea";
-import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
 import { GridFormDropDown } from "../../components/gridForm/GridFormDropDown";
 
 export default {
@@ -142,7 +141,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           headerName: "Multi-editor",
           maxWidth: 140,
         },
-        (_params: ICellEditorParams) =>
+        (_params) =>
           _params.rowIndex == 0
             ? Editor({
                 multiEdit: true,

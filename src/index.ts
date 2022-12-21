@@ -12,6 +12,8 @@ export * from "./contexts/GridSubComponentContext";
 export type { GridBaseRow } from "./components/Grid";
 export { Grid } from "./components/Grid";
 export * from "./components/GridCell";
+export * from "./components/GridCellMultiEditor";
+
 export { GridIcon } from "./components/GridIcon";
 export { ComponentLoadingWrapper } from "./components/ComponentLoadingWrapper";
 export { GridCellMultiSelectClassRules } from "./components/GridCellMultiSelectClassRules";
@@ -34,6 +36,10 @@ export { GridFormSubComponentTextInput } from "./components/gridForm/GridFormSub
 export * from "./components/gridForm/GridFormDropDown";
 export * from "./components/gridForm/GridFormMultiSelect";
 export * from "./components/gridForm/GridFormPopoverMenu";
+export * from "./components/gridForm/GridFormTextInput";
+export * from "./components/gridForm/GridFormTextArea";
+export * from "./components/gridForm/GridFormMessage";
+export * from "./components/gridForm/GridFormEditBearing";
 
 export { GridHeaderSelect } from "./components/gridHeader/GridHeaderSelect";
 

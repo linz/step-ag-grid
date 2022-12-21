@@ -15,12 +15,16 @@ export const Editor = <FN extends (param: any) => JSX.Element>(props: {
   params: { ...props.editorParams, multiEdit: props.multiEdit },
 });
 
+export interface RowCellEditorParams<RowType extends GridBaseRow> extends ICellEditorParams {
+  data: RowType;
+}
+
 /*
  * All cells should use this
  */
 export const GridCellMultiEditor = <RowType extends GridBaseRow>(
   props: GenericCellColDef<RowType>,
-  cellEditorSelector: (params: ICellEditorParams) => CellEditorSelectorResult,
+  cellEditorSelector: (params: RowCellEditorParams<RowType>) => CellEditorSelectorResult,
 ): ColDefT<RowType> => {
   return {
     colId: props.colId ?? props.field,
