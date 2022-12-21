@@ -1,8 +1,8 @@
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { delay, isEmpty } from "lodash-es";
+import { isEmpty } from "lodash-es";
 import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
@@ -49,10 +49,13 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extend
   filtered?: "local" | "reload";
   filterPlaceholder?: string;
   filterHelpText?: string;
+  noOptionsMessage?: string;
   onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
   onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<RowType>) => Promise<void>;
-  options: SelectOption[] | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption[]> | SelectOption[]);
-  optionsRequestCancel?: () => void;
+  options:
+    | SelectOption[]
+    | ((selectedRows: RowType[], filter?: string) => Promise<SelectOption[] | undefined> | SelectOption[] | undefined)
+    | undefined;
 }
 
 const fieldToString = (field: any) => {
@@ -65,7 +68,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const [filter, setFilter] = useState("");
   const [filteredValues, setFilteredValues] = useState<any[]>();
-  const optionsInitialising = useRef(false);
   const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
   const subComponentInitialValue = useRef<string | null>(null);
@@ -92,33 +94,33 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
 
   // Load up options list if it's async function
   useEffect(() => {
-    if (options || optionsInitialising.current) return;
-    optionsInitialising.current = true;
-    let optionsConf = props.options ?? [];
+    if (options) return;
+    let optionsConf = props.options;
 
     (async () => {
       if (typeof optionsConf == "function") {
         optionsConf = await optionsConf(selectedRows, filter);
       }
+      if (optionsConf !== undefined) {
+        const optionsList = optionsConf?.map((item) =>
+          item == null || typeof item == "string"
+            ? ({
+                value: item,
+                label: item,
+                disabled: false,
+              } as FinalSelectOption)
+            : item,
+        );
 
-      const optionsList = optionsConf?.map((item) =>
-        item == null || typeof item == "string"
-          ? ({
-              value: item,
-              label: item,
-              disabled: false,
-            } as FinalSelectOption)
-          : item,
-      );
-
-      if (props.filtered) {
-        // This is needed otherwise when filter input is rendered and sets autofocus
-        // the mouse up of the double click edit triggers the cell to cancel editing
-        delay(() => setOptions(optionsList), 100);
-      } else {
-        setOptions(optionsList);
+        if (props.filtered) {
+          // This is needed otherwise when filter input is rendered and sets autofocus
+          // the mouse up of the double click edit triggers the cell to cancel editing
+          setOptions(optionsList);
+          //delay(() => setOptions(optionsList), 100);
+        } else {
+          setOptions(optionsList);
+        }
       }
-      optionsInitialising.current = false;
     })();
   }, [filter, options, props, selectedRows]);
 
@@ -141,11 +143,12 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
     }
   }, [props.filtered, filter, options]);
 
-  const researchOnFilterChange = debounce(
-    useCallback(() => {
-      setOptions(null);
-    }, []),
-    500,
+  const researchOnFilterChange = useMemo(
+    () =>
+      debounce(() => {
+        setOptions(null);
+      }, 500),
+    [],
   );
 
   const previousFilter = useRef<string>(filter);
@@ -154,7 +157,6 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   useEffect(() => {
     if (previousFilter.current != filter && props.filtered == "reload") {
       previousFilter.current = filter;
-      props.optionsRequestCancel && props.optionsRequestCancel();
       researchOnFilterChange().then();
     }
   }, [filter, props, researchOnFilterChange]);
@@ -232,7 +234,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
         <>
           {options && (isEmpty(options) || (filteredValues && isEmpty(filteredValues))) && (
             <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
-              No Options
+              {props.noOptionsMessage ?? "No Options"}
             </MenuItem>
           )}
           {options?.map((item: FinalSelectOption, index) =>
