@@ -6,9 +6,9 @@ module.exports = {
   testMatch: ["<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"],
   testEnvironment: "jsdom",
   transform: {
-    "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/config/jest/babelTransform.js",
-    "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-    "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js",
+    "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/config/jest/babelTransform.cjs",
+    "^.+\\.css$": "<rootDir>/config/jest/cssTransform.cjs",
+    "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.cjs",
   },
   transformIgnorePatterns: ["node_modules/(?!(ol|@geoblocks/ol-maplibre-layer|geotiff|quick-lru)|lodash-es|lodash/)"],
   moduleNameMapper: {
