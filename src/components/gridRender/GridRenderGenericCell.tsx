@@ -4,9 +4,7 @@ import { ColDefT } from "../GridCell";
 import {
   EditableCallbackParams,
   SuppressKeyboardEventParams,
-  ValueFormatterFunc,
   ValueFormatterParams,
-  ValueGetterFunc,
   ValueGetterParams,
 } from "ag-grid-community/dist/lib/entities/colDef";
 
