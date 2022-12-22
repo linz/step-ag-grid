@@ -1,7 +1,14 @@
 import { ICellRendererParams } from "ag-grid-community";
 import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
-import { EditableCallbackParams, SuppressKeyboardEventParams } from "ag-grid-community/dist/lib/entities/colDef";
+import {
+  EditableCallbackParams,
+  SuppressKeyboardEventParams,
+  ValueFormatterFunc,
+  ValueFormatterParams,
+  ValueGetterFunc,
+  ValueGetterParams,
+} from "ag-grid-community/dist/lib/entities/colDef";
 
 export interface RowICellRendererParams<RowType extends GridBaseRow> extends ICellRendererParams {
   data: RowType;
@@ -11,8 +18,19 @@ export interface RowEditableCallbackParams<RowType extends GridBaseRow> extends 
   data: RowType;
 }
 
+export interface RowValueFormatterParams<RowType extends GridBaseRow> extends ValueFormatterParams {
+  data: RowType;
+}
+
+export interface RowValueGetterParams<RowType extends GridBaseRow> extends ValueGetterParams {
+  data: RowType;
+}
+
 export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDefT<RowType> {
+  cellRenderer?: (params: RowICellRendererParams<RowType>) => any;
   cellRendererParams?: GenericCellRendererParams<RowType>;
+  valueGetter?: string | ((params: RowValueGetterParams<RowType>) => any);
+  valueFormatter?: string | ((params: RowValueFormatterParams<RowType>) => string);
   editable?: boolean | ((params: RowEditableCallbackParams<RowType>) => boolean);
 }
 
