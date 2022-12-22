@@ -142,13 +142,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
             filtered: "reload",
             filterPlaceholder: "Search me...",
             options: optionsFn,
-            optionsRequestCancel: () => {
-              // TODO wrap options in an abortable request
-              // When performing rest requests call the abort controller,
-              // otherwise you'll get multiple requests coming back in different order
-              // eslint-disable-next-line no-console
-              console.log("optionsRequestCancelled");
-            },
           },
         },
       ),
