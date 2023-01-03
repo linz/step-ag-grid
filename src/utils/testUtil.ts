@@ -137,6 +137,13 @@ export const clickMultiSelectOption = async (value: string): Promise<void> => {
   menuItem.parentElement && userEvent.click(menuItem.parentElement);
 };
 
+export const typeInput = async (value: string): Promise<void> => {
+  const openMenu = await findOpenMenu();
+  const input = await findQuick({ child: { tagName: "input[type='text']" } }, openMenu);
+  userEvent.clear(input);
+  userEvent.type(input, value);
+};
+
 export const typeOtherInput = async (value: string): Promise<void> => {
   const openMenu = await findOpenMenu();
   const otherInput = await findQuick({ classes: ".subComponent", child: { tagName: "input[type='text']" } }, openMenu);
