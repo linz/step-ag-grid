@@ -1,6 +1,7 @@
 import { act, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
+import { isEqual } from "lodash-es";
 
 export const countRows = async (within?: HTMLElement): Promise<number> => {
   return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
@@ -96,6 +97,12 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
     },
     { timeout: 5000 },
   );
+};
+
+export const validateMenuOptions = async (expectedMenuOptions: Array<string>): Promise<boolean> => {
+  const openMenu = await findOpenMenu();
+  const actualOptions = (await within(openMenu).findAllByRole("menuitem")).map((menuItem) => menuItem.textContent);
+  return isEqual(actualOptions, expectedMenuOptions);
 };
 
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
