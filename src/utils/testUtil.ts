@@ -161,8 +161,14 @@ export const typeOnlyInput = async (value: string): Promise<void> => {
 };
 
 export const typeInputByLabel = async (value: string, labelText: string): Promise<void> => {
-  const label = getAllQuick({ child: { tagName: "label" } }).filter((l) => l.innerHTML == labelText)[0];
-  typeInput(value, { child: { tagName: `input[id='${label.getAttribute("for")}']` } });
+  const labels = getAllQuick({ child: { tagName: "label" } }).filter((l) => l.textContent == labelText);
+  if (labels.length == 0) {
+    throw Error(`Label not found for text: ${labelText}`);
+  }
+  if (labels.length > 1) {
+    throw Error(`Multiple labels found for text: ${labelText}`);
+  }
+  typeInput(value, { child: { tagName: `input[id='${labels[0].getAttribute("for")}']` } });
 };
 
 export const typeInputByPlaceholder = async (value: string, placeholder: string): Promise<void> => {
