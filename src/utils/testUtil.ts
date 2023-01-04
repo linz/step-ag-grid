@@ -99,7 +99,12 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
   );
 };
 
-export const validateMenuOptions = async (expectedMenuOptions: Array<string>): Promise<boolean> => {
+export const validateMenuOptions = async (
+  rowId: number | string,
+  colId: string,
+  expectedMenuOptions: Array<string>,
+): Promise<boolean> => {
+  await editCell(rowId, colId);
   const openMenu = await findOpenMenu();
   const actualOptions = (await within(openMenu).findAllByRole("menuitem")).map((menuItem) => menuItem.textContent);
   return isEqual(actualOptions, expectedMenuOptions);
