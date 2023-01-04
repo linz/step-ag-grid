@@ -147,6 +147,7 @@ The following testing calls can be imported from step-ag-grid:
 - selectCell
 - editCell
 - findOpenMenu
+- validateMenuOptions
 - queryMenuOption
 - findMenuOption
 - clickMenuOption
@@ -154,6 +155,9 @@ The following testing calls can be imported from step-ag-grid:
 - getMultiSelectOptions
 - findMultiSelectOption
 - clickMultiSelectOption
+- typeOnlyInput
+- typeInputByLabel
+- typeInputByPlaceholder
 - typeOtherInput
 - typeOtherTextArea
 - closeMenu
