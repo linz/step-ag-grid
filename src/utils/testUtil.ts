@@ -150,10 +150,12 @@ export const clickMultiSelectOption = async (value: string): Promise<void> => {
 };
 
 const typeInput = async (value: string, filter: IQueryQuick): Promise<void> => {
-  const openMenu = await findOpenMenu();
-  const input = await findQuick(filter, openMenu);
-  userEvent.clear(input);
-  userEvent.type(input, value);
+  await act(async () => {
+    const openMenu = await findOpenMenu();
+    const input = await findQuick(filter, openMenu);
+    userEvent.clear(input);
+    userEvent.type(input, value);
+  });
 };
 
 export const typeOnlyInput = async (value: string): Promise<void> => {
