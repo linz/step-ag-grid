@@ -171,11 +171,12 @@ export const Grid = (params: GridProps): JSX.Element => {
     const adjustColDefs = (params.columnDefs as ColDef[]).map((colDef) => {
       return {
         ...colDef,
-        editable: params.readOnly ? false : colDef.editable,
+        editable: params.readOnly ? false : params.defaultColDef?.editable ?? colDef.editable,
         cellClassRules: {
           ...colDef.cellClassRules,
           "GridCell-readonly": (ccp: CellClassParams) =>
-            params.readOnly != null && !params.readOnly && !fnOrVar(colDef.editable, ccp),
+            (params.readOnly != null || !params.readOnly) &&
+            !fnOrVar(params.defaultColDef?.editable ?? colDef.editable, ccp),
         },
       };
     });
@@ -207,7 +208,13 @@ export const Grid = (params: GridProps): JSX.Element => {
           ...adjustColDefs,
         ]
       : adjustColDefs;
-  }, [clickSelectorCheckboxWhenContainingCellClicked, params.columnDefs, params.selectable, params.readOnly]);
+  }, [
+    clickSelectorCheckboxWhenContainingCellClicked,
+    params.columnDefs,
+    params.selectable,
+    params.readOnly,
+    params.defaultColDef,
+  ]);
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
