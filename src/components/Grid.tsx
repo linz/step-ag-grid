@@ -175,7 +175,8 @@ export const Grid = (params: GridProps): JSX.Element => {
         cellClassRules: {
           ...colDef.cellClassRules,
           "GridCell-readonly": (ccp: CellClassParams) =>
-            params.readOnly || !fnOrVar(params.defaultColDef?.editable ?? colDef.editable, ccp),
+            (params.readOnly != null || !params.readOnly) &&
+            !fnOrVar(params.defaultColDef?.editable ?? colDef.editable, ccp),
         },
       };
     });
