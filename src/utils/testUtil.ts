@@ -111,8 +111,8 @@ export const validateMenuOptions = async (
 };
 
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
-  const menuOption = await findMenuOption(menuOptionText);
   await act(async () => {
+    const menuOption = await findMenuOption(menuOptionText);
     userEvent.click(menuOption);
   });
 };
