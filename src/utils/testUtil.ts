@@ -137,9 +137,9 @@ export const openAndFindMenuOption = async (
   colId: string,
   menuOptionText: string | RegExp,
   within?: HTMLElement,
-): Promise<void> => {
+): Promise<HTMLElement> => {
   await editCell(rowId, colId, within);
-  await findMenuOption(menuOptionText);
+  return await findMenuOption(menuOptionText);
 };
 
 export const getMultiSelectOptions = async () => {
