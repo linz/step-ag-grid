@@ -76,6 +76,11 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
   await waitFor(findOpenMenu);
 };
 
+export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
+  const cell = await findCell(rowId, colId, within);
+  return cell.className.includes("GridCell-reaonly");
+};
+
 const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
 
 export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement | null> => {
