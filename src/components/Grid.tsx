@@ -36,6 +36,7 @@ export interface GridProps {
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
+  alwaysShowVerticalScroll?: boolean;
 }
 
 /**
@@ -363,6 +364,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         postSortRows={params.postSortRows ?? postSortRows}
         onSelectionChanged={synchroniseExternalStateToGridSelection}
         onColumnMoved={params.onColumnMoved}
+        alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
       />
     </div>
   );

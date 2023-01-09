@@ -21,6 +21,7 @@ export default {
   args: {
     quickFilterValue: "",
     selectable: true,
+    alwaysShowVerticalScroll: false,
   },
   decorators: [
     (Story) => (
