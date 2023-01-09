@@ -78,7 +78,7 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
 
 export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
   const cell = await findCell(rowId, colId, within);
-  return cell.className.includes("GridCell-reaonly");
+  return cell.className.includes("GridCell-readonly");
 };
 
 const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
