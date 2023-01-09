@@ -132,6 +132,16 @@ export const openAndClickMenuOption = async (
   await clickMenuOption(menuOptionText);
 };
 
+export const openAndFindMenuOption = async (
+  rowId: number | string,
+  colId: string,
+  menuOptionText: string | RegExp,
+  within?: HTMLElement,
+): Promise<HTMLElement> => {
+  await editCell(rowId, colId, within);
+  return await findMenuOption(menuOptionText);
+};
+
 export const getMultiSelectOptions = async () => {
   const openMenu = await findOpenMenu();
   return getAllQuick<HTMLInputElement>({ role: "menuitem", child: { tagName: "input,textarea" } }, openMenu).map(
