@@ -76,6 +76,11 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
   await waitFor(findOpenMenu);
 };
 
+export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
+  const cell = await findCell(rowId, colId, within);
+  return cell.className.includes("GridCell-reaonly");
+};
+
 const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
 
 export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement | null> => {
@@ -159,7 +164,7 @@ const typeInput = async (value: string, filter: IQueryQuick): Promise<void> => {
 };
 
 export const typeOnlyInput = async (value: string): Promise<void> => {
-  await typeInput(value, { child: { tagName: "input[type='text']" } });
+  await typeInput(value, { child: { tagName: "input[type='text'], textarea" } });
 };
 
 export const typeInputByLabel = async (value: string, labelText: string): Promise<void> => {
@@ -170,11 +175,14 @@ export const typeInputByLabel = async (value: string, labelText: string): Promis
   if (labels.length > 1) {
     throw Error(`Multiple labels found for text: ${labelText}`);
   }
-  await typeInput(value, { child: { tagName: `input[id='${labels[0].getAttribute("for")}']` } });
+  const inputId = labels[0].getAttribute("for");
+  await typeInput(value, { child: { tagName: `input[id='${inputId}'], textarea[id='${inputId}']` } });
 };
 
 export const typeInputByPlaceholder = async (value: string, placeholder: string): Promise<void> => {
-  await typeInput(value, { child: { tagName: `input[placeholder='${placeholder}']` } });
+  await typeInput(value, {
+    child: { tagName: `input[placeholder='${placeholder}'], textarea[placeholder='${placeholder}']` },
+  });
 };
 
 export const typeOtherInput = async (value: string): Promise<void> => {
