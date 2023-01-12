@@ -73,7 +73,7 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
     const cell = await findCell(rowId, colId, within);
     userEvent.dblClick(cell);
   });
-  await waitFor(findOpenMenu);
+  await waitFor(findOpenPopover);
 };
 
 export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
@@ -81,10 +81,10 @@ export const isCellReadOnly = async (rowId: number | string, colId: string, with
   return cell.className.includes("GridCell-readonly");
 };
 
-const findOpenMenu = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
+export const findOpenPopover = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
 
 export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement | null> => {
-  const openMenu = await findOpenMenu();
+  const openMenu = await findOpenPopover();
   const els = await within(openMenu).findAllByRole("menuitem");
   const matcher = getMatcher(menuOptionText);
   const result = els.find(matcher);
@@ -110,7 +110,7 @@ export const validateMenuOptions = async (
   expectedMenuOptions: Array<string>,
 ): Promise<boolean> => {
   await editCell(rowId, colId);
-  const openMenu = await findOpenMenu();
+  const openMenu = await findOpenPopover();
   const actualOptions = (await within(openMenu).findAllByRole("menuitem")).map((menuItem) => menuItem.textContent);
   return isEqual(actualOptions, expectedMenuOptions);
 };
@@ -143,7 +143,7 @@ export const openAndFindMenuOption = async (
 };
 
 export const getMultiSelectOptions = async () => {
-  const openMenu = await findOpenMenu();
+  const openMenu = await findOpenPopover();
   return getAllQuick<HTMLInputElement>({ role: "menuitem", child: { tagName: "input,textarea" } }, openMenu).map(
     (input) => {
       return {
@@ -155,7 +155,7 @@ export const getMultiSelectOptions = async () => {
 };
 
 export const findMultiSelectOption = async (value: string): Promise<HTMLElement> => {
-  const openMenu = await findOpenMenu();
+  const openMenu = await findOpenPopover();
   return getQuick({ role: "menuitem", child: { tagName: `input[value='${value}']` } }, openMenu);
 };
 
@@ -164,18 +164,16 @@ export const clickMultiSelectOption = async (value: string): Promise<void> => {
   menuItem.parentElement && userEvent.click(menuItem.parentElement);
 };
 
-const typeInput = async (value: string, filter: IQueryQuick): Promise<void> => {
-  await act(async () => {
-    const openMenu = await findOpenMenu();
+const typeInput = async (value: string, filter: IQueryQuick): Promise<void> =>
+  act(async () => {
+    const openMenu = await findOpenPopover();
     const input = await findQuick(filter, openMenu);
     userEvent.clear(input);
     userEvent.type(input, value);
   });
-};
 
-export const typeOnlyInput = async (value: string): Promise<void> => {
-  await typeInput(value, { child: { tagName: "input[type='text'], textarea" } });
-};
+export const typeOnlyInput = async (value: string): Promise<void> =>
+  typeInput(value, { child: { tagName: "input[type='text'], textarea" } });
 
 export const typeInputByLabel = async (value: string, labelText: string): Promise<void> => {
   const labels = getAllQuick({ child: { tagName: "label" } }).filter((l) => l.textContent == labelText);
@@ -189,28 +187,24 @@ export const typeInputByLabel = async (value: string, labelText: string): Promis
   await typeInput(value, { child: { tagName: `input[id='${inputId}'], textarea[id='${inputId}']` } });
 };
 
-export const typeInputByPlaceholder = async (value: string, placeholder: string): Promise<void> => {
-  await typeInput(value, {
+export const typeInputByPlaceholder = async (value: string, placeholder: string): Promise<void> =>
+  typeInput(value, {
     child: { tagName: `input[placeholder='${placeholder}'], textarea[placeholder='${placeholder}']` },
   });
-};
 
-export const typeOtherInput = async (value: string): Promise<void> => {
-  await typeInput(value, { classes: ".subComponent", child: { tagName: "input[type='text']" } });
-};
+export const typeOtherInput = async (value: string): Promise<void> =>
+  typeInput(value, { classes: ".subComponent", child: { tagName: "input[type='text']" } });
 
-export const typeOtherTextArea = async (value: string): Promise<void> => {
-  await typeInput(value, { classes: ".subComponent", child: { tagName: "textarea" } });
-};
+export const typeOtherTextArea = async (value: string): Promise<void> =>
+  typeInput(value, { classes: ".subComponent", child: { tagName: "textarea" } });
 
-export const closeMenu = (): void => {
-  userEvent.click(document.body);
-};
+export const closeMenu = (): void => userEvent.click(document.body);
+export const closePopover = (): void => userEvent.click(document.body);
 
-export const findActionButton = (text: string, container: HTMLElement): Promise<HTMLElement> =>
+export const findActionButton = (text: string, container?: HTMLElement): Promise<HTMLElement> =>
   findQuick({ tagName: "button", child: { classes: ".ActionButton-minimalAreaDisplay", text: text } }, container);
 
-export const clickActionButton = async (text: string, container: HTMLElement): Promise<void> => {
+export const clickActionButton = async (text: string, container?: HTMLElement): Promise<void> => {
   await act(async () => {
     const button = await findActionButton(text, container);
     userEvent.click(button);
