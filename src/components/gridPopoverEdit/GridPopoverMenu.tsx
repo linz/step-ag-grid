@@ -13,7 +13,9 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
 ): ColDefT<RowType> =>
   GridCell<RowType, GridFormPopoutMenuProps<RowType>>(
     {
+      minWidth: 40,
       maxWidth: 40,
+      width: 40,
       editable: colDef.editable != null ? colDef.editable : true,
       cellStyle: { justifyContent: "center" },
       cellRenderer: GridRenderPopoutMenuCell,
