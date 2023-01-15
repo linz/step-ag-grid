@@ -42,8 +42,13 @@ export const deselectRow = async (rowId: string | number, within?: HTMLElement):
   _selectRow("deselect", rowId, within);
 
 export const findCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<HTMLElement> => {
-  const row = await findRow(rowId, within);
-  return await findQuick({ tagName: `[col-id='${colId}']` }, row);
+  //if this is not wrapped in an act console errors are logged during testing
+  let cell!: HTMLElement;
+  await act(async () => {
+    const row = await findRow(rowId, within);
+    cell = await findQuick({ tagName: `[col-id='${colId}']` }, row);
+  });
+  return cell;
 };
 
 export const findCellContains = async (
@@ -169,7 +174,10 @@ const typeInput = async (value: string, filter: IQueryQuick): Promise<void> =>
     const openMenu = await findOpenPopover();
     const input = await findQuick(filter, openMenu);
     userEvent.clear(input);
-    userEvent.type(input, value);
+    //'typing' an empty string will cause a console error and it's also unnecessary after the previous clear call
+    if (value.length > 0) {
+      userEvent.type(input, value);
+    }
   });
 
 export const typeOnlyInput = async (value: string): Promise<void> =>
