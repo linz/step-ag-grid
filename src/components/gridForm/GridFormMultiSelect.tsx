@@ -170,8 +170,8 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                 const subOptions = headerGroups[`${header.filter}`];
                 return (
                   !isEmpty(subOptions) && (
-                    <>
-                      {header.header && <MenuHeader key={`header_${index}`}>{header.header}</MenuHeader>}
+                    <Fragment key={`group_${index}`}>
+                      {header.header && <MenuHeader>{header.header}</MenuHeader>}
                       {subOptions.map((item, index) =>
                         item.value === MenuSeparatorString ? (
                           <MenuDivider key={`div_${index}`} />
@@ -188,7 +188,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                           </Fragment>
                         ),
                       )}
-                    </>
+                    </Fragment>
                   )
                 );
               })}
