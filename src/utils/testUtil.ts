@@ -8,7 +8,12 @@ export const countRows = async (within?: HTMLElement): Promise<number> => {
 };
 
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
-  return findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
+  //if this is not wrapped in an act console errors are logged during testing
+  let row!: HTMLDivElement;
+  await act(async () => {
+    row = await findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
+  });
+  return row;
 };
 
 export const queryRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement | null> => {
