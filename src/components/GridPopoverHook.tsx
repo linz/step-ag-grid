@@ -63,7 +63,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
           {anchorRef.current && (
             <ControlledMenu
               state={isOpen ? "open" : "closed"}
-              portal={(window as any).testPortals ?? true}
+              portal={true}
               unmountOnClose={true}
               anchorRef={anchorRef}
               saveButtonRef={saveButtonRef}
