@@ -100,7 +100,7 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
               return [
                 {
                   label: "Single edit only",
-                  action: async (selectedRows) => {
+                  action: async ({ selectedRows }) => {
                     alert(`Single-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
                     await wait(1500);
                   },
@@ -108,7 +108,7 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
                 },
                 {
                   label: "Multi-edit",
-                  action: async (selectedRows) => {
+                  action: async ({ selectedRows }) => {
                     alert(`Multi-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
                     await wait(1500);
                   },
@@ -123,9 +123,9 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
                 },
                 {
                   label: "Other (TextInput)",
-                  action: async (_, menuOptionResult) => {
+                  action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
-                    console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                    console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
@@ -134,9 +134,9 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
                 },
                 {
                   label: "Other (TextArea)",
-                  action: async (_, menuOptionResult) => {
+                  action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
-                    console.log(`Sub selected value was ${JSON.stringify(menuOptionResult.subValue)}`);
+                    console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (

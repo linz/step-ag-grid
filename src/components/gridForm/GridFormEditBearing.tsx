@@ -7,14 +7,15 @@ import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends CellEditorCommon {
+  formatValue?: (value: any) => string;
   placeHolder?: string;
   range?: (value: number | null) => string | null;
-  onSave?: (selectedRows: RowType[], value: number | null) => Promise<boolean>;
+  onSave?: (props: { selectedRows: RowType[]; value: number | null }) => Promise<boolean>;
 }
 
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
-  const { field, value: initialValue, formatValue } = useGridPopoverContext<RowType>();
-
+  const { field, value: initialValue } = useGridPopoverContext<RowType>();
+  console.log({ props });
   // This clears out any scientific precision
   const defaultValue = useMemo(
     () => (initialValue == null ? "" : parseFloat(parseFloat(initialValue).toFixed(10)).toString()),
@@ -34,7 +35,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
       }
 
       if (props.onSave) {
-        return await props.onSave(selectedRows, parsedValue);
+        return await props.onSave({ selectedRows, value: parsedValue });
       } else {
         if (field == null) {
           console.error("field is not defined in ColDef");
@@ -63,7 +64,11 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
         }}
         autoFocus={true}
         placeholder={props.placeHolder}
-        formatted={bearingStringValidator(value, props.range) ? "?" : formatValue(bearingNumberParser(value))}
+        formatted={
+          bearingStringValidator(value, props.range) || !props.formatValue
+            ? "?"
+            : props.formatValue(bearingNumberParser(value))
+        }
         error={bearingStringValidator(value, props.range)}
         helpText={"Press enter or tab to save"}
       />

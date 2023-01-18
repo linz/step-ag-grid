@@ -346,7 +346,11 @@ export const ControlledMenuFr = (
   );
 
   if (portal === true && anchorRef?.current != null) {
-    portal = { target: anchorRef.current.ownerDocument.body } as PortalFieldType;
+    if (hasParentClass("react-menu-inline-test", anchorRef.current)) {
+      portal = false;
+    } else {
+      portal = { target: anchorRef.current.ownerDocument.body } as PortalFieldType;
+    }
   }
 
   if (portal) {

@@ -78,6 +78,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   },
 ): ColDefT<RowType> => {
   return {
+    filter: "agSetColumnFilter",
     colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,

@@ -10,7 +10,7 @@ import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
 export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
-  defaultAction?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
+  defaultAction?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
 }
 
 /** Menu configuration types **/
@@ -26,7 +26,7 @@ export interface SelectedMenuOptionResult<RowType extends GridBaseRow> extends M
 
 export interface MenuOption<RowType extends GridBaseRow> {
   label: JSX.Element | string | MenuSeparatorType;
-  action?: (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => Promise<void>;
+  action?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
   subComponent?: (props: any) => JSX.Element;
@@ -47,9 +47,9 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
 
   const defaultAction = useCallback(
-    async (selectedRows: RowType[], menuOption: SelectedMenuOptionResult<RowType>) => {
-      if (props.defaultAction) await props.defaultAction(selectedRows, menuOption);
-      else console.error(`No action specified for ${menuOption.label} menu options`);
+    async (params: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => {
+      if (props.defaultAction) await props.defaultAction(params);
+      else console.error(`No action specified for ${params.menuOption.label} menu options`);
     },
     [props],
   );
@@ -77,8 +77,10 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
 
   const actionClick = useCallback(
     async (menuOption: MenuOption<RowType>) => {
-      const result = { ...menuOption, subValue: subSelectedValue };
-      await (menuOption.action ?? defaultAction)(selectedRows, result);
+      await (menuOption.action ?? defaultAction)({
+        selectedRows,
+        menuOption: { ...menuOption, subValue: subSelectedValue },
+      });
       return true;
     },
     [defaultAction, selectedRows, subSelectedValue],

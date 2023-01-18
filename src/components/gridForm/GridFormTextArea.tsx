@@ -11,7 +11,7 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow>
     CellEditorCommon {
   placeholder?: string;
   width?: string | number;
-  onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
+  onSave?: (props: { selectedRows: RowType[]; value: string }) => Promise<boolean>;
   helpText?: string;
 }
 
@@ -34,7 +34,7 @@ export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTex
       if (initValue === trimmedValue) return true;
 
       if (props.onSave) {
-        return await props.onSave(selectedRows, trimmedValue);
+        return await props.onSave({ selectedRows, value: trimmedValue });
       }
 
       selectedRows.forEach((row) => (row[field] = trimmedValue as any));

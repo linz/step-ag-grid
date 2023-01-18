@@ -72,7 +72,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               if (value === "never") return "The value 'never' is not allowed";
               return null;
             },
-            onSave: async (selectedRows, value) => {
+            onSave: async ({ selectedRows, value }) => {
               await wait(1000);
               selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
               return true;
@@ -87,7 +87,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           maxWidth: 140,
           valueFormatter: (params) => {
             const v = params.data.distance;
-            return v != null ? `${v}${params.colDef.cellEditorParams.units}` : v;
+            return v != null ? `${v}${params.colDef.cellEditorParams.units}` : "–";
           },
         },
         {
@@ -100,7 +100,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               if (value.length && !isFloat(value)) return "Value must be a number";
               return null;
             },
-            onSave: async (selectedRows, value) => {
+            onSave: async ({ selectedRows, value }) => {
               await wait(1000);
               selectedRows.forEach(
                 (selectedRow) => (selectedRow["distance"] = value.length ? parseFloat(value) : null),
@@ -126,7 +126,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               if (value === "never") return "The value 'never' is not allowed";
               return null;
             },
-            onSave: async (selectedRows, value) => {
+            onSave: async ({ selectedRows, value }) => {
               await wait(1000);
               selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
               return true;
@@ -170,7 +170,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
             options: async (_) => [
               {
                 label: "Delete",
-                action: async (selectedRows) => {
+                action: async ({ selectedRows }) => {
                   await wait(1500);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
                 },

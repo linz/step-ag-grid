@@ -27,7 +27,7 @@ export interface GridProps {
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   defaultColDef?: GridOptions["defaultColDef"];
-  columnDefs: GridOptions["columnDefs"];
+  columnDefs: ColDef[];
   rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
@@ -168,8 +168,8 @@ export const Grid = (params: GridProps): JSX.Element => {
     synchroniseExternallySelectedItemsToGrid();
   }, [synchroniseExternallySelectedItemsToGrid]);
 
-  const columnDefs = useMemo((): GridOptions["columnDefs"] => {
-    const adjustColDefs = (params.columnDefs as ColDef[]).map((colDef) => {
+  const columnDefs = useMemo((): ColDef[] => {
+    const adjustColDefs = params.columnDefs.map((colDef) => {
       return {
         ...colDef,
         editable: params.readOnly ? false : params.defaultColDef?.editable ?? colDef.editable,
