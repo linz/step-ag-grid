@@ -15,7 +15,7 @@ export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends C
 
 export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
   const { field, value: initialValue } = useGridPopoverContext<RowType>();
-  console.log({ props });
+
   // This clears out any scientific precision
   const defaultValue = useMemo(
     () => (initialValue == null ? "" : parseFloat(parseFloat(initialValue).toFixed(10)).toString()),
