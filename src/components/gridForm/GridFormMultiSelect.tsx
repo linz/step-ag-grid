@@ -52,8 +52,8 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends C
   filtered?: boolean;
   filterPlaceholder?: string;
   filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
-  onSelectFilter?: (filter: string, options: MultiSelectOption[]) => void;
-  onSave?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => Promise<boolean>;
+  onSelectFilter?: (props: { filter: string; options: MultiSelectOption[] }) => void;
+  onSave?: (props: { selectedRows: RowType[]; selectedOptions: MultiSelectOption[] }) => Promise<boolean>;
   headers?: GridFormMultiSelectGroup[];
   options: MultiSelectOption[] | ((selectedRows: RowType[]) => Promise<MultiSelectOption[]> | MultiSelectOption[]);
   invalid?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => boolean;
@@ -90,10 +90,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
       // Any changes to save?
       if (initialValues === JSON.stringify(options)) return true;
 
-      return props.onSave(
+      return props.onSave({
         selectedRows,
-        options.filter((o) => o.checked),
-      );
+        selectedOptions: options.filter((o) => o.checked),
+      });
     },
     [initialValues, options, props],
   );
@@ -203,7 +203,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
 const FilterInput = (props: {
   options: MultiSelectOption[];
   setOptions: (options: MultiSelectOption[]) => void;
-  onSelectFilter?: (filter: string, options: MultiSelectOption[]) => void;
+  onSelectFilter?: (props: { filter: string; options: MultiSelectOption[] }) => void;
   filter: string;
   setFilter: Dispatch<SetStateAction<string>>;
   headerGroups: HeaderGroupType;
@@ -259,7 +259,7 @@ const FilterInput = (props: {
     }
 
     const preFilterOptions = JSON.stringify(options);
-    onSelectFilter(filterTrimmed, options);
+    onSelectFilter({ filter: filterTrimmed, options });
     // Detect if options list changed and update
     if (preFilterOptions === JSON.stringify(options)) return;
 

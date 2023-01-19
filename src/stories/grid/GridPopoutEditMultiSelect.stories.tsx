@@ -96,7 +96,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
                 subComponent: () => <GridFormSubComponentTextArea required={true} maxLength={5} defaultValue={""} />,
               },
             ],
-            onSave: async (selectedRows, selectedOptions) => {
+            onSave: async ({ selectedRows, selectedOptions }) => {
               // eslint-disable-next-line no-console
               console.log("multiSelect result", { selectedRows, selectedOptions });
 
@@ -129,7 +129,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               isEmpty(filter) || options.find((o) => o.label && o.label.toLowerCase() === filter.toLowerCase())
                 ? undefined
                 : "Press enter to add free text",
-            onSelectFilter: async (filter, options) => {
+            onSelectFilter: async ({ filter, options }) => {
               if (isEmpty(filter) || options.find((o) => o.label && o.label.toLowerCase() === filter.toLowerCase()))
                 return;
               options.push({ value: filter, label: filter, filter: "freeText", checked: true });
@@ -159,7 +159,7 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
               );
               return r;
             },
-            onSave: async (selectedRows, selectedOptions) => {
+            onSave: async ({ selectedRows, selectedOptions }) => {
               // eslint-disable-next-line no-console
               console.log("multiSelect result", { selectedRows, selectedOptions });
 

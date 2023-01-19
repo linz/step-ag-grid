@@ -72,7 +72,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         },
         {
           editorParams: {
-            onSave: async (selectedRows, value: ITestRow["bearing"]) => {
+            onSave: async ({ selectedRows, value }) => {
               await wait(1000);
               selectedRows.forEach((row) => (row["bearing"] = value));
               return true;

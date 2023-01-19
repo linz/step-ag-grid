@@ -12,7 +12,7 @@ export interface GridFormTextInputProps<RowType extends GridBaseRow>
   placeholder?: string;
   units?: string;
   width?: string | number;
-  onSave?: (selectedRows: RowType[], value: string) => Promise<boolean>;
+  onSave?: (props: { selectedRows: RowType[]; value: string }) => Promise<boolean>;
   helpText?: string;
 }
 
@@ -35,7 +35,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
       if (initValue === trimmedValue) return true;
 
       if (props.onSave) {
-        return await props.onSave(selectedRows, trimmedValue);
+        return await props.onSave({ selectedRows, value: trimmedValue });
       }
 
       selectedRows.forEach((row) => (row[field] = trimmedValue as any));

@@ -1,22 +1,20 @@
-import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-
-export const bearingValueFormatter = (params: ValueFormatterParams): string => {
-  const value = typeof params.value == "string" ? parseFloat(params.value) : params.value;
-  if (value == null) {
+export const bearingValueFormatter = (value: any): string => {
+  const safeValue = typeof value == "string" ? parseFloat(value) : value;
+  if (safeValue == null) {
     return "–";
   }
-  return convertDDToDMS(value, false, false);
+  return convertDDToDMS(safeValue, false, false);
 };
 
-export const bearingCorrectionValueFormatter = (params: ValueFormatterParams): string => {
-  const value = params.value;
-  if (value == null) {
+export const bearingCorrectionValueFormatter = (value: any): string => {
+  const safeValue = value;
+  if (safeValue == null) {
     return "–";
   }
-  if (typeof value === "string") {
-    return convertDDToDMS(bearingNumberParser(value), true, true);
+  if (typeof safeValue === "string") {
+    return convertDDToDMS(bearingNumberParser(safeValue), true, true);
   }
-  return convertDDToDMS(value, true, true);
+  return convertDDToDMS(safeValue, true, true);
 };
 
 export const bearingNumberParser = (value: string): number | null => {
