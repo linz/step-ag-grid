@@ -8,13 +8,14 @@ import { GridSubComponentContext } from "../../contexts/GridSubComponentContext"
 import { ClickEvent } from "../../react-menu3/types";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 
-export interface GridFormPopoutMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormPopoverMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
   defaultAction?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
 }
 
 /** Menu configuration types **/
-export const PopoutMenuSeparator = Object.freeze({ __isMenuSeparator__: true });
+const __isMenuSeparator__ = "__isMenuSeparator__";
+export const PopoutMenuSeparator = Object.freeze({ label: __isMenuSeparator__ });
 
 interface MenuSeparatorType {
   __isMenuSeparator__: boolean;
@@ -36,7 +37,7 @@ export interface MenuOption<RowType extends GridBaseRow> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridFormPopoutMenuProps<RowType>) => {
+export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridFormPopoverMenuProps<RowType>) => {
   const { selectedRows, updateValue, data } = useGridPopoverContext<RowType>();
 
   const optionsInitialising = useRef(false);
@@ -119,49 +120,55 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormPopupMenu"}>
       <>
-        {options?.map((item, index) =>
-          item.label === PopoutMenuSeparator ? (
-            <MenuDivider key={`$$divider_${index}`} />
-          ) : (
-            !item.hidden && (
-              <Fragment key={`${item.label}`}>
-                <MenuItem
-                  key={`${item.label}`}
-                  onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
-                  disabled={!!item.disabled}
-                  title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                >
-                  {item.label as JSX.Element | string}
-                </MenuItem>
-                {item.subComponent && subComponentSelected === item && (
-                  <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                    {(_: any) =>
-                      item.subComponent && (
-                        <GridSubComponentContext.Provider
-                          value={{
-                            context: {},
-                            data,
-                            value: subSelectedValue,
-                            setValue: (value: any) => {
-                              setSubSelectedValue(value);
-                            },
-                            setValid: (valid: boolean) => {
-                              subComponentIsValid.current = valid;
-                            },
-                            triggerSave,
-                          }}
-                        >
-                          <div className={"subComponent"}>
-                            <item.subComponent />
-                          </div>
-                        </GridSubComponentContext.Provider>
-                      )
-                    }
-                  </FocusableItem>
-                )}
-              </Fragment>
-            )
-          ),
+        {options?.length === 0 ? (
+          <MenuItem key={`GridPopoverMenu-empty`} className={"GridPopoverMenu-noOptions"} disabled={true}>
+            No actions
+          </MenuItem>
+        ) : (
+          options?.map((item, index) =>
+            item.label === "__isMenuSeparator__" ? (
+              <MenuDivider key={`$$divider_${index}`} />
+            ) : (
+              !item.hidden && (
+                <Fragment key={`${item.label}`}>
+                  <MenuItem
+                    key={`${item.label}`}
+                    onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
+                    disabled={!!item.disabled}
+                    title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                  >
+                    {item.label as JSX.Element | string}
+                  </MenuItem>
+                  {item.subComponent && subComponentSelected === item && (
+                    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                      {(_: any) =>
+                        item.subComponent && (
+                          <GridSubComponentContext.Provider
+                            value={{
+                              context: {},
+                              data,
+                              value: subSelectedValue,
+                              setValue: (value: any) => {
+                                setSubSelectedValue(value);
+                              },
+                              setValid: (valid: boolean) => {
+                                subComponentIsValid.current = valid;
+                              },
+                              triggerSave,
+                            }}
+                          >
+                            <div className={"subComponent"}>
+                              <item.subComponent />
+                            </div>
+                          </GridSubComponentContext.Provider>
+                        )
+                      }
+                    </FocusableItem>
+                  )}
+                </Fragment>
+              )
+            ),
+          )
         )}
       </>
     </ComponentLoadingWrapper>,

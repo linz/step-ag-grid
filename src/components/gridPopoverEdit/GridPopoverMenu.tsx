@@ -1,6 +1,6 @@
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
-import { GridFormPopoverMenu, GridFormPopoutMenuProps } from "../gridForm/GridFormPopoverMenu";
+import { GridFormPopoverMenu, GridFormPopoverMenuProps } from "../gridForm/GridFormPopoverMenu";
 import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
@@ -9,9 +9,9 @@ import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
  */
 export const GridPopoverMenu = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType>,
-  custom: GenericCellEditorProps<GridFormPopoutMenuProps<RowType>>,
+  custom: GenericCellEditorProps<GridFormPopoverMenuProps<RowType>>,
 ): ColDefT<RowType> =>
-  GridCell<RowType, GridFormPopoutMenuProps<RowType>>(
+  GridCell<RowType, GridFormPopoverMenuProps<RowType>>(
     {
       minWidth: 40,
       maxWidth: 40,

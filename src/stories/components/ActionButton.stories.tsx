@@ -39,6 +39,17 @@ const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
         className={"ActionButton-fill"}
         style={{ maxWidth: 160 }}
       />
+      <br />
+      <ActionButton
+        icon={"ic_arrow_forward_right"}
+        name={"Disabled"}
+        onClick={performAction}
+        iconPosition={"right"}
+        level={"secondary"}
+        className={"ActionButton-fill"}
+        style={{ maxWidth: 160 }}
+        disabled={true}
+      />
     </>
   );
 };

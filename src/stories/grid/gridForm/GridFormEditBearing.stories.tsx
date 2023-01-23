@@ -1,7 +1,5 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-// Force react-menu not to render static inline not absolute
-import "./reactMenuTest.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { GridFormEditBearing } from "../../../components/gridForm/GridFormEditBearing";
@@ -11,7 +9,7 @@ import { useRef } from "react";
 import { GridPopoverEditBearingEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
 
 export default {
-  title: "GridForm / Samples",
+  title: "GridForm / Testing",
   component: GridFormEditBearing,
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;
