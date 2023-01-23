@@ -85,7 +85,7 @@ const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
     <div className={"react-menu-inline-test"}>
       <GridContextProvider>
         {configs.map((config, index) => (
-          <div>
+          <div key={`${index}`}>
             <h6 ref={anchorRefs[index]}>{config[0]}</h6>
             <GridPopoverContext.Provider
               value={
