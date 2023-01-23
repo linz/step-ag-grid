@@ -81,3 +81,17 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
 
   return dmsString;
 };
+
+export const bearingRangeValidator = (value: number | null) => {
+  if (value === null) return "Bearing is required";
+  if (value >= 360) return "Bearing must be less than 360 degrees";
+  if (value < 0) return "Bearing must not be negative";
+  return null;
+};
+
+export const bearingCorrectionRangeValidator = (value: number | null) => {
+  if (value === null) return "Bearing correction is required";
+  if (value >= 360) return "Bearing correction must be less than 360 degrees";
+  if (value <= -180) return "Bearing correction must be greater then -180 degrees";
+  return null;
+};

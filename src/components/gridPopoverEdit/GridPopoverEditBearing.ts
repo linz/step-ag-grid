@@ -1,4 +1,9 @@
-import { bearingCorrectionValueFormatter, bearingValueFormatter } from "../../utils/bearing";
+import {
+  bearingCorrectionRangeValidator,
+  bearingCorrectionValueFormatter,
+  bearingRangeValidator,
+  bearingValueFormatter,
+} from "../../utils/bearing";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { GridBaseRow } from "../Grid";
@@ -27,12 +32,7 @@ const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
 export const GridPopoverEditBearingEditorParams = {
   placeHolder: "Enter bearing",
   formatValue: bearingValueFormatter,
-  range: (value: number | null) => {
-    if (value === null) return "Bearing is required";
-    if (value >= 360) return "Bearing must be less than 360 degrees";
-    if (value < 0) return "Bearing must not be negative";
-    return null;
-  },
+  range: bearingRangeValidator,
 };
 
 export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
@@ -50,12 +50,7 @@ export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
 export const GridPopoverEditBearingCorrectionEditorParams = {
   placeHolder: "Enter bearing correction",
   formatValue: bearingCorrectionValueFormatter,
-  range: (value: number | null) => {
-    if (value === null) return "Bearing correction is required";
-    if (value >= 360) return "Bearing correction must be less than 360 degrees";
-    if (value <= -180) return "Bearing correction must be greater then -180 degrees";
-    return null;
-  },
+  range: bearingCorrectionRangeValidator,
 };
 
 export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow>(

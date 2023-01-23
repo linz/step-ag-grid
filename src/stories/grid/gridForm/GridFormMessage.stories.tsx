@@ -29,4 +29,3 @@ const Template: ComponentStory<typeof GridFormMessage> = (props) => {
 };
 
 export const GridFormMessage_ = Template.bind({});
-GridFormMessage_.args = {};
