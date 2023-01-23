@@ -21,6 +21,7 @@ export interface ActionButtonProps {
   onClick: () => Promise<void> | void;
   level?: LuiButtonProps["level"];
   style?: CSSProperties;
+  disabled?: boolean;
 }
 
 // Kept this less than one second, so I don't have issues with waitFor as it defaults to 1s
@@ -30,6 +31,7 @@ export const ActionButton = ({
   icon,
   name,
   inProgressName,
+  disabled,
   dataTestId,
   style,
   className,
@@ -83,7 +85,7 @@ export const ActionButton = ({
           setInProgress(false);
         }
       }}
-      disabled={localInProgress}
+      disabled={localInProgress || disabled}
     >
       {iconPosition === "right" && buttonText}
       {localInProgress ? (

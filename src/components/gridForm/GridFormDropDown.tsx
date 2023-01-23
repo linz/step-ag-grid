@@ -45,8 +45,9 @@ export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extend
     | "GridPopoverEditDropDown-containerUnlimited"
     | string
     | undefined;
-  // local means the filter won't change if it's reloaded, reload means it does change
+  // local means the use the local filter, otherwise it's expected options will be passed a function that takes a filter
   filtered?: "local" | "reload";
+  filterDefaultValue?: string;
   filterPlaceholder?: string;
   filterHelpText?: string;
   noOptionsMessage?: string;
@@ -66,7 +67,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   const { selectedRows, field, data } = useGridPopoverContext<RowType>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState(props.filterDefaultValue ?? "");
   const [filteredValues, setFilteredValues] = useState<any[]>();
   const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
@@ -143,7 +144,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
     }
   }, [props.filtered, filter, options]);
 
-  const researchOnFilterChange = useMemo(
+  const reSearchOnFilterChange = useMemo(
     () =>
       debounce(() => {
         setOptions(null);
@@ -157,9 +158,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
   useEffect(() => {
     if (previousFilter.current != filter && props.filtered == "reload") {
       previousFilter.current = filter;
-      researchOnFilterChange().then();
+      reSearchOnFilterChange().then();
     }
-  }, [filter, props, researchOnFilterChange]);
+  }, [filter, props, reSearchOnFilterChange]);
 
   /**
    * Saves are wrapped in updateValue and triggered by blur events
@@ -192,6 +193,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
     invalid: () => !!(selectedItem && !subComponentIsValid.current),
     save,
   });
+
+  let lastHeader: JSX.Element | null = null;
+  let showHeader: JSX.Element | null = null;
 
   return popoverWrapper(
     <>
@@ -237,76 +241,87 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
               {props.noOptionsMessage ?? "No Options"}
             </MenuItem>
           )}
-          {options?.map((item: FinalSelectOption, index) =>
-            item.value === MenuSeparatorString ? (
-              <MenuDivider key={`$$divider_${index}`} />
-            ) : item.value === MenuHeaderString ? (
-              <MenuHeader key={`$$header_${index}`}>{item.label}</MenuHeader>
-            ) : (
+          {options?.map((item: FinalSelectOption, index) => {
+            showHeader = null;
+            if (item.value === MenuSeparatorString) {
+              return <MenuDivider key={`$$divider_${index}`} />;
+            } else if (item.value === MenuHeaderString) {
+              lastHeader = <MenuHeader key={`$$header_${index}`}>{item.label}</MenuHeader>;
+              return <></>;
+            } else {
+              if (lastHeader) {
+                showHeader = lastHeader;
+                lastHeader = null;
+              }
+            }
+            return (
               (!filteredValues || filteredValues.includes(item)) && (
-                <div key={`menu-wrapper-${index}`}>
-                  <MenuItem
-                    key={`${fieldToString(field)}-${index}`}
-                    disabled={!!item.disabled}
-                    title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                    value={item.value}
-                    onFocus={() => {
-                      setSelectedItem(item);
-                      if (item.subComponent) {
+                <>
+                  {showHeader}
+                  <div key={`menu-wrapper-${index}`}>
+                    <MenuItem
+                      key={`${fieldToString(field)}-${index}`}
+                      disabled={!!item.disabled}
+                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                      value={item.value}
+                      onFocus={() => {
                         setSelectedItem(item);
-                        subComponentIsValid.current = true;
-                        subComponentInitialValue.current = null;
-                      } else {
-                        setSubSelectedValue(null);
-                        subComponentIsValid.current = true;
-                      }
-                    }}
-                    onClick={(e: ClickEvent) => {
-                      if (item.subComponent) {
-                        e.keepOpen = true;
-                      }
-                    }}
-                  >
-                    {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                    {item.subComponent ? "..." : ""}
-                  </MenuItem>
+                        if (item.subComponent) {
+                          setSelectedItem(item);
+                          subComponentIsValid.current = true;
+                          subComponentInitialValue.current = null;
+                        } else {
+                          setSubSelectedValue(null);
+                          subComponentIsValid.current = true;
+                        }
+                      }}
+                      onClick={(e: ClickEvent) => {
+                        if (item.subComponent) {
+                          e.keepOpen = true;
+                        }
+                      }}
+                    >
+                      {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
+                      {item.subComponent ? "..." : ""}
+                    </MenuItem>
 
-                  {item.subComponent && selectedItem === item && (
-                    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                      {(ref: MenuInstance) => (
-                        <GridSubComponentContext.Provider
-                          value={{
-                            context: { options },
-                            data,
-                            value: subSelectedValue,
-                            setValue: (value: any) => {
-                              setSubSelectedValue(value);
-                              if (subComponentInitialValue.current === null) {
-                                // copy the default value of the sub-component so we can change detect on save
-                                subComponentInitialValue.current = JSON.stringify(value);
-                              }
-                            },
-                            setValid: (valid: boolean) => {
-                              subComponentIsValid.current = valid;
-                            },
-                            triggerSave: async () => {
-                              ref.closeMenu();
-                            },
-                          }}
-                        >
-                          {item.subComponent && (
-                            <div className={"subComponent"}>
-                              <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
-                            </div>
-                          )}
-                        </GridSubComponentContext.Provider>
-                      )}
-                    </FocusableItem>
-                  )}
-                </div>
+                    {item.subComponent && selectedItem === item && (
+                      <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                        {(ref: MenuInstance) => (
+                          <GridSubComponentContext.Provider
+                            value={{
+                              context: { options },
+                              data,
+                              value: subSelectedValue,
+                              setValue: (value: any) => {
+                                setSubSelectedValue(value);
+                                if (subComponentInitialValue.current === null) {
+                                  // copy the default value of the subcomponent so we can change detect on save
+                                  subComponentInitialValue.current = JSON.stringify(value);
+                                }
+                              },
+                              setValid: (valid: boolean) => {
+                                subComponentIsValid.current = valid;
+                              },
+                              triggerSave: async () => {
+                                ref.closeMenu();
+                              },
+                            }}
+                          >
+                            {item.subComponent && (
+                              <div className={"subComponent"}>
+                                <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                              </div>
+                            )}
+                          </GridSubComponentContext.Provider>
+                        )}
+                      </FocusableItem>
+                    )}
+                  </div>
+                </>
               )
-            ),
-          )}
+            );
+          })}
         </>
       </ComponentLoadingWrapper>
     </>,

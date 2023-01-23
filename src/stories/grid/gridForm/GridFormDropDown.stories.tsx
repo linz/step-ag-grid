@@ -1,60 +1,109 @@
 import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
-// Force react-menu not to render static inline not absolute
-import "./reactMenuTest.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormDropDown, MenuHeaderItem } from "../../../components/gridForm/GridFormDropDown";
+import {
+  GridFormDropDown,
+  GridFormPopoutDropDownProps,
+  MenuHeaderItem,
+} from "../../../components/gridForm/GridFormDropDown";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
+import { GridBaseRow } from "../../../components/Grid";
 
 export default {
-  title: "GridForm / Samples",
+  title: "GridForm / Testing",
   component: GridFormDropDown,
   args: {},
 } as ComponentMeta<typeof GridFormDropDown>;
 
 const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
-  const anchorRef1 = useRef<HTMLHeadingElement>(null);
-  const anchorRef2 = useRef<HTMLHeadingElement>(null);
-  const anchorRef3 = useRef<HTMLHeadingElement>(null);
+  const configs: [string, GridFormPopoutDropDownProps<GridBaseRow>, string?][] = [
+    ["No options", { options: [] }],
+    ["Custom no options", { options: [], noOptionsMessage: "Custom no options" }],
+    [
+      "Enabled and disabled",
+      {
+        options: [
+          { label: "Enabled", value: 1 },
+          { label: "Disabled", value: 0, disabled: true },
+        ],
+      },
+    ],
+    [
+      "Headers",
+      {
+        options: [
+          MenuHeaderItem("Header 1"),
+          { label: "Option 1", value: 1 },
+          MenuHeaderItem("Header 2"),
+          { label: "Option 2", value: 2 },
+        ],
+      },
+    ],
+    [
+      "Filter",
+      {
+        filtered: "local",
+        options: [
+          MenuHeaderItem("Header 1"),
+          { label: "Option 1", value: 1 },
+          MenuHeaderItem("Header 2"),
+          { label: "Option 2", value: 2 },
+        ],
+      },
+    ],
+    [
+      "Filter custom placeholder",
+      {
+        filtered: "local",
+        filterPlaceholder: "Custom placeholder",
+        filterHelpText: "Filter help text",
+        options: [MenuHeaderItem("Header 1"), { label: "Option 1", value: 1 }],
+      },
+    ],
+    [
+      "Filter help text and default filter text",
+      {
+        filtered: "local",
+        filterHelpText: "Filter help text",
+        filterDefaultValue: "filter",
+        options: [
+          MenuHeaderItem("Header 1"),
+          { label: "Filter match", value: 1 },
+          MenuHeaderItem("ERROR! this header should not be visible"),
+          { label: "ERROR! this option should not be visible", value: 2 },
+        ],
+      },
+    ],
+  ];
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const anchorRefs = configs.map(() => useRef<HTMLHeadingElement>(null));
 
   return (
     <div className={"react-menu-inline-test"}>
       <GridContextProvider>
-        <h6 ref={anchorRef1}>No options</h6>
-        <GridPopoverContext.Provider value={{ anchorRef: anchorRef1 } as any as GridPopoverContextType<any>}>
-          <GridFormDropDown {...props} options={[]} />
-        </GridPopoverContext.Provider>
-
-        <h6 ref={anchorRef2}>Enabled and disabled</h6>
-        <GridPopoverContext.Provider value={{ anchorRef: anchorRef2 } as any as GridPopoverContextType<any>}>
-          <GridFormDropDown
-            {...props}
-            options={[
-              { label: "Enabled", value: 1 },
-              { label: "Disabled", value: 0, disabled: true },
-            ]}
-          />
-        </GridPopoverContext.Provider>
-
-        <h6 ref={anchorRef3}>Headers</h6>
-        <GridPopoverContext.Provider value={{ anchorRef: anchorRef3 } as any as GridPopoverContextType<any>}>
-          <GridFormDropDown
-            {...props}
-            options={[
-              MenuHeaderItem("Header 1"),
-              { label: "Option 1", value: 1 },
-              MenuHeaderItem("Header 2"),
-              { label: "Option 2", value: 2 },
-            ]}
-          />
-        </GridPopoverContext.Provider>
+        {configs.map((config, index) => (
+          <div key={`${index}`}>
+            <h6 ref={anchorRefs[index]}>{config[0]}</h6>
+            <GridPopoverContext.Provider
+              value={
+                {
+                  anchorRef: anchorRefs[index],
+                  data: { value: config[2] },
+                  value: config[2],
+                  field: "value",
+                } as any as GridPopoverContextType<any>
+              }
+            >
+              <GridFormDropDown {...props} {...config[1]} />
+            </GridPopoverContext.Provider>
+          </div>
+        ))}
       </GridContextProvider>
     </div>
   );
 };
 
 export const GridFormDropDown_ = Template.bind({});
-GridFormDropDown_.args = { options: [] };
