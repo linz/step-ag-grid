@@ -4,7 +4,6 @@ import {
   bearingStringValidator,
   convertDDToDMS,
 } from "./bearing";
-import { GridPopoverEditBearingCorrectionEditorParams } from "../components/gridPopoverEdit/GridPopoverEditBearing";
 
 describe("bearing", () => {
   test("convertDDToDMS converts decimal-ish degrees to DMS", () => {
