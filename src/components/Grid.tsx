@@ -297,16 +297,6 @@ export const Grid = (params: GridProps): JSX.Element => {
     [startCellEditing],
   );
 
-  const onCellEditingStopped = useCallback(
-    (event: CellEvent) => {
-      refreshSelectedRows(event);
-      // The grid loses cell focus after editing
-      const cell = event.api.getFocusedCell();
-      cell && event.api.setFocusedCell(cell.rowIndex, cell.column);
-    },
-    [refreshSelectedRows],
-  );
-
   // When rows added or removed then resize columns
   useEffect(() => {
     if (columnDefs?.length) {
@@ -354,7 +344,6 @@ export const Grid = (params: GridProps): JSX.Element => {
         onCellClicked={onCellClicked}
         onCellDoubleClicked={onCellDoubleClick}
         onCellEditingStarted={refreshSelectedRows}
-        onCellEditingStopped={onCellEditingStopped}
         domLayout={params.domLayout}
         columnDefs={columnDefs}
         rowData={params.rowData}
