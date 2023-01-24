@@ -9,7 +9,17 @@
   fill: colors.$info;
 }
 
+.AgGridGenericCellRenderer-ic_info_outlineIcon {
+  margin-right: 4px;
+  fill: colors.$info;
+}
+
 .AgGridGenericCellRenderer-ic_warningIcon {
+  margin-right: 4px;
+  fill: colors.$warning;
+}
+
+.AgGridGenericCellRenderer-ic_warning_outlineIcon {
   margin-right: 4px;
   fill: colors.$warning;
 }

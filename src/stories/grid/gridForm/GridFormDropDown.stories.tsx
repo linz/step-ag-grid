@@ -2,11 +2,7 @@ import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import {
-  GridFormDropDown,
-  GridFormPopoutDropDownProps,
-  MenuHeaderItem,
-} from "../../../components/gridForm/GridFormDropDown";
+import { GridFormDropDown, GridFormDropDownProps, MenuHeaderItem } from "../../../components/gridForm/GridFormDropDown";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -19,7 +15,7 @@ export default {
 } as ComponentMeta<typeof GridFormDropDown>;
 
 const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
-  const configs: [string, GridFormPopoutDropDownProps<GridBaseRow>, string?][] = [
+  const configs: [string, GridFormDropDownProps<GridBaseRow>, string?][] = [
     ["No options", { options: [] }],
     ["Custom no options", { options: [], noOptionsMessage: "Custom no options" }],
     [

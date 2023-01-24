@@ -29,8 +29,8 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   return (
     <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
       <>
-        {typeof warningText === "string" && <GridIcon icon={"ic_warning"} title={warningText} />}
-        {typeof infoText === "string" && <GridIcon icon={"ic_info"} title={infoText} />}
+        {typeof warningText === "string" && <GridIcon icon={"ic_warning_outline"} title={warningText} />}
+        {typeof infoText === "string" && <GridIcon icon={"ic_info_outline"} title={infoText} />}
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
           {colDef?.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />

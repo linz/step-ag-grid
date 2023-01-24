@@ -9,13 +9,13 @@
 .step-ag-grid-react-menu.szh-menu {
   z-index: 900;
   color: colors.$base-type-color;
-  @include fonts.font-light();
+  @include fonts.font-regular();
 
   div,
   a[role="menuitem"] {
     text-decoration: none;
     color: colors.$base-type-color;
-    @include fonts.font-light();
+    @include fonts.font-regular();
   }
 
   li[role="menuitem"]:hover {

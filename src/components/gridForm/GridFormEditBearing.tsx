@@ -56,7 +56,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
   });
 
   return popoverWrapper(
-    <div className={"GridFormEditBearing-input Grid-popoverContainer"}>
+    <div className={"GridFormEditBearing-input"}>
       <TextInputFormatted
         value={defaultValue}
         onChange={(e) => {
