@@ -95,6 +95,8 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
         setSubComponentSelected(subComponentSelected === item ? null : item);
         e.keepOpen = true;
       } else {
+        subComponentIsValid.current = true;
+        setSubSelectedValue(null);
         await updateValue(async () => actionClick(item), e.key === "Tab" ? (e.shiftKey ? -1 : 1) : 0);
       }
     },
