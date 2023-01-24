@@ -22,7 +22,7 @@ const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
       "With options",
       {
         options: [
-          { label: "One", value: 0 },
+          { label: "One", value: 0, checked: true },
           { label: "Two", value: 1 },
         ],
       },
@@ -34,7 +34,7 @@ const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
         options: [
           { label: "One", value: 0 },
           { label: "With warning", value: 1, warning: "Test warning" },
-          { label: "Three", value: 2 },
+          { label: "Three", value: 2, checked: true },
         ],
       },
     ],
