@@ -36,7 +36,7 @@ export const MenuHeaderItem = (title: string) => {
 
 export type SelectOption = null | string | FinalSelectOption;
 
-export interface GridFormPopoutDropDownProps<RowType extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormDropDownProps<RowType extends GridBaseRow> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options
   className?:
     | "GridPopoverEditDropDown-containerSmall"
@@ -63,7 +63,7 @@ const fieldToString = (field: any) => {
   return typeof field == "symbol" ? field.toString() : `${field}`;
 };
 
-export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPopoutDropDownProps<RowType>) => {
+export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDropDownProps<RowType>) => {
   const { selectedRows, field, data } = useGridPopoverContext<RowType>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
@@ -215,7 +215,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
                   className={"LuiTextInput-input"}
                   ref={ref}
                   type="text"
-                  placeholder={props.filterPlaceholder ?? "Placeholder"}
+                  placeholder={props.filterPlaceholder ?? "Filter..."}
                   data-testid={"filteredMenu-free-text-input"}
                   defaultValue={filter}
                   data-allowtabtosave={true}
@@ -237,7 +237,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormPop
       <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
         <>
           {options && (isEmpty(options) || (filteredValues && isEmpty(filteredValues))) && (
-            <MenuItem key={`${fieldToString(field)}-empty`} className={"GridPopoverEditDropDown-noOptions"}>
+            <MenuItem
+              key={`${fieldToString(field)}-empty`}
+              className={"GridPopoverEditDropDown-noOptions"}
+              disabled={true}
+            >
               {props.noOptionsMessage ?? "No Options"}
             </MenuItem>
           )}

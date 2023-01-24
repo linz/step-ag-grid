@@ -1,7 +1,12 @@
-import { convertDDToDMS } from "./bearing";
+import {
+  bearingCorrectionRangeValidator,
+  bearingRangeValidator,
+  bearingStringValidator,
+  convertDDToDMS,
+} from "./bearing";
 
-describe("convertDDToDMS", () => {
-  test("converts decimal-ish degrees to DMS", () => {
+describe("bearing", () => {
+  test("convertDDToDMS converts decimal-ish degrees to DMS", () => {
     expect(convertDDToDMS(-0.001, false, false)).toBe("-0° 00' 10\"");
     expect(convertDDToDMS(-10.001, false, false)).toBe("-10° 00' 10\"");
     expect(convertDDToDMS(-370.001, false, false)).toBe("-10° 00' 10\"");
@@ -26,5 +31,43 @@ describe("convertDDToDMS", () => {
     expect(convertDDToDMS(300, false, false)).toBe("300° 00'");
     expect(convertDDToDMS(300.1, false, false)).toBe("300° 10'");
     expect(convertDDToDMS(0, false)).toBe("0° 00'");
+  });
+
+  test("bearingStringValidator", () => {
+    const tests: [string, string | null][] = [
+      ["", null],
+      ["1", null],
+      ["1.2345", null],
+      ["-1.2345", null],
+      ["360.2345", null],
+      ["-360.2345", null],
+      ["1.2e6", "Bearing must be a number in D.MMSSS format"],
+      ["0.60000", "Bearing must be a number in D.MMSSS format"],
+      ["0.00600", "Bearing must be a number in D.MMSSS format"],
+      ["0.123456", "Bearing has a maximum of 5 decimal places"],
+    ];
+
+    tests.forEach((test, i) => {
+      expect(bearingStringValidator(test[0]), `Test ${i}: "${test[0]}" should return "${test[1]}"`).toBe(test[1]);
+    });
+
+    // calls custom invalid
+    const fn = jest.fn();
+    bearingStringValidator("1.2", fn);
+    expect(fn).toHaveBeenCalledWith(1.2);
+  });
+
+  test("bearingRangeValidator", () => {
+    expect(bearingRangeValidator(0)).toBeNull();
+    expect(bearingRangeValidator(359.595999)).toBeNull();
+    expect(bearingRangeValidator(-0.00001)).toBe("Bearing must not be negative");
+    expect(bearingRangeValidator(360)).toBe("Bearing must be less than 360 degrees");
+  });
+
+  test("bearingCorrectionRangeValidator", () => {
+    expect(bearingCorrectionRangeValidator(-179.59999)).toBeNull();
+    expect(bearingCorrectionRangeValidator(359.59999)).toBeNull();
+    expect(bearingCorrectionRangeValidator(-180)).toBe("Bearing correction must be greater then -180 degrees");
+    expect(bearingCorrectionRangeValidator(360)).toBe("Bearing correction must be less than 360 degrees");
   });
 });

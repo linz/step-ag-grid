@@ -2,7 +2,7 @@ import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormEditBearing } from "../../../components/gridForm/GridFormEditBearing";
+import { GridFormEditBearing, GridFormEditBearingProps } from "../../../components/gridForm/GridFormEditBearing";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -15,14 +15,11 @@ export default {
 } as ComponentMeta<typeof GridFormEditBearing>;
 
 const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
-  const values = [
-    ["Null value", null],
-    ["Minimum value", 0],
-    ["Maximum value", 359.59599],
-    ["5dp value", 1.23456],
-    ["Invalid 6dp value", 1.234567],
-    ["Invalid exceeds max value", 360],
-    ["Invalid exceeds min value", -0.00001],
+  const values: [string, GridFormEditBearingProps<any>, number | null][] = [
+    ["Null value", {}, null],
+    ["Custom placeholder", { placeHolder: "Custom placeholder" }, null],
+    ["Valid value", {}, 90],
+    ["With error", {}, 1.234567],
   ];
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const anchorRefs = values.map(() => useRef<HTMLHeadingElement>(null));
@@ -37,11 +34,11 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
               value={
                 {
                   anchorRef: anchorRefs[index],
-                  value: value[1],
+                  value: value[2],
                 } as any as GridPopoverContextType<any>
               }
             >
-              <GridFormEditBearing {...props} {...GridPopoverEditBearingEditorParams} />
+              <GridFormEditBearing {...props} {...GridPopoverEditBearingEditorParams} {...value[1]} />
             </GridPopoverContext.Provider>
           </>
         ))}
@@ -51,4 +48,3 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
 };
 
 export const GridFormEditBearing_ = Template.bind({});
-GridFormEditBearing_.args = {};

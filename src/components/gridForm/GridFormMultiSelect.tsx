@@ -52,6 +52,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends C
   filtered?: boolean;
   filterPlaceholder?: string;
   filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
+  noOptionsMessage?: string;
   onSelectFilter?: (props: { filter: string; options: MultiSelectOption[] }) => void;
   onSave?: (props: { selectedRows: RowType[]; selectedOptions: MultiSelectOption[] }) => Promise<boolean>;
   headers?: GridFormMultiSelectGroup[];
@@ -117,7 +118,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
   const headerGroups = useMemo(() => {
     if (!options) return undefined;
     const result = groupBy(
-      options.filter((o) => textMatch(o.label, filter) && o.value),
+      options.filter((o) => textMatch(o.label, filter) && o.value != null),
       "filter",
     );
     // remove leading/trailing/duplicate dividers
@@ -163,8 +164,12 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
               filterPlaceholder={props.filterPlaceholder}
             />
           )}
-
-          {headerGroups && (
+          {headerGroups && (isEmpty(headerGroups) || !toPairs(headerGroups).some(([_, options]) => !isEmpty(options))) && (
+            <MenuItem key={"noOptions"} className={"GridMultiSelect-noOptions"} disabled={true}>
+              {props.noOptionsMessage ?? "No Options"}
+            </MenuItem>
+          )}
+          {headerGroups && !isEmpty(headerGroups) && (
             <div className={"GridFormMultiSelect-options"}>
               {headers.map((header, index) => {
                 const subOptions = headerGroups[`${header.filter}`];
@@ -307,7 +312,7 @@ const FilterInput = (props: {
             <input
               className={"LuiTextInput-input"}
               type="text"
-              placeholder={filterPlaceholder ?? "Placeholder"}
+              placeholder={filterPlaceholder ?? "Filter..."}
               data-testid={"filteredMenu-free-text-input"}
               value={filter}
               data-disableenterautosave={true}
@@ -328,9 +333,6 @@ const FilterInput = (props: {
         )}
       </FocusableItem>
       <MenuDivider key={`$$divider_filter`} />
-      {headerGroups && !toPairs(headerGroups).some(([_, options]) => !isEmpty(options)) && (
-        <div className={"szh-menu__item GridPopoverEditDropDown-noOptions"}>No Options</div>
-      )}
     </>
   );
 };
@@ -365,7 +367,7 @@ const MenuRadioItem = (props: {
         value={`${item.value}`}
         label={
           <>
-            {item.warning && <GridIcon icon={"ic_warning"} title={item.warning} />}
+            {item.warning && <GridIcon icon={"ic_warning_outline"} title={item.warning} />}
             {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
           </>
         }
