@@ -188,6 +188,23 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
     return true;
   }, [filter, filteredValues, options, props, selectItemHandler, selectedItem, selectedRows, subSelectedValue]);
 
+  const onMouseEnterFocus = useCallback((item: FinalSelectOption) => {
+    setSelectedItem(item);
+    if (item.subComponent) {
+      subComponentIsValid.current = true;
+      subComponentInitialValue.current = null;
+    } else {
+      setSubSelectedValue(null);
+      subComponentIsValid.current = true;
+    }
+  }, []);
+
+  const onMouseLeaveFocus = useCallback(() => {
+    setSelectedItem(null);
+    setSubSelectedValue(null);
+    subComponentIsValid.current = true;
+  }, []);
+
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid: () => !!(selectedItem && !subComponentIsValid.current),
@@ -268,17 +285,9 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       disabled={!!item.disabled}
                       title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                       value={item.value}
-                      onFocus={() => {
-                        setSelectedItem(item);
-                        if (item.subComponent) {
-                          setSelectedItem(item);
-                          subComponentIsValid.current = true;
-                          subComponentInitialValue.current = null;
-                        } else {
-                          setSubSelectedValue(null);
-                          subComponentIsValid.current = true;
-                        }
-                      }}
+                      onFocus={() => onMouseEnterFocus(item)}
+                      onMouseEnter={() => onMouseEnterFocus(item)}
+                      onMouseLeave={onMouseLeaveFocus}
                       onClick={(e: ClickEvent) => {
                         if (item.subComponent) {
                           e.keepOpen = true;

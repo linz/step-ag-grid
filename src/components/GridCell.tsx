@@ -81,6 +81,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
+    editable: props.editable ?? false,
     ...(custom?.editor && {
       cellClassRules: GridCellMultiSelectClassRules,
       editable: props.editable ?? true,
