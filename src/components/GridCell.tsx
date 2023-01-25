@@ -31,7 +31,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
       <>
         {typeof warningText === "string" && <GridIcon icon={"ic_warning_outline"} title={warningText} />}
         {typeof infoText === "string" && <GridIcon icon={"ic_info_outline"} title={infoText} />}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        <div style={{ display: "flex", flex: 1 }}>
           {colDef?.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />
           ) : (

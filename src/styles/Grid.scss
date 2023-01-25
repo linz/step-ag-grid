@@ -44,6 +44,13 @@
   visibility: visible;
 }
 
+.ag-selection-checkbox{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .GridFormMessage-container {
   padding: 4px 8px;
   max-width: 400px;
