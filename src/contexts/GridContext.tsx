@@ -5,6 +5,7 @@ import { GridBaseRow } from "../components/Grid";
 export interface GridContextType {
   gridReady: boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
+  prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
@@ -34,6 +35,9 @@ export interface GridContextType {
 
 export const GridContext = createContext<GridContextType>({
   gridReady: false,
+  prePopupOps: () => {
+    console.error("no context provider for prePopupOps");
+  },
   externallySelectedItemsAreInSync: false,
   setGridApi: () => {
     console.error("no context provider for setGridApi");
