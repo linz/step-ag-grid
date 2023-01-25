@@ -5,6 +5,7 @@ import { defer, delay, difference, isEmpty, last, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
+import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 
 interface GridContextProps {
   children: ReactNode;
@@ -20,6 +21,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const [gridApi, _setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
   const idsBeforeUpdate = useRef<number[]>([]);
+  const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
 
   const setGridApi = useCallback((gridApi: GridApi | undefined) => {
@@ -42,6 +44,13 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     },
     [gridApi],
   );
+
+  /**
+   * Before a popup record the currently focused cell.
+   */
+  const prePopupOps = useCallback(() => {
+    prePopupFocusedCell.current = gridApi?.getFocusedCell() ?? undefined;
+  }, [gridApi]);
 
   /**
    * Set the quick filter value to grid.
@@ -276,7 +285,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     });
   }, [gridApiOp]);
 
-  const stopEditing = useCallback((): void => gridApiOp((gridApi) => gridApi.stopEditing()), [gridApiOp]);
+  const stopEditing = useCallback((): void => {
+    if (prePopupFocusedCell.current) {
+      gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+    }
+    gridApiOp((gridApi) => gridApi.stopEditing());
+  }, [gridApi, gridApiOp]);
 
   const selectNextCell = useCallback(
     (tabDirection: -1 | 0 | 1 = 0) => {
@@ -297,8 +311,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     ): Promise<boolean> => {
       setSaving && setSaving(true);
       return await gridApiOp(async (gridApi) => {
-        const preOpCell = gridApi.getFocusedCell();
-
         const selectedRows = props.selectedRows;
 
         let ok = false;
@@ -331,13 +343,13 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         }
 
         // Only focus next cell if user hasn't already manually changed focus
-        const postOpCell = gridApi.getFocusedCell();
+        const postPopupFocusedCell = gridApi.getFocusedCell();
         if (
           tabDirection &&
-          preOpCell &&
-          postOpCell &&
-          preOpCell.rowIndex == postOpCell.rowIndex &&
-          preOpCell.column.getColId() == postOpCell.column.getColId()
+          prePopupFocusedCell.current &&
+          postPopupFocusedCell &&
+          prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
+          prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
           selectNextCell(tabDirection);
         }
@@ -368,6 +380,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     <GridContext.Provider
       value={{
         gridReady,
+        prePopupOps,
         setGridApi,
         setQuickFilter,
         selectRowsById,

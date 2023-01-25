@@ -46,6 +46,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   const {
     gridReady,
     setGridApi,
+    prePopupOps,
     setQuickFilter,
     ensureRowVisible,
     selectRowsById,
@@ -241,6 +242,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const startCellEditing = useCallback(
     (event: CellEvent) => {
+      prePopupOps();
       if (!event.node.isSelected()) {
         event.node.setSelected(true, true);
       }
@@ -256,7 +258,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         });
       }
     },
-    [checkUpdating],
+    [checkUpdating, prePopupOps],
   );
 
   const onCellDoubleClick = useCallback(
