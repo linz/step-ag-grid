@@ -16,6 +16,7 @@ export interface GridPopoverHookProps<RowType> {
     | null
     | undefined;
   save?: (selectedRows: RowType[]) => Promise<boolean>;
+  dontSaveOnExternalClick?: boolean;
 }
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
@@ -96,7 +97,11 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
                 ref={saveButtonRef}
                 data-reason={""}
                 onClick={(e) => {
-                  triggerSave(e.currentTarget.getAttribute("data-reason") ?? undefined).then();
+                  let reason = e.currentTarget.getAttribute("data-reason") ?? undefined;
+                  if (props.dontSaveOnExternalClick && reason === CloseReason.BLUR) {
+                    reason = CloseReason.CANCEL;
+                  }
+                  triggerSave(reason).then();
                 }}
                 style={{ display: "none" }}
               />
@@ -105,7 +110,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
         </>
       );
     },
-    [anchorRef, isOpen, props.className, saving, triggerSave],
+    [anchorRef, isOpen, props.className, props.dontSaveOnExternalClick, saving, triggerSave],
   );
 
   return {
