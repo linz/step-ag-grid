@@ -197,9 +197,8 @@ export const Grid = (params: GridProps): JSX.Element => {
           {
             colId: "selection",
             editable: false,
-            initialWidth: 35,
-            minWidth: 35,
-            maxWidth: 35,
+            minWidth: 42,
+            maxWidth: 42,
             suppressSizeToFit: true,
             checkboxSelection: true,
             headerComponent: GridHeaderSelect,
