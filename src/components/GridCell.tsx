@@ -67,7 +67,7 @@ export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
 };
 
 /*
- * All cells should use this
+ * All cells should use this.
  */
 export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCommon>(
   props: GenericCellColDef<RowType>,
