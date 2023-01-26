@@ -182,7 +182,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   const columnDefs = useMemo((): ColDef[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
       const colDefEditable = colDef.editable;
-      const editable = combineEditables(params.readOnly !== false, params.defaultColDef?.editable, colDefEditable);
+      const editable = combineEditables(params.readOnly !== true, params.defaultColDef?.editable, colDefEditable);
       return {
         ...colDef,
         editable,
