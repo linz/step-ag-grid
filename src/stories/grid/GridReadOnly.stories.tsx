@@ -100,7 +100,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Custom edit",
         maxWidth: 100,
         editable: true,
-        valueFormatter: () => "Double click me!",
+        valueFormatter: () => "Press E",
         cellRendererParams: {
           rightHoverElement: (
             <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />

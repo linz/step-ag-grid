@@ -1,5 +1,5 @@
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GridBaseRow } from "../Grid";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { isEmpty } from "lodash-es";
@@ -188,27 +188,11 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
     return true;
   }, [filter, filteredValues, options, props, selectItemHandler, selectedItem, selectedRows, subSelectedValue]);
 
-  const onMouseEnterFocus = useCallback((item: FinalSelectOption) => {
-    setSelectedItem(item);
-    if (item.subComponent) {
-      subComponentIsValid.current = true;
-      subComponentInitialValue.current = null;
-    } else {
-      setSubSelectedValue(null);
-      subComponentIsValid.current = true;
-    }
-  }, []);
-
-  const onMouseLeaveFocus = useCallback(() => {
-    setSelectedItem(null);
-    setSubSelectedValue(null);
-    subComponentIsValid.current = true;
-  }, []);
-
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid: () => !!(selectedItem && !subComponentIsValid.current),
     save,
+    dontSaveOnExternalClick: true,
   });
 
   let lastHeader: JSX.Element | null = null;
@@ -277,7 +261,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
             }
             return (
               (!filteredValues || filteredValues.includes(item)) && (
-                <>
+                <Fragment key={`${index}`}>
                   {showHeader}
                   <div key={`menu-wrapper-${index}`}>
                     <MenuItem
@@ -285,9 +269,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       disabled={!!item.disabled}
                       title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                       value={item.value}
-                      onFocus={() => onMouseEnterFocus(item)}
-                      onMouseEnter={() => onMouseEnterFocus(item)}
-                      onMouseLeave={onMouseLeaveFocus}
+                      onFocus={() => {
+                        setSelectedItem(item);
+                        if (item.subComponent) {
+                          subComponentIsValid.current = true;
+                          subComponentInitialValue.current = null;
+                        } else {
+                          setSubSelectedValue(null);
+                          subComponentIsValid.current = true;
+                        }
+                      }}
                       onClick={(e: ClickEvent) => {
                         if (item.subComponent) {
                           e.keepOpen = true;
@@ -331,7 +322,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       </FocusableItem>
                     )}
                   </div>
-                </>
+                </Fragment>
               )
             );
           })}
