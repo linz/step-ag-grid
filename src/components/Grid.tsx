@@ -10,7 +10,7 @@ import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
-import { CellClassParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 export interface GridBaseRow {
   id: string | number;
@@ -162,6 +162,16 @@ export const Grid = (params: GridProps): JSX.Element => {
     updateQuickFilter();
   }, [updateQuickFilter]);
 
+  const combineEditables =
+    (...editables: (boolean | EditableCallback | undefined)[]) =>
+    (params: EditableCallbackParams): boolean => {
+      const results = editables.map((editable) => fnOrVar(editable, params));
+      // If editable is not set anywhere then it's non-editable
+      if (results.every((v) => v == null)) return false;
+      // If any editable value is or returns false then it's non-editable
+      return !results.some((v) => v == false);
+    };
+
   /**
    * Synchronise externally selected items to grid on externalSelectedItems change
    */
@@ -171,14 +181,14 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const columnDefs = useMemo((): ColDef[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
+      const colDefEditable = colDef.editable;
+      const editable = combineEditables(params.readOnly !== false, params.defaultColDef?.editable, colDefEditable);
       return {
         ...colDef,
-        editable: params.readOnly ? false : params.defaultColDef?.editable ?? colDef.editable,
+        editable,
         cellClassRules: {
           ...colDef.cellClassRules,
-          "GridCell-readonly": (ccp: CellClassParams) =>
-            (params.readOnly != null || !params.readOnly) &&
-            !fnOrVar(params.defaultColDef?.editable ?? colDef.editable, ccp),
+          "GridCell-readonly": (ccp: CellClassParams) => !editable(ccp as any as EditableCallbackParams),
         },
       };
     });
@@ -187,9 +197,8 @@ export const Grid = (params: GridProps): JSX.Element => {
           {
             colId: "selection",
             editable: false,
-            initialWidth: 35,
-            minWidth: 35,
-            maxWidth: 35,
+            minWidth: 42,
+            maxWidth: 42,
             suppressSizeToFit: true,
             checkboxSelection: true,
             headerComponent: GridHeaderSelect,
@@ -280,6 +289,7 @@ export const Grid = (params: GridProps): JSX.Element => {
   const invokeEditAction = (e: CellEvent): boolean => {
     const editAction = e.colDef?.cellRendererParams?.editAction;
     if (!editAction) return false;
+
     const editable = fnOrVar(e.colDef?.editable, e);
     if (editable) {
       if (!e.node.isSelected()) {

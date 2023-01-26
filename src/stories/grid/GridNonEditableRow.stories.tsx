@@ -168,17 +168,15 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
   return (
     <Grid
       {...props}
-      selectable={true}
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       defaultColDef={defaultColDef}
       columnDefs={columnDefs}
       rowData={rowData}
       domLayout={"autoHeight"}
-      autoSelectFirstRow={true}
-      readOnly={false}
     />
   );
 };
 
 export const NonEditableRow = GridNonEditableRowTemplate.bind({});
+NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
