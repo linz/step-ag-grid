@@ -3,14 +3,10 @@ import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
 import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridRenderGenericCell";
-import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
+import { ColDef, ICellEditorParams, ICellRendererParams, ValueGetterFunc } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
-import {
-  SuppressKeyboardEventParams,
-  ValueFormatterParams,
-  ValueGetterFunc,
-} from "ag-grid-community/dist/lib/entities/colDef";
+import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { fnOrVar } from "../utils/util";
 
@@ -26,15 +22,19 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
 
   const rendererParams = colDef.cellRendererParams as GenericCellRendererParams<any> | undefined;
   const warningFn = rendererParams?.warning;
-  const warningText = warningFn ? warningFn(props) : undefined;
+  let warningText = warningFn ? warningFn(props) : undefined;
   const infoFn = rendererParams?.info;
-  const infoText = infoFn ? infoFn(props) : undefined;
+  let infoText = infoFn ? infoFn(props) : undefined;
+  if (Array.isArray(warningText)) warningText = warningText.join("\n");
+  if (Array.isArray(infoText)) infoText = infoText.join("\n");
 
   return (
     <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
       <>
-        {typeof warningText === "string" && <GridIcon icon={"ic_warning_outline"} title={warningText} />}
-        {typeof infoText === "string" && <GridIcon icon={"ic_info_outline"} title={infoText} />}
+        {!!warningText && (
+          <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+        )}
+        {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
           {colDef?.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />

@@ -300,7 +300,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                               setValue: (value: any) => {
                                 setSubSelectedValue(value);
                                 if (subComponentInitialValue.current === null) {
-                                  // copy the default value of the subcomponent so we can change detect on save
+                                  // copy the default value of the subcomponent, so we can change detect on save
                                   subComponentInitialValue.current = JSON.stringify(value);
                                 }
                               },
