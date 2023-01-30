@@ -6,7 +6,11 @@ import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridR
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
-import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import {
+  SuppressKeyboardEventParams,
+  ValueFormatterParams,
+  ValueGetterFunc,
+} from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { fnOrVar } from "../utils/util";
 
@@ -91,6 +95,11 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     ...(custom?.editorParams && {
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
+    // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
+    ...(props.valueFormatter &&
+      !props.filterValueGetter && {
+        filterValueGetter: props.valueFormatter as string | ValueGetterFunc,
+      }),
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
       if (params.value == null) return "–";
