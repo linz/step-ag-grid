@@ -6,7 +6,11 @@ import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridR
 import { ColDef, ICellEditorParams, ICellRendererParams, ValueGetterFunc } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
-import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import {
+  SuppressKeyboardEventParams,
+  ValueFormatterParams,
+  ValueGetterParams,
+} from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { fnOrVar } from "../utils/util";
 
@@ -81,6 +85,24 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     editorParams?: Props;
   },
 ): ColDefT<RowType> => {
+  // Generate a default filter value getter which uses the formatted value plus
+  // the editable value if it's a string and different from the formatted value.
+  // This is so that e.g. bearings can be searched for by DMS or raw number.
+  const valueFormatter = props.valueFormatter;
+  let filterValueGetter = props.filterValueGetter;
+  const field = props.field;
+  if (!filterValueGetter && typeof valueFormatter === "function" && field) {
+    filterValueGetter = (params: ValueGetterParams) => {
+      const value = params.getValue(field);
+      let formattedValue = valueFormatter({ ...params, value });
+      // Search for null values using standard dash
+      if (formattedValue === "–") formattedValue += " -";
+      // Search by raw value as well as formatted
+      const gotValue = ["string", "number"].includes(typeof value) ? value : undefined;
+      return (formattedValue + (gotValue != null && formattedValue != gotValue ? " " + gotValue : "")) //
+        .replaceAll(/\s+/g, " ");
+    };
+  }
   return {
     colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
@@ -96,10 +118,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
-    ...(props.valueFormatter &&
-      !props.filterValueGetter && {
-        filterValueGetter: props.valueFormatter as string | ValueGetterFunc,
-      }),
+    filterValueGetter,
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
       if (params.value == null) return "–";
