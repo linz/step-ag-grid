@@ -2,15 +2,11 @@ import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
-import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridRenderGenericCell";
-import { ColDef, ICellEditorParams, ICellRendererParams, ValueGetterFunc } from "ag-grid-community";
+import { GenericCellColDef, GenericCellRendererParams, RowValueGetterParams } from "./gridRender/GridRenderGenericCell";
+import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
-import {
-  SuppressKeyboardEventParams,
-  ValueFormatterParams,
-  ValueGetterParams,
-} from "ag-grid-community/dist/lib/entities/colDef";
+import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { fnOrVar } from "../utils/util";
 
@@ -40,13 +36,13 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         )}
         {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          {colDef?.cellRendererParams?.originalCellRenderer ? (
+          {colDef.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />
           ) : (
             <span title={props.valueFormatted}>{props.valueFormatted}</span>
           )}
         </div>
-        {fnOrVar(props.colDef?.editable, props) && rendererParams?.rightHoverElement && (
+        {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
           <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
         )}
       </>
@@ -92,7 +88,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   let filterValueGetter = props.filterValueGetter;
   const field = props.field;
   if (!filterValueGetter && typeof valueFormatter === "function" && field) {
-    filterValueGetter = (params: ValueGetterParams) => {
+    filterValueGetter = (params: RowValueGetterParams<RowType>) => {
       const value = params.getValue(field);
       let formattedValue = valueFormatter({ ...params, value });
       // Search for null values using standard dash

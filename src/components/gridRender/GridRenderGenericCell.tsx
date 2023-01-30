@@ -19,6 +19,9 @@ export interface RowEditableCallbackParams<RowType extends GridBaseRow> extends 
 export interface RowValueFormatterParams<RowType extends GridBaseRow> extends ValueFormatterParams {
   data: RowType;
 }
+export interface RowValueGetterParams<RowType extends GridBaseRow> extends ValueGetterParams {
+  data: RowType;
+}
 
 export interface RowValueGetterParams<RowType extends GridBaseRow> extends ValueGetterParams {
   data: RowType;
@@ -29,6 +32,7 @@ export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDefT<
   cellRendererParams?: GenericCellRendererParams<RowType>;
   valueGetter?: string | ((params: RowValueGetterParams<RowType>) => any);
   valueFormatter?: string | ((params: RowValueFormatterParams<RowType>) => string);
+  filterValueGetter?: string | ((params: RowValueGetterParams<RowType>) => string);
   editable?: boolean | ((params: RowEditableCallbackParams<RowType>) => boolean);
 }
 
