@@ -37,6 +37,6 @@ export interface GenericCellRendererParams<RowType extends GridBaseRow> {
   rightHoverElement?: JSX.Element | undefined;
   editAction?: (selectedRows: RowType[]) => void;
   shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | void) | undefined>;
-  warning?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
-  info?: (props: RowICellRendererParams<RowType>) => string | boolean | null | undefined;
+  warning?: (props: RowICellRendererParams<RowType>) => string | string[] | boolean | null | undefined;
+  info?: (props: RowICellRendererParams<RowType>) => string | string[] | boolean | null | undefined;
 }
