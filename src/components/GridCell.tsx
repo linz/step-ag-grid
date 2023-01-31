@@ -2,8 +2,13 @@ import { forwardRef, useContext } from "react";
 import { GridBaseRow } from "./Grid";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
-import { GenericCellColDef, GenericCellRendererParams } from "./gridRender/GridRenderGenericCell";
-import { ColDef, ICellEditorParams, ICellRendererParams, ValueGetterFunc } from "ag-grid-community";
+import {
+  GenericCellColDef,
+  GenericCellRendererParams,
+  RowValueFormatterParams,
+  RowValueGetterParams,
+} from "./gridRender/GridRenderGenericCell";
+import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { GridLoadableCell } from "./GridLoadableCell";
 import { GridIcon } from "./GridIcon";
 import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
@@ -36,13 +41,13 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         )}
         {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          {colDef?.cellRendererParams?.originalCellRenderer ? (
+          {colDef.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />
           ) : (
             <span title={props.valueFormatted}>{props.valueFormatted}</span>
           )}
         </div>
-        {fnOrVar(props.colDef?.editable, props) && rendererParams?.rightHoverElement && (
+        {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
           <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
         )}
       </>
@@ -70,6 +75,28 @@ export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   );
 };
 
+export const generateFilterGetter = <RowType extends GridBaseRow>(
+  field: string | undefined,
+  filterValueGetter: string | ((params: RowValueGetterParams<RowType>) => string) | undefined,
+  valueFormatter: string | ((params: RowValueFormatterParams<RowType>) => string) | undefined,
+) => {
+  if (filterValueGetter) return filterValueGetter;
+  // aggrid will default to valueGetter
+  if (typeof valueFormatter !== "function" || !field) return undefined;
+
+  return (params: RowValueGetterParams<RowType>) => {
+    const value = params.getValue(field);
+    let formattedValue = valueFormatter({ ...params, value });
+    // Search for null values using standard dash
+    if (formattedValue === "–") formattedValue += " -";
+    // Search by raw value as well as formatted
+    const gotValue = ["string", "number"].includes(typeof value) ? value : undefined;
+    return (formattedValue + (gotValue != null && formattedValue != gotValue ? " " + gotValue : "")) //
+      .replaceAll(/\s+/g, " ")
+      .trim();
+  };
+};
+
 /*
  * All cells should use this.
  */
@@ -81,6 +108,12 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     editorParams?: Props;
   },
 ): ColDefT<RowType> => {
+  // Generate a default filter value getter which uses the formatted value plus
+  // the editable value if it's a string and different from the formatted value.
+  // This is so that e.g. bearings can be searched for by DMS or raw number.
+  const valueFormatter = props.valueFormatter;
+  const filterValueGetter = generateFilterGetter(props.field, props.filterValueGetter, valueFormatter);
+
   return {
     colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
@@ -96,10 +129,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
       cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
     }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
-    ...(props.valueFormatter &&
-      !props.filterValueGetter && {
-        filterValueGetter: props.valueFormatter as string | ValueGetterFunc,
-      }),
+    filterValueGetter,
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
       if (params.value == null) return "–";

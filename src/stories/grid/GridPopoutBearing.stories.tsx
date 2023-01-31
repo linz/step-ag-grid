@@ -95,6 +95,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 
   return (
     <Grid
+      quickFilter={true}
       data-testid={"bearingsTestTable"}
       {...props}
       readOnly={false}
