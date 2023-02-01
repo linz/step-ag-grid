@@ -18,7 +18,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 import { MenuSeparatorString } from "./GridFormDropDown";
 import { CellEditorCommon } from "../GridCell";
 import { ClickEvent } from "../../react-menu3/types";
-import { GridSubComponentContext } from "contexts/GridSubComponentContext";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { FormError } from "../../lui/FormError";
 import { textMatch } from "../../utils/textMatcher";

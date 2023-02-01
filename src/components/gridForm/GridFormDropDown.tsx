@@ -7,7 +7,7 @@ import debounce from "debounce-promise";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { GridSubComponentContext } from "contexts/GridSubComponentContext";
+import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { ClickEvent, MenuInstance } from "../../react-menu3/types";
 import { FormError } from "../../lui/FormError";
 import { isNotEmpty } from "../../utils/util";
