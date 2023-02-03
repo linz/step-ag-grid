@@ -11,7 +11,7 @@ import { userEvent, waitFor, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 export default {
-  title: "GridForm / Interactions",
+  title: "GridForm / Interaction Tests",
   component: GridFormEditBearing,
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;

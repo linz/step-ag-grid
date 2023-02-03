@@ -57,7 +57,7 @@ export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTe
         error={invalid()}
         formatted={props.units}
         style={{ width: props.width ?? 240 }}
-        placeholder={props.placeholder}
+        placeholder={props.placeholder ?? "Type here"}
         helpText={helpText}
       />
     </div>,

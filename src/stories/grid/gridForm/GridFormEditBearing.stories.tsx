@@ -9,7 +9,7 @@ import { useRef } from "react";
 import { GridPopoverEditBearingEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
 
 export default {
-  title: "GridForm / Testing",
+  title: "GridForm / Static Tests",
   component: GridFormEditBearing,
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;

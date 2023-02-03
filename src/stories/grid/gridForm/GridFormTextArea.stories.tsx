@@ -9,7 +9,7 @@ import { useRef } from "react";
 import { GridBaseRow } from "../../../components/Grid";
 
 export default {
-  title: "GridForm / Testing",
+  title: "GridForm / Static Tests",
   component: GridFormTextArea,
   args: {},
 } as ComponentMeta<typeof GridFormTextArea>;
