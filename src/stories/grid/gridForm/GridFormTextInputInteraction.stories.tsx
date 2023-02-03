@@ -6,8 +6,8 @@ import { GridFormTextInput } from "../../../components/gridForm/GridFormTextInpu
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
-import { userEvent, waitFor, within } from "@storybook/testing-library";
-import { jest, expect } from "@storybook/jest";
+import { userEvent, within } from "@storybook/testing-library";
+import { expect, jest } from "@storybook/jest";
 
 export default {
   title: "GridForm / Interaction Tests",
@@ -44,9 +44,8 @@ export const GridFormTextInputInteractions_ = Template.bind({});
 GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  await waitFor(async () => {
-    expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
-  });
+  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+
   const inputField = canvas.getByPlaceholderText("Type here");
   userEvent.type(inputField, "Hello");
 
