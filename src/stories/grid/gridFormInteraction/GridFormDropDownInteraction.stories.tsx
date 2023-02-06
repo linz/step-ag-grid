@@ -6,17 +6,14 @@ import {
   GridFormDropDown,
   GridFormDropDownProps,
   GridPopoutEditDropDownSelectedItem,
-  MenuHeaderItem,
 } from "../../../components/gridForm/GridFormDropDown";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 import { GridFormSubComponentTextInput } from "../../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../../components/gridForm/GridFormSubComponentTextArea";
-import { userEvent, waitFor, within } from "@storybook/testing-library";
+import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
-import { act } from "react-dom/test-utils";
-import { wait } from "../../../utils/util";
 
 export default {
   title: "GridForm / Interactions",
@@ -26,10 +23,7 @@ export default {
 
 const updateValue = jest
   .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
-  .mockImplementation(async (saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => {
-    console.log("update value called saveFn");
-    await saveFn([]);
-  });
+  .mockImplementation((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
 
 const onSelectedItem = jest.fn<Promise<void>, [GridPopoutEditDropDownSelectedItem<any>]>().mockResolvedValue(undefined);
 
