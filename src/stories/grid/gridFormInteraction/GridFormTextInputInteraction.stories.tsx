@@ -2,23 +2,22 @@ import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormEditBearing } from "../../../components/gridForm/GridFormEditBearing";
+import { GridFormTextInput } from "../../../components/gridForm/GridFormTextInput";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
-import { GridPopoverEditBearingCorrectionEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
 import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 export default {
-  title: "GridForm / Interaction Tests",
-  component: GridFormEditBearing,
+  title: "GridForm / Interactions",
+  component: GridFormTextInput,
   args: {},
-} as ComponentMeta<typeof GridFormEditBearing>;
+} as ComponentMeta<typeof GridFormTextInput>;
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
+const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
@@ -34,28 +33,23 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
             } as any as GridPopoverContextType<any>
           }
         >
-          <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} />
+          <GridFormTextInput {...props} required={true} />
         </GridPopoverContext.Provider>
       </GridContextProvider>
     </div>
   );
 };
 
-export const GridFormEditBearingCorrectionInteractions_ = Template.bind({});
-GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
+export const GridFormTextInputInteractions_ = Template.bind({});
+GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
-  const inputField = canvas.getByPlaceholderText("Enter bearing correction");
+  const inputField = canvas.getByPlaceholderText("Type here");
+  userEvent.type(inputField, "Hello");
 
-  // Test formatting null
-  expect(await canvas.findByText("–")).toBeInTheDocument();
-
-  // Test formatting a bearing
-  expect(inputField).toBeInTheDocument();
-  userEvent.type(inputField, "1.2345");
-  expect(await canvas.findByText("+1° 23' 45.0\"")).toBeInTheDocument();
+  expect(canvas.getByText("Press enter or tab to save")).toBeInTheDocument();
 
   // Test enter to save
   updateValue.mockClear();
@@ -79,10 +73,9 @@ GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.type(inputField, "xxx");
-  expect(await canvas.findByText("?")).toBeInTheDocument();
+  userEvent.clear(inputField);
 
-  expect(canvas.getByText("Bearing must be a number in D.MMSSS format")).toBeInTheDocument();
+  expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
   userEvent.type(inputField, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
   userEvent.tab();

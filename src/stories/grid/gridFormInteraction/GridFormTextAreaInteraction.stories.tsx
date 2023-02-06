@@ -2,7 +2,7 @@ import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormTextInput } from "../../../components/gridForm/GridFormTextInput";
+import { GridFormTextArea } from "../../../components/gridForm/GridFormTextArea";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -10,14 +10,14 @@ import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 export default {
-  title: "GridForm / Interaction Tests",
-  component: GridFormTextInput,
+  title: "GridForm / Interactions",
+  component: GridFormTextArea,
   args: {},
-} as ComponentMeta<typeof GridFormTextInput>;
+} as ComponentMeta<typeof GridFormTextArea>;
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
+const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
@@ -33,15 +33,15 @@ const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
             } as any as GridPopoverContextType<any>
           }
         >
-          <GridFormTextInput {...props} required={true} />
+          <GridFormTextArea {...props} required={true} />
         </GridPopoverContext.Provider>
       </GridContextProvider>
     </div>
   );
 };
 
-export const GridFormTextInputInteractions_ = Template.bind({});
-GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
+export const GridFormTextAreaInteractions_ = Template.bind({});
+GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
@@ -49,12 +49,7 @@ GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   const inputField = canvas.getByPlaceholderText("Type here");
   userEvent.type(inputField, "Hello");
 
-  expect(canvas.getByText("Press enter or tab to save")).toBeInTheDocument();
-
-  // Test enter to save
-  updateValue.mockClear();
-  userEvent.type(inputField, "{Enter}");
-  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 0); // 0 = Enter
+  expect(await canvas.findByText("Press tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -76,8 +71,6 @@ GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   userEvent.clear(inputField);
 
   expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
-  userEvent.type(inputField, "{Enter}");
-  expect(updateValue).not.toHaveBeenCalled();
   userEvent.tab();
   expect(updateValue).not.toHaveBeenCalled();
   userEvent.tab({ shift: true });
