@@ -280,9 +280,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                         }
                       }}
                       onClick={(e: ClickEvent) => {
-                        if (item.subComponent) {
-                          e.keepOpen = true;
-                        }
+                        e.keepOpen = !!item.subComponent;
                       }}
                     >
                       {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
@@ -314,7 +312,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                           >
                             {item.subComponent && (
                               <div className={"subComponent"}>
-                                <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                                <item.subComponent />
                               </div>
                             )}
                           </GridSubComponentContext.Provider>

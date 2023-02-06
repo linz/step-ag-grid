@@ -397,29 +397,25 @@ const MenuSubComponent = (props: {
   const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
   return (
     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
-      {(_: any) =>
-        item.subComponent && (
-          <GridSubComponentContext.Provider
-            value={{
-              context: { options },
-              data,
-              value: item.subValue,
-              setValue: (value: any) => {
-                item.subValue = value;
-                setOptions([...options]);
-              },
-              setValid: (valid: boolean) => {
-                subComponentIsValid[`${item.value}`] = valid;
-              },
-              triggerSave,
-            }}
-          >
-            <div className={"subComponent"}>
-              <item.subComponent />
-            </div>
-          </GridSubComponentContext.Provider>
-        )
-      }
+      {() => (
+        <GridSubComponentContext.Provider
+          value={{
+            context: { options },
+            data,
+            value: item.subValue,
+            setValue: (value: any) => {
+              item.subValue = value;
+              setOptions([...options]);
+            },
+            setValid: (valid: boolean) => {
+              subComponentIsValid[`${item.value}`] = valid;
+            },
+            triggerSave,
+          }}
+        >
+          <div className={"subComponent"}>{item.subComponent && <item.subComponent />}</div>
+        </GridSubComponentContext.Provider>
+      )}
     </FocusableItem>
   );
 };

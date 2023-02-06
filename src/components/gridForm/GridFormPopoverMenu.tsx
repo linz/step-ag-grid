@@ -143,28 +143,24 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                   </MenuItem>
                   {item.subComponent && subComponentSelected === item && (
                     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                      {(_: any) =>
-                        item.subComponent && (
-                          <GridSubComponentContext.Provider
-                            value={{
-                              context: {},
-                              data,
-                              value: subSelectedValue,
-                              setValue: (value: any) => {
-                                setSubSelectedValue(value);
-                              },
-                              setValid: (valid: boolean) => {
-                                subComponentIsValid.current = valid;
-                              },
-                              triggerSave,
-                            }}
-                          >
-                            <div className={"subComponent"}>
-                              <item.subComponent />
-                            </div>
-                          </GridSubComponentContext.Provider>
-                        )
-                      }
+                      {() => (
+                        <GridSubComponentContext.Provider
+                          value={{
+                            context: {},
+                            data,
+                            value: subSelectedValue,
+                            setValue: (value: any) => {
+                              setSubSelectedValue(value);
+                            },
+                            setValid: (valid: boolean) => {
+                              subComponentIsValid.current = valid;
+                            },
+                            triggerSave,
+                          }}
+                        >
+                          <div className={"subComponent"}>{item.subComponent && <item.subComponent />}</div>
+                        </GridSubComponentContext.Provider>
+                      )}
                     </FocusableItem>
                   )}
                 </Fragment>
