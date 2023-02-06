@@ -13,6 +13,8 @@ import { useRef } from "react";
 import { userEvent, waitFor, within } from "@storybook/testing-library";
 import { jest, expect } from "@storybook/jest";
 import { GridBaseRow } from "../../../components/Grid";
+import { GridFormSubComponentTextInput } from "../../../components/gridForm/GridFormSubComponentTextInput";
+import { GridFormSubComponentTextArea } from "../../../components/gridForm/GridFormSubComponentTextArea";
 
 export default {
   title: "GridForm / Interaction Tests",
@@ -56,6 +58,20 @@ const Template: ComponentStory<typeof GridFormPopoverMenu> = (props) => {
               { label: "Enabled", value: 1, action: enabledAction },
               PopoutMenuSeparator,
               { label: "Disabled", value: 0, disabled: true, action: disabledAction },
+              {
+                label: "Sub text input",
+                value: 0,
+                subComponent: () => (
+                  <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+                ),
+              },
+              {
+                label: "Sub text area",
+                value: 0,
+                subComponent: () => (
+                  <GridFormSubComponentTextArea placeholder={"Text area"} maxLength={5} required defaultValue={""} />
+                ),
+              },
               { label: "ERROR! this should be hidden", value: 3, hidden: true },
             ]}
           />
@@ -69,14 +85,87 @@ export const GridFormPopoverMenuInteractions_ = Template.bind({});
 GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  const enabledMenuOption = await canvas.findByRole("menuitem", { name: "Enabled" });
+  const getOption = (name: string) => canvas.findByRole("menuitem", { name });
+
+  const enabledMenuOption = await getOption("Enabled");
   expect(enabledMenuOption).toBeInTheDocument();
   userEvent.click(enabledMenuOption);
   expect(enabledAction).toHaveBeenCalled();
 
   enabledAction.mockClear();
-  const disabledMenuOption = await canvas.findByRole("menuitem", { name: "Disabled" });
+  const disabledMenuOption = await getOption("Disabled");
   expect(disabledMenuOption).toBeInTheDocument();
   userEvent.click(disabledMenuOption);
   expect(disabledAction).not.toHaveBeenCalled();
+
+  // Sub input tests
+  const subTextInput = await getOption("Sub text input");
+  expect(subTextInput).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+
+  const subTextArea = await getOption("Sub text area");
+  expect(subTextArea).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
+
+  userEvent.click(subTextInput);
+  const textInput = await canvas.findByPlaceholderText("Text input");
+  expect(textInput).toBeInTheDocument();
+  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
+
+  userEvent.type(textInput, "Hello");
+  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+
+  // Test tab to save
+  updateValue.mockClear();
+  userEvent.tab();
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
+
+  // Test shift+tab to save
+  updateValue.mockClear();
+  userEvent.tab({ shift: true });
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
+
+  // Test escape to not save
+  updateValue.mockClear();
+  userEvent.type(textInput, "{Escape}");
+  expect(updateValue).not.toHaveBeenCalled();
+
+  // Test invalid value doesn't save
+  updateValue.mockClear();
+  userEvent.clear(textInput);
+  userEvent.type(textInput, "{Enter}");
+  expect(updateValue).not.toHaveBeenCalled();
+
+  // Sub text area tests
+  subTextArea.click();
+
+  const textArea = await canvas.findByPlaceholderText("Text area");
+  expect(textArea).toBeInTheDocument();
+  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+
+  userEvent.type(textArea, "Hello");
+  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+
+  // Test tab to save
+  updateValue.mockClear();
+  userEvent.tab();
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
+
+  // Test shift+tab to save
+  updateValue.mockClear();
+  userEvent.tab({ shift: true });
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
+
+  // Test escape to not save
+  updateValue.mockClear();
+  userEvent.type(textArea, "{Escape}");
+  expect(updateValue).not.toHaveBeenCalled();
+
+  // Test invalid value doesn't save
+  updateValue.mockClear();
+  userEvent.clear(textArea);
+  userEvent.type(textArea, "{Enter}");
+  expect(updateValue).not.toHaveBeenCalled();
 };

@@ -66,7 +66,7 @@ GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
 
-  // Test shift+tab to save
+  // Test escape not to save
   updateValue.mockClear();
   userEvent.type(inputField, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
