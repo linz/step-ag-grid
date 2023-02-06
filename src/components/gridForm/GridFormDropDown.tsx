@@ -74,7 +74,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
   const subComponentInitialValue = useRef<string | null>(null);
   const [subSelectedValue, setSubSelectedValue] = useState<any>(null);
   // Note: null is assumed to be the filter
-  const selectedItem = useRef<FinalSelectOption | null>(null);
+  const [selectedItem, setSelectedItem] = useState<FinalSelectOption | null>(null);
 
   const selectItemHandler = useCallback(
     async (value: any, subComponentValue?: any): Promise<boolean> => {
@@ -169,7 +169,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
     if (!options) return true;
 
     // Filter saved
-    if (selectedItem.current === null) {
+    if (selectedItem === null) {
       if (props.onSelectFilter) {
         const { onSelectFilter } = props;
         await onSelectFilter({ selectedRows, value: filter });
@@ -182,15 +182,15 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
       }
       return false;
     }
-    if (selectedItem.current.subComponent && !subComponentIsValid.current) return false;
-    await selectItemHandler(selectedItem.current.value, subSelectedValue);
+    if (selectedItem.subComponent && !subComponentIsValid.current) return false;
+    await selectItemHandler(selectedItem.value, subSelectedValue);
 
     return true;
-  }, [filter, filteredValues, options, props, selectItemHandler, selectedRows, subSelectedValue]);
+  }, [filter, filteredValues, options, props, selectItemHandler, selectedItem, selectedRows, subSelectedValue]);
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
-    invalid: () => !!(selectedItem.current && !subComponentIsValid.current),
+    invalid: () => !!(selectedItem && !subComponentIsValid.current),
     save,
     dontSaveOnExternalClick: true,
   });
@@ -205,7 +205,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
           <FocusableItem
             className={"filter-item"}
             onFocus={() => {
-              selectedItem.current = null;
+              setSelectedItem(null);
               setSubSelectedValue(null);
               subComponentIsValid.current = true;
             }}
@@ -270,7 +270,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                       value={item.value}
                       onFocus={() => {
-                        selectedItem.current = item;
+                        setSelectedItem(item);
                         if (item.subComponent) {
                           subComponentIsValid.current = true;
                           subComponentInitialValue.current = null;
@@ -280,15 +280,16 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                         }
                       }}
                       onClick={(e: ClickEvent) => {
-                        selectedItem.current = item;
-                        e.keepOpen = !!item.subComponent;
+                        if (item.subComponent) {
+                          e.keepOpen = true;
+                        }
                       }}
                     >
                       {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
                       {item.subComponent ? "..." : ""}
                     </MenuItem>
 
-                    {item.subComponent && selectedItem.current === item && (
+                    {item.subComponent && selectedItem === item && (
                       <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
                         {() => (
                           <GridSubComponentContext.Provider
@@ -307,7 +308,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                                 subComponentIsValid.current = valid;
                               },
                               triggerSave: async () => {
-                                //empty
+                                // empty
                               },
                             }}
                           >
