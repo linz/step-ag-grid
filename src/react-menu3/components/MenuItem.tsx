@@ -128,7 +128,7 @@ const MenuItemFr = ({
   };
 
   /**
-   * Keyboard events are triggered on up, otherwise sub-components get spaces and enters typed in them
+   * Keyboard events are triggered on up, otherwise subcomponents get spaces and enters typed in them
    */
   const handleKeyUp = (e: KeyboardEvent) => {
     if (!isHovering) return;
