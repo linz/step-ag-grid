@@ -14,6 +14,7 @@ import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverEditDropDown } from "../../components/gridPopoverEdit/GridPopoverEditDropDown";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
+import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 
 export default {
   title: "Components / Grids",
@@ -234,9 +235,16 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
                 },
                 {
                   value: "oth",
-                  label: "Other",
+                  label: "Other text input",
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other..."} defaultValue={""} required={true} />
+                    <GridFormSubComponentTextInput placeholder={"Other..."} defaultValue={"a"} required={true} />
+                  ),
+                },
+                {
+                  value: "oth",
+                  label: "Other text area",
+                  subComponent: () => (
+                    <GridFormSubComponentTextArea placeholder={"Other..."} defaultValue={"b"} required={true} />
                   ),
                 },
               ];
