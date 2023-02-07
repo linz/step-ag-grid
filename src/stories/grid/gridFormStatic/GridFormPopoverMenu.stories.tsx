@@ -13,7 +13,7 @@ import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopover
 import { GridBaseRow } from "../../../components/Grid";
 
 export default {
-  title: "GridForm / Testing",
+  title: "GridForm / Static Tests",
   component: GridFormPopoverMenu,
   args: {},
 } as ComponentMeta<typeof GridFormPopoverMenu>;

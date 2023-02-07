@@ -18,6 +18,7 @@ export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaE
   mandatory?: boolean;
   helpText?: string;
   error?: JSX.Element | string | boolean | null;
+  allowTabToSave?: boolean;
 }
 
 export const TextAreaInput = (props: LuiTextAreaInputProps) => {
@@ -50,6 +51,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
               }
               props.onMouseEnter && props.onMouseEnter(e);
             }}
+            data-allowtabtosave={props.allowTabToSave}
           >
             {props.value}
           </textarea>

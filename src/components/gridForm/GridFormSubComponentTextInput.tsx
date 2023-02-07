@@ -41,6 +41,7 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
       autoFocus={true}
       placeholder={props.placeholder}
       style={{ width: "100%" }}
+      allowTabToSave={true}
     />
   );
 };

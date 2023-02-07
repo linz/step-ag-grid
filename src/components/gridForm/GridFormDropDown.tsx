@@ -8,7 +8,7 @@ import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { ClickEvent, MenuInstance } from "../../react-menu3/types";
+import { ClickEvent } from "../../react-menu3/types";
 import { FormError } from "../../lui/FormError";
 import { isNotEmpty } from "../../utils/util";
 
@@ -270,19 +270,17 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                       value={item.value}
                       onFocus={() => {
-                        setSelectedItem(item);
-                        if (item.subComponent) {
-                          subComponentIsValid.current = true;
-                          subComponentInitialValue.current = null;
-                        } else {
+                        if (selectedItem !== item) {
+                          setSelectedItem(item);
                           setSubSelectedValue(null);
                           subComponentIsValid.current = true;
+                          if (item.subComponent) {
+                            subComponentInitialValue.current = null;
+                          }
                         }
                       }}
                       onClick={(e: ClickEvent) => {
-                        if (item.subComponent) {
-                          e.keepOpen = true;
-                        }
+                        e.keepOpen = !!item.subComponent;
                       }}
                     >
                       {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
@@ -291,7 +289,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
 
                     {item.subComponent && selectedItem === item && (
                       <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
-                        {(ref: MenuInstance) => (
+                        {() => (
                           <GridSubComponentContext.Provider
                             value={{
                               context: { options },
@@ -308,13 +306,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                                 subComponentIsValid.current = valid;
                               },
                               triggerSave: async () => {
-                                ref.closeMenu();
+                                // empty
                               },
                             }}
                           >
                             {item.subComponent && (
                               <div className={"subComponent"}>
-                                <item.subComponent key={`${fieldToString(field)}-${index}_subcomponent_inner`} />
+                                <item.subComponent />
                               </div>
                             )}
                           </GridSubComponentContext.Provider>

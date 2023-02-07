@@ -44,6 +44,7 @@ export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
         helpText={helpText}
         autoFocus={true}
         placeholder={props.placeholder}
+        allowTabToSave={true}
       />
     </div>
   );

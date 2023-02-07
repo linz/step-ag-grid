@@ -6,10 +6,10 @@ import { GridFormEditBearing, GridFormEditBearingProps } from "../../../componen
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
-import { GridPopoverEditBearingCorrectionEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
+import { GridPopoverEditBearingEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
 
 export default {
-  title: "GridForm / Testing",
+  title: "GridForm / Static Tests",
   component: GridFormEditBearing,
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;
@@ -18,8 +18,8 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
   const values: [string, GridFormEditBearingProps<any>, number | null][] = [
     ["Null value", {}, null],
     ["Custom placeholder", { placeHolder: "Custom placeholder" }, null],
-    ["Valid value", {}, -10],
-    ["With error", {}, 360],
+    ["Valid value", {}, 90],
+    ["With error", {}, 1.234567],
   ];
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const anchorRefs = values.map(() => useRef<HTMLHeadingElement>(null));
@@ -38,7 +38,7 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
                 } as any as GridPopoverContextType<any>
               }
             >
-              <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} {...value[1]} />
+              <GridFormEditBearing {...props} {...GridPopoverEditBearingEditorParams} {...value[1]} />
             </GridPopoverContext.Provider>
           </>
         ))}
@@ -47,4 +47,4 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
   );
 };
 
-export const GridFormEditBearingCorrection_ = Template.bind({});
+export const GridFormEditBearing_ = Template.bind({});

@@ -2,23 +2,23 @@ import "@linzjs/lui/dist/scss/base.scss";
 import "@linzjs/lui/dist/fonts";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormTextArea, GridFormTextAreaProps } from "../../../components/gridForm/GridFormTextArea";
+import { GridFormTextInput, GridFormTextInputProps } from "../../../components/gridForm/GridFormTextInput";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 import { GridBaseRow } from "../../../components/Grid";
 
 export default {
-  title: "GridForm / Testing",
-  component: GridFormTextArea,
+  title: "GridForm / Static Tests",
+  component: GridFormTextInput,
   args: {},
-} as ComponentMeta<typeof GridFormTextArea>;
+} as ComponentMeta<typeof GridFormTextInput>;
 
-const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
-  const configs: [string, GridFormTextAreaProps<GridBaseRow>, string?][] = [
-    ["Text area", {}],
-    ["Text area with text", {}, "Some text"],
-    ["Text area with error & placeholder", { required: true, placeholder: "Custom placeholder" }],
+const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
+  const configs: [string, GridFormTextInputProps<GridBaseRow>, string?][] = [
+    ["Text input", {}],
+    ["Text input with text", {}, "Some text"],
+    ["Text input with error & placeholder", { required: true, placeholder: "Custom placeholder" }],
   ];
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const anchorRefs = configs.map(() => useRef<HTMLHeadingElement>(null));
@@ -32,7 +32,7 @@ const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
             <GridPopoverContext.Provider
               value={{ anchorRef: anchorRefs[index], value: config[2] } as any as GridPopoverContextType<any>}
             >
-              <GridFormTextArea {...props} {...config[1]} />
+              <GridFormTextInput {...props} {...config[1]} />
             </GridPopoverContext.Provider>
           </>
         ))}
@@ -41,4 +41,4 @@ const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
   );
 };
 
-export const GridFormTextArea_ = Template.bind({});
+export const GridFormTextInput_ = Template.bind({});

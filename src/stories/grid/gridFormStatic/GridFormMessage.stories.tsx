@@ -8,7 +8,7 @@ import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopover
 import { useRef } from "react";
 
 export default {
-  title: "GridForm / Testing",
+  title: "GridForm / Static Tests",
   component: GridFormMessage,
   args: {},
 } as ComponentMeta<typeof GridFormMessage>;
