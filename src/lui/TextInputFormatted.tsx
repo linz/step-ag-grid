@@ -14,6 +14,7 @@ export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes
   helpText?: string;
   error?: JSX.Element | string | boolean | null;
   formatted?: string;
+  allowTabToSave?: boolean;
 }
 
 export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
@@ -31,6 +32,7 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
             e.currentTarget.focus();
             props.onMouseEnter && props.onMouseEnter(e);
           }}
+          data-allowtabtosave={props.allowTabToSave}
         />
         <span className={"LuiTextInput-formatted"}>{props.formatted}</span>
       </span>
