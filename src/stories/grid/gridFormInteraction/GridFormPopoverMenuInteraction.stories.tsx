@@ -146,7 +146,7 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
 
   userEvent.type(textArea, "Hello");
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  expect(await canvas.findByText("Press tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
