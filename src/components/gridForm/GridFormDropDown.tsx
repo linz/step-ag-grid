@@ -270,13 +270,13 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
                       title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                       value={item.value}
                       onFocus={() => {
-                        setSelectedItem(item);
-                        if (item.subComponent) {
-                          subComponentIsValid.current = true;
-                          subComponentInitialValue.current = null;
-                        } else {
+                        if (selectedItem !== item) {
+                          setSelectedItem(item);
                           setSubSelectedValue(null);
                           subComponentIsValid.current = true;
+                          if (item.subComponent) {
+                            subComponentInitialValue.current = null;
+                          }
                         }
                       }}
                       onClick={(e: ClickEvent) => {
