@@ -10,7 +10,7 @@ module.exports = {
     "^.+\\.css$": "<rootDir>/config/jest/cssTransform.cjs",
     "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.cjs",
   },
-  transformIgnorePatterns: ["node_modules/(?!(ol|@geoblocks/ol-maplibre-layer|geotiff|quick-lru)|lodash-es|lodash/)"],
+  transformIgnorePatterns: ["node_modules/(?!(ol|@geoblocks/ol-maplibre-layer|geotiff|quick-lru)|lodash-es|lodash|escape-string-regexp|matcher/)"],
   moduleNameMapper: {
     "^@components/(.*)$": "<rootDir>/src/components/$1",
   },

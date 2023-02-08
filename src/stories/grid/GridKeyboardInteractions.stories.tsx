@@ -16,7 +16,7 @@ import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { GridIcon } from "../../components/GridIcon";
-import { userEvent, waitFor, within } from "@storybook/testing-library";
+import { userEvent, waitFor } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
 
 export default {
