@@ -40,7 +40,7 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
           {/* wrapper div used for error styling */}
           <textarea
             rows={5}
-            {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
+            {...omit(props, ["error", "value", "helpText", "formatted", "className", "allowTabToSave"])}
             id={id}
             value={props.value ?? ""}
             spellCheck={true}

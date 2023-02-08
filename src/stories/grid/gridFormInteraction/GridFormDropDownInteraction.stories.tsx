@@ -127,4 +127,11 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   userEvent.clear(textInput);
   userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
+
+  // Test filter
+  const filterText = await canvas.findByPlaceholderText("Filter...");
+  userEvent.type(filterText, "ena");
+  expect(canvas.queryByText("Enabled")).toBeInTheDocument();
+  expect(canvas.queryByText("Disabled")).not.toBeInTheDocument();
+  expect(canvas.queryByText("Sub menu...")).not.toBeInTheDocument();
 };

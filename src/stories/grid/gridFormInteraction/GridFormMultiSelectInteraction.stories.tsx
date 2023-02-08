@@ -14,6 +14,7 @@ import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopover
 import { GridFormSubComponentTextInput } from "../../../components/gridForm/GridFormSubComponentTextInput";
 import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { wait } from "../../../utils/util";
 
 export default {
   title: "GridForm / Interactions",
@@ -37,6 +38,7 @@ const options = Object.freeze([
       <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
     ),
   },
+  { label: "Other", value: 3 },
 ]) as MultiSelectOption[];
 
 const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
@@ -98,6 +100,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   expect(textInput).toBeInTheDocument();
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
+  userEvent.click(textInput);
   userEvent.type(textInput, "Hello");
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 
@@ -135,4 +138,16 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSave).not.toHaveBeenCalled();
+
+  // Test filter
+  const filterText = await canvas.findByPlaceholderText("Filter...");
+  userEvent.type(filterText, "o");
+  await wait(500);
+  expect(canvas.queryByText("One")).toBeInTheDocument();
+  expect(canvas.queryByText("Other")).toBeInTheDocument();
+  userEvent.type(filterText, "n");
+  expect(canvas.queryByText("One")).toBeInTheDocument();
+  expect(canvas.queryByText("Zero")).not.toBeInTheDocument();
+  expect(canvas.queryByText("Sub component")).not.toBeInTheDocument();
+  expect(canvas.queryByText("Other")).not.toBeInTheDocument();
 };

@@ -127,6 +127,25 @@ export const ControlledMenuFr = (
         return;
       }
 
+      const invokeSave = (reason: string) => {
+        if (!saveButtonRef?.current) return;
+        saveButtonRef.current?.setAttribute("data-reason", reason);
+        saveButtonRef?.current?.click();
+      };
+
+      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") == "true";
+      if (allowTabToSave) {
+        if (isDown) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          lastTabDownEl.current = activeElement;
+        } else {
+          lastTabDownEl.current == activeElement &&
+            invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
+        }
+        return;
+      }
+
       const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
@@ -138,12 +157,6 @@ export const ControlledMenuFr = (
 
       const isTextArea = activeElement.nodeName === "TEXTAREA";
       const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") == "true" || isTextArea;
-      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") == "true";
-      const invokeSave = (reason: string) => {
-        if (!saveButtonRef?.current) return;
-        saveButtonRef.current?.setAttribute("data-reason", reason);
-        saveButtonRef?.current?.click();
-      };
 
       switch (activeElement.nodeName) {
         case "TEXTAREA":
