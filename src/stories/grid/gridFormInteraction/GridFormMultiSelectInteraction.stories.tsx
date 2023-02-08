@@ -4,45 +4,48 @@ import "@linzjs/lui/dist/fonts";
 import { useRef } from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import {
-  GridFormDropDown,
-  GridFormDropDownProps,
-  GridPopoutEditDropDownSelectedItem,
-} from "../../../components/gridForm/GridFormDropDown";
+  GridFormMultiSelect,
+  GridFormMultiSelectProps,
+  GridFormMultiSelectSaveProps,
+  MultiSelectOption,
+} from "../../../components/gridForm/GridFormMultiSelect";
 import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { GridFormSubComponentTextInput } from "../../../components/gridForm/GridFormSubComponentTextInput";
 import { userEvent, within } from "@storybook/testing-library";
 import { expect, jest } from "@storybook/jest";
+import { wait } from "../../../utils/util";
 
 export default {
   title: "GridForm / Interactions",
-  component: GridFormDropDown,
+  component: GridFormMultiSelect,
   args: {},
-} as ComponentMeta<typeof GridFormDropDown>;
+} as ComponentMeta<typeof GridFormMultiSelect>;
 
 const updateValue = jest
   .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
   .mockImplementation((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
 
-const onSelectedItem = jest
-  .fn<Promise<void>, [GridPopoutEditDropDownSelectedItem<any>]>()
-  .mockImplementation(async () => undefined);
+const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().mockImplementation(async () => true);
 
-const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
-  const config: GridFormDropDownProps<any> = {
-    filtered: "local",
-    onSelectedItem,
-    options: [
-      { label: "Enabled", value: 1 },
-      { label: "Disabled", value: 0, disabled: true },
-      {
-        label: "Sub menu",
-        value: 0,
-        subComponent: () => (
-          <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
-        ),
-      },
-    ],
+const options = Object.freeze([
+  { label: "Zero", value: 0 },
+  { label: "One", value: 1 },
+  {
+    label: "Sub component",
+    value: 2,
+    subComponent: () => (
+      <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+    ),
+  },
+  { label: "Other", value: 3 },
+]) as MultiSelectOption[];
+
+const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
+  const config: GridFormMultiSelectProps<any> = {
+    filtered: true,
+    onSave,
+    options,
   };
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
@@ -63,7 +66,7 @@ const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
               } as any as GridPopoverContextType<any>
             }
           >
-            <GridFormDropDown {...props} {...config} />
+            <GridFormMultiSelect {...props} {...config} />
           </GridPopoverContext.Provider>
         </div>
       </GridContextProvider>
@@ -71,30 +74,23 @@ const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
   );
 };
 
-export const GridFormDropDownInteractions_ = Template.bind({});
-GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
+export const GridFormMultiSelectInteractions_ = Template.bind({});
+GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  const getOption = (name: string) => canvas.findByRole("menuitem", { name });
+  const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
 
   // Check enabled menu handles click
-  const enabledMenuOption = await getOption("Enabled");
-  expect(enabledMenuOption).toBeInTheDocument();
+  const zeroMenuOption = await getOption(/Zero/);
+  expect(zeroMenuOption).toBeInTheDocument();
 
-  userEvent.click(enabledMenuOption);
+  userEvent.click(zeroMenuOption);
+  userEvent.keyboard("{Tab}");
   expect(updateValue).toHaveBeenCalled();
-  expect(onSelectedItem).toHaveBeenCalled();
-
-  // Check disabled menu ignores click
-  updateValue.mockClear();
-  onSelectedItem.mockClear();
-  const disabledMenuOption = await getOption("Disabled");
-  userEvent.click(disabledMenuOption);
-  expect(updateValue).not.toHaveBeenCalled();
-  expect(onSelectedItem).not.toHaveBeenCalled();
+  expect(onSave).toHaveBeenCalledWith({ selectedOptions: [options[0]], selectedRows: [] });
 
   // Check sub menu works
-  const subTextInput = await getOption("Sub menu...");
+  const subTextInput = await getOption(/Sub component/);
   expect(subTextInput).toBeInTheDocument();
 
   expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
@@ -104,34 +100,54 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   expect(textInput).toBeInTheDocument();
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
+  userEvent.click(textInput);
   userEvent.type(textInput, "Hello");
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
+  onSave.mockClear();
   userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
+  expect(onSave).toHaveBeenCalledWith({
+    selectedRows: [],
+    selectedOptions: [
+      { label: "Zero", value: 0, checked: true },
+      { label: "Sub component", value: 2, checked: true, subValue: "Hello", subComponent: expect.anything() },
+    ],
+  });
 
   // Test shift+tab to save
   updateValue.mockClear();
+  onSave.mockClear();
   userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
+  expect(onSave).toHaveBeenCalled();
 
   // Test escape to not save
   updateValue.mockClear();
+  onSave.mockClear();
   userEvent.type(textInput, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
+  expect(onSave).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
+  onSave.mockClear();
   userEvent.clear(textInput);
   userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
+  expect(onSave).not.toHaveBeenCalled();
 
   // Test filter
   const filterText = await canvas.findByPlaceholderText("Filter...");
-  userEvent.type(filterText, "ena");
-  expect(canvas.queryByText("Enabled")).toBeInTheDocument();
-  expect(canvas.queryByText("Disabled")).not.toBeInTheDocument();
-  expect(canvas.queryByText("Sub menu...")).not.toBeInTheDocument();
+  userEvent.type(filterText, "o");
+  await wait(500);
+  expect(canvas.queryByText("One")).toBeInTheDocument();
+  expect(canvas.queryByText("Other")).toBeInTheDocument();
+  userEvent.type(filterText, "n");
+  expect(canvas.queryByText("One")).toBeInTheDocument();
+  expect(canvas.queryByText("Zero")).not.toBeInTheDocument();
+  expect(canvas.queryByText("Sub component")).not.toBeInTheDocument();
+  expect(canvas.queryByText("Other")).not.toBeInTheDocument();
 };

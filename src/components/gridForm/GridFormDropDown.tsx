@@ -11,6 +11,7 @@ import { GridSubComponentContext } from "../../contexts/GridSubComponentContext"
 import { ClickEvent } from "../../react-menu3/types";
 import { FormError } from "../../lui/FormError";
 import { isNotEmpty } from "../../utils/util";
+import { textMatch } from "../../utils/textMatcher";
 
 export interface GridPopoutEditDropDownSelectedItem<RowType> {
   // Note the row that was clicked on will be first
@@ -136,8 +137,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
               console.error("Cannot filter non-string labels", option);
               return undefined;
             }
-            const str = (option.label as string) || "";
-            return str.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ? option : undefined;
+            return textMatch((option.label as string) || "", filter) ? option : undefined;
           })
           .filter((r) => r !== undefined),
       );

@@ -81,8 +81,8 @@ const GridDemo = () => {
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: (props) => props.value === "Tester" && "Testers are testing",
-          info: (props) => props.value === "Developer" && "Developers are awesome",
+          warning: ({value}) => value === "Tester" && "Testers are testing",
+          info: ({value}) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridPopoverEditDropDown(
@@ -107,8 +107,8 @@ const GridDemo = () => {
         {
           multiEdit: true,
           editorParams: {
-            message: async (formParams) => {
-              return `There are ${formParams.selectedRows.length} row(s) selected`;
+            message: async ({selectedRows}) => {
+              return `There are ${selectedRows.length} row(s) selected`;
             },
           },
         },

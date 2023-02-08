@@ -42,7 +42,7 @@ interface ITestRow {
   bearing: string | number | null;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -57,8 +57,8 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           field: "bearingCorrection",
           headerName: "Bearing correction",
           cellRendererParams: {
-            warning: (props) => props.data.id == 1002 && "Testers are testing",
-            info: (props) => props.data.id == 1001 && "Developers are developing",
+            warning: ({ data }) => data.id == 1002 && "Testers are testing",
+            info: ({ data }) => data.id == 1001 && "Developers are developing",
           },
         },
         {
@@ -108,4 +108,4 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 };
 
-export const Bearings = GridReadOnlyTemplate.bind({});
+export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});

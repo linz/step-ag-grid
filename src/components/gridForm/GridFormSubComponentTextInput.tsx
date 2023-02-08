@@ -38,7 +38,6 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
       error={invalid()}
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
-      autoFocus={true}
       placeholder={props.placeholder}
       style={{ width: "100%" }}
       allowTabToSave={true}

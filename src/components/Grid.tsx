@@ -340,33 +340,35 @@ export const Grid = (params: GridProps): JSX.Element => {
           />
         </div>
       )}
-      <AgGridReact
-        animateRows={params.animateRows}
-        rowClassRules={params.rowClassRules}
-        defaultColDef={params.defaultColDef}
-        getRowId={(params) => `${params.data.id}`}
-        suppressRowClickSelection={true}
-        rowSelection={params.rowSelection ?? "multiple"}
-        suppressBrowserResizeObserver={true}
-        colResizeDefault={"shift"}
-        onFirstDataRendered={sizeColumnsToFit}
-        onGridSizeChanged={sizeColumnsToFit}
-        suppressClickEdit={true}
-        onCellKeyPress={onCellKeyPress}
-        onCellClicked={onCellClicked}
-        onCellDoubleClicked={onCellDoubleClick}
-        onCellEditingStarted={refreshSelectedRows}
-        domLayout={params.domLayout}
-        columnDefs={columnDefs}
-        rowData={params.rowData}
-        noRowsOverlayComponent={noRowsOverlayComponent}
-        onGridReady={onGridReady}
-        onSortChanged={ensureSelectedRowIsVisible}
-        postSortRows={params.postSortRows ?? postSortRows}
-        onSelectionChanged={synchroniseExternalStateToGridSelection}
-        onColumnMoved={params.onColumnMoved}
-        alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
-      />
+      <div style={{ flex: 1 }}>
+        <AgGridReact
+          animateRows={params.animateRows}
+          rowClassRules={params.rowClassRules}
+          defaultColDef={params.defaultColDef}
+          getRowId={(params) => `${params.data.id}`}
+          suppressRowClickSelection={true}
+          rowSelection={params.rowSelection ?? "multiple"}
+          suppressBrowserResizeObserver={true}
+          colResizeDefault={"shift"}
+          onFirstDataRendered={sizeColumnsToFit}
+          onGridSizeChanged={sizeColumnsToFit}
+          suppressClickEdit={true}
+          onCellKeyPress={onCellKeyPress}
+          onCellClicked={onCellClicked}
+          onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStarted={refreshSelectedRows}
+          domLayout={params.domLayout}
+          columnDefs={columnDefs}
+          rowData={params.rowData}
+          noRowsOverlayComponent={noRowsOverlayComponent}
+          onGridReady={onGridReady}
+          onSortChanged={ensureSelectedRowIsVisible}
+          postSortRows={params.postSortRows ?? postSortRows}
+          onSelectionChanged={synchroniseExternalStateToGridSelection}
+          onColumnMoved={params.onColumnMoved}
+          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
+        />
+      </div>
     </div>
   );
 };

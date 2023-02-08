@@ -41,6 +41,11 @@ export interface GridFormMultiSelectGroup {
   filter?: string;
 }
 
+export interface GridFormMultiSelectSaveProps<RowType extends GridBaseRow> {
+  selectedRows: RowType[];
+  selectedOptions: MultiSelectOption[];
+}
+
 export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends CellEditorCommon {
   className?:
     | "GridMultiSelect-containerSmall"
@@ -54,7 +59,7 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends C
   filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
   noOptionsMessage?: string;
   onSelectFilter?: (props: { filter: string; options: MultiSelectOption[] }) => void;
-  onSave?: (props: { selectedRows: RowType[]; selectedOptions: MultiSelectOption[] }) => Promise<boolean>;
+  onSave?: (props: GridFormMultiSelectSaveProps<RowType>) => Promise<boolean>;
   headers?: GridFormMultiSelectGroup[];
   options: MultiSelectOption[] | ((selectedRows: RowType[]) => Promise<MultiSelectOption[]> | MultiSelectOption[]);
   invalid?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => boolean;

@@ -128,6 +128,7 @@ export const validateMenuOptions = async (
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
   await act(async () => {
     const menuOption = await findMenuOption(menuOptionText);
+    // eslint-disable-next-line testing-library/await-async-utils
     userEvent.click(menuOption);
   });
 };

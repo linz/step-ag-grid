@@ -42,7 +42,6 @@ export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         helpText={helpText}
-        autoFocus={true}
         placeholder={props.placeholder}
         allowTabToSave={true}
       />

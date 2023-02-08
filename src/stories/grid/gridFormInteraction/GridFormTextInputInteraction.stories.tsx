@@ -23,7 +23,7 @@ const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
   return (
     <div className={"react-menu-inline-test"}>
       <GridContextProvider>
-        <h6 ref={anchorRef}>Test</h6>
+        <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
           value={
             {

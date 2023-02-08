@@ -26,7 +26,7 @@ export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
           type={"text"}
           spellCheck={true}
           defaultValue={props.value}
-          {...omit(props, ["error", "value", "helpText", "formatted", "className"])}
+          {...omit(props, ["error", "value", "helpText", "formatted", "className", "allowTabToSave"])}
           className={"LuiTextInput-input"}
           onMouseEnter={(e) => {
             e.currentTarget.focus();
