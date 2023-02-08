@@ -42,7 +42,7 @@ interface ITestRow {
   bearing: string | number | null;
 }
 
-const GridPopoutBearingTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -108,4 +108,4 @@ const GridPopoutBearingTemplate: ComponentStory<typeof Grid> = (props: GridProps
   );
 };
 
-export const _GridPopoutBearingTemplate = GridPopoutBearingTemplate.bind({});
+export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
