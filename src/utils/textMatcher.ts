@@ -5,7 +5,7 @@ import { isMatch } from "matcher";
  * Text matching with wildcards and multiple matchers.
  *
  * "L" => L*
- * "L*" => L*
+ * "=L" => L
  * "*L*" => *L*
  * "*L" => *L
  * "A B" => A* and B*
@@ -19,8 +19,15 @@ export const textMatch = (text: string | undefined | null, filter: string): bool
   const superFilters = filter
     .split(",")
     .map((sf) => sf.trim())
-    .filter((sf) => sf);
+    .filter((sf) => sf)
+    .map((r) =>
+      r
+        .split(/\s+/)
+        .map((f) => (f.startsWith("=") ? f.slice(1) : f + "*"))
+        .join(" "),
+    );
   const [negativeFilters, positiveFilters] = partition(superFilters, (superFilters) => superFilters.startsWith("!"));
+
   const values = text.replaceAll(",", " ").trim().split(/\s+/);
   return (
     (isEmpty(positiveFilters) || // Not filtered
