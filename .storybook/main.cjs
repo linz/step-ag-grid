@@ -6,7 +6,7 @@ module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   // Specifying the add-ons for Storybook if requiring specific addons to make a story work then add them here
   addons: [
-    "@storybook/addon-actions",
+    "@storybook/addon-essentials",
     "@storybook/addon-interactions",
   ],
   webpackFinal: async (config) => {

@@ -169,11 +169,12 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
               filterPlaceholder={props.filterPlaceholder}
             />
           )}
-          {headerGroups && (isEmpty(headerGroups) || !toPairs(headerGroups).some(([_, options]) => !isEmpty(options))) && (
-            <MenuItem key={"noOptions"} className={"GridMultiSelect-noOptions"} disabled={true}>
-              {props.noOptionsMessage ?? "No Options"}
-            </MenuItem>
-          )}
+          {headerGroups &&
+            (isEmpty(headerGroups) || !toPairs(headerGroups).some(([_, options]) => !isEmpty(options))) && (
+              <MenuItem key={"noOptions"} className={"GridMultiSelect-noOptions"} disabled={true}>
+                {props.noOptionsMessage ?? "No Options"}
+              </MenuItem>
+            )}
           {headerGroups && !isEmpty(headerGroups) && (
             <div className={"GridFormMultiSelect-options"}>
               {headers.map((header, index) => {
