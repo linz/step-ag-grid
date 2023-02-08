@@ -1,28 +1,26 @@
 const path = require("path");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 module.exports = {
+  core: { builder: 'webpack5', },
   // Specifying the location of the stories and file formats of what stories can be
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  // Specifying the add ons for Storybook if requiring specific add ons to make a story work then add them here
+  // Specifying the add-ons for Storybook if requiring specific addons to make a story work then add them here
   addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "storybook-addon-mock/register",
+    "@storybook/addon-actions",
     "@storybook/addon-interactions",
   ],
   webpackFinal: async (config) => {
+    config.resolve.fallback = {
+      crypto: false,
+    };
+
     // Handling scss files when used within components consumed by a story
     config.module.rules.push({
       test: /\.scss$/,
       use: [
         "style-loader",
         "css-loader",
-        {
-          loader: "sass-loader",
-          options: {
-            webpackImporter: true,
-          },
-        },
+        "sass-loader",
       ],
       include: path.resolve(__dirname, "../"),
     });
@@ -47,6 +45,7 @@ module.exports = {
         ],
       },
     });
+
     // Resolving the paths for dynamic locations (@components -> ./xxx/xxx/xxx/Components)
     config.resolve.plugins = [
       ...(config.resolve.plugins || []),
