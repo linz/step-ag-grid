@@ -44,7 +44,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
           {colDef.cellRendererParams?.originalCellRenderer ? (
             <colDef.cellRendererParams.originalCellRenderer {...props} />
           ) : (
-            <span title={props.valueFormatted}>{props.valueFormatted}</span>
+            <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
           )}
         </div>
         {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
