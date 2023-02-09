@@ -38,5 +38,5 @@ export const useMenuState = (
     exit: getTransition(transition, "close"),
   });
 
-  return [{ state: MenuStateMap[state], endTransition }, toggleMenu];
+  return [{ state: MenuStateMap[state.status], endTransition }, toggleMenu];
 };
