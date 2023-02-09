@@ -316,6 +316,11 @@ export const Grid = (params: GridProps): JSX.Element => {
     }
   }, [columnDefs?.length, sizeColumnsToFit]);
 
+  const defaultColDef = useMemo(
+    () => ({ wrapHeaderText: true, autoHeaderHeight: true, ...params.defaultColDef }),
+    [params.defaultColDef],
+  );
+
   return (
     <div
       data-testid={params["data-testid"]}
@@ -344,7 +349,7 @@ export const Grid = (params: GridProps): JSX.Element => {
         <AgGridReact
           animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
-          defaultColDef={params.defaultColDef}
+          defaultColDef={defaultColDef}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
           rowSelection={params.rowSelection ?? "multiple"}
