@@ -168,24 +168,18 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
     filter: "onx",
     options: [
       {
+        ...options[0],
         checked: true,
-        label: "Zero",
-        value: 0,
       },
       {
-        label: "One",
-        value: 1,
+        ...options[1],
       },
       {
+        ...options[2],
         checked: true,
-        label: "Sub component",
-        subComponent: expect.anything(),
-        subValue: "",
-        value: 2,
       },
       {
-        label: "Other",
-        value: 3,
+        ...options[3],
       },
     ],
   });
