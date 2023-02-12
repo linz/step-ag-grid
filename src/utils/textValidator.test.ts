@@ -73,6 +73,10 @@ describe("TextInputValidator", () => {
         tests: [
           ["xx", null],
           ["", "Must not be empty"],
+          ["\t", "Must not be empty"],
+          ["\n", "Must not be empty"],
+          ["\r", "Must not be empty"],
+          [" ", "Must not be empty"],
         ],
       },
     ] as (TextInputValidatorProps<GridBaseRow> & { tests: [string, string | undefined][] })[];

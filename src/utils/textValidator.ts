@@ -28,7 +28,7 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
   if (typeof value !== "string") {
     return "Value is not a string";
   }
-  if (props.required && value == "") {
+  if (props.required && value.trim() == "") {
     return "Must not be empty";
   }
   if (props.maxLength && value.length > props.maxLength) {
