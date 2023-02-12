@@ -27,23 +27,26 @@ const updateValue = jest
   .mockImplementation((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
 
 const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().mockImplementation(async () => true);
+const onSelectFilter = jest.fn();
 
-const options = Object.freeze([
-  { label: "Zero", value: 0 },
-  { label: "One", value: 1 },
-  {
-    label: "Sub component",
-    value: 2,
-    subComponent: () => (
-      <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
-    ),
-  },
-  { label: "Other", value: 3 },
-]) as MultiSelectOption[];
-
+let options: MultiSelectOption[] = [];
 const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
+  options = [
+    { label: "Zero", value: 0 },
+    { label: "One", value: 1 },
+    {
+      label: "Sub component",
+      value: 2,
+      subComponent: () => (
+        <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+      ),
+    },
+    { label: "Other", value: 3 },
+  ];
   const config: GridFormMultiSelectProps<any> = {
     filtered: true,
+    onSelectFilter,
+    filterHelpText: "Press enter to add free-text",
     onSave,
     options,
   };
@@ -76,6 +79,10 @@ const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
 
 export const GridFormMultiSelectInteractions_ = Template.bind({});
 GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
+  updateValue.mockClear();
+  onSave.mockClear();
+  onSelectFilter.mockClear();
+
   const canvas = within(canvasElement);
 
   const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
@@ -150,4 +157,36 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   expect(canvas.queryByText("Zero")).not.toBeInTheDocument();
   expect(canvas.queryByText("Sub component")).not.toBeInTheDocument();
   expect(canvas.queryByText("Other")).not.toBeInTheDocument();
+
+  userEvent.type(filterText, "x");
+  expect(canvas.queryByText("One")).not.toBeInTheDocument();
+  expect(canvas.queryByText("No Options")).toBeInTheDocument();
+
+  // Check enter works to add custom free-text
+  userEvent.type(filterText, "{Enter}");
+  expect(onSelectFilter).toHaveBeenCalledWith({
+    filter: "onx",
+    options: [
+      {
+        checked: true,
+        label: "Zero",
+        value: 0,
+      },
+      {
+        label: "One",
+        value: 1,
+      },
+      {
+        checked: true,
+        label: "Sub component",
+        subComponent: expect.anything(),
+        subValue: "",
+        value: 2,
+      },
+      {
+        label: "Other",
+        value: 3,
+      },
+    ],
+  });
 };
