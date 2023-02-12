@@ -134,7 +134,7 @@ export const ControlledMenuFr = (
       };
 
       const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") == "true";
-      if (allowTabToSave) {
+      if (allowTabToSave && ev.key === "Tab") {
         if (isDown) {
           ev.preventDefault();
           ev.stopPropagation();
