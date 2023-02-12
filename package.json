@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@linzjs/lui": ">=17",
-    "ag-grid-community": "^27.3.0",
+    "ag-grid-community": "27.3.0",
     "ag-grid-react": "^27.3.0",
     "debounce-promise": "^3.1.2",
     "lodash-es": ">=4",
