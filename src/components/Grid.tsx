@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { CellClickedEvent, ColDef } from "ag-grid-community";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
@@ -11,6 +11,7 @@ import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { GridFilterProvider } from "./GridFilter";
 
 export interface GridBaseRow {
   id: string | number;
@@ -23,6 +24,9 @@ export interface GridProps {
   quickFilter?: boolean;
   quickFilterPlaceholder?: string;
   quickFilterValue?: string;
+
+  renderExtraFilters: ReactElement;
+
   domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
@@ -316,6 +320,8 @@ export const Grid = (params: GridProps): JSX.Element => {
     }
   }, [columnDefs?.length, sizeColumnsToFit]);
 
+  const agGridRef = useRef<AgGridReact>(null);
+
   return (
     <div
       data-testid={params["data-testid"]}
@@ -325,9 +331,10 @@ export const Grid = (params: GridProps): JSX.Element => {
         staleGrid && "Grid-sortIsStale",
         gridReady && params.rowData && "Grid-ready",
       )}
+      role="table"
     >
       {params.quickFilter && (
-        <div className="Grid-quickFilter">
+        <div className={clsx("Grid-quickFilter", params.renderExtraFilters && "Grid-extraFilters")}>
           <input
             aria-label="Search"
             className="lui-margin-top-xxs lui-margin-bottom-xxs Grid-quickFilterBox"
@@ -338,8 +345,15 @@ export const Grid = (params: GridProps): JSX.Element => {
               setInternalQuickFilter(event.target.value);
             }}
           />
+
+          <div className="Grid-extraFilters-container">
+            <GridFilterProvider agGridRef={agGridRef}>
+              {params.renderExtraFilters !== undefined && params.renderExtraFilters}
+            </GridFilterProvider>
+          </div>
         </div>
       )}
+
       <div style={{ flex: 1 }}>
         <AgGridReact
           animateRows={params.animateRows}
@@ -366,6 +380,7 @@ export const Grid = (params: GridProps): JSX.Element => {
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
+          ref={agGridRef}
         />
       </div>
     </div>
