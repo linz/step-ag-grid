@@ -346,11 +346,11 @@ export const Grid = (params: GridProps): JSX.Element => {
             }}
           />
 
-          <div className="Grid-extraFilters-container">
-            <GridFilterProvider agGridRef={agGridRef}>
-              {params.renderExtraFilters !== undefined && params.renderExtraFilters}
-            </GridFilterProvider>
-          </div>
+          {params.renderExtraFilters !== undefined && (
+            <div className="Grid-extraFilters-container">
+              <GridFilterProvider agGridRef={agGridRef}>{params.renderExtraFilters}</GridFilterProvider>
+            </div>
+          )}
         </div>
       )}
 
