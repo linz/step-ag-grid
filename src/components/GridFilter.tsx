@@ -1,7 +1,7 @@
 import { AgGridReact } from "ag-grid-react";
-import React, { PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useReducer } from "react";
 
-type IGridFilterCallback<T = unknown> = (row: T, rowData: T[]) => boolean;
+type IGridFilterCallback<T = unknown> = (row: T, index: number, rowData: T[]) => boolean;
 
 type IGridFilter<T = any> = {
   callback: IGridFilterCallback<T>;
@@ -15,7 +15,7 @@ type State = {
   filters: IGridFilter[];
 };
 
-const GridFilterContext = React.createContext<{ state: State; dispatch: Dispatch } | undefined>(undefined);
+const GridFilterContext = createContext<{ state: State; dispatch: Dispatch } | undefined>(undefined);
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -38,24 +38,24 @@ export const GridFilterProvider = ({
   agGridRef,
   children,
 }: PropsWithChildren<{ agGridRef: React.RefObject<AgGridReact> }>) => {
-  const [state, dispatch] = React.useReducer(reducer, {
+  const [state, dispatch] = useReducer(reducer, {
     filters: [],
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const agGrid = agGridRef.current;
 
     if (agGrid?.api) {
-      const rowData = agGrid.props.rowData || [];
+      const rowData = agGrid.props.rowData ?? [];
 
       if (state.filters.length > 0) {
-        const filterCallbacks = state.filters.map((filter) => (row: any) => filter.callback(row, rowData));
+        let data = agGrid.props.rowData ?? [];
 
-        const filteredRowData = rowData.filter(
-          (row) => filterCallbacks.filter((filterCallback) => filterCallback(row)).length === state.filters.length,
-        );
+        state.filters.forEach((filter) => {
+          data = data.filter((row, index) => filter.callback(row, index, rowData));
+        });
 
-        agGrid.api.setRowData(filteredRowData);
+        agGrid.api.setRowData(data);
       } else {
         agGrid.api.setRowData(rowData);
       }
@@ -66,7 +66,7 @@ export const GridFilterProvider = ({
 };
 
 export const useGridFilter = <T,>() => {
-  const context = React.useContext(GridFilterContext);
+  const context = useContext(GridFilterContext);
 
   if (context == null) {
     throw new Error("useExtra must be used within a GridFilterContext");
@@ -75,8 +75,8 @@ export const useGridFilter = <T,>() => {
   const { state, dispatch } = context;
 
   return {
-    setFilters: (builder: GridFilterBuilder<T>) => {
-      dispatch({ type: "setFilters", payload: builder.filters });
+    setFilters: (expression: GridFilterExpression<T>) => {
+      dispatch({ type: "setFilters", payload: expression.filters });
     },
     resetFilters: () => {
       dispatch({ type: "resetFilters" });
@@ -85,7 +85,7 @@ export const useGridFilter = <T,>() => {
   };
 };
 
-class FilterExpression<T> {
+class GridFilterExpression<T> {
   filters: IGridFilter<T>[] = [];
 
   addFilter(callback: IGridFilterCallback<T>) {
@@ -116,10 +116,4 @@ class FilterExpression<T> {
   }
 }
 
-class GridFilterBuilder<T> extends FilterExpression<T> {
-  constructor() {
-    super();
-  }
-}
-
-export const GridFilter = <T,>() => new GridFilterBuilder<T>();
+export const GridFilter = <T,>() => new GridFilterExpression<T>();
