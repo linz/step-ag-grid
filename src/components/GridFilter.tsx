@@ -1,5 +1,5 @@
 import { AgGridReact } from "ag-grid-react";
-import { createContext, PropsWithChildren, useContext, useEffect, useReducer } from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 
 type IGridFilterCallback<T = unknown> = (row: T, index: number, rowData: T[]) => boolean;
 
@@ -7,62 +7,44 @@ type IGridFilter<T = any> = {
   callback: IGridFilterCallback<T>;
 };
 
-type Action = { type: "resetFilters" } | { type: "setFilters"; payload: IGridFilter[] };
-
-type Dispatch = (action: Action) => void;
-
-type State = {
-  filters: IGridFilter[];
-};
-
-const GridFilterContext = createContext<{ state: State; dispatch: Dispatch } | undefined>(undefined);
-
-function reducer(state: State, action: Action) {
-  switch (action.type) {
-    case "setFilters": {
-      return {
-        ...state,
-        filters: [...action.payload],
-      };
+const GridFilterContext = createContext<
+  | {
+      setFilters: (filters: IGridFilter[]) => void;
     }
-
-    default:
-      return {
-        ...state,
-        filters: [],
-      };
-  }
-}
+  | undefined
+>(undefined);
 
 export const GridFilterProvider = ({
   agGridRef,
   children,
 }: PropsWithChildren<{ agGridRef: React.RefObject<AgGridReact> }>) => {
-  const [state, dispatch] = useReducer(reducer, {
-    filters: [],
-  });
+  return (
+    <GridFilterContext.Provider
+      value={{
+        setFilters: (filters: IGridFilter[]) => {
+          const agGrid = agGridRef.current;
 
-  useEffect(() => {
-    const agGrid = agGridRef.current;
+          if (agGrid?.api) {
+            agGrid.api.setIsExternalFilterPresent(() => filters.length > 0);
+            agGrid.api.setDoesExternalFilterPass((node) => {
+              const row = node.data;
 
-    if (agGrid?.api) {
-      const rowData = agGrid.props.rowData ?? [];
+              const doesAllFilterPass = filters.every(({ callback }) => {
+                const doesFilterPass = callback(row, node.rowIndex ?? 0, agGrid.props.rowData ?? []);
+                return doesFilterPass;
+              });
 
-      if (state.filters.length > 0) {
-        let data = agGrid.props.rowData ?? [];
+              return doesAllFilterPass;
+            });
 
-        state.filters.forEach((filter) => {
-          data = data.filter((row, index) => filter.callback(row, index, rowData));
-        });
-
-        agGrid.api.setRowData(data);
-      } else {
-        agGrid.api.setRowData(rowData);
-      }
-    }
-  }, [agGridRef, state.filters]);
-
-  return <GridFilterContext.Provider value={{ dispatch, state }}>{children}</GridFilterContext.Provider>;
+            agGrid.api.onFilterChanged();
+          }
+        },
+      }}
+    >
+      {children}
+    </GridFilterContext.Provider>
+  );
 };
 
 export const useGridFilter = <T,>() => {
@@ -72,16 +54,13 @@ export const useGridFilter = <T,>() => {
     throw new Error("useExtra must be used within a GridFilterContext");
   }
 
-  const { state, dispatch } = context;
-
   return {
     setFilters: (expression: GridFilterExpression<T>) => {
-      dispatch({ type: "setFilters", payload: expression.filters });
+      context.setFilters(expression.filters);
     },
     resetFilters: () => {
-      dispatch({ type: "resetFilters" });
+      context.setFilters([]);
     },
-    state,
   };
 };
 
