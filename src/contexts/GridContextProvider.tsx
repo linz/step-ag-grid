@@ -1,7 +1,7 @@
-import { ReactElement, ReactNode, useCallback, useContext, useRef, useState } from "react";
+import { ReactElement, ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { ColDef, GridApi, RowNode } from "ag-grid-community";
 import { GridContext, GridFilterExternal } from "./GridContext";
-import { defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
+import { debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
@@ -377,14 +377,22 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     }
   }, [externallySelectedItemsAreInSync]);
 
+  const onFilterChanged = useMemo(
+    () =>
+      debounce(() => {
+        gridApi && gridApi.onFilterChanged();
+      }, 200),
+    [gridApi],
+  );
+
   const addExternalFilter = (filter: GridFilterExternal<any>) => {
     externalFilters.current.push(filter);
-    gridApi && gridApi.onFilterChanged();
+    onFilterChanged();
   };
 
   const removeExternalFilter = (filter: GridFilterExternal<any>) => {
     remove(externalFilters.current, (v) => v === filter);
-    gridApi && gridApi.onFilterChanged();
+    onFilterChanged();
   };
 
   const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
