@@ -233,14 +233,13 @@ export const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Elemen
 
   useGridFilter(filter);
 
-  const updateValue = useCallback((newValue: string) => {
-    newValue = newValue.trim();
+  const updateValue = (newValue: string) => {
     try {
-      setValue(newValue == "" ? undefined : parseInt(newValue));
+      setValue(newValue.trim() == "" ? undefined : parseInt(newValue));
     } catch {
       // ignore number parse exception
     }
-  }, []);
+  };
 
   return <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} />;
 };
