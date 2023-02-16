@@ -222,11 +222,12 @@ export const Grid = (params: GridProps): JSX.Element => {
         ]
       : adjustColDefs;
   }, [
-    clickSelectorCheckboxWhenContainingCellClicked,
     params.columnDefs,
     params.selectable,
+    params.rowSelection,
     params.readOnly,
-    params.defaultColDef,
+    params.defaultColDef?.editable,
+    clickSelectorCheckboxWhenContainingCellClicked,
   ]);
 
   const onGridReady = useCallback(
