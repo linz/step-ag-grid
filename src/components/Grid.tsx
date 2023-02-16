@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { CellClickedEvent, ColDef } from "ag-grid-community";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
+import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
 import { GridContext } from "../contexts/GridContext";
@@ -20,16 +20,12 @@ export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   selectable?: boolean;
   ["data-testid"]?: string;
-  quickFilter?: boolean;
-  quickFilterPlaceholder?: string;
-  quickFilterValue?: string;
   domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: ColDef[];
   rowData: GridOptions["rowData"];
-  noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowClassRules?: GridOptions["rowClassRules"];
@@ -47,7 +43,6 @@ export const Grid = (params: GridProps): JSX.Element => {
     gridReady,
     setGridApi,
     prePopupOps,
-    setQuickFilter,
     ensureRowVisible,
     selectRowsById,
     focusByRowById,
@@ -60,7 +55,6 @@ export const Grid = (params: GridProps): JSX.Element => {
   } = useContext(GridContext);
   const { checkUpdating } = useContext(GridUpdatingContext);
 
-  const [internalQuickFilter, setInternalQuickFilter] = useState("");
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
@@ -144,26 +138,6 @@ export const Grid = (params: GridProps): JSX.Element => {
     setExternallySelectedItemsAreInSync(true);
   }, [gridReady, params.externalSelectedItems, ensureRowVisible, selectRowsById, setExternallySelectedItemsAreInSync]);
 
-  /**
-   * Synchronise quick filter to grid
-   */
-  const updateQuickFilter = useCallback(() => {
-    if (!gridReady) return;
-    if (params.quickFilter) {
-      setQuickFilter(internalQuickFilter);
-      return;
-    }
-    if (params.quickFilterValue == null) return;
-    setQuickFilter(params.quickFilterValue);
-  }, [gridReady, internalQuickFilter, params.quickFilter, params.quickFilterValue, setQuickFilter]);
-
-  /**
-   * Synchronise quick filter to grid
-   */
-  useEffect(() => {
-    updateQuickFilter();
-  }, [updateQuickFilter]);
-
   const combineEditables =
     (...editables: (boolean | EditableCallback | undefined)[]) =>
     (params: EditableCallbackParams): boolean => {
@@ -234,14 +208,19 @@ export const Grid = (params: GridProps): JSX.Element => {
     (event: GridReadyEvent) => {
       setGridApi(event.api);
       synchroniseExternallySelectedItemsToGrid();
-      updateQuickFilter();
     },
-    [setGridApi, synchroniseExternallySelectedItemsToGrid, updateQuickFilter],
+    [setGridApi, synchroniseExternallySelectedItemsToGrid],
   );
 
   const noRowsOverlayComponent = useCallback(
-    () => <span>{params.noRowsOverlayText ?? "There are currently no rows"}</span>,
-    [params.noRowsOverlayText],
+    (event: AgGridEvent) => {
+      const hasData = (params.rowData?.length ?? 0) > 0;
+      const hasFilteredData = event.api.getDisplayedRowCount() > 0;
+      return (
+        <span>{!hasData ? "There are currently no rows" : !hasFilteredData ? "All rows have been filtered" : ""}</span>
+      );
+    },
+    [params.rowData?.length],
   );
 
   const refreshSelectedRows = useCallback((event: CellEvent): void => {
@@ -329,20 +308,6 @@ export const Grid = (params: GridProps): JSX.Element => {
         gridReady && params.rowData && "Grid-ready",
       )}
     >
-      {params.quickFilter && (
-        <div className="Grid-quickFilter">
-          <input
-            aria-label="Search"
-            className="lui-margin-top-xxs lui-margin-bottom-xxs Grid-quickFilterBox"
-            type="text"
-            placeholder={params.quickFilterPlaceholder ?? "Search..."}
-            value={internalQuickFilter}
-            onChange={(event): void => {
-              setInternalQuickFilter(event.target.value);
-            }}
-          />
-        </div>
-      )}
       <div style={{ flex: 1 }}>
         <AgGridReact
           animateRows={params.animateRows}
@@ -371,6 +336,9 @@ export const Grid = (params: GridProps): JSX.Element => {
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
+          onModelUpdated={(event: ModelUpdatedEvent) => {
+            event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
+          }}
         />
       </div>
     </div>

@@ -12,11 +12,12 @@ import { wait } from "../../utils/util";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
-import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { GridIcon } from "../../components/GridIcon";
 import { useGridFilter } from "../../components/GridFilter";
+import { GridFilterQuick } from "../../components/gridFilter/GridFilterQuick";
+import { GridFilters } from "../../components/gridFilter/GridFilters";
 
 export default {
   title: "Components / Grids",
@@ -174,7 +175,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
                   ),
                 },
-              ] as MenuOption<ITestRow>[];
+              ];
             },
           },
         },
@@ -203,12 +204,13 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 
   return (
     <>
-      <div>
+      <GridFilters>
+        <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
         <div>
           Filter: Age less than:
           <GridFilterLessThan field={"age"} />
         </div>
-      </div>
+      </GridFilters>
       <Grid
         {...props}
         selectable={true}
