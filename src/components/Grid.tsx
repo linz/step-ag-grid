@@ -203,7 +203,7 @@ export const Grid = (params: GridProps): JSX.Element => {
             maxWidth: 42,
             suppressSizeToFit: true,
             checkboxSelection: true,
-            headerComponent: GridHeaderSelect,
+            headerComponent: params.rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
                 const selectedNodeCount = e.api.getSelectedRows().length;
