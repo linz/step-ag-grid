@@ -225,7 +225,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 };
 
-export const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
+const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
   const [value, setValue] = useState<number>();
 
   const filter = useCallback(
