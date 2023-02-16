@@ -207,7 +207,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       <GridFilters>
         <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
         <div>
-          Filter: Age less than:
+          Custom filter: Age less than:
           <GridFilterLessThan field={"age"} />
         </div>
       </GridFilters>

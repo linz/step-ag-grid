@@ -223,6 +223,10 @@ export const Grid = (params: GridProps): JSX.Element => {
     [params.rowData?.length],
   );
 
+  const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
+    event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
+  }, []);
+
   const refreshSelectedRows = useCallback((event: CellEvent): void => {
     // Force-refresh all selected rows to re-run class function, to update selection highlighting
     event.api.refreshCells({
@@ -328,6 +332,7 @@ export const Grid = (params: GridProps): JSX.Element => {
           columnDefs={columnDefs}
           rowData={params.rowData}
           noRowsOverlayComponent={noRowsOverlayComponent}
+          onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
           postSortRows={params.postSortRows ?? postSortRows}
@@ -336,9 +341,6 @@ export const Grid = (params: GridProps): JSX.Element => {
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
-          onModelUpdated={(event: ModelUpdatedEvent) => {
-            event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
-          }}
         />
       </div>
     </div>
