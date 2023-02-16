@@ -55,6 +55,8 @@ export const Grid = (params: GridProps): JSX.Element => {
     sizeColumnsToFit,
     externallySelectedItemsAreInSync,
     setExternallySelectedItemsAreInSync,
+    isExternalFilterPresent,
+    doesExternalFilterPass,
   } = useContext(GridContext);
   const { checkUpdating } = useContext(GridUpdatingContext);
 
@@ -366,6 +368,8 @@ export const Grid = (params: GridProps): JSX.Element => {
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
+          isExternalFilterPresent={isExternalFilterPresent}
+          doesExternalFilterPass={doesExternalFilterPass}
         />
       </div>
     </div>

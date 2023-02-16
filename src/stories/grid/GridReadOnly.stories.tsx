@@ -16,6 +16,7 @@ import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { GridIcon } from "../../components/GridIcon";
+import { useGridFilter } from "../../components/GridFilter";
 
 export default {
   title: "Components / Grids",
@@ -201,17 +202,37 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   ]);
 
   return (
-    <Grid
-      {...props}
-      selectable={true}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-      autoSelectFirstRow={true}
-    />
+    <>
+      <div>
+        <div>
+          Filter: Age less than:
+          <GridFilterLessThan field={"age"} />
+        </div>
+      </div>
+      <Grid
+        {...props}
+        selectable={true}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        domLayout={"autoHeight"}
+        autoSelectFirstRow={true}
+      />
+    </>
   );
+};
+
+export const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
+  const [value, setValue] = useState<number>();
+
+  const filter = (data: ITestRow): boolean => {
+    return value == null || data[props.field] < value;
+  };
+
+  useGridFilter(filter);
+
+  return <input type={"text"} defaultValue={value} onChange={(e) => setValue(parseInt(e.target.value))} />;
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});

@@ -1,7 +1,7 @@
 import { ReactElement, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import { ColDef, GridApi, RowNode } from "ag-grid-community";
-import { GridContext } from "./GridContext";
-import { defer, delay, difference, isEmpty, last, sortBy } from "lodash-es";
+import { GridContext, GridFilterExternal } from "./GridContext";
+import { defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
@@ -23,6 +23,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
+  const externalFilters = useRef<GridFilterExternal<any>[]>([]);
 
   const setGridApi = useCallback((gridApi: GridApi | undefined) => {
     _setGridApi(gridApi);
@@ -376,6 +377,22 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     }
   }, [externallySelectedItemsAreInSync]);
 
+  const addExternalFilter = (filter: GridFilterExternal<any>) => {
+    externalFilters.current.push(filter);
+    gridApi && gridApi.onFilterChanged();
+  };
+
+  const removeExternalFilter = (filter: GridFilterExternal<any>) => {
+    remove(externalFilters.current, (v) => v === filter);
+    gridApi && gridApi.onFilterChanged();
+  };
+
+  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+
+  const doesExternalFilterPass = (node: RowNode): boolean => {
+    return externalFilters.current.every((filter) => filter(node.data, node));
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -402,6 +419,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         externallySelectedItemsAreInSync,
         setExternallySelectedItemsAreInSync,
         waitForExternallySelectedItemsToBeInSync,
+        addExternalFilter,
+        removeExternalFilter,
+        isExternalFilterPresent,
+        doesExternalFilterPass,
       }}
     >
       {props.children}
