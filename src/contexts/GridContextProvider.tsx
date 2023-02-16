@@ -23,7 +23,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
-  const externalFilters = useRef<GridFilterExternal<any>[]>([]);
+  const externalFilters = useRef<GridFilterExternal[]>([]);
 
   const setGridApi = useCallback((gridApi: GridApi | undefined) => {
     _setGridApi(gridApi);
@@ -385,12 +385,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     [gridApi],
   );
 
-  const addExternalFilter = (filter: GridFilterExternal<any>) => {
+  const addExternalFilter = (filter: GridFilterExternal) => {
     externalFilters.current.push(filter);
     onFilterChanged();
   };
 
-  const removeExternalFilter = (filter: GridFilterExternal<any>) => {
+  const removeExternalFilter = (filter: GridFilterExternal) => {
     remove(externalFilters.current, (v) => v === filter);
     onFilterChanged();
   };
