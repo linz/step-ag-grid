@@ -1,9 +1,9 @@
-import { useContext, useEffect } from "react";
-import { GridContext, GridFilterExternal } from "../contexts/GridContext";
+import { useEffect } from "react";
+import { GridFilterExternal, useGridContext } from "../contexts/GridContext";
 import { GridBaseRow } from "./Grid";
 
 export const useGridFilter = <RowType extends GridBaseRow>(filter: GridFilterExternal<RowType>) => {
-  const { addExternalFilter, removeExternalFilter } = useContext(GridContext);
+  const { addExternalFilter, removeExternalFilter } = useGridContext<RowType>();
 
   useEffect(() => {
     const thisFilter = filter;

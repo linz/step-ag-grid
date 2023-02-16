@@ -7,7 +7,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { wait } from "../../utils/util";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { ColDefT, GridCell } from "../../components/GridCell";
@@ -226,13 +226,23 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 export const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
   const [value, setValue] = useState<number>();
 
-  const filter = (data: ITestRow): boolean => {
-    return value == null || data[props.field] < value;
-  };
+  const filter = useCallback(
+    (data: ITestRow): boolean => value == null || data[props.field] < value,
+    [props.field, value],
+  );
 
   useGridFilter(filter);
 
-  return <input type={"text"} defaultValue={value} onChange={(e) => setValue(parseInt(e.target.value))} />;
+  const updateValue = useCallback((newValue: string) => {
+    newValue = newValue.trim();
+    try {
+      setValue(newValue == "" ? undefined : parseInt(newValue));
+    } catch {
+      // ignore number parse exception
+    }
+  }, []);
+
+  return <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} />;
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
