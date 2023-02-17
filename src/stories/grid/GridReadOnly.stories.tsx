@@ -18,6 +18,7 @@ import { GridIcon } from "../../components/GridIcon";
 import { useGridFilter } from "../../components/GridFilter";
 import { GridFilterQuick } from "../../components/gridFilter/GridFilterQuick";
 import { GridFilters } from "../../components/gridFilter/GridFilters";
+import { GridWrapper } from "../../components/GridWrapper";
 
 export default {
   title: "Components / Grids",
@@ -31,7 +32,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1024, height: 400 }}>
+      <div style={{ width: 1024, height: 400, display: "flex", flexDirection: "column" }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -203,7 +204,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   ]);
 
   return (
-    <>
+    <GridWrapper maxHeight={200}>
       <GridFilters>
         <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
         <div>
@@ -218,10 +219,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        domLayout={"autoHeight"}
         autoSelectFirstRow={true}
       />
-    </>
+    </GridWrapper>
   );
 };
 

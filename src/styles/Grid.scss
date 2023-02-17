@@ -9,6 +9,12 @@
   flex-direction: column;
 }
 
+.Grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .Grid-sortIsStale {
   span.ag-icon.ag-icon-desc::after {
     content: "*";
