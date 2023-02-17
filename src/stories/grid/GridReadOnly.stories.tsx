@@ -215,11 +215,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       <Grid
         {...props}
         selectable={true}
+        autoSelectFirstRow={true}
         externalSelectedItems={externalSelectedItems}
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        autoSelectFirstRow={true}
       />
     </GridWrapper>
   );
