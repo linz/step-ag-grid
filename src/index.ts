@@ -41,6 +41,10 @@ export * from "./components/gridForm/GridFormTextArea";
 export * from "./components/gridForm/GridFormMessage";
 export * from "./components/gridForm/GridFormEditBearing";
 
+export { useGridFilter } from "./components/GridFilter";
+export * from "./components/gridFilter/GridFilterQuick";
+export * from "./components/gridFilter/GridFilters";
+
 export { GridHeaderSelect } from "./components/gridHeader/GridHeaderSelect";
 
 export { TextAreaInput } from "./lui/TextAreaInput";
