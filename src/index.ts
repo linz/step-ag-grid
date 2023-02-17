@@ -44,6 +44,7 @@ export * from "./components/gridForm/GridFormEditBearing";
 export { useGridFilter } from "./components/GridFilter";
 export * from "./components/gridFilter/GridFilterQuick";
 export * from "./components/gridFilter/GridFilters";
+export * from "./components/GridWrapper";
 
 export { GridHeaderSelect } from "./components/gridHeader/GridHeaderSelect";
 
