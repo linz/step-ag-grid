@@ -2,6 +2,8 @@ import { createContext } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridBaseRow } from "../components/Grid";
 
+export type GridFilterExternal = (data: any, rowNode: RowNode) => boolean;
+
 export interface GridContextType {
   gridReady: boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
@@ -31,6 +33,10 @@ export interface GridContextType {
   externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
+  addExternalFilter: (filter: GridFilterExternal) => void;
+  removeExternalFilter: (filter: GridFilterExternal) => void;
+  isExternalFilterPresent: () => boolean;
+  doesExternalFilterPass: (node: RowNode) => boolean;
 }
 
 export const GridContext = createContext<GridContextType>({
@@ -103,5 +109,19 @@ export const GridContext = createContext<GridContextType>({
   },
   waitForExternallySelectedItemsToBeInSync: async () => {
     console.error("no context provider for waitForExternallySelectedItemsToBeInSync");
+  },
+  addExternalFilter: () => {
+    console.error("no context provider for addExternalFilter");
+  },
+  removeExternalFilter: () => {
+    console.error("no context provider for removeExternalFilter");
+  },
+  isExternalFilterPresent: () => {
+    console.error("no context provider for isExternalFilterPresent");
+    return false;
+  },
+  doesExternalFilterPass: () => {
+    console.error("no context provider for doesExternalFilterPass");
+    return true;
   },
 });

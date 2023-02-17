@@ -95,7 +95,6 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
 
   return (
     <Grid
-      quickFilter={true}
       data-testid={"bearingsTestTable"}
       {...props}
       readOnly={false}

@@ -1,7 +1,7 @@
-import { ReactElement, ReactNode, useCallback, useContext, useRef, useState } from "react";
+import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ColDef, GridApi, RowNode } from "ag-grid-community";
-import { GridContext } from "./GridContext";
-import { defer, delay, difference, isEmpty, last, sortBy } from "lodash-es";
+import { GridContext, GridFilterExternal } from "./GridContext";
+import { debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 import { GridBaseRow } from "../components/Grid";
@@ -20,14 +20,30 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(GridUpdatingContext);
   const [gridApi, _setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
+  const [quickFilter, setQuickFilter] = useState("");
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
+  const externalFilters = useRef<GridFilterExternal[]>([]);
 
-  const setGridApi = useCallback((gridApi: GridApi | undefined) => {
-    _setGridApi(gridApi);
-    setGridReady(!!gridApi);
-  }, []);
+  /**
+   * Set quick filter directly on grid, based on previously save quickFilter state.
+   */
+  useEffect(() => {
+    gridApi?.setQuickFilter(quickFilter);
+  }, [gridApi, quickFilter]);
+
+  /**
+   * Set the grid api when the grid is ready.
+   */
+  const setGridApi = useCallback(
+    (gridApi: GridApi | undefined) => {
+      _setGridApi(gridApi);
+      gridApi?.setQuickFilter(quickFilter);
+      setGridReady(!!gridApi);
+    },
+    [quickFilter],
+  );
 
   /**
    * Wraps things that require gridApi in common handling, for when gridApi not present.
@@ -51,16 +67,6 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const prePopupOps = useCallback(() => {
     prePopupFocusedCell.current = gridApi?.getFocusedCell() ?? undefined;
   }, [gridApi]);
-
-  /**
-   * Set the quick filter value to grid.
-   */
-  const setQuickFilter = useCallback(
-    (quickFilter: string) => {
-      gridApiOp((gridApi) => gridApi.setQuickFilter(quickFilter));
-    },
-    [gridApiOp],
-  );
 
   /**
    * Get all row id's in grid.
@@ -376,6 +382,30 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     }
   }, [externallySelectedItemsAreInSync]);
 
+  const onFilterChanged = useMemo(
+    () =>
+      debounce(() => {
+        gridApi && gridApi.onFilterChanged();
+      }, 200),
+    [gridApi],
+  );
+
+  const addExternalFilter = (filter: GridFilterExternal) => {
+    externalFilters.current.push(filter);
+    onFilterChanged();
+  };
+
+  const removeExternalFilter = (filter: GridFilterExternal) => {
+    remove(externalFilters.current, (v) => v === filter);
+    onFilterChanged();
+  };
+
+  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+
+  const doesExternalFilterPass = (node: RowNode): boolean => {
+    return externalFilters.current.every((filter) => filter(node.data, node));
+  };
+
   return (
     <GridContext.Provider
       value={{
@@ -402,6 +432,10 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
         externallySelectedItemsAreInSync,
         setExternallySelectedItemsAreInSync,
         waitForExternallySelectedItemsToBeInSync,
+        addExternalFilter,
+        removeExternalFilter,
+        isExternalFilterPresent,
+        doesExternalFilterPass,
       }}
     >
       {props.children}

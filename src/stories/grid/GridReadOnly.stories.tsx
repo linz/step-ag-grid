@@ -7,15 +7,18 @@ import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/clien
 import { GridUpdatingContextProvider } from "../../contexts/GridUpdatingContextProvider";
 import { GridContextProvider } from "../../contexts/GridContextProvider";
 import { Grid, GridProps } from "../../components/Grid";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { wait } from "../../utils/util";
 import { GridPopoverMenu } from "../../components/gridPopoverEdit/GridPopoverMenu";
 import { ColDefT, GridCell } from "../../components/GridCell";
 import { GridPopoverMessage } from "../../components/gridPopoverEdit/GridPopoverMessage";
-import { MenuOption } from "../../components/gridForm/GridFormPopoverMenu";
 import { GridFormSubComponentTextInput } from "../../components/gridForm/GridFormSubComponentTextInput";
 import { GridFormSubComponentTextArea } from "../../components/gridForm/GridFormSubComponentTextArea";
 import { GridIcon } from "../../components/GridIcon";
+import { useGridFilter } from "../../components/GridFilter";
+import { GridFilterQuick } from "../../components/gridFilter/GridFilterQuick";
+import { GridFilters } from "../../components/gridFilter/GridFilters";
+import { GridWrapper } from "../../components/GridWrapper";
 
 export default {
   title: "Components / Grids",
@@ -29,7 +32,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1024, height: 400 }}>
+      <div style={{ width: 1024, height: 400, display: "flex", flexDirection: "column" }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -173,7 +176,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
                     <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
                   ),
                 },
-              ] as MenuOption<ITestRow>[];
+              ];
             },
           },
         },
@@ -201,17 +204,46 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   ]);
 
   return (
-    <Grid
-      {...props}
-      selectable={true}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-      autoSelectFirstRow={true}
-    />
+    <GridWrapper maxHeight={200}>
+      <GridFilters>
+        <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
+        <div>
+          Custom filter: Age less than:
+          <GridFilterLessThan field={"age"} />
+        </div>
+      </GridFilters>
+      <Grid
+        {...props}
+        selectable={true}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        autoSelectFirstRow={true}
+      />
+    </GridWrapper>
   );
+};
+
+const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
+  const [value, setValue] = useState<number>();
+
+  const filter = useCallback(
+    (data: ITestRow): boolean => value == null || data[props.field] < value,
+    [props.field, value],
+  );
+
+  useGridFilter(filter);
+
+  const updateValue = (newValue: string) => {
+    try {
+      setValue(newValue.trim() == "" ? undefined : parseInt(newValue));
+    } catch {
+      // ignore number parse exception
+    }
+  };
+
+  return <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} />;
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
