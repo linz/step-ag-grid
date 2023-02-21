@@ -31,7 +31,7 @@ export const GridFilterButtons = <RowType extends GridBaseRow>({
               key={`${index}`}
               className={clsx(
                 `lui-button lui-button-secondary`,
-                selectedOption.label === option.label ? `lui-button-active` : "",
+                selectedOption?.label === option.label ? `lui-button-active` : "",
               )}
               style={{ whiteSpace: "nowrap" }}
               onClick={() => {
