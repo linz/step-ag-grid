@@ -19,6 +19,7 @@ import { useGridFilter } from "../../components/GridFilter";
 import { GridFilterQuick } from "../../components/gridFilter/GridFilterQuick";
 import { GridFilters } from "../../components/gridFilter/GridFilters";
 import { GridWrapper } from "../../components/GridWrapper";
+import { GridFilterButtons } from "../../components/gridFilter/GridFilterButtons";
 
 export default {
   title: "Components / Grids",
@@ -204,13 +205,25 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   ]);
 
   return (
-    <GridWrapper maxHeight={200}>
+    <GridWrapper maxHeight={300}>
       <GridFilters>
         <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
         <div>
           Custom filter: Age less than:
           <GridFilterLessThan field={"age"} />
         </div>
+        <GridFilterButtons<ITestRow>
+          options={[
+            {
+              label: "All",
+              defaultSelected: true,
+            },
+            {
+              label: "< 30",
+              filter: (row) => row.age < 30,
+            },
+          ]}
+        />
       </GridFilters>
       <Grid
         {...props}

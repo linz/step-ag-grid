@@ -24,7 +24,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
-  const externalFilters = useRef<GridFilterExternal[]>([]);
+  const externalFilters = useRef<GridFilterExternal<any>[]>([]);
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -390,12 +390,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     [gridApi],
   );
 
-  const addExternalFilter = (filter: GridFilterExternal) => {
+  const addExternalFilter = (filter: GridFilterExternal<any>) => {
     externalFilters.current.push(filter);
     onFilterChanged();
   };
 
-  const removeExternalFilter = (filter: GridFilterExternal) => {
+  const removeExternalFilter = (filter: GridFilterExternal<any>) => {
     remove(externalFilters.current, (v) => v === filter);
     onFilterChanged();
   };
