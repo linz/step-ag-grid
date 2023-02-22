@@ -8,7 +8,7 @@ import { GridFilterExternal } from "../../contexts/GridContext";
 import { GridBaseRow } from "../Grid";
 import { useGridFilter } from "../GridFilter";
 
-interface GridFilterButtonsOption<RowType extends GridBaseRow> {
+export interface GridFilterButtonsOption<RowType extends GridBaseRow> {
   defaultSelected?: boolean;
   filter?: GridFilterExternal<RowType>;
   label: string;
