@@ -1,10 +1,10 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import { GridApi, RowNode } from "ag-grid-community";
 import { GridBaseRow } from "../components/Grid";
 
-export type GridFilterExternal = (data: any, rowNode: RowNode) => boolean;
+export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
-export interface GridContextType {
+export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
   setGridApi: (gridApi: GridApi | undefined) => void;
   prePopupOps: () => void;
@@ -33,13 +33,13 @@ export interface GridContextType {
   externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
-  addExternalFilter: (filter: GridFilterExternal) => void;
-  removeExternalFilter: (filter: GridFilterExternal) => void;
+  addExternalFilter: (filter: GridFilterExternal<RowType>) => void;
+  removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
 }
 
-export const GridContext = createContext<GridContextType>({
+export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
   prePopupOps: () => {
     console.error("no context provider for prePopupOps");
@@ -125,3 +125,5 @@ export const GridContext = createContext<GridContextType>({
     return true;
   },
 });
+
+export const useGridContext = <RowType extends GridBaseRow>() => useContext<GridContextType<RowType>>(GridContext);
