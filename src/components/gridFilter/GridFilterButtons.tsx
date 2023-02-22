@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import clsx, { ClassValue } from "clsx";
 import { useMemo, useState } from "react";
 import { LuiButton, LuiButtonGroup } from "@linzjs/lui";
 import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
@@ -13,11 +13,13 @@ interface GridFilterButtonsOption<RowType extends GridBaseRow> {
 }
 
 export type GridFilterButtonsProps<RowType extends GridBaseRow> = {
+  className?: ClassValue;
   luiButtonProps?: Partial<LuiButtonProps>;
   options: GridFilterButtonsOption<RowType>[];
 };
 
 export const GridFilterButtons = <RowType extends GridBaseRow>({
+  className,
   luiButtonProps,
   options,
 }: GridFilterButtonsProps<RowType>): JSX.Element => {
@@ -28,7 +30,7 @@ export const GridFilterButtons = <RowType extends GridBaseRow>({
   useGridFilter(filter);
 
   return (
-    <div className="lui-margin-top-xxs lui-margin-bottom-xxs">
+    <div className={clsx("lui-margin-top-xxs lui-margin-bottom-xxs", className)}>
       <LuiButtonGroup>
         {options.map((option, index) => (
           <LuiButton
