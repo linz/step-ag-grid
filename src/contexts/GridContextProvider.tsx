@@ -16,7 +16,7 @@ interface GridContextProps {
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = (props: GridContextProps): ReactElement => {
+export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(GridUpdatingContext);
   const [gridApi, _setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
@@ -24,7 +24,7 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
-  const externalFilters = useRef<GridFilterExternal<any>[]>([]);
+  const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -390,12 +390,12 @@ export const GridContextProvider = (props: GridContextProps): ReactElement => {
     [gridApi],
   );
 
-  const addExternalFilter = (filter: GridFilterExternal<any>) => {
+  const addExternalFilter = (filter: GridFilterExternal<RowType>) => {
     externalFilters.current.push(filter);
     onFilterChanged();
   };
 
-  const removeExternalFilter = (filter: GridFilterExternal<any>) => {
+  const removeExternalFilter = (filter: GridFilterExternal<RowType>) => {
     remove(externalFilters.current, (v) => v === filter);
     onFilterChanged();
   };

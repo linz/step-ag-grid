@@ -216,7 +216,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           options={[
             {
               label: "All",
-              defaultSelected: true,
             },
             {
               label: "< 30",
