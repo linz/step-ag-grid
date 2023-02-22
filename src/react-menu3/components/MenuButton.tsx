@@ -1,7 +1,8 @@
-import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
+import { LegacyRef, ReactNode, forwardRef, useMemo } from "react";
+
 import { useBEM } from "../hooks";
-import { menuButtonClass } from "../utils";
 import { BaseProps, MenuButtonModifiers } from "../types";
+import { menuButtonClass } from "../utils";
 
 export interface MenuButtonProps extends BaseProps<MenuButtonModifiers> {
   disabled?: boolean;

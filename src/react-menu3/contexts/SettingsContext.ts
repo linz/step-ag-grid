@@ -1,4 +1,5 @@
-import { createContext, MutableRefObject, RefObject } from "react";
+import { MutableRefObject, RefObject, createContext } from "react";
+
 import { ControlledMenuProps, MenuReposition, MenuViewScroll, RectElement, TransitionFieldType } from "../types";
 
 interface SettingsContextType extends ControlledMenuProps {

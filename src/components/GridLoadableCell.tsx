@@ -1,4 +1,5 @@
 import clsx from "clsx";
+
 import { LuiMiniSpinner } from "@linzjs/lui";
 
 export const GridLoadableCell = (props: { isLoading: boolean; children: JSX.Element | string; className?: string }) => (

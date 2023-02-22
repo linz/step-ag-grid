@@ -1,4 +1,5 @@
-import { memo, forwardRef, useContext, useRef, MutableRefObject, PropsWithRef } from "react";
+import { MutableRefObject, PropsWithRef, forwardRef, memo, useContext, useRef } from "react";
+
 import { HoverItemContext } from "../contexts/HoverItemContext";
 
 export interface withHoveringResultProps {

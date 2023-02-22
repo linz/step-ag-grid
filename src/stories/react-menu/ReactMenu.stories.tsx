@@ -1,9 +1,10 @@
+import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { userEvent, within } from "@storybook/testing-library";
+
 import { Grid } from "../../components/Grid";
 import { Menu, MenuButton, MenuDivider, MenuItem, SubMenu } from "../../react-menu3";
-import { userEvent, within } from "@storybook/testing-library";
 import { wait } from "../../utils/util";
-import { expect, jest } from "@storybook/jest";
 
 export default {
   title: "Components / React-menu",

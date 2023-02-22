@@ -1,12 +1,16 @@
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormEditBearing, GridFormEditBearingProps } from "../../../components/gridForm/GridFormEditBearing";
-import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
-import { GridPopoverEditBearingEditorParams } from "../../../components/gridPopoverEdit/GridPopoverEditBearing";
+
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/lui/dist/scss/base.scss";
+
+import {
+  GridContextProvider,
+  GridFormEditBearing,
+  GridFormEditBearingProps,
+  GridPopoverEditBearingEditorParams,
+} from "../../..";
 
 export default {
   title: "GridForm / Static Tests",

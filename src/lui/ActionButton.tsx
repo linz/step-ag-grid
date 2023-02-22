@@ -1,12 +1,13 @@
-import "./ActionButton.scss";
-
 import clsx from "clsx";
-import { useEffect, useState, CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
+
 import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
+import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
 import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
+
+import "./ActionButton.scss";
 import { usePrevious } from "./reactUtils";
 import { useStateDeferred } from "./stateDeferredHook";
-import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
 
 export interface ActionButtonProps {
   icon: IconName;

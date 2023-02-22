@@ -1,6 +1,7 @@
 import { useTransition } from "react-transition-state";
-import { MenuStateMap, getTransition } from "../utils";
+
 import { MenuState, MenuStateOptions } from "../types";
+import { MenuStateMap, getTransition } from "../utils";
 
 /**
  * A custom Hook which helps manage the states of `ControlledMenu`.

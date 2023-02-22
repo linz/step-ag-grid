@@ -1,5 +1,7 @@
 import { ICellRendererParams } from "ag-grid-community";
+
 import { LuiIcon } from "@linzjs/lui";
+
 import { fnOrVar } from "../../utils/util";
 
 export const GridRenderPopoutMenuCell = (props: ICellRendererParams) => {

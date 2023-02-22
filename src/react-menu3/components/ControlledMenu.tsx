@@ -1,13 +1,14 @@
-import { forwardRef, useRef, useMemo, useCallback, useEffect, FocusEvent, MutableRefObject, ForwardedRef } from "react";
+import { FocusEvent, ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { MenuList } from "./MenuList";
-import { useBEM } from "../hooks";
-import { menuContainerClass, mergeProps, safeCall, isMenuOpen, getTransition, CloseReason, Keys } from "../utils";
+
 import { hasParentClass } from "../../utils/util";
-import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
+import { EventHandlersContext, EventHandlersContextType } from "../contexts/EventHandlersContext";
 import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
 import { SettingsContext } from "../contexts/SettingsContext";
-import { EventHandlersContext, EventHandlersContextType } from "../contexts/EventHandlersContext";
+import { useBEM } from "../hooks";
+import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
+import { CloseReason, Keys, getTransition, isMenuOpen, menuContainerClass, mergeProps, safeCall } from "../utils";
+import { MenuList } from "./MenuList";
 
 export const ControlledMenuFr = (
   {

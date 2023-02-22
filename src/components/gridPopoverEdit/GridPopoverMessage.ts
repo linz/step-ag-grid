@@ -1,6 +1,6 @@
+import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormMessage, GridFormMessageProps } from "../gridForm/GridFormMessage";
-import { GridBaseRow } from "../Grid";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
 export const GridPopoverMessage = <RowType extends GridBaseRow>(

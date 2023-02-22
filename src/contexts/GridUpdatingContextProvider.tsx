@@ -1,5 +1,6 @@
-import { ReactNode, useRef, useState } from "react";
 import { castArray, flatten, remove } from "lodash-es";
+import { ReactNode, useRef, useState } from "react";
+
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
 interface UpdatingContextProviderProps {

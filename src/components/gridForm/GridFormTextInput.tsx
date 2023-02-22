@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
+
+import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
+import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface GridFormTextInputProps<RowType extends GridBaseRow>
   extends TextInputValidatorProps<RowType>,
