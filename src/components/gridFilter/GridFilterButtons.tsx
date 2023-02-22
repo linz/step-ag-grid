@@ -5,6 +5,7 @@ import { LuiButton, LuiButtonGroup } from "@linzjs/lui";
 import { GridFilterExternal } from "../../contexts/GridContext";
 import { useGridFilter } from "../GridFilter";
 import { GridBaseRow } from "../Grid";
+import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
 
 interface GridFilterButtonsOption<RowType extends GridBaseRow> {
   defaultSelected?: boolean;
@@ -13,12 +14,15 @@ interface GridFilterButtonsOption<RowType extends GridBaseRow> {
 }
 
 export type GridFilterButtonsProps<RowType extends GridBaseRow> = {
+  luiButtonProps?: Partial<LuiButtonProps>;
   options: GridFilterButtonsOption<RowType>[];
 };
 
 export const GridFilterButtons = <RowType extends GridBaseRow>({
+  luiButtonProps,
   options,
 }: GridFilterButtonsProps<RowType>): JSX.Element => {
+  // Select defaultSelected option, otherwise first option.  If no options select none.
   const [selectedOption, setSelectedOption] = useState(options.find((option) => option.defaultSelected) ?? options[0]);
 
   const filter = useMemo(() => selectedOption?.filter, [selectedOption]);
@@ -30,14 +34,13 @@ export const GridFilterButtons = <RowType extends GridBaseRow>({
         {options.map((option, index) => (
           <LuiButton
             key={`${index}`}
+            {...luiButtonProps}
             className={clsx(
               `lui-button lui-button-secondary`,
               selectedOption?.label === option.label && `lui-button-active`,
+              luiButtonProps?.className,
             )}
-            style={{ whiteSpace: "nowrap" }}
-            onClick={() => {
-              setSelectedOption(option);
-            }}
+            onClick={() => setSelectedOption(option)}
           >
             {option.label}
           </LuiButton>

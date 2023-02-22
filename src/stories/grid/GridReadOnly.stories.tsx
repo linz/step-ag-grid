@@ -213,6 +213,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           <GridFilterLessThan field={"age"} />
         </div>
         <GridFilterButtons<ITestRow>
+          luiButtonProps={{ style: { whiteSpace: "nowrap" } }}
           options={[
             {
               label: "All",
