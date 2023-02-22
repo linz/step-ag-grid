@@ -20,7 +20,6 @@ import { GridFilterQuick } from "../../components/gridFilter/GridFilterQuick";
 import { GridFilters } from "../../components/gridFilter/GridFilters";
 import { GridFilterButtons } from "../../components/gridFilter/GridFilterButtons";
 import { GridWrapper } from "../../components/GridWrapper";
-import { GridFilterButtons } from "../../components/gridFilter/GridFilterButtons";
 
 export default {
   title: "Components / Grids",
