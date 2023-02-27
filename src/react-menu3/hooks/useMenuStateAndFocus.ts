@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useMenuState } from "./useMenuState";
+
 import { ControlledMenuProps, FocusPosition, MenuStateOptions } from "../types";
+import { useMenuState } from "./useMenuState";
 
 export const useMenuStateAndFocus = (
   options: MenuStateOptions,

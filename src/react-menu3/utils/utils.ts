@@ -1,7 +1,8 @@
-import { unstable_batchedUpdates } from "react-dom";
-import { MenuState, MenuStateOptions } from "../types";
-import { MenuButtonProps } from "../components/MenuButton";
 import { findIndex } from "lodash-es";
+import { unstable_batchedUpdates } from "react-dom";
+
+import { MenuButtonProps } from "../components/MenuButton";
+import { MenuState, MenuStateOptions } from "../types";
 
 export const isMenuOpen = (state?: MenuState) => !!state && state[0] === "o";
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());

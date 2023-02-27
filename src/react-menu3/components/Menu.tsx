@@ -1,17 +1,18 @@
 import {
-  cloneElement,
+  ForwardedRef,
   Fragment,
+  ReactElement,
+  cloneElement,
   forwardRef,
-  useRef,
   useCallback,
   useImperativeHandle,
-  ReactElement,
-  ForwardedRef,
+  useRef,
 } from "react";
-import { ControlledMenu } from "./ControlledMenu";
-import { useMenuChange, useMenuStateAndFocus, useCombinedRef } from "../hooks";
-import { getName, mergeProps, safeCall, isMenuOpen, Keys, FocusPositions } from "../utils";
+
+import { useCombinedRef, useMenuChange, useMenuStateAndFocus } from "../hooks";
 import { MenuButtonModifiers, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../types";
+import { FocusPositions, Keys, getName, isMenuOpen, mergeProps, safeCall } from "../utils";
+import { ControlledMenu } from "./ControlledMenu";
 
 //
 // Menu

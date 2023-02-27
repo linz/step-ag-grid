@@ -6,6 +6,7 @@
  * @return HTMLElement array
  */
 import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
+
 import { wait } from "./util";
 
 const queryAllBySelector = <T extends HTMLElement>(selector: string, container: HTMLElement = document.body): T[] =>

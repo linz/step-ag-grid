@@ -1,4 +1,5 @@
 import { MutableRefObject } from "react";
+
 import { useLayoutEffect } from "./useIsomorphicLayoutEffect";
 
 export const useItemEffect = (

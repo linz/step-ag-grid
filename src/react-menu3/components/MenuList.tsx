@@ -1,30 +1,31 @@
+import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+
+import { HoverItemContext } from "../contexts/HoverItemContext";
+import { MenuListContext } from "../contexts/MenuListContext";
+import { MenuListItemContext } from "../contexts/MenuListItemContext";
+import { SettingsContext } from "../contexts/SettingsContext";
 import { useBEM, useCombinedRef, useItems, useLayoutEffect } from "../hooks";
 import { getPositionHelpers, positionContextMenu, positionMenu } from "../positionUtils";
+import { ControlledMenuProps, MenuDirection } from "../types";
 import {
-  batchedUpdates,
   CloseReason,
+  FocusPositions,
+  HoverActionTypes,
+  Keys,
+  batchedUpdates,
   commonProps,
   floatEqual,
   focusFirstInput,
-  FocusPositions,
   getScrollAncestor,
   getTransition,
-  HoverActionTypes,
   isMenuOpen,
-  Keys,
   menuArrowClass,
   menuClass,
   mergeProps,
   safeCall,
 } from "../utils";
-import { ControlledMenuProps, MenuDirection } from "../types";
-import { MenuListItemContext } from "../contexts/MenuListItemContext";
-import { HoverItemContext } from "../contexts/HoverItemContext";
-import { MenuListContext } from "../contexts/MenuListContext";
-import { SettingsContext } from "../contexts/SettingsContext";
-import { debounce } from "lodash-es";
 
 export const MenuList = ({
   ariaLabel,

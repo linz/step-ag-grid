@@ -1,5 +1,5 @@
-import { TextInputValidator, TextInputValidatorProps } from "./textValidator";
 import { GridBaseRow } from "../components/Grid";
+import { TextInputValidator, TextInputValidatorProps } from "./textValidator";
 
 describe("TextInputValidator", () => {
   test("number format", () => {

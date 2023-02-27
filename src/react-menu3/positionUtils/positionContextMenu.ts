@@ -1,5 +1,5 @@
-import { getPositionHelpers } from "./getPositionHelpers";
 import { MenuDirection } from "../types";
+import { getPositionHelpers } from "./getPositionHelpers";
 
 export const positionContextMenu = ({
   positionHelpers,

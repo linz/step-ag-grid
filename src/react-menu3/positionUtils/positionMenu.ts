@@ -1,8 +1,9 @@
+import { MutableRefObject } from "react";
+
+import { MenuDirection } from "../types";
+import { getPositionHelpers } from "./getPositionHelpers";
 import { placeLeftorRight } from "./placeLeftorRight";
 import { placeToporBottom } from "./placeToporBottom";
-import { MutableRefObject } from "react";
-import { getPositionHelpers } from "./getPositionHelpers";
-import { MenuDirection } from "../types";
 
 interface positionMenuProps {
   offsetX: number;

@@ -1,8 +1,8 @@
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormPopoverMenu, GridFormPopoverMenuProps } from "../gridForm/GridFormPopoverMenu";
-import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
+import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
 
 /**
  * Popout burger menu

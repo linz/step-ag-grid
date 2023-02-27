@@ -1,7 +1,8 @@
-import { usePrevious } from "./reactUtils";
-import { useEffect, useState } from "react";
-import { act, render } from "@testing-library/react";
 import { screen } from "@testing-library/dom";
+import { act, render } from "@testing-library/react";
+import { useEffect, useState } from "react";
+
+import { usePrevious } from "./reactUtils";
 
 interface WrapperProps {
   value: boolean;

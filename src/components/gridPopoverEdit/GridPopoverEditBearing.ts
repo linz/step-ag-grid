@@ -1,14 +1,15 @@
+import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+
 import {
   bearingCorrectionRangeValidator,
   bearingCorrectionValueFormatter,
   bearingRangeValidator,
   bearingValueFormatter,
 } from "../../utils/bearing";
+import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
-import { GridBaseRow } from "../Grid";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
-import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 
 const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
   colDef: GenericCellColDef<RowType>,

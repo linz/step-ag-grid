@@ -1,12 +1,14 @@
 import clsx, { ClassValue } from "clsx";
 import { useMemo, useState } from "react";
+
 import { LuiButton, LuiButtonGroup } from "@linzjs/lui";
 import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
-import { GridBaseRow } from "../Grid";
+
 import { GridFilterExternal } from "../../contexts/GridContext";
+import { GridBaseRow } from "../Grid";
 import { useGridFilter } from "../GridFilter";
 
-interface GridFilterButtonsOption<RowType extends GridBaseRow> {
+export interface GridFilterButtonsOption<RowType extends GridBaseRow> {
   defaultSelected?: boolean;
   filter?: GridFilterExternal<RowType>;
   label: string;

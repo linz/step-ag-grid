@@ -1,9 +1,10 @@
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { ActionButton } from "../../lui/ActionButton";
 import { useCallback } from "react";
+
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/lui/dist/scss/base.scss";
+
+import { ActionButton } from "../../lui/ActionButton";
 import { wait } from "../../utils/util";
 
 export default {

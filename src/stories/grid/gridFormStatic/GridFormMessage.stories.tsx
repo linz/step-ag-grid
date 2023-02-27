@@ -1,11 +1,11 @@
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { GridFormMessage } from "../../../components/gridForm/GridFormMessage";
-import { GridContextProvider } from "../../../contexts/GridContextProvider";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
+
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/lui/dist/scss/base.scss";
+
+import { GridContextProvider, GridFormMessage } from "../../..";
 
 export default {
   title: "GridForm / Static Tests",

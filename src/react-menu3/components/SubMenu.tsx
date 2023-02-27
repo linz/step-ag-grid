@@ -1,30 +1,20 @@
 import {
-  useRef,
+  CSSProperties,
+  KeyboardEvent,
+  ReactNode,
   useContext,
   useEffect,
-  useMemo,
   useImperativeHandle,
-  CSSProperties,
-  ReactNode,
-  KeyboardEvent,
+  useMemo,
+  useRef,
 } from "react";
 import { createPortal } from "react-dom";
-import { useBEM, useCombinedRef, useMenuChange, useMenuStateAndFocus, useItemEffect } from "../hooks";
-import { MenuList } from "./MenuList";
-import {
-  mergeProps,
-  batchedUpdates,
-  commonProps,
-  safeCall,
-  menuClass,
-  subMenuClass,
-  menuItemClass,
-  isMenuOpen,
-  withHovering,
-  Keys,
-  HoverActionTypes,
-  FocusPositions,
-} from "../utils";
+
+import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
+import { MenuListContext } from "../contexts/MenuListContext";
+import { MenuListItemContext } from "../contexts/MenuListItemContext";
+import { SettingsContext } from "../contexts/SettingsContext";
+import { useBEM, useCombinedRef, useItemEffect, useMenuChange, useMenuStateAndFocus } from "../hooks";
 import {
   BaseProps,
   ClassNameProp,
@@ -38,11 +28,22 @@ import {
   RenderProp,
   UncontrolledMenuProps,
 } from "../types";
+import {
+  FocusPositions,
+  HoverActionTypes,
+  Keys,
+  batchedUpdates,
+  commonProps,
+  isMenuOpen,
+  menuClass,
+  menuItemClass,
+  mergeProps,
+  safeCall,
+  subMenuClass,
+  withHovering,
+} from "../utils";
 import { withHoveringResultProps } from "../utils/withHovering";
-import { MenuListItemContext } from "../contexts/MenuListItemContext";
-import { MenuListContext } from "../contexts/MenuListContext";
-import { SettingsContext } from "../contexts/SettingsContext";
-import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
+import { MenuList } from "./MenuList";
 
 //
 // SubMenu

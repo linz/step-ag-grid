@@ -1,20 +1,21 @@
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-
+import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import {
-  GridFormPopoverMenu,
-  PopoutMenuSeparator,
-  SelectedMenuOptionResult,
-} from "../../../components/gridForm/GridFormPopoverMenu";
-import { GridContextProvider } from "../../../contexts/GridContextProvider";
+import { userEvent, within } from "@storybook/testing-library";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
-import { userEvent, within } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
-import { GridBaseRow } from "../../../components/Grid";
-import { GridFormSubComponentTextInput } from "../../../components/gridForm/GridFormSubComponentTextInput";
-import { GridFormSubComponentTextArea } from "../../../components/gridForm/GridFormSubComponentTextArea";
+
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/lui/dist/scss/base.scss";
+
+import {
+  GridBaseRow,
+  GridContextProvider,
+  GridFormPopoverMenu,
+  GridFormSubComponentTextArea,
+  GridFormSubComponentTextInput,
+  PopoutMenuSeparator,
+  SelectedMenuOptionResult,
+} from "../../..";
 
 export default {
   title: "GridForm / Interactions",

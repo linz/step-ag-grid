@@ -1,8 +1,9 @@
-import { useRef, useContext, useEffect, FocusEvent, MutableRefObject } from "react";
+import { FocusEvent, MutableRefObject, useContext, useEffect, useRef } from "react";
+
+import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
+import { MenuListItemContext } from "../contexts/MenuListItemContext";
 import { HoverActionTypes } from "../utils";
 import { useItemEffect } from "./useItemEffect";
-import { MenuListItemContext } from "../contexts/MenuListItemContext";
-import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
 
 // This hook includes some common stateful logic in MenuItem and FocusableItem
 export const useItemState = (
