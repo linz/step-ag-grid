@@ -28,6 +28,8 @@
   },
   "peerDependencies": {
     "@linzjs/lui": ">=17",
+    "ag-grid-community": ">=27",
+    "ag-grid-react": ">=27",
     "lodash-es": ">=4",
     "react": ">=17",
     "react-dom": ">=17"
