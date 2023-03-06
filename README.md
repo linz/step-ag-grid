@@ -1,5 +1,7 @@
 # step-ag-grid
 
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
 ## Features
@@ -44,21 +46,21 @@ Storybook demo deployed at: https://linz.github.io/step-ag-grid/
 Check `src\stories` for more usage examples
 
 ```tsx
-import "@linzjs/lui/dist/scss/base.scss";
-import "@linzjs/lui/dist/fonts";
-import "@linzjs/step-ag-grid/dist/index.css";
-// Only required for LINZ themes otherwise import the default theme from ag-grid
-import "@linzjs/step-ag-grid/dist/GridTheme.scss";
-
 import { useMemo } from "react";
+
+import "@linzjs/lui/dist/fonts";
+import "@linzjs/lui/dist/scss/base.scss";
 import {
-  GridUpdatingContextProvider,
-  GridContextProvider,
   ColDefT,
   GridCell,
-  GridPopoverMessage,
+  GridContextProvider,
   GridPopoverEditDropDown,
+  GridPopoverMessage,
+  GridUpdatingContextProvider,
 } from "@linzjs/step-ag-grid";
+// Only required for LINZ themes otherwise import the default theme from ag-grid
+import "@linzjs/step-ag-grid/dist/GridTheme.scss";
+import "@linzjs/step-ag-grid/dist/index.css";
 
 const GridDemo = () => {
   interface ITestRow {
@@ -81,8 +83,8 @@ const GridDemo = () => {
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: ({value}) => value === "Tester" && "Testers are testing",
-          info: ({value}) => value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridPopoverEditDropDown(
@@ -107,7 +109,7 @@ const GridDemo = () => {
         {
           multiEdit: true,
           editorParams: {
-            message: async ({selectedRows}) => {
+            message: async ({ selectedRows }) => {
               return `There are ${selectedRows.length} row(s) selected`;
             },
           },
