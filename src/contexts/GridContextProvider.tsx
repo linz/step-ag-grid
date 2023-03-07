@@ -1,8 +1,9 @@
-import { ColDef, GridApi, RowNode } from "ag-grid-community";
+import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
+import { ColDefT } from "../components";
 import { GridBaseRow } from "../components/Grid";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridContext, GridFilterExternal } from "./GridContext";
@@ -19,7 +20,8 @@ interface GridContextProps {
  */
 export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
   const { modifyUpdating } = useContext(GridUpdatingContext);
-  const [gridApi, _setGridApi] = useState<GridApi>();
+  const [gridApi, setGridApi] = useState<GridApi>();
+  const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
   const idsBeforeUpdate = useRef<number[]>([]);
@@ -37,9 +39,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Set the grid api when the grid is ready.
    */
-  const setGridApi = useCallback(
-    (gridApi: GridApi | undefined) => {
-      _setGridApi(gridApi);
+  const setApis = useCallback(
+    (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined) => {
+      setGridApi(gridApi);
+      setColumnApi(columnApi);
       gridApi?.setQuickFilter(quickFilter);
       setGridReady(!!gridApi);
     },
@@ -407,12 +410,43 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     return externalFilters.current.every((filter) => filter(node.data, node));
   };
 
+  const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
+
+  const [colsInvisible, setColsInvisible] = useState<string[]>([]);
+  const toggleColumnVisibility = useCallback(
+    (colId: string) => {
+      const isColumnInvisible = colsInvisible.includes(colId);
+      if (isColumnInvisible) setColsInvisible(colsInvisible.filter((id) => id !== colId));
+      else setColsInvisible([...colsInvisible, colId]);
+    },
+    [colsInvisible],
+  );
+  const resetColumnVisibility = useCallback(() => {
+    setColsInvisible([]);
+  }, []);
+
+  useEffect(() => {
+    if (columnApi) {
+      columnApi.setColumnsVisible(
+        getColumns().map((col) => col.colId ?? ""),
+        true,
+      );
+      columnApi.setColumnsVisible(colsInvisible, false);
+    }
+  }, [colsInvisible, columnApi, getColumns]);
+
+  const columnVisible = useCallback((colId: string) => !colsInvisible.includes(colId), [colsInvisible]);
+
   return (
     <GridContext.Provider
       value={{
+        getColumns,
+        toggleColumnVisibility,
+        resetColumnVisibility,
+        columnVisible,
         gridReady,
         prePopupOps,
-        setGridApi,
+        setApis,
         setQuickFilter,
         selectRowsById,
         selectRowsDiff,

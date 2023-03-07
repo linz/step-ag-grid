@@ -23,6 +23,7 @@ import {
   useGridFilter,
   wait,
 } from "../..";
+import { GridColumnsToggle } from "../../components/gridFilter/GridColumnsToggle";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -229,6 +230,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           ]}
         />
+        <GridColumnsToggle />
       </GridFilters>
       <Grid
         {...props}

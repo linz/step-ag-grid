@@ -11,7 +11,7 @@ import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
-import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
+import { GridHeaderSelect } from "./gridHeader";
 
 export interface GridBaseRow {
   id: string | number;
@@ -42,7 +42,7 @@ export interface GridProps {
 export const Grid = (params: GridProps): JSX.Element => {
   const {
     gridReady,
-    setGridApi,
+    setApis,
     prePopupOps,
     ensureRowVisible,
     selectRowsById,
@@ -207,10 +207,10 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setGridApi(event.api);
+      setApis(event.api, event.columnApi);
       synchroniseExternallySelectedItemsToGrid();
     },
-    [setGridApi, synchroniseExternallySelectedItemsToGrid],
+    [setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
   const noRowsOverlayComponent = useCallback(

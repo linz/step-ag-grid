@@ -1,13 +1,14 @@
-import { GridApi, RowNode } from "ag-grid-community";
+import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
+import { ColDefT } from "../components";
 import { GridBaseRow } from "../components/Grid";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
-  setGridApi: (gridApi: GridApi | undefined) => void;
+  setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined) => void;
   prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
@@ -38,16 +39,34 @@ export interface GridContextType<RowType extends GridBaseRow> {
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
+  getColumns: () => ColDefT<RowType>[];
+  toggleColumnVisibility: (colId: string) => void;
+  resetColumnVisibility: () => void;
+  columnVisible: (colId: string) => boolean;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
+  getColumns: () => {
+    console.error("no context provider for getColumns");
+    return [];
+  },
+  toggleColumnVisibility: () => {
+    console.error("no context provider for toggleColumnVisibility");
+  },
+  resetColumnVisibility: () => {
+    console.error("no context provider for resetColumnVisibility");
+  },
+  columnVisible: () => {
+    console.error("no context provider for columnVisible");
+    return true;
+  },
   prePopupOps: () => {
     console.error("no context provider for prePopupOps");
   },
   externallySelectedItemsAreInSync: false,
-  setGridApi: () => {
-    console.error("no context provider for setGridApi");
+  setApis: () => {
+    console.error("no context provider for setApis");
   },
   setQuickFilter: () => {
     console.error("no context provider for setQuickFilter");
