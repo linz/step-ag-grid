@@ -1,6 +1,6 @@
 import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
-import { debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
+import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT } from "../components";
@@ -430,9 +430,11 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     if (columnApi) {
       // show all columns that aren't invisible
       columnApi.setColumnsVisible(
-        getColumns()
-          .filter((col) => col.colId && !colsInvisible.includes(col.colId))
-          .map((col) => col.colId ?? ""),
+        compact(
+          getColumns()
+            .filter((col) => !col.lockVisible && col.colId && !colsInvisible.includes(col.colId))
+            .map((col) => col.colId),
+        ),
         true,
       );
       // hide all invisible columns
