@@ -10,7 +10,7 @@ import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
 import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
 
-export const GridColumnsToggle = (): JSX.Element => {
+export const GridFilterColumnsToggle = (): JSX.Element => {
   const { getColumns, toggleColumnVisibility, columnVisible, resetColumnVisibility } = useContext(GridContext);
 
   const toggleColumn = <T extends GridBaseRow>(col: ColDefT<T>) => {
@@ -30,6 +30,7 @@ export const GridColumnsToggle = (): JSX.Element => {
             .map((col) => (
               <MenuItem
                 key={col.colId}
+                disabled={col.lockVisible}
                 onClick={(e: ClickEvent) => {
                   // Global react-menu MenuItem handler handles tabs
                   if (e.key !== "Tab" && e.key !== "Enter") {
@@ -42,6 +43,7 @@ export const GridColumnsToggle = (): JSX.Element => {
                   isChecked={columnVisible(col.colId ?? "")}
                   value={`${col.colId}`}
                   label={col.headerName ?? ""}
+                  isDisabled={col.lockVisible}
                   inputProps={{
                     onClick: (e) => {
                       // Click is handled by MenuItem onClick
@@ -66,7 +68,7 @@ export const GridColumnsToggle = (): JSX.Element => {
               }
             }}
           >
-            <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} />
+            <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItemIcon"} />
             Reset columns
           </MenuItem>
         </Menu>

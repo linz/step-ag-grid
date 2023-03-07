@@ -4,7 +4,7 @@ import { debounce, defer, delay, difference, isEmpty, last, remove, sortBy } fro
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT } from "../components";
-import { GridBaseRow } from "../components/Grid";
+import { GridBaseRow } from "../components";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
@@ -24,6 +24,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
+  const [colsInvisible, setColsInvisible] = useState<string[]>([]);
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
@@ -412,25 +413,29 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
 
-  const [colsInvisible, setColsInvisible] = useState<string[]>([]);
   const toggleColumnVisibility = useCallback(
     (colId: string) => {
-      const isColumnInvisible = colsInvisible.includes(colId);
-      if (isColumnInvisible) setColsInvisible(colsInvisible.filter((id) => id !== colId));
-      else setColsInvisible([...colsInvisible, colId]);
+      setColsInvisible(
+        colsInvisible.includes(colId) ? colsInvisible.filter((id) => id !== colId) : [...colsInvisible, colId],
+      );
     },
     [colsInvisible],
   );
+
   const resetColumnVisibility = useCallback(() => {
     setColsInvisible([]);
   }, []);
 
   useEffect(() => {
     if (columnApi) {
+      // show all columns that aren't invisible
       columnApi.setColumnsVisible(
-        getColumns().map((col) => col.colId ?? ""),
+        getColumns()
+          .filter((col) => col.colId && !colsInvisible.includes(col.colId))
+          .map((col) => col.colId ?? ""),
         true,
       );
+      // hide all invisible columns
       columnApi.setColumnsVisible(colsInvisible, false);
     }
   }, [colsInvisible, columnApi, getColumns]);

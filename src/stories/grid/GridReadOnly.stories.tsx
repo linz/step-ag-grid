@@ -23,7 +23,7 @@ import {
   useGridFilter,
   wait,
 } from "../..";
-import { GridColumnsToggle } from "../../components/gridFilter/GridColumnsToggle";
+import { GridFilterColumnsToggle } from "../../components/gridFilter/GridFilterColumnsToggle";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -67,6 +67,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
+        lockVisible: true,
       }),
       GridCell({
         field: "position",
@@ -230,7 +231,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           ]}
         />
-        <GridColumnsToggle />
+        <GridFilterColumnsToggle />
       </GridFilters>
       <Grid
         {...props}
