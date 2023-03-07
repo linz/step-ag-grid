@@ -1,8 +1,7 @@
 import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
-import { AgGridReact } from "ag-grid-react";
+import { AgGridReact, AgGridReactProps } from "ag-grid-react";
 import clsx from "clsx";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -17,25 +16,18 @@ export interface GridBaseRow {
   id: string | number;
 }
 
-export interface GridProps {
+export type GridProps = {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   selectable?: boolean;
   ["data-testid"]?: string;
-  domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
-  defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: ColDef[];
-  rowData: GridOptions["rowData"];
   noRowsOverlayText?: string;
-  postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
-  rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
-  onColumnMoved?: GridOptions["onColumnMoved"];
-  alwaysShowVerticalScroll?: boolean;
-}
+} & AgGridReactProps;
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
@@ -321,8 +313,7 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
     >
       <div style={{ flex: 1 }}>
         <AgGridReact
-          animateRows={params.animateRows}
-          rowClassRules={params.rowClassRules}
+          {...params}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
@@ -335,17 +326,13 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
-          domLayout={params.domLayout}
           columnDefs={columnDefs}
-          rowData={params.rowData}
           noRowsOverlayComponent={noRowsOverlayComponent}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
           postSortRows={params.postSortRows ?? postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
-          onColumnMoved={params.onColumnMoved}
-          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
         />
