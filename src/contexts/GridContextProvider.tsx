@@ -255,7 +255,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     return gridApiOp((gridApi) => {
       const rowData: T[] = [];
       gridApi.forEachNodeAfterFilter((node) => {
-        rowData.push(node.data);
+        if (node.isSelected()) rowData.push(node.data);
       });
       return rowData;
     });
