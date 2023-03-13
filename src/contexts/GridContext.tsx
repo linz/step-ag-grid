@@ -2,7 +2,7 @@ import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
 import { ColDefT } from "../components";
-import { GridBaseRow } from "../components/Grid";
+import { GridBaseRow } from "../components";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
@@ -13,7 +13,9 @@ export interface GridContextType<RowType extends GridBaseRow> {
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
+  getFilteredSelectedRows: <T extends GridBaseRow>() => T[];
   getSelectedRowIds: () => number[];
+  getFilteredSelectedRowIds: () => number[];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsById: (rowIds?: number[]) => void;
@@ -40,9 +42,8 @@ export interface GridContextType<RowType extends GridBaseRow> {
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
   getColumns: () => ColDefT<RowType>[];
-  toggleColumnVisibility: (colId: string) => void;
-  resetColumnVisibility: () => void;
-  columnVisible: (colId: string) => boolean;
+  invisibleColumnIds: string[];
+  setInvisibleColumnIds: (colIds: string[]) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
@@ -51,15 +52,9 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getColumns");
     return [];
   },
-  toggleColumnVisibility: () => {
-    console.error("no context provider for toggleColumnVisibility");
-  },
-  resetColumnVisibility: () => {
-    console.error("no context provider for resetColumnVisibility");
-  },
-  columnVisible: () => {
-    console.error("no context provider for columnVisible");
-    return true;
+  invisibleColumnIds: [],
+  setInvisibleColumnIds: () => {
+    console.error("no context provider for setInvisibleColumnIds");
   },
   prePopupOps: () => {
     console.error("no context provider for prePopupOps");
@@ -78,8 +73,16 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getSelectedRows");
     return [];
   },
+  getFilteredSelectedRows: <T extends unknown>(): T[] => {
+    console.error("no context provider for getFilteredSelectedRows");
+    return [];
+  },
   getSelectedRowIds: () => {
     console.error("no context provider for getSelectedRowIds");
+    return [];
+  },
+  getFilteredSelectedRowIds: () => {
+    console.error("no context provider for getFilteredSelectedRowIds");
     return [];
   },
   selectRowsDiff: async () => {

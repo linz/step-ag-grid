@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { useContext } from "react";
+import { isEmpty } from "lodash-es";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { LuiCheckboxInput, LuiIcon } from "@linzjs/lui";
 
@@ -10,15 +11,73 @@ import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
 import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
 
-export const GridFilterColumnsToggle = (): JSX.Element => {
-  const { getColumns, toggleColumnVisibility, columnVisible, resetColumnVisibility } = useContext(GridContext);
+export interface GridFilterColumnsToggleProps {
+  saveState?: boolean;
+}
 
-  const toggleColumn = <T extends GridBaseRow>(col: ColDefT<T>) => {
-    toggleColumnVisibility(col.colId ?? "");
-  };
+export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsToggleProps): JSX.Element => {
+  const [loaded, setLoaded] = useState(false);
+  const { getColumns, invisibleColumnIds, setInvisibleColumnIds } = useContext(GridContext);
+
+  const columnStorageKey = useMemo(() => {
+    // Grid hasn't been initialised yet
+    if (isEmpty(getColumns())) return null;
+    return (
+      "stepAgGrid_invisibleColumnIds_" +
+      getColumns()
+        .map((col) => col.colId || "")
+        .join("_")
+    );
+  }, [getColumns]);
+
+  // Load state on start
+  useEffect(() => {
+    if (!columnStorageKey || loaded) return;
+    if (saveState) {
+      try {
+        const stored = window.localStorage.getItem(columnStorageKey);
+        const invisibleIds = JSON.parse(stored ?? "[]");
+        if (!Array.isArray(invisibleIds)) {
+          console.error(`stored invisible ids not an array: ${stored}`);
+        } else if (!invisibleIds.every((id) => typeof id === "string")) {
+          console.error(`stored invisible ids not strings: ${stored}`);
+        } else {
+          invisibleIds && setInvisibleColumnIds(invisibleIds);
+          setLoaded(true);
+        }
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+  }, [columnStorageKey, loaded, saveState, setInvisibleColumnIds]);
+
+  // Save state on column visibility change
+  useEffect(() => {
+    loaded &&
+      columnStorageKey &&
+      saveState &&
+      window.localStorage.setItem(columnStorageKey, JSON.stringify(invisibleColumnIds));
+  }, [columnStorageKey, invisibleColumnIds, loaded, saveState]);
+
+  const toggleColumn = useCallback(
+    (colId?: string) => {
+      if (!colId) return;
+      setInvisibleColumnIds(
+        invisibleColumnIds.includes(colId)
+          ? invisibleColumnIds.filter((id) => id !== colId)
+          : [...invisibleColumnIds, colId],
+      );
+    },
+    [invisibleColumnIds, setInvisibleColumnIds],
+  );
 
   const resetColumns = () => {
-    resetColumnVisibility();
+    setInvisibleColumnIds([]);
+  };
+
+  const numericRegExp = /^\d+$/;
+  const isNonManageableColum = (col: ColDefT<GridBaseRow>) => {
+    return col.lockVisible || col.colId == null || numericRegExp.test(col.colId);
   };
 
   return (
@@ -35,15 +94,15 @@ export const GridFilterColumnsToggle = (): JSX.Element => {
                   // Global react-menu MenuItem handler handles tabs
                   if (e.key !== "Tab" && e.key !== "Enter") {
                     e.keepOpen = true;
-                    toggleColumn(col);
+                    toggleColumn(col.colId);
                   }
                 }}
               >
                 <LuiCheckboxInput
-                  isChecked={columnVisible(col.colId ?? "")}
+                  isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
                   value={`${col.colId}`}
                   label={col.headerName ?? ""}
-                  isDisabled={col.lockVisible}
+                  isDisabled={isNonManageableColum(col)}
                   inputProps={{
                     onClick: (e) => {
                       // Click is handled by MenuItem onClick

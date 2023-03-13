@@ -24,7 +24,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [colsInvisible, setColsInvisible] = useState<string[]>([]);
+  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>([]);
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
@@ -251,9 +251,24 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     );
   }, [gridApiOp]);
 
+  const getFilteredSelectedRows = useCallback(<T extends unknown>(): T[] => {
+    return gridApiOp((gridApi) => {
+      const rowData: T[] = [];
+      gridApi.forEachNodeAfterFilter((node) => {
+        rowData.push(node.data);
+      });
+      return rowData;
+    });
+  }, [gridApiOp]);
+
   const getSelectedRowIds = useCallback(
     (): number[] => getSelectedRows().map((row) => (row as any).id as number),
     [getSelectedRows],
+  );
+
+  const getFilteredSelectedRowIds = useCallback(
+    (): number[] => getFilteredSelectedRows().map((row) => (row as any).id as number),
+    [getFilteredSelectedRows],
   );
 
   const editingCells = useCallback((): boolean => {
@@ -413,44 +428,28 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
 
-  const toggleColumnVisibility = useCallback(
-    (colId: string) => {
-      setColsInvisible(
-        colsInvisible.includes(colId) ? colsInvisible.filter((id) => id !== colId) : [...colsInvisible, colId],
-      );
-    },
-    [colsInvisible],
-  );
-
-  const resetColumnVisibility = useCallback(() => {
-    setColsInvisible([]);
-  }, []);
-
   useEffect(() => {
     if (columnApi) {
       // show all columns that aren't invisible
       columnApi.setColumnsVisible(
         compact(
           getColumns()
-            .filter((col) => !col.lockVisible && col.colId && !colsInvisible.includes(col.colId))
+            .filter((col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId))
             .map((col) => col.colId),
         ),
         true,
       );
       // hide all invisible columns
-      columnApi.setColumnsVisible(colsInvisible, false);
+      columnApi.setColumnsVisible(invisibleColumnIds, false);
     }
-  }, [colsInvisible, columnApi, getColumns]);
-
-  const columnVisible = useCallback((colId: string) => !colsInvisible.includes(colId), [colsInvisible]);
+  }, [invisibleColumnIds, columnApi, getColumns]);
 
   return (
     <GridContext.Provider
       value={{
         getColumns,
-        toggleColumnVisibility,
-        resetColumnVisibility,
-        columnVisible,
+        invisibleColumnIds,
+        setInvisibleColumnIds,
         gridReady,
         prePopupOps,
         setApis,
@@ -463,7 +462,9 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         flashRowsDiff,
         focusByRowById,
         getSelectedRows,
+        getFilteredSelectedRows,
         getSelectedRowIds,
+        getFilteredSelectedRowIds,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,
