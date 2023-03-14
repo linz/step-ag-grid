@@ -6,7 +6,7 @@ import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton"
 
 import { GridFilterExternal } from "../../contexts/GridContext";
 import { GridBaseRow } from "../Grid";
-import { useGridFilter } from "../useGridFilter";
+import { useGridFilter } from "./useGridFilter";
 
 export interface GridFilterButtonsOption<RowType extends GridBaseRow> {
   defaultSelected?: boolean;
@@ -32,10 +32,7 @@ export const GridFilterButtons = <RowType extends GridBaseRow>({
   useGridFilter(filter);
 
   return (
-    <div
-      className={clsx("lui-margin-top-xxs lui-margin-bottom-xxs", className)}
-      style={{ display: "flex", alignItems: "center" }}
-    >
+    <div className={clsx(className, "flex-col-center")}>
       <LuiButtonGroup>
         {options.map((option, index) => (
           <LuiButton

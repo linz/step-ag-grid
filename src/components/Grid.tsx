@@ -27,6 +27,7 @@ export interface GridProps {
   defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: ColDef[];
   rowData: GridOptions["rowData"];
+  noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowClassRules?: GridOptions["rowClassRules"];
@@ -218,10 +219,16 @@ export const Grid = (params: GridProps): JSX.Element => {
       const hasData = (params.rowData?.length ?? 0) > 0;
       const hasFilteredData = event.api.getDisplayedRowCount() > 0;
       return (
-        <span>{!hasData ? "There are currently no rows" : !hasFilteredData ? "All rows have been filtered" : ""}</span>
+        <span>
+          {!hasData
+            ? params.noRowsOverlayText ?? "There are currently no rows"
+            : !hasFilteredData
+            ? "All rows have been filtered"
+            : ""}
+        </span>
       );
     },
-    [params.rowData?.length],
+    [params.noRowsOverlayText, params.rowData?.length],
   );
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {

@@ -27,21 +27,24 @@
 
 .Grid-container-filters {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 0.25rem;
   flex: 0;
   display: flex;
+  align-items: center;
   flex-direction: row;
   grid-column-gap: 1em;
+  padding: 0.25rem 0;
 }
 
 
 .Grid-quickFilterBox {
   width: 100%;
-  height: 48px;
+  height: 40px;
   border: 0.06rem solid colors.$silver;
   border-radius: 3px;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
+  font-family: "Open Sans", system-ui, sans-serif;
 }
 
 .Grid-popoverContainer {
@@ -81,3 +84,16 @@
 .Grid-container.ag-theme-alpine .ag-cell-wrapper {
   width: 100%;
 }
+
+.flex-col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flex-row-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+

@@ -18,11 +18,11 @@ export const GridFilterQuick = ({ quickFilterPlaceholder, defaultValue }: GridFi
   return (
     <input
       aria-label="Search"
-      className="lui-margin-top-xxs lui-margin-bottom-xxs Grid-quickFilterBox"
+      className="Grid-quickFilterBox"
       type="text"
       placeholder={quickFilterPlaceholder ?? "Search..."}
       value={quickFilterValue}
-      onChange={(event): void => {
+      onChange={(event) => {
         setQuickFilterValue(event.target.value);
       }}
     />

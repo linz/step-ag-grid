@@ -83,39 +83,46 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
   return (
     <div className={clsx("lui-margin-top-xxs lui-margin-bottom-xxs")} style={{ display: "flex", alignItems: "center" }}>
       <>
-        <Menu menuButton={<GridFilterHeaderIconButton icon={"ic_columns"} />} menuClassName={"step-ag-grid-react-menu"}>
-          {getColumns()
-            .filter((col) => !!col.headerName)
-            .map((col) => (
-              <MenuItem
-                key={col.colId}
-                disabled={col.lockVisible}
-                onClick={(e: ClickEvent) => {
-                  // Global react-menu MenuItem handler handles tabs
-                  if (e.key !== "Tab" && e.key !== "Enter") {
-                    e.keepOpen = true;
-                    toggleColumn(col.colId);
-                  }
-                }}
-              >
-                <LuiCheckboxInput
-                  isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
-                  value={`${col.colId}`}
-                  label={col.headerName ?? ""}
-                  isDisabled={isNonManageableColum(col)}
-                  inputProps={{
-                    onClick: (e) => {
-                      // Click is handled by MenuItem onClick
-                      e.preventDefault();
-                      e.stopPropagation();
-                    },
+        <Menu
+          menuButton={<GridFilterHeaderIconButton icon={"ic_columns"} title={"Column visibility"} />}
+          menuClassName={"step-ag-grid-react-menu"}
+          portal={true}
+          unmountOnClose={true}
+        >
+          <div className={"GridFilterColumnsToggle-container"}>
+            {getColumns()
+              .filter((col) => !!col.headerName)
+              .map((col) => (
+                <MenuItem
+                  key={col.colId}
+                  disabled={col.lockVisible}
+                  onClick={(e: ClickEvent) => {
+                    // Global react-menu MenuItem handler handles tabs
+                    if (e.key !== "Tab" && e.key !== "Enter") {
+                      e.keepOpen = true;
+                      toggleColumn(col.colId);
+                    }
                   }}
-                  onChange={() => {
-                    /*Do nothing, change handled by menuItem*/
-                  }}
-                />
-              </MenuItem>
-            ))}
+                >
+                  <LuiCheckboxInput
+                    isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
+                    value={`${col.colId}`}
+                    label={col.headerName ?? ""}
+                    isDisabled={isNonManageableColum(col)}
+                    inputProps={{
+                      onClick: (e) => {
+                        // Click is handled by MenuItem onClick
+                        e.preventDefault();
+                        e.stopPropagation();
+                      },
+                    }}
+                    onChange={() => {
+                      /*Do nothing, change handled by menuItem*/
+                    }}
+                  />
+                </MenuItem>
+              ))}
+          </div>
           <MenuDivider key={`$$divider_reset_columns`} />
           <MenuItem
             key={"$$reset_columns"}

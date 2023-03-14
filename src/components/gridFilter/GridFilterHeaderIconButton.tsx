@@ -1,33 +1,33 @@
-import { ButtonHTMLAttributes, MouseEventHandler, forwardRef } from "react";
+import { ButtonHTMLAttributes, MouseEvent, forwardRef } from "react";
 
-import { LuiIcon } from "@linzjs/lui";
+import { LuiButton, LuiIcon } from "@linzjs/lui";
 import { IconName, IconSize } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
-
-import "./GridFilterHeaderIconButton.scss";
 
 export interface GridFilterHeaderIconButtonProps {
   icon: IconName;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
+  onClick?: (e: MouseEvent) => void;
   buttonProps?: Partial<ButtonHTMLAttributes<HTMLButtonElement>>;
   disabled?: boolean;
   size?: IconSize;
+  title: string;
 }
 
 export const GridFilterHeaderIconButton = forwardRef<HTMLButtonElement, GridFilterHeaderIconButtonProps>(
-  function columnsButton({ icon, onClick, buttonProps, disabled = false, size = "md" }, ref) {
+  function columnsButton({ icon, title, onClick, buttonProps, disabled = false, size = "md" }, ref) {
     return (
-      <button
+      <LuiButton
         {...buttonProps}
         type={"button"}
-        className={"GridFilterHeaderIconButton"}
+        level={"tertiary"}
+        className={"GridFilterHeaderIconButton lui-button-icon-only"}
         ref={ref}
-        aria-label="More actions"
-        title={"More actions"}
+        aria-label={title}
+        title={title}
         onClick={onClick}
         disabled={disabled}
       >
         <LuiIcon name={icon} alt={"Menu"} size={size} />
-      </button>
+      </LuiButton>
     );
   },
 );

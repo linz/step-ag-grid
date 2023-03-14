@@ -14,7 +14,7 @@ import {
   GenericCellRendererParams,
   RowValueFormatterParams,
   RowValueGetterParams,
-} from "./gridRender/GridRenderGenericCell";
+} from "./gridRender";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
