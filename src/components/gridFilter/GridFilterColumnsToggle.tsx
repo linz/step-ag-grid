@@ -19,16 +19,16 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
   const [loaded, setLoaded] = useState(false);
   const { getColumns, invisibleColumnIds, setInvisibleColumnIds } = useContext(GridContext);
 
-  const columnStorageKey = useMemo(() => {
-    // Grid hasn't been initialised yet
-    if (isEmpty(getColumns())) return null;
-    return (
-      "stepAgGrid_invisibleColumnIds_" +
-      getColumns()
-        .map((col) => col.colId || "")
-        .join("_")
-    );
-  }, [getColumns]);
+  const columnStorageKey = useMemo(
+    () =>
+      isEmpty(getColumns())
+        ? null // Grid hasn't been initialised yet
+        : "stepAgGrid_invisibleColumnIds_" +
+          getColumns()
+            .map((col) => col.colId || "")
+            .join("_"),
+    [getColumns],
+  );
 
   // Load state on start
   useEffect(() => {
@@ -43,11 +43,11 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
           console.error(`stored invisible ids not strings: ${stored}`);
         } else {
           invisibleIds && setInvisibleColumnIds(invisibleIds);
-          setLoaded(true);
         }
       } catch (ex) {
         console.error(ex);
       }
+      setLoaded(true);
     }
   }, [columnStorageKey, loaded, saveState, setInvisibleColumnIds]);
 
@@ -76,7 +76,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
   };
 
   const numericRegExp = /^\d+$/;
-  const isNonManageableColum = (col: ColDefT<GridBaseRow>) => {
+  const isNonManageableColumn = (col: ColDefT<GridBaseRow>) => {
     return col.lockVisible || col.colId == null || numericRegExp.test(col.colId);
   };
 
@@ -98,9 +98,11 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
                   disabled={col.lockVisible}
                   onClick={(e: ClickEvent) => {
                     // Global react-menu MenuItem handler handles tabs
-                    if (e.key !== "Tab" && e.key !== "Enter") {
+                    if (e.key !== "Tab") {
                       e.keepOpen = true;
-                      toggleColumn(col.colId);
+                      if (e.key !== "Enter") {
+                        toggleColumn(col.colId);
+                      }
                     }
                   }}
                 >
@@ -108,10 +110,10 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
                     isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
                     value={`${col.colId}`}
                     label={col.headerName ?? ""}
-                    isDisabled={isNonManageableColum(col)}
+                    isDisabled={isNonManageableColumn(col)}
                     inputProps={{
                       onClick: (e) => {
-                        // Click is handled by MenuItem onClick
+                        // Click is handled by MenuItem onClick so keyboard events work
                         e.preventDefault();
                         e.stopPropagation();
                       },
@@ -128,8 +130,8 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
             key={"$$reset_columns"}
             onClick={(e: ClickEvent) => {
               // Global react-menu MenuItem handler handles tabs
-              if (e.key !== "Tab" && e.key !== "Enter") {
-                e.keepOpen = true;
+              if (e.key !== "Tab") {
+                e.keepOpen = e.key !== "Enter";
                 resetColumns();
               }
             }}
