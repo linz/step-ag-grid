@@ -40,7 +40,7 @@ export interface GridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = (params: GridProps): JSX.Element => {
+export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...params }: GridProps): JSX.Element => {
   const {
     gridReady,
     setApis,
@@ -80,7 +80,7 @@ export const Grid = (params: GridProps): JSX.Element => {
     externallySelectedItemsAreInSync,
     focusByRowById,
     gridReady,
-    params,
+    params.externalSelectedItems,
     params.autoSelectFirstRow,
     params.rowData,
     selectRowsById,
@@ -179,11 +179,10 @@ export const Grid = (params: GridProps): JSX.Element => {
             maxWidth: 42,
             suppressSizeToFit: true,
             checkboxSelection: true,
-            headerComponent: params.rowSelection === "multiple" ? GridHeaderSelect : null,
+            headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
-                const selectedNodeCount = e.api.getSelectedRows().length;
-                if (selectedNodeCount == 0) {
+                if (isEmpty(e.api.getSelectedRows())) {
                   e.api.selectAllFiltered();
                 } else {
                   e.api.deselectAll();
@@ -200,18 +199,18 @@ export const Grid = (params: GridProps): JSX.Element => {
   }, [
     params.columnDefs,
     params.selectable,
-    params.rowSelection,
     params.readOnly,
     params.defaultColDef?.editable,
+    rowSelection,
     clickSelectorCheckboxWhenContainingCellClicked,
   ]);
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setApis(event.api, event.columnApi, params["data-testid"]);
+      setApis(event.api, event.columnApi, dataTestId);
       synchroniseExternallySelectedItemsToGrid();
     },
-    [setApis, synchroniseExternallySelectedItemsToGrid],
+    [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
   const noRowsOverlayComponent = useCallback(
@@ -312,7 +311,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   return (
     <div
-      data-testid={params["data-testid"]}
+      data-testid={dataTestId}
       className={clsx(
         "Grid-container",
         "ag-theme-alpine",
@@ -326,7 +325,7 @@ export const Grid = (params: GridProps): JSX.Element => {
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
-          rowSelection={params.rowSelection ?? "multiple"}
+          rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
           colResizeDefault={"shift"}
           onFirstDataRendered={sizeColumnsToFit}
