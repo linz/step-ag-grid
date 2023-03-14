@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { isEmpty } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
@@ -81,66 +80,62 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
   };
 
   return (
-    <div className={clsx("lui-margin-top-xxs lui-margin-bottom-xxs")} style={{ display: "flex", alignItems: "center" }}>
-      <>
-        <Menu
-          menuButton={<GridFilterHeaderIconButton icon={"ic_columns"} title={"Column visibility"} />}
-          menuClassName={"step-ag-grid-react-menu"}
-          portal={true}
-          unmountOnClose={true}
-        >
-          <div className={"GridFilterColumnsToggle-container"}>
-            {getColumns()
-              .filter((col) => !!col.headerName)
-              .map((col) => (
-                <MenuItem
-                  key={col.colId}
-                  disabled={col.lockVisible}
-                  onClick={(e: ClickEvent) => {
-                    // Global react-menu MenuItem handler handles tabs
-                    if (e.key !== "Tab") {
-                      e.keepOpen = true;
-                      if (e.key !== "Enter") {
-                        toggleColumn(col.colId);
-                      }
-                    }
-                  }}
-                >
-                  <LuiCheckboxInput
-                    isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
-                    value={`${col.colId}`}
-                    label={col.headerName ?? ""}
-                    isDisabled={isNonManageableColumn(col)}
-                    inputProps={{
-                      onClick: (e) => {
-                        // Click is handled by MenuItem onClick so keyboard events work
-                        e.preventDefault();
-                        e.stopPropagation();
-                      },
-                    }}
-                    onChange={() => {
-                      /*Do nothing, change handled by menuItem*/
-                    }}
-                  />
-                </MenuItem>
-              ))}
-          </div>
-          <MenuDivider key={`$$divider_reset_columns`} />
-          <MenuItem
-            key={"$$reset_columns"}
-            onClick={(e: ClickEvent) => {
-              // Global react-menu MenuItem handler handles tabs
-              if (e.key !== "Tab") {
-                e.keepOpen = e.key !== "Enter";
-                resetColumns();
-              }
-            }}
-          >
-            <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItemIcon"} />
-            Reset columns
-          </MenuItem>
-        </Menu>
-      </>
-    </div>
+    <Menu
+      menuButton={<GridFilterHeaderIconButton icon={"ic_columns"} title={"Column visibility"} />}
+      menuClassName={"step-ag-grid-react-menu"}
+      portal={true}
+      unmountOnClose={true}
+    >
+      <div className={"GridFilterColumnsToggle-container"}>
+        {getColumns()
+          .filter((col) => !!col.headerName)
+          .map((col) => (
+            <MenuItem
+              key={col.colId}
+              disabled={col.lockVisible}
+              onClick={(e: ClickEvent) => {
+                // Global react-menu MenuItem handler handles tabs
+                if (e.key !== "Tab") {
+                  e.keepOpen = true;
+                  if (e.key !== "Enter") {
+                    toggleColumn(col.colId);
+                  }
+                }
+              }}
+            >
+              <LuiCheckboxInput
+                isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
+                value={`${col.colId}`}
+                label={col.headerName ?? ""}
+                isDisabled={isNonManageableColumn(col)}
+                inputProps={{
+                  onClick: (e) => {
+                    // Click is handled by MenuItem onClick so keyboard events work
+                    e.preventDefault();
+                    e.stopPropagation();
+                  },
+                }}
+                onChange={() => {
+                  /*Do nothing, change handled by menuItem*/
+                }}
+              />
+            </MenuItem>
+          ))}
+      </div>
+      <MenuDivider key={`$$divider_reset_columns`} />
+      <MenuItem
+        key={"$$reset_columns"}
+        onClick={(e: ClickEvent) => {
+          // Global react-menu MenuItem handler handles tabs
+          if (e.key !== "Tab") {
+            e.keepOpen = e.key !== "Enter";
+            resetColumns();
+          }
+        }}
+      >
+        <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItemIcon"} />
+        Reset columns
+      </MenuItem>
+    </Menu>
   );
 };
