@@ -24,6 +24,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
   const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>([]);
+  const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
@@ -35,19 +36,6 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   useEffect(() => {
     gridApi?.setQuickFilter(quickFilter);
   }, [gridApi, quickFilter]);
-
-  /**
-   * Set the grid api when the grid is ready.
-   */
-  const setApis = useCallback(
-    (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined) => {
-      setGridApi(gridApi);
-      setColumnApi(columnApi);
-      gridApi?.setQuickFilter(quickFilter);
-      setGridReady(!!gridApi);
-    },
-    [quickFilter],
-  );
 
   /**
    * Wraps things that require gridApi in common handling, for when gridApi not present.
@@ -64,6 +52,54 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     },
     [gridApi],
   );
+
+  /**
+   * Scroll row into view by Id.
+   *
+   * @param id Id to scroll into view
+   * @return true if row is found, else false
+   */
+  const ensureRowVisible = useCallback(
+    (id: number | string): boolean => {
+      return gridApiOp((gridApi) => {
+        const node = gridApi.getRowNode(`${id}`);
+        if (!node) return false;
+        gridApi.ensureNodeVisible(node);
+        return true;
+      });
+    },
+    [gridApiOp],
+  );
+
+  /**
+   * Set the grid api when the grid is ready.
+   */
+  const setApis = useCallback(
+    (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => {
+      testId.current = dataTestId;
+      setGridApi(gridApi);
+      setColumnApi(columnApi);
+      gridApi?.setQuickFilter(quickFilter);
+      setGridReady(!!gridApi);
+    },
+    [quickFilter],
+  );
+
+  /**
+   * Expose scrollRowIntoView for playwright tests.
+   */
+  useEffect(() => {
+    const globalSupport = (window as any).__stepAgGrid || ((window as any).__stepAgGrid = { grids: {} });
+    if (testId.current) {
+      globalSupport.grids[testId.current] = {
+        scrollRowIntoViewById: (rowId: number | string) => {
+          if (!ensureRowVisible(rowId)) {
+            throw `scrollRowIntoView failed on grid '${testId.current}' as row with id: '${rowId}' was not found`;
+          }
+        },
+      };
+    }
+  }, [ensureRowVisible]);
 
   /**
    * Before a popup record the currently focused cell.
@@ -276,18 +312,6 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       () => false,
     );
   }, [gridApiOp]);
-
-  const ensureRowVisible = useCallback(
-    (id: number | string): boolean => {
-      return gridApiOp((gridApi) => {
-        const node = gridApi.getRowNode(`${id}`);
-        if (!node) return false;
-        gridApi.ensureNodeVisible(node);
-        return true;
-      });
-    },
-    [gridApiOp],
-  );
 
   /**
    * Scroll last selected row into view on grid sort change

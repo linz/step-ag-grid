@@ -208,7 +208,7 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setApis(event.api, event.columnApi);
+      setApis(event.api, event.columnApi, params["data-testid"]);
       synchroniseExternallySelectedItemsToGrid();
     },
     [setApis, synchroniseExternallySelectedItemsToGrid],

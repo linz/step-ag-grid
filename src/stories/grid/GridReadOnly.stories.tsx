@@ -231,6 +231,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         <GridFilterColumnsToggle />
       </GridFilters>
       <Grid
+        data-testid={"readonly"}
         {...props}
         selectable={true}
         autoSelectFirstRow={true}

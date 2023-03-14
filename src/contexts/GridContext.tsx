@@ -7,7 +7,7 @@ export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, ro
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
-  setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined) => void;
+  setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
