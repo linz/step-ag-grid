@@ -1,18 +1,20 @@
-import { GridApi, RowNode } from "ag-grid-community";
+import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
-import { GridBaseRow } from "../components/Grid";
+import { ColDefT, GridBaseRow } from "../components";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
-  setGridApi: (gridApi: GridApi | undefined) => void;
+  setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
+  getFilteredSelectedRows: <T extends GridBaseRow>() => T[];
   getSelectedRowIds: () => number[];
+  getFilteredSelectedRowIds: () => number[];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsById: (rowIds?: number[]) => void;
@@ -38,16 +40,27 @@ export interface GridContextType<RowType extends GridBaseRow> {
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
+  getColumns: () => ColDefT<RowType>[];
+  invisibleColumnIds: string[];
+  setInvisibleColumnIds: (colIds: string[]) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
+  getColumns: () => {
+    console.error("no context provider for getColumns");
+    return [];
+  },
+  invisibleColumnIds: [],
+  setInvisibleColumnIds: () => {
+    console.error("no context provider for setInvisibleColumnIds");
+  },
   prePopupOps: () => {
     console.error("no context provider for prePopupOps");
   },
   externallySelectedItemsAreInSync: false,
-  setGridApi: () => {
-    console.error("no context provider for setGridApi");
+  setApis: () => {
+    console.error("no context provider for setApis");
   },
   setQuickFilter: () => {
     console.error("no context provider for setQuickFilter");
@@ -59,8 +72,16 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getSelectedRows");
     return [];
   },
+  getFilteredSelectedRows: <T extends unknown>(): T[] => {
+    console.error("no context provider for getFilteredSelectedRows");
+    return [];
+  },
   getSelectedRowIds: () => {
     console.error("no context provider for getSelectedRowIds");
+    return [];
+  },
+  getFilteredSelectedRowIds: () => {
+    console.error("no context provider for getFilteredSelectedRowIds");
     return [];
   },
   selectRowsDiff: async () => {

@@ -4,7 +4,6 @@ export * from "./GridCell";
 export * from "./GridCellMultiEditor";
 export * from "./GridCellMultiSelectClassRules";
 export * from "./gridFilter";
-export * from "./GridFilter";
 export * from "./gridForm";
 export * from "./gridHeader";
 export * from "./GridIcon";

@@ -130,7 +130,28 @@ const GridDemo = () => {
   return (
     <GridUpdatingContextProvider>
       <GridContextProvider>
-        <Grid selectable={true} columnDefs={columnDefs} rowData={rowData} />
+        <GridWrapper>
+          <GridFilters>
+            <GridFilterQuick quickFilterPlaceholder={"Search..."} />
+            <GridFilterButtons<ITestRow>
+                    options={[
+                      {
+                        label: "All",
+                      },
+                      {
+                        label: "Developers",
+                        filter: (row) => row.position === "Developer",
+                      },
+                      {
+                        label: "Testers",
+                        filter: (row) => row.position === "Tester",
+                      },
+                    ]}
+            />
+            <GridFilterColumnsToggle/>
+          </GridFilters>
+          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData} />
+        </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
   );
@@ -187,3 +208,13 @@ test("click Delete menu option removes row from the table", async () => {
   await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined());
 });
 ```
+
+## Playwright support
+
+If your grid has a data-testid a global will be exposed in window with the helper scrollRowIntoViewById.
+This will throw an exception if the row id is not found.
+
+```tsx
+window.__stepAgGrid.grids[dataTestId].scrollRowIntoViewById("1000")
+```
+

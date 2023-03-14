@@ -12,7 +12,7 @@ interface GridPopoverContextProps {
 }
 
 export const GridPopoverContextProvider = ({ props, children }: GridPopoverContextProps) => {
-  const { getSelectedRows, updatingCells } = useContext(GridContext);
+  const { getFilteredSelectedRows, updatingCells } = useContext(GridContext);
   const anchorRef = useRef<Element>(props.eGridCell);
 
   const hasSaved = useRef(false);
@@ -23,8 +23,9 @@ export const GridPopoverContextProvider = ({ props, children }: GridPopoverConte
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   // Then item that is clicked on will always be first in the list
   const selectedRows = useMemo(
-    () => (multiEdit ? sortBy(getSelectedRows(), (row) => row.id !== props.data.id) : [props.data as GridBaseRow]),
-    [getSelectedRows, multiEdit, props.data],
+    () =>
+      multiEdit ? sortBy(getFilteredSelectedRows(), (row) => row.id !== props.data.id) : [props.data as GridBaseRow],
+    [getFilteredSelectedRows, multiEdit, props.data],
   );
   const field = props.colDef?.field ?? "";
 

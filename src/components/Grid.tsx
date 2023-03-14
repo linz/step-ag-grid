@@ -11,7 +11,7 @@ import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
-import { GridHeaderSelect } from "./gridHeader/GridHeaderSelect";
+import { GridHeaderSelect } from "./gridHeader";
 
 export interface GridBaseRow {
   id: string | number;
@@ -27,6 +27,7 @@ export interface GridProps {
   defaultColDef?: GridOptions["defaultColDef"];
   columnDefs: ColDef[];
   rowData: GridOptions["rowData"];
+  noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowClassRules?: GridOptions["rowClassRules"];
@@ -42,7 +43,7 @@ export interface GridProps {
 export const Grid = (params: GridProps): JSX.Element => {
   const {
     gridReady,
-    setGridApi,
+    setApis,
     prePopupOps,
     ensureRowVisible,
     selectRowsById,
@@ -207,10 +208,10 @@ export const Grid = (params: GridProps): JSX.Element => {
 
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setGridApi(event.api);
+      setApis(event.api, event.columnApi, params["data-testid"]);
       synchroniseExternallySelectedItemsToGrid();
     },
-    [setGridApi, synchroniseExternallySelectedItemsToGrid],
+    [setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
   const noRowsOverlayComponent = useCallback(
@@ -218,10 +219,16 @@ export const Grid = (params: GridProps): JSX.Element => {
       const hasData = (params.rowData?.length ?? 0) > 0;
       const hasFilteredData = event.api.getDisplayedRowCount() > 0;
       return (
-        <span>{!hasData ? "There are currently no rows" : !hasFilteredData ? "All rows have been filtered" : ""}</span>
+        <span>
+          {!hasData
+            ? params.noRowsOverlayText ?? "There are currently no rows"
+            : !hasFilteredData
+            ? "All rows have been filtered"
+            : ""}
+        </span>
       );
     },
-    [params.rowData?.length],
+    [params.noRowsOverlayText, params.rowData?.length],
   );
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {

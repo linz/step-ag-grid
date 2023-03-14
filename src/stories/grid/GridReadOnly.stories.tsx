@@ -23,6 +23,7 @@ import {
   useGridFilter,
   wait,
 } from "../..";
+import { GridFilterColumnsToggle } from "../../components";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -66,6 +67,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
+        lockVisible: true,
       }),
       GridCell({
         field: "position",
@@ -213,10 +215,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     <GridWrapper maxHeight={300}>
       <GridFilters>
         <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
-        <div>
-          Custom filter: Age less than:
-          <GridFilterLessThan field={"age"} />
-        </div>
+        <GridFilterLessThan text="Age <" field={"age"} />
         <GridFilterButtons<ITestRow>
           luiButtonProps={{ style: { whiteSpace: "nowrap" } }}
           options={[
@@ -229,8 +228,10 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
             },
           ]}
         />
+        <GridFilterColumnsToggle />
       </GridFilters>
       <Grid
+        data-testid={"readonly"}
         {...props}
         selectable={true}
         autoSelectFirstRow={true}
@@ -243,7 +244,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 };
 
-const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
+const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): JSX.Element => {
   const [value, setValue] = useState<number>();
 
   const filter = useCallback(
@@ -261,7 +262,13 @@ const GridFilterLessThan = (props: { field: keyof ITestRow }): JSX.Element => {
     }
   };
 
-  return <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} />;
+  return (
+    <div className={"flex-row-center"}>
+      <div style={{ whiteSpace: "nowrap" }}>{props.text}</div>
+      &#160;
+      <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
+    </div>
+  );
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
