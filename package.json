@@ -32,7 +32,7 @@
     "ag-grid-react": ">=27",
     "lodash-es": ">=4",
     "react": ">=17",
-    "react-dom": ">=17"
+    "react-dom": ">=18"
   },
   "dependencies": {
     "@linzjs/lui": ">=17",
@@ -42,7 +42,7 @@
     "lodash-es": ">=4",
     "matcher": "^5.0.0",
     "react": ">=17",
-    "react-dom": ">=17",
+    "react-dom": ">=18",
     "react-transition-state": "^2.0.2",
     "uuid": "^9.0.0"
   },
@@ -105,7 +105,7 @@
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.13.0",
     "@types/react": "^17.0.53",
-    "@types/react-dom": "^17.0.18",
+    "@types/react-dom": "^18.0.11",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/parser": "^5.51.0",
     "babel-jest": "^29.4.2",
