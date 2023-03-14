@@ -57,6 +57,10 @@ import {
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
+  GridWrapper,
+  GridFilters,
+  GridFilterQuick,
+  GridFilterButtons
 } from "@linzjs/step-ag-grid";
 // Only required for LINZ themes otherwise import the default theme from ag-grid
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
