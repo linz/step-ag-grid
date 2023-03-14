@@ -92,7 +92,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
           .map((col) => (
             <MenuItem
               key={col.colId}
-              disabled={col.lockVisible}
+              disabled={isNonManageableColumn(col)}
               onClick={(e: ClickEvent) => {
                 // Global react-menu MenuItem handler handles tabs
                 if (e.key !== "Tab") {
