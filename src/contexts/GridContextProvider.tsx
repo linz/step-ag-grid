@@ -3,8 +3,7 @@ import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { ColDefT } from "../components";
-import { GridBaseRow } from "../components";
+import { ColDefT, GridBaseRow } from "../components";
 import { isNotEmpty, wait } from "../utils/util";
 import { GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";

@@ -1,8 +1,7 @@
 import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
-import { ColDefT } from "../components";
-import { GridBaseRow } from "../components";
+import { ColDefT, GridBaseRow } from "../components";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 

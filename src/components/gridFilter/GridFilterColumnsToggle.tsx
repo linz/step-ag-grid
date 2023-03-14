@@ -133,7 +133,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
           }
         }}
       >
-        <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItemIcon"} />
+        <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItem-icon"} />
         Reset columns
       </MenuItem>
     </Menu>
