@@ -10,7 +10,8 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
-import { GridNoRowsOverlay, usePostSortRowsHook } from "./";
+import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
+import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
 
 export interface GridBaseRow {
