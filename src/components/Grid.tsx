@@ -214,10 +214,6 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
-  //const noRowsOverlayComponent = (
-  //  <NoRowsOverlayComponent noRowsOverlayText={params.noRowsOverlayText} rowData={params.rowData} />
-  //);
-
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
   }, []);
