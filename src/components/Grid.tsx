@@ -36,12 +36,20 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   alwaysShowVerticalScroll?: boolean;
+  onGridSizeChanged: GridOptions["onGridSizeChanged"];
+  onFirstDataRendered: GridOptions["onFirstDataRendered"];
+  suppressColumnVirtualization: GridOptions["suppressColumnVirtualisation"];
 }
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...params }: GridProps): JSX.Element => {
+export const Grid = ({
+  "data-testid": dataTestId,
+  rowSelection = "multiple",
+  suppressColumnVirtualization = true,
+  ...params
+}: GridProps): JSX.Element => {
   const {
     gridReady,
     setApis,
@@ -312,8 +320,9 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
           colResizeDefault={"shift"}
-          onFirstDataRendered={sizeColumnsToFit}
-          onGridSizeChanged={sizeColumnsToFit}
+          onFirstDataRendered={params.onFirstDataRendered ?? sizeColumnsToFit}
+          onGridSizeChanged={params.onGridSizeChanged ?? sizeColumnsToFit}
+          suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
