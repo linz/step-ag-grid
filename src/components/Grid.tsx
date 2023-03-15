@@ -43,7 +43,12 @@ export interface GridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...params }: GridProps): JSX.Element => {
+export const Grid = ({
+  "data-testid": dataTestId,
+  rowSelection = "multiple",
+  suppressColumnVirtualization = true,
+  ...params
+}: GridProps): JSX.Element => {
   const {
     gridReady,
     setApis,
@@ -333,7 +338,7 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           colResizeDefault={"shift"}
           onFirstDataRendered={params.onFirstDataRendered ?? sizeColumnsToFit}
           onGridSizeChanged={params.onGridSizeChanged ?? sizeColumnsToFit}
-          suppressColumnVirtualisation={params.suppressColumnVirtualization ?? true}
+          suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
