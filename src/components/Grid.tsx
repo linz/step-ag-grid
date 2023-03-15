@@ -1,7 +1,7 @@
 import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
@@ -10,6 +10,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
+import { NoRowsOverlayComponentFn } from "./GridNoRowsOverlayComponent";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
 
@@ -213,25 +214,9 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
-  const noRowsOverlayComponent = useCallback(
-    (event: AgGridEvent) => {
-      let hasData = false;
-      // This is the only way to get a correct data rows exists flag.  params.rowData.length doesn't work here.
-      event.api.forEachNode(() => {
-        hasData = true;
-      });
-      const hasFilteredData = event.api.getDisplayedRowCount() > 0;
-      return (
-        <span>
-          {!hasData
-            ? params.noRowsOverlayText ?? "There are currently no rows"
-            : !hasFilteredData
-            ? "All rows have been filtered"
-            : ""}
-        </span>
-      );
-    },
-    [params],
+  const noRowsOverlayComponent = useMemo(
+    () => NoRowsOverlayComponentFn(params.noRowsOverlayText),
+    [params.noRowsOverlayText],
   );
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
