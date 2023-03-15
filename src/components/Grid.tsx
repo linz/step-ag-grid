@@ -215,7 +215,11 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
 
   const noRowsOverlayComponent = useCallback(
     (event: AgGridEvent) => {
-      const hasData = (params.rowData?.length ?? 0) > 0;
+      let hasData = false;
+      // This is the only way to get a correct data rows exists flag.  params.rowData.length doesn't work here.
+      event.api.forEachNode(() => {
+        hasData = true;
+      });
       const hasFilteredData = event.api.getDisplayedRowCount() > 0;
       return (
         <span>
@@ -227,7 +231,7 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
         </span>
       );
     },
-    [params.noRowsOverlayText, params.rowData?.length],
+    [params],
   );
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
