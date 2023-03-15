@@ -8,6 +8,7 @@ export * from "./gridForm";
 export * from "./gridHeader";
 export * from "./GridIcon";
 export * from "./GridLoadableCell";
+export * from "./GridNoRowsOverlayComponent";
 export * from "./gridPopoverEdit";
 export * from "./GridPopoverHook";
 export * from "./gridRender";
