@@ -333,7 +333,7 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           colResizeDefault={"shift"}
           onFirstDataRendered={params.onFirstDataRendered ?? sizeColumnsToFit}
           onGridSizeChanged={params.onGridSizeChanged ?? sizeColumnsToFit}
-          suppressColumnVirtualisation={params.suppressColumnVirtualization}
+          suppressColumnVirtualisation={params.suppressColumnVirtualization ?? true}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
