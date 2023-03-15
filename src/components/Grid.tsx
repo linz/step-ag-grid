@@ -35,6 +35,9 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   alwaysShowVerticalScroll?: boolean;
+  onGridSizeChanged: GridOptions["onGridSizeChanged"];
+  onFirstDataRendered: GridOptions["onFirstDataRendered"];
+  suppressColumnVirtualization: GridOptions["suppressColumnVirtualisation"];
 }
 
 /**
@@ -328,8 +331,9 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
           colResizeDefault={"shift"}
-          onFirstDataRendered={sizeColumnsToFit}
-          onGridSizeChanged={sizeColumnsToFit}
+          onFirstDataRendered={params.onFirstDataRendered ?? sizeColumnsToFit}
+          onGridSizeChanged={params.onGridSizeChanged ?? sizeColumnsToFit}
+          suppressColumnVirtualisation={params.suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
