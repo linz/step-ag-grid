@@ -20,9 +20,9 @@ import {
   GridUpdatingContextProvider,
   MenuOption,
   wait,
-} from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+} from "../../../";
+import "../../../styles/GridTheme.scss";
+import "../../../styles/index.scss";
 
 export default {
   title: "Components / Grids",
