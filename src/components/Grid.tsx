@@ -10,7 +10,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
-import { NoRowsOverlayComponent, usePostSortRowsHook } from "./";
+import { GridNoRowsOverlay, usePostSortRowsHook } from "./";
 import { GridHeaderSelect } from "./gridHeader";
 
 export interface GridBaseRow {
@@ -321,7 +321,7 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           domLayout={params.domLayout}
           columnDefs={columnDefs}
           rowData={params.rowData}
-          noRowsOverlayComponent={NoRowsOverlayComponent}
+          noRowsOverlayComponent={GridNoRowsOverlay}
           noRowsOverlayComponentParams={{ rowData: params.rowData, noRowsOverlayText: params.noRowsOverlayText }}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}

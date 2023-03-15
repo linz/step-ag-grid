@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash-es";
 
-export const NoRowsOverlayComponent = (params: {
+export const GridNoRowsOverlay = (params: {
   rowData: any[] | null | undefined;
   noRowsOverlayText: string | undefined;
 }) => (
