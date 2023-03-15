@@ -20,7 +20,7 @@ import {
   GridUpdatingContextProvider,
   MenuOption,
   wait,
-} from "../../../index";
+} from "../../../";
 import "../../../styles/GridTheme.scss";
 import "../../../styles/index.scss";
 
