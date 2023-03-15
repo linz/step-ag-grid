@@ -10,7 +10,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "r
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { fnOrVar, isNotEmpty } from "../utils/util";
-import { NoRowsOverlayComponentFn } from "./GridNoRowsOverlayComponent";
+import { NoRowsOverlayComponent } from "./GridNoRowsOverlayComponent";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
 
@@ -214,10 +214,9 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
-  const noRowsOverlayComponent = useMemo(
-    () => NoRowsOverlayComponentFn(params.noRowsOverlayText),
-    [params.noRowsOverlayText],
-  );
+  //const noRowsOverlayComponent = (
+  //  <NoRowsOverlayComponent noRowsOverlayText={params.noRowsOverlayText} rowData={params.rowData} />
+  //);
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
@@ -327,7 +326,8 @@ export const Grid = ({ rowSelection = "multiple", "data-testid": dataTestId, ...
           domLayout={params.domLayout}
           columnDefs={columnDefs}
           rowData={params.rowData}
-          noRowsOverlayComponent={noRowsOverlayComponent}
+          noRowsOverlayComponent={NoRowsOverlayComponent}
+          noRowsOverlayComponentParams={{ rowData: params.rowData, noRowsOverlayText: params.noRowsOverlayText }}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
