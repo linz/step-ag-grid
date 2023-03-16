@@ -54,27 +54,25 @@ const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <div>
-          <h6 ref={anchorRef}>Interaction test</h6>
-          <GridPopoverContext.Provider
-            value={
-              {
-                anchorRef: anchorRef,
-                updateValue,
-                data: { value: "" },
-                value: "",
-                field: "value",
-                selectedRows: [],
-              } as any as GridPopoverContextType<any>
-            }
-          >
-            <GridFormMultiSelect {...props} {...config} />
-          </GridPopoverContext.Provider>
-        </div>
-      </GridContextProvider>
-    </div>
+    <GridContextProvider>
+      <div>
+        <h6 ref={anchorRef}>Interaction test</h6>
+        <GridPopoverContext.Provider
+          value={
+            {
+              anchorRef: anchorRef,
+              updateValue,
+              data: { value: "" },
+              value: "",
+              field: "value",
+              selectedRows: [],
+            } as any as GridPopoverContextType<any>
+          }
+        >
+          <GridFormMultiSelect {...props} {...config} />
+        </GridPopoverContext.Provider>
+      </div>
+    </GridContextProvider>
   );
 };
 
@@ -84,7 +82,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   onSave.mockClear();
   onSelectFilter.mockClear();
 
-  const canvas = within(canvasElement);
+  const canvas = within(canvasElement.ownerDocument.body);
 
   const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
 

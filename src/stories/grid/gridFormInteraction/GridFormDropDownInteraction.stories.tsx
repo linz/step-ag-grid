@@ -13,6 +13,7 @@ import {
   GridFormDropDownProps,
   GridFormSubComponentTextInput,
   GridPopoutEditDropDownSelectedItem,
+  wait,
 } from "../../..";
 
 export default {
@@ -48,33 +49,31 @@ const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <div>
-          <h6 ref={anchorRef}>Interaction test</h6>
-          <GridPopoverContext.Provider
-            value={
-              {
-                anchorRef: anchorRef,
-                updateValue,
-                data: { value: "" },
-                value: "",
-                field: "value",
-                selectedRows: [],
-              } as any as GridPopoverContextType<any>
-            }
-          >
-            <GridFormDropDown {...props} {...config} />
-          </GridPopoverContext.Provider>
-        </div>
-      </GridContextProvider>
-    </div>
+    <GridContextProvider>
+      <div>
+        <h6 ref={anchorRef}>Interaction test</h6>
+        <GridPopoverContext.Provider
+          value={
+            {
+              anchorRef: anchorRef,
+              updateValue,
+              data: { value: "" },
+              value: "",
+              field: "value",
+              selectedRows: [],
+            } as any as GridPopoverContextType<any>
+          }
+        >
+          <GridFormDropDown {...props} {...config} />
+        </GridPopoverContext.Provider>
+      </div>
+    </GridContextProvider>
   );
 };
 
 export const GridFormDropDownInteractions_ = Template.bind({});
 GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
+  const canvas = within(canvasElement.ownerDocument.body);
 
   const getOption = (name: string) => canvas.findByRole("menuitem", { name });
 
