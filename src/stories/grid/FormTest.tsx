@@ -54,6 +54,8 @@ export const FormTest = (props: CellEditorCommon): JSX.Element => {
         <LuiAlertModal
           data-testid="WarningAlertWithButtons-modal"
           level="warning"
+          shouldCloseOnOverlayClick={true}
+          onClose={() => setShowModal(false)}
           // If panel is popped out, append modal to popped out window DOM, otherwise use default
           //appendToElement={() => (poppedOut && popoutElement) || document.body}
         >

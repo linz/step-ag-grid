@@ -78,7 +78,6 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               viewScroll={"auto"}
               dontShrinkIfDirectionIsTop={true}
               className={props.className}
-              closeMenuExclusionClassName={"ReactModal__Content"}
             >
               {saving && ( // This is the overlay that prevents editing when the editor is saving
                 <div

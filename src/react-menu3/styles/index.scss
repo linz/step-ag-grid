@@ -1,6 +1,15 @@
 @use "var";
 @use "core";
 
+.ReactMenu-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
 .szh-menu {
   user-select: none;
   color: var.$color;
