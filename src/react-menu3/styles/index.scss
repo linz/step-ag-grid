@@ -81,6 +81,10 @@
   }
 }
 
-.react-menu-inline-test .szh-menu-container, .react-menu-inline-test .szh-menu {
-  position: initial !important;
+.react-menu-inline-test .szh-menu-container {
+  z-index: 3;
+}
+
+.react-menu-inline-test .szh-menu {
+  position: static !important;
 }
