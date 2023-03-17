@@ -12,6 +12,7 @@ import { GridContextProvider, GridFormTextArea } from "../../..";
 export default {
   title: "GridForm / Interactions",
   component: GridFormTextArea,
+  decorators: [(storyFn) => <div style={{ width: 400, height: 800 }}>{storyFn()}</div>],
   args: {},
 } as ComponentMeta<typeof GridFormTextArea>;
 

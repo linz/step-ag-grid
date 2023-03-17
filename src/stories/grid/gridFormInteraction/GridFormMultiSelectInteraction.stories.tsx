@@ -20,6 +20,7 @@ import {
 export default {
   title: "GridForm / Interactions",
   component: GridFormMultiSelect,
+  decorators: [(storyFn) => <div style={{ width: 400, height: 800 }}>{storyFn()}</div>],
   args: {},
 } as ComponentMeta<typeof GridFormMultiSelect>;
 

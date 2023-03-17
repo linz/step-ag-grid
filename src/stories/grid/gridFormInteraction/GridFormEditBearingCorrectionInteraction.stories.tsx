@@ -12,6 +12,7 @@ import { GridContextProvider, GridFormEditBearing, GridPopoverEditBearingCorrect
 export default {
   title: "GridForm / Interactions",
   component: GridFormEditBearing,
+  decorators: [(storyFn) => <div style={{ width: 400, height: 800 }}>{storyFn()}</div>],
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;
 
