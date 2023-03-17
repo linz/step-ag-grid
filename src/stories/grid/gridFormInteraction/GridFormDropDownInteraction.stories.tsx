@@ -18,7 +18,7 @@ import {
 export default {
   title: "GridForm / Interactions",
   component: GridFormDropDown,
-  decorators: [(storyFn) => <div style={{ width: 400, height: 800 }}>{storyFn()}</div>],
+  decorators: [(storyFn) => <div style={{ width: 600, height: 400 }}>{storyFn()}</div>],
   args: {},
 } as ComponentMeta<typeof GridFormDropDown>;
 
