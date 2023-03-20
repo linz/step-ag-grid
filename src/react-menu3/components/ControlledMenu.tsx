@@ -1,4 +1,5 @@
-import { ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import { delay } from "lodash-es";
+import React, { ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { hasParentClass } from "../../utils/util";
@@ -90,6 +91,23 @@ export const ControlledMenuFr = (
     }
   }, [onClose, saveButtonRef, skipOpen]);
 
+  const handleContextMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const replayEvent = new MouseEvent(e.type, e.nativeEvent);
+      const ownerDocument = (e.target as Node).ownerDocument;
+      e.preventDefault();
+      e.stopPropagation();
+      safeCall(onClose, { reason: CloseReason.CANCEL });
+
+      ownerDocument &&
+        delay(() => {
+          const el = ownerDocument.elementFromPoint(e.clientX, e.clientY);
+          el?.dispatchEvent(replayEvent);
+        }, 150);
+    },
+    [onClose],
+  );
+
   const lastTabDownEl = useRef<Element>();
   const lastEnterDownEl = useRef<Element>();
   const handleKeyboardTabAndEnter = useCallback(
@@ -106,12 +124,15 @@ export const ControlledMenuFr = (
       }
 
       if (ev.key === "Escape") {
-        if (isDown) {
-          if (document.elementFromPoint(0, 0)?.getAttribute("data-testid") === reactMenuOverlayTestId) {
+        if (document.elementFromPoint(0, 0)?.getAttribute("data-testid") === reactMenuOverlayTestId) {
+          if (isDown) {
+            ev.preventDefault();
+            ev.stopPropagation();
+          } else {
             safeCall(onClose, { reason: CloseReason.CANCEL });
           }
-          return;
         }
+        return;
       }
 
       const invokeSave = (reason: string) => {
@@ -271,13 +292,15 @@ export const ControlledMenuFr = (
     [onItemClick, onClose],
   );
 
-  const onKeyDown = ({ key }: KeyboardEvent) => {
+  // escape is handled by global handler
+  const onKeyDown = () => {};
+  /*const onKeyDown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case Keys.ESC:
         safeCall(onClose, { key, reason: CloseReason.CANCEL });
         break;
     }
-  };
+  };*/
 
   const itemTransition = getTransition(transition, "item");
   const modifiers = useMemo(() => ({ theme: theming, itemTransition }), [theming, itemTransition]);
@@ -285,7 +308,12 @@ export const ControlledMenuFr = (
   const menuList = (
     <>
       {isMenuOpen(state) && (
-        <div data-testid={reactMenuOverlayTestId} className={"ReactMenu-overlay"} onClick={handleSaveOnOverlayClick} />
+        <div
+          data-testid={reactMenuOverlayTestId}
+          className={"ReactMenu-overlay"}
+          onClick={handleSaveOnOverlayClick}
+          onContextMenu={(e) => handleContextMenuClick(e)}
+        />
       )}
       <div
         {...mergeProps({ onKeyDown }, containerProps)}
