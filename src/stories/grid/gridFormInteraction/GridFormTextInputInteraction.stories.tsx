@@ -40,8 +40,8 @@ const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
 };
 
 export const GridFormTextInputInteractions_ = Template.bind({});
-GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement.ownerDocument.body);
+GridFormTextInputInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 

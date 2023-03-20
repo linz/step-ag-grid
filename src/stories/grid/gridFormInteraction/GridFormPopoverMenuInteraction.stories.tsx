@@ -82,8 +82,8 @@ const Template: ComponentStory<typeof GridFormPopoverMenu> = (props) => {
 };
 
 export const GridFormPopoverMenuInteractions_ = Template.bind({});
-GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement.ownerDocument.body);
+GridFormPopoverMenuInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   const getOption = (name: string) => canvas.findByRole("menuitem", { name });
 

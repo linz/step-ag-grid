@@ -72,8 +72,8 @@ const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
 };
 
 export const GridFormDropDownInteractions_ = Template.bind({});
-GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement.ownerDocument.body);
+GridFormDropDownInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   const getOption = (name: string) => canvas.findByRole("menuitem", { name });
 

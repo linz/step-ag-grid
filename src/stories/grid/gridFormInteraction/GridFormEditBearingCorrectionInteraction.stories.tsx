@@ -40,8 +40,8 @@ const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
 };
 
 export const GridFormEditBearingCorrectionInteractions_ = Template.bind({});
-GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement.ownerDocument.body);
+GridFormEditBearingCorrectionInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 

@@ -78,12 +78,12 @@ const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
 };
 
 export const GridFormMultiSelectInteractions_ = Template.bind({});
-GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
+GridFormMultiSelectInteractions_.play = async () => {
+  const canvas = within(document.body);
+
   updateValue.mockClear();
   onSave.mockClear();
   onSelectFilter.mockClear();
-
-  const canvas = within(canvasElement.ownerDocument.body);
 
   const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
 
