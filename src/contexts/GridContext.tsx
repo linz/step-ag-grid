@@ -1,9 +1,9 @@
-import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
+import { ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 
-export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
+export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: IRowNode<RowType>) => boolean;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
@@ -39,7 +39,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   addExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
-  doesExternalFilterPass: (node: RowNode) => boolean;
+  doesExternalFilterPass: (node: IRowNode<RowType>) => boolean;
   getColumns: () => ColDefT<RowType>[];
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;

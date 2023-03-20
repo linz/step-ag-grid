@@ -1,5 +1,5 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
-import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
+import { ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
+import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPositionUtils";
 import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
@@ -133,12 +133,12 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = useCallback((): RowNode[] => {
+  const _getNewNodes = useCallback((): IRowNode<any>[] => {
     return gridApiOp(
       (gridApi) =>
         difference(_getAllRowIds(), idsBeforeUpdate.current)
           .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
+          .filter((r) => r) as IRowNode<any>[],
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -445,8 +445,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
 
-  const doesExternalFilterPass = (node: RowNode): boolean => {
-    return externalFilters.current.every((filter) => filter(node.data, node));
+  const doesExternalFilterPass = (node: IRowNode<RowType>): boolean => {
+    return externalFilters.current.every((filter) => filter(node.data!, node));
   };
 
   const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);

@@ -20,6 +20,7 @@ export interface GridBaseRow {
 
 export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
+  theme?: string;
   selectable?: boolean;
   ["data-testid"]?: string;
   domLayout?: GridOptions["domLayout"];
@@ -48,6 +49,7 @@ export const Grid = ({
   "data-testid": dataTestId,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
+  theme = "ag-theme-alpine",
   ...params
 }: GridProps): JSX.Element => {
   const {
@@ -306,7 +308,7 @@ export const Grid = ({
       data-testid={dataTestId}
       className={clsx(
         "Grid-container",
-        "ag-theme-alpine",
+        theme,
         staleGrid && "Grid-sortIsStale",
         gridReady && params.rowData && "Grid-ready",
       )}
@@ -341,7 +343,7 @@ export const Grid = ({
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
-          doesExternalFilterPass={doesExternalFilterPass}
+          doesExternalFilterPass={(rowNode) => doesExternalFilterPass(rowNode)}
         />
       </div>
     </div>
