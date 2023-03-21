@@ -21,6 +21,7 @@ export interface GridBaseRow {
 export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   selectable?: boolean;
+  theme?: string; // should have prefix ag-theme-
   ["data-testid"]?: string;
   domLayout?: GridOptions["domLayout"];
   externalSelectedItems?: any[];
@@ -48,6 +49,7 @@ export const Grid = ({
   "data-testid": dataTestId,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
+  theme = "ag-theme-alpine",
   ...params
 }: GridProps): JSX.Element => {
   const {
@@ -306,7 +308,7 @@ export const Grid = ({
       data-testid={dataTestId}
       className={clsx(
         "Grid-container",
-        "ag-theme-alpine",
+        theme,
         staleGrid && "Grid-sortIsStale",
         gridReady && params.rowData && "Grid-ready",
       )}
