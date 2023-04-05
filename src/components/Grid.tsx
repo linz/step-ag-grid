@@ -37,9 +37,9 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   alwaysShowVerticalScroll?: boolean;
-  onGridSizeChanged: GridOptions["onGridSizeChanged"];
-  onFirstDataRendered: GridOptions["onFirstDataRendered"];
-  suppressColumnVirtualization: GridOptions["suppressColumnVirtualisation"];
+  onGridSizeChanged?: GridOptions["onGridSizeChanged"];
+  onFirstDataRendered?: GridOptions["onFirstDataRendered"];
+  suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
 }
 
 /**
