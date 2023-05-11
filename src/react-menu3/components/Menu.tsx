@@ -40,7 +40,7 @@ export function MenuFr(
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = useCallback(
-    (e: any) => {
+    (e: MenuCloseEvent) => {
       toggleMenu(false);
       if (e.key) buttonRef.current && buttonRef.current.focus();
     },
