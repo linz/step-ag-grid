@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { useCombinedRef, useMenuChange, useMenuStateAndFocus } from "../hooks";
-import { MenuButtonModifiers, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../types";
+import { MenuButtonModifiers, MenuCloseEvent, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../types";
 import { FocusPositions, Keys, getName, isMenuOpen, mergeProps, safeCall } from "../utils";
 import { ControlledMenu } from "./ControlledMenu";
 
