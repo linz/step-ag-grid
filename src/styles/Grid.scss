@@ -41,14 +41,18 @@
   margin-left: 0 !important;
 }
 
-.GridFilter-container {
+%GridFilter-container {
   &:not(:last-child) {
     margin-right: 8px;
   }
 }
 
+.GridFilter-container {
+  @extend %GridFilter-container;
+}
+
 .GridFilterQuick-container {
-  @extend .GridFilter-container;
+  @extend %GridFilter-container;
   flex: 1;
 }
 
