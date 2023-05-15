@@ -565,7 +565,7 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   // If no valueFormatter then value _must_ be a string
   if (valueFormatter == null) {
     if (params.value != null && typeof params.value !== "string") {
-      console.error("downloadCsv: valueFormatter missing and getValue is not a string, colDef:", colDef);
+      console.error(`downloadCsv: valueFormatter missing and getValue is not a string, colId: ${colDef.colId}`);
     }
     return encodeToString(params.value);
   }
@@ -573,15 +573,14 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   // We don't have access to registered functions, so we can't call them
   if (typeof valueFormatter !== "function") {
     console.error(
-      "downloadCsv: String type (registered) value formatters are unsupported in downloadCsv, colDef:",
-      colDef,
+      `downloadCsv: String type (registered) value formatters are unsupported in downloadCsv, colId: ${colDef.colId}`,
     );
     return encodeToString(params.value);
   }
 
   const result = valueFormatter({ ...params, data: params.node?.data, colDef } as ValueFormatterParams);
   if (params.value != null && typeof result !== "string") {
-    console.error("downloadCsv: valueFormatter is returning non string values, colDef:", colDef);
+    console.error(`downloadCsv: valueFormatter is returning non string values, colDef:", colId: ${colDef.colId}`);
   }
   // We add an extra encodeToString here just in case valueFormatter is returning non string values
   return encodeToString(result);
