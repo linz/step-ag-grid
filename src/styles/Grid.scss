@@ -41,12 +41,15 @@
   margin-left: 0 !important;
 }
 
-.GridFilterQuick-container {
-  flex: 1;
-
+.GridFilter-container {
   &:not(:last-child) {
     margin-right: 8px;
   }
+}
+
+.GridFilterQuick-container {
+  @extend .GridFilter-container;
+  flex: 1;
 }
 
 .GridFilterQuick-input {

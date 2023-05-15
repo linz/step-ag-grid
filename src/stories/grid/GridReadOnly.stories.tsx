@@ -266,7 +266,7 @@ const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): JSX
   };
 
   return (
-    <div className={"flex-row-center"}>
+    <div className={"GridFilter-container flex-row-center"}>
       <div style={{ whiteSpace: "nowrap" }}>{props.text}</div>
       &#160;
       <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
