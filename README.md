@@ -155,7 +155,7 @@ const GridDemo = () => {
                           ]}
                   />
                   <GridFilterColumnsToggle/>
-                  <GridFilterDownloadCsvButton/>
+                  <GridFilterDownloadCsvButton fileName={"exportFile"}/>
                 </GridFilters>
                 <Grid selectable={true} columnDefs={columnDefs} rowData={rowData}/>
               </GridWrapper>
