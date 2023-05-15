@@ -81,6 +81,7 @@ const GridDemo = () => {
               headerName: "Id",
               initialWidth: 65,
               maxWidth: 85,
+              export: false,
             }),
             GridCell({
               field: "name",
@@ -167,6 +168,8 @@ const GridDemo = () => {
 ## CSV Download
 CSV download relies on column valueFormatters vs ag-grid's default valueGetter implementation.
 If you use a customRenderer for a column be sure to include a valueFormatter.
+
+To exclude a column from CSV download add ```export: false``` to the GridCell definition.
 
 ## Writing tests
 
