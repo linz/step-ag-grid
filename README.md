@@ -168,10 +168,10 @@ const GridDemo = () => {
 ## CSV Download
 CSV download relies on column valueFormatters vs ag-grid's default valueGetter implementation.
 If you use a customRenderer for a column be sure to include a valueFormatter.
+To disable this behaviour pass undefined to processCellCallback.
+```<GridFilterDownloadCsvButton processCellCallback={undefined}/>```
 
 To exclude a column from CSV download add ```export: false``` to the GridCell definition. 
-To disable this behaviour pass undefined to processCellCallback. 
-```<GridFilterDownloadCsvButton processCellCallback={undefined}/>```
 
 ## Writing tests
 
