@@ -1,5 +1,7 @@
 import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
+import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
@@ -418,12 +420,18 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApiOp],
   );
 
+  // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
+  const externallySelectedItemsAreInSyncRef = useRef(false);
+  useEffect(() => {
+    externallySelectedItemsAreInSyncRef.current = externallySelectedItemsAreInSync;
+  }, [externallySelectedItemsAreInSync]);
+
   const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
     // Wait for up to 5 seconds
-    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync; i++) {
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSyncRef.current; i++) {
       await wait(200);
     }
-  }, [externallySelectedItemsAreInSync]);
+  }, []);
 
   const onFilterChanged = useMemo(
     () =>
@@ -467,6 +475,26 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     }
   }, [invisibleColumnIds, columnApi, getColumns]);
 
+  /**
+   * Download visible columns as a CSV
+   */
+  const downloadCsv = useCallback(
+    (csvExportParams?: CsvExportParams) => {
+      if (!gridApi || !columnApi) return;
+
+      const columnKeys = columnApi
+        ?.getColumnState()
+        .filter((cs) => !cs.hide && gridApi.getColumnDef(cs.colId)?.headerComponentParams?.exportable !== false)
+        .map((cs) => cs.colId);
+      gridApi.exportDataAsCsv({
+        columnKeys,
+        processCellCallback: downloadCsvUseValueFormattersProcessCellCallback,
+        ...csvExportParams,
+      });
+    },
+    [columnApi, gridApi],
+  );
+
   return (
     <GridContext.Provider
       value={{
@@ -502,9 +530,59 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         removeExternalFilter,
         isExternalFilterPresent,
         doesExternalFilterPass,
+        downloadCsv,
       }}
     >
       {props.children}
     </GridContext.Provider>
   );
+};
+
+/**
+ * Aggrid defaults to using getters and ignores formatters.
+ * step-ag-grid by default has a valueFormatter for every column that defaults to the getter if no valueFormatter
+ * This function uses valueFormatter by default
+ */
+export const downloadCsvUseValueFormattersProcessCellCallback = (params: ProcessCellForExportParams): string => {
+  const encodeToString = (value: any): string => {
+    // Convert nullish values to blank
+    if (value === "-" || value === "–" || value == null) {
+      return "";
+    }
+    if (typeof value === "string") {
+      return value;
+    }
+    return JSON.stringify(value);
+  };
+
+  // Try to use valueFormatter
+  const colDef = params?.column?.getColDef();
+  if (!colDef) return encodeToString(params.value);
+
+  // All columns in step-ag-grid have a default valueFormatter
+  // If you have custom a renderer you need to define your own valueFormatter to produce the text value
+  const valueFormatter = colDef.valueFormatter;
+  // If no valueFormatter then value _must_ be a string
+  if (valueFormatter == null) {
+    if (params.value != null && typeof params.value !== "string") {
+      console.error("downloadCsv: valueFormatter missing and getValue is not a string, colDef:", colDef);
+    }
+    return encodeToString(params.value);
+  }
+
+  // We don't have access to registered functions, so we can't call them
+  if (typeof valueFormatter !== "function") {
+    console.error(
+      "downloadCsv: String type (registered) value formatters are unsupported in downloadCsv, colDef:",
+      colDef,
+    );
+    return encodeToString(params.value);
+  }
+
+  const result = valueFormatter({ ...params, data: params.node?.data, colDef } as ValueFormatterParams);
+  if (params.value != null && typeof result !== "string") {
+    console.error("downloadCsv: valueFormatter is returning non string values, colDef:", colDef);
+  }
+  // We add an extra encodeToString here just in case valueFormatter is returning non string values
+  return encodeToString(result);
 };

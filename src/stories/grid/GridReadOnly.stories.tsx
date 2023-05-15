@@ -24,6 +24,7 @@ import {
   wait,
 } from "../..";
 import { GridFilterColumnsToggle } from "../../components";
+import { GridFilterDownloadCsvButton } from "../../components/gridFilter/GridFilterDownloadCsvButton";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -96,6 +97,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           headerName: "Popout message",
           maxWidth: 150,
           cellRenderer: () => <>Single Click me!</>,
+          exportable: false,
         },
         {
           multiEdit: true,
@@ -214,7 +216,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   return (
     <GridWrapper maxHeight={300}>
       <GridFilters>
-        <GridFilterQuick quickFilterPlaceholder={"Custom placeholder..."} />
+        <GridFilterQuick />
         <GridFilterLessThan text="Age <" field={"age"} />
         <GridFilterButtons<ITestRow>
           luiButtonProps={{ style: { whiteSpace: "nowrap" } }}
@@ -229,6 +231,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           ]}
         />
         <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton />
       </GridFilters>
       <Grid
         data-testid={"readonly"}

@@ -27,15 +27,19 @@
 
 .Grid-container-filters {
   width: 100%;
-  margin-bottom: 16px;
   flex: 0;
   display: flex;
   align-items: center;
   flex-direction: row;
-  grid-column-gap: 1em;
-  padding: 0.25rem 0;
+  padding: 16px;
+  background-color: colors.$hint;
+  border-bottom: 1px solid colors.$silver;
+  border-top: 2px solid colors.$lily;
 }
 
+.Grid-container-filters button {
+  margin-left: 0 !important;
+}
 
 .Grid-quickFilterBox {
   width: 100%;
@@ -45,6 +49,10 @@
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   font-family: "Open Sans", system-ui, sans-serif;
+
+  &:not(:last-child) {
+    margin-right: 8px;
+  }
 }
 
 .Grid-popoverContainer {

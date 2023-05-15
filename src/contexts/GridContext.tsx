@@ -1,4 +1,5 @@
 import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
+import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { createContext, useContext } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
@@ -43,6 +44,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   getColumns: () => ColDefT<RowType>[];
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
+  downloadCsv: (csvExportParams?: CsvExportParams) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
@@ -145,6 +147,9 @@ export const GridContext = createContext<GridContextType<any>>({
   doesExternalFilterPass: () => {
     console.error("no context provider for doesExternalFilterPass");
     return true;
+  },
+  downloadCsv: () => {
+    console.error("no context provider for downloadCsv");
   },
 });
 

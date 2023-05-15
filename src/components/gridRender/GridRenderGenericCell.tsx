@@ -35,6 +35,7 @@ export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDefT<
   valueFormatter?: string | ((params: RowValueFormatterParams<RowType>) => string);
   filterValueGetter?: string | ((params: RowValueGetterParams<RowType>) => string);
   editable?: boolean | ((params: RowEditableCallbackParams<RowType>) => boolean);
+  exportable?: boolean;
 }
 
 export interface GenericCellRendererParams<RowType extends GridBaseRow> {

@@ -114,6 +114,9 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   // This is so that e.g. bearings can be searched for by DMS or raw number.
   const valueFormatter = props.valueFormatter;
   const filterValueGetter = generateFilterGetter(props.field, props.filterValueGetter, valueFormatter);
+  const exportable = props.exportable;
+  // Can't leave this here ag-grid will complain
+  delete props.exportable;
 
   return {
     colId: props.field,
@@ -143,6 +146,10 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     cellRendererParams: {
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
+    },
+    headerComponentParams: {
+      exportable,
+      ...props.headerComponentParams,
     },
   };
 };

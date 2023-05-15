@@ -9,10 +9,15 @@ import {
   Grid,
   GridCell,
   GridContextProvider,
+  GridFilterColumnsToggle,
+  GridFilterDownloadCsvButton,
+  GridFilterQuick,
+  GridFilters,
   GridPopoverEditBearing,
   GridPopoverEditBearingCorrection,
   GridProps,
   GridUpdatingContextProvider,
+  GridWrapper,
   wait,
 } from "../..";
 import "../../styles/GridTheme.scss";
@@ -97,16 +102,23 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
   ] as ITestRow[]);
 
   return (
-    <Grid
-      data-testid={"bearingsTestTable"}
-      {...props}
-      readOnly={false}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-    />
+    <GridWrapper maxHeight={300}>
+      <GridFilters>
+        <GridFilterQuick />
+        <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+      </GridFilters>
+      <Grid
+        data-testid={"bearingsTestTable"}
+        {...props}
+        readOnly={false}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        domLayout={"autoHeight"}
+      />
+    </GridWrapper>
   );
 };
 

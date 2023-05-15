@@ -9,12 +9,17 @@ import {
   Grid,
   GridCell,
   GridContextProvider,
+  GridFilterColumnsToggle,
+  GridFilterDownloadCsvButton,
+  GridFilterQuick,
+  GridFilters,
   GridFormSubComponentTextArea,
   GridFormSubComponentTextInput,
   GridPopoverEditDropDown,
   GridPopoverMenu,
   GridProps,
   GridUpdatingContextProvider,
+  GridWrapper,
   MenuHeaderItem,
   MenuSeparator,
   MenuSeparatorString,
@@ -299,14 +304,21 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
   ] as ITestRow[]);
 
   return (
-    <Grid
-      {...props}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-    />
+    <GridWrapper maxHeight={300}>
+      <GridFilters>
+        <GridFilterQuick />
+        <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+      </GridFilters>
+      <Grid
+        {...props}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        domLayout={"autoHeight"}
+      />
+    </GridWrapper>
   );
 };
 
