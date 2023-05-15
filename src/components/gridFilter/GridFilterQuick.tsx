@@ -16,15 +16,17 @@ export const GridFilterQuick = ({ quickFilterPlaceholder, defaultValue }: GridFi
   }, [quickFilterValue, setQuickFilter]);
 
   return (
-    <input
-      aria-label="Search"
-      className="Grid-quickFilterBox"
-      type="text"
-      placeholder={quickFilterPlaceholder ?? "Search..."}
-      value={quickFilterValue}
-      onChange={(event) => {
-        setQuickFilterValue(event.target.value);
-      }}
-    />
+    <div className="GridFilterQuick-container">
+      <input
+        aria-label="Search"
+        className="GridFilterQuick-input"
+        type="text"
+        placeholder={quickFilterPlaceholder ?? "Search..."}
+        value={quickFilterValue}
+        onChange={(event) => {
+          setQuickFilterValue(event.target.value);
+        }}
+      />
+    </div>
   );
 };
