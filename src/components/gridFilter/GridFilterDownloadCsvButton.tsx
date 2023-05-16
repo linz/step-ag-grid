@@ -1,6 +1,6 @@
 import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { delay } from "lodash-es";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 import { LuiMiniSpinner } from "@linzjs/lui";
 
