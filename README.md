@@ -46,7 +46,7 @@ Storybook demo deployed at: https://linz.github.io/step-ag-grid/
 Check `src\stories` for more usage examples
 
 ```tsx
-import {useMemo} from "react";
+import { useMemo } from "react";
 
 import "@linzjs/lui/dist/fonts";
 import "@linzjs/lui/dist/scss/base.scss";
@@ -65,7 +65,7 @@ import {
 // Only required for LINZ themes otherwise import the default theme from ag-grid
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 import "@linzjs/step-ag-grid/dist/index.css";
-import {GridFilterDownloadCsvButton} from "./GridFilterDownloadCsvButton";
+import { GridFilterDownloadCsvButton } from "./GridFilterDownloadCsvButton";
 
 const GridDemo = () => {
   interface ITestRow {
@@ -75,92 +75,92 @@ const GridDemo = () => {
   }
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
-          () => [
-            GridCell({
-              field: "id",
-              headerName: "Id",
-              initialWidth: 65,
-              maxWidth: 85,
-              export: false,
-            }),
-            GridCell({
-              field: "name",
-              headerName: "Name",
-              initialWidth: 65,
-              maxWidth: 150,
-              cellRendererParams: {
-                warning: ({value}) => value === "Tester" && "Testers are testing",
-                info: ({value}) => value === "Developer" && "Developers are awesome",
+    () => [
+      GridCell({
+        field: "id",
+        headerName: "Id",
+        initialWidth: 65,
+        maxWidth: 85,
+        export: false,
+      }),
+      GridCell({
+        field: "name",
+        headerName: "Name",
+        initialWidth: 65,
+        maxWidth: 150,
+        cellRendererParams: {
+          warning: ({value}) => value === "Tester" && "Testers are testing",
+          info: ({value}) => value === "Developer" && "Developers are awesome",
+        },
+      }),
+      GridPopoverEditDropDown(
+              {
+                field: "position",
+                initialWidth: 65,
+                maxWidth: 150,
+                headerName: "Position",
               },
-            }),
-            GridPopoverEditDropDown(
-                    {
-                      field: "position",
-                      initialWidth: 65,
-                      maxWidth: 150,
-                      headerName: "Position",
-                    },
-                    {
-                      multiEdit: false,
-                      editorParams: {
-                        options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-                      },
-                    },
-            ),
-            GridPopoverMessage(
-                    {
-                      headerName: "Popout message",
-                      cellRenderer: () => <>Click me!</>,
-                    },
-                    {
-                      multiEdit: true,
-                      editorParams: {
-                        message: async ({selectedRows}) => {
-                          return `There are ${selectedRows.length} row(s) selected`;
-                        },
-                      },
-                    },
-            ),
-          ],
-          [],
+              {
+                multiEdit: false,
+                editorParams: {
+                  options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+                },
+              },
+      ),
+      GridPopoverMessage(
+              {
+                headerName: "Popout message",
+                cellRenderer: () => <>Click me!</>,
+              },
+              {
+                multiEdit: true,
+                editorParams: {
+                  message: async ({selectedRows}) => {
+                    return `There are ${selectedRows.length} row(s) selected`;
+                  },
+                },
+              },
+      ),
+    ],
+    [],
   );
 
   const rowData: ITestRow[] = useMemo(
-          () => [
-            {id: 1000, name: "Tom", position: "Tester"},
-            {id: 1001, name: "Sue", position: "Developer"},
-          ],
-          [],
+    () => [
+      {id: 1000, name: "Tom", position: "Tester"},
+      {id: 1001, name: "Sue", position: "Developer"},
+    ],
+    [],
   );
 
   return (
-          <GridUpdatingContextProvider>
-            <GridContextProvider>
-              <GridWrapper>
-                <GridFilters>
-                  <GridFilterQuick/>
-                  <GridFilterButtons<ITestRow>
-                          options={[
-                            {
-                              label: "All",
-                            },
-                            {
-                              label: "Developers",
-                              filter: (row) => row.position === "Developer",
-                            },
-                            {
-                              label: "Testers",
-                              filter: (row) => row.position === "Tester",
-                            },
-                          ]}
-                  />
-                  <GridFilterColumnsToggle/>
-                  <GridFilterDownloadCsvButton fileName={"exportFile"}/>
-                </GridFilters>
-                <Grid selectable={true} columnDefs={columnDefs} rowData={rowData}/>
-              </GridWrapper>
-            </GridContextProvider>
-          </GridUpdatingContextProvider>
+    <GridUpdatingContextProvider>
+      <GridContextProvider>
+        <GridWrapper>
+          <GridFilters>
+            <GridFilterQuick/>
+            <GridFilterButtons<ITestRow>
+                    options={[
+                      {
+                        label: "All",
+                      },
+                      {
+                        label: "Developers",
+                        filter: (row) => row.position === "Developer",
+                      },
+                      {
+                        label: "Testers",
+                        filter: (row) => row.position === "Tester",
+                      },
+                    ]}
+            />
+            <GridFilterColumnsToggle/>
+            <GridFilterDownloadCsvButton fileName={"exportFile"}/>
+          </GridFilters>
+          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData}/>
+        </GridWrapper>
+      </GridContextProvider>
+    </GridUpdatingContextProvider>
   );
 };
 ```
