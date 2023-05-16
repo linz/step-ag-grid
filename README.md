@@ -89,37 +89,37 @@ const GridDemo = () => {
         initialWidth: 65,
         maxWidth: 150,
         cellRendererParams: {
-          warning: ({value}) => value === "Tester" && "Testers are testing",
-          info: ({value}) => value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridPopoverEditDropDown(
-              {
-                field: "position",
-                initialWidth: 65,
-                maxWidth: 150,
-                headerName: "Position",
-              },
-              {
-                multiEdit: false,
-                editorParams: {
-                  options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
-                },
-              },
+        {
+          field: "position",
+          initialWidth: 65,
+          maxWidth: 150,
+          headerName: "Position",
+        },
+        {
+          multiEdit: false,
+          editorParams: {
+            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester", MenuSeparator, "(other)"],
+          },
+        },
       ),
       GridPopoverMessage(
-              {
-                headerName: "Popout message",
-                cellRenderer: () => <>Click me!</>,
-              },
-              {
-                multiEdit: true,
-                editorParams: {
-                  message: async ({selectedRows}) => {
-                    return `There are ${selectedRows.length} row(s) selected`;
-                  },
-                },
-              },
+        {
+          headerName: "Popout message",
+          cellRenderer: () => <>Click me!</>,
+        },
+        {
+          multiEdit: true,
+          editorParams: {
+            message: async ({selectedRows}) => {
+              return `There are ${selectedRows.length} row(s) selected`;
+            },
+          },
+        },
       ),
     ],
     [],
@@ -127,8 +127,8 @@ const GridDemo = () => {
 
   const rowData: ITestRow[] = useMemo(
     () => [
-      {id: 1000, name: "Tom", position: "Tester"},
-      {id: 1001, name: "Sue", position: "Developer"},
+      { id: 1000, name: "Tom", position: "Tester" },
+      { id: 1001, name: "Sue", position: "Developer" },
     ],
     [],
   );
@@ -140,19 +140,19 @@ const GridDemo = () => {
           <GridFilters>
             <GridFilterQuick/>
             <GridFilterButtons<ITestRow>
-                    options={[
-                      {
-                        label: "All",
-                      },
-                      {
-                        label: "Developers",
-                        filter: (row) => row.position === "Developer",
-                      },
-                      {
-                        label: "Testers",
-                        filter: (row) => row.position === "Tester",
-                      },
-                    ]}
+              options={[
+                {
+                  label: "All",
+                },
+                {
+                  label: "Developers",
+                  filter: (row) => row.position === "Developer",
+                },
+                {
+                  label: "Testers",
+                  filter: (row) => row.position === "Tester",
+                },
+              ]}
             />
             <GridFilterColumnsToggle/>
             <GridFilterDownloadCsvButton fileName={"exportFile"}/>
