@@ -35,7 +35,7 @@ export const GridFilterDownloadCsvButton = (csvExportParams: CsvExportParams) =>
   ) : (
     <GridFilterHeaderIconButton
       icon={"ic_save_download"}
-      title={downloading ? "Downloading..." : "Download CSV"}
+      title={"Download CSV"}
       onClick={handleDownloadClick}
       disabled={downloading}
     />
