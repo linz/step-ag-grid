@@ -187,6 +187,9 @@ export const Grid = ({
             colId: "selection",
             editable: false,
             minWidth: 42,
+            headerComponentParams: {
+              exportable: false,
+            },
             maxWidth: 42,
             suppressSizeToFit: true,
             checkboxSelection: true,
@@ -344,6 +347,7 @@ export const Grid = ({
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
+          maintainColumnOrder={true}
         />
       </div>
     </div>

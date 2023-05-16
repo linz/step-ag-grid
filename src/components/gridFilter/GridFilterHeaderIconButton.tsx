@@ -19,7 +19,7 @@ export const GridFilterHeaderIconButton = forwardRef<HTMLButtonElement, GridFilt
         {...buttonProps}
         type={"button"}
         level={"tertiary"}
-        className={"GridFilterHeaderIconButton lui-button-icon-only"}
+        className={"lui-button-icon-only"}
         ref={ref}
         aria-label={title}
         title={title}

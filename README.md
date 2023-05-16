@@ -65,6 +65,7 @@ import {
 // Only required for LINZ themes otherwise import the default theme from ag-grid
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 import "@linzjs/step-ag-grid/dist/index.css";
+import { GridFilterDownloadCsvButton } from "./GridFilterDownloadCsvButton";
 
 const GridDemo = () => {
   interface ITestRow {
@@ -80,6 +81,7 @@ const GridDemo = () => {
         headerName: "Id",
         initialWidth: 65,
         maxWidth: 85,
+        export: false,
       }),
       GridCell({
         field: "name",
@@ -113,7 +115,7 @@ const GridDemo = () => {
         {
           multiEdit: true,
           editorParams: {
-            message: async ({ selectedRows }) => {
+            message: async ({selectedRows}) => {
               return `There are ${selectedRows.length} row(s) selected`;
             },
           },
@@ -136,31 +138,40 @@ const GridDemo = () => {
       <GridContextProvider>
         <GridWrapper>
           <GridFilters>
-            <GridFilterQuick quickFilterPlaceholder={"Search..."} />
+            <GridFilterQuick/>
             <GridFilterButtons<ITestRow>
-                    options={[
-                      {
-                        label: "All",
-                      },
-                      {
-                        label: "Developers",
-                        filter: (row) => row.position === "Developer",
-                      },
-                      {
-                        label: "Testers",
-                        filter: (row) => row.position === "Tester",
-                      },
-                    ]}
+              options={[
+                {
+                  label: "All",
+                },
+                {
+                  label: "Developers",
+                  filter: (row) => row.position === "Developer",
+                },
+                {
+                  label: "Testers",
+                  filter: (row) => row.position === "Tester",
+                },
+              ]}
             />
             <GridFilterColumnsToggle/>
+            <GridFilterDownloadCsvButton fileName={"exportFile"}/>
           </GridFilters>
-          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData} />
+          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData}/>
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
   );
 };
 ```
+
+## CSV Download
+CSV download relies on column valueFormatters vs ag-grid's default valueGetter implementation.
+If you use a customRenderer for a column be sure to include a valueFormatter.
+To disable this behaviour pass undefined to processCellCallback.
+```<GridFilterDownloadCsvButton processCellCallback={undefined}/>```
+
+To exclude a column from CSV download add ```export: false``` to the GridCell definition. 
 
 ## Writing tests
 
