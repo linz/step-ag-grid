@@ -1,4 +1,5 @@
 import { isEmpty, negate } from "lodash-es";
+import sanitize from "sanitize-filename";
 
 export const isNotEmpty = negate(isEmpty);
 
@@ -36,3 +37,12 @@ export const stringByteLengthIsInvalid = (str: string, maxBytes: number) =>
   new TextEncoder().encode(str).length > maxBytes;
 
 export const fnOrVar = (fn: any, param: any) => (typeof fn === "function" ? fn(param) : fn);
+
+/**
+ * Trim filename and replaces troublesome characters.
+ *
+ * e.g. " LT 1235/543 &%//*$ " => "LT_1235-543_&%_*$"
+ * e.g. " @filename here!!!" => "filename_here"
+ */
+export const sanitiseFileName = (filename: string): string =>
+  sanitize(filename.trim().replaceAll(/(\/|\\)+/g, "-")).replaceAll(/\s+/g, "_");
