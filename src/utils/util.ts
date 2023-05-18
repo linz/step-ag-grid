@@ -41,8 +41,8 @@ export const fnOrVar = (fn: any, param: any) => (typeof fn === "function" ? fn(p
 /**
  * Trim filename and replaces troublesome characters.
  *
- * e.g. " LT 1235/543 &%//*$ " => "LT_1235-543_&%_*$"
- * e.g. " @filename here!!!" => "filename_here"
+ * e.g. " LT 1235/543 &%//*$ " => "LT_1235-543_&%-$"
+ * e.g. " @filename here!!!" => "@filename_here!!!"
  */
 export const sanitiseFileName = (filename: string): string =>
   sanitize(filename.trim().replaceAll(/(\/|\\)+/g, "-")).replaceAll(/\s+/g, "_");
