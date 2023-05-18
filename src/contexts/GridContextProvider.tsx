@@ -6,7 +6,7 @@ import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sor
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
-import { isNotEmpty, wait } from "../utils/util";
+import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
@@ -482,6 +482,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     (csvExportParams?: CsvExportParams) => {
       if (!gridApi || !columnApi) return;
 
+      const fileName = csvExportParams?.fileName && sanitiseFileName(csvExportParams.fileName);
+
       const columnKeys = columnApi
         ?.getColumnState()
         .filter((cs) => !cs.hide && gridApi.getColumnDef(cs.colId)?.headerComponentParams?.exportable !== false)
@@ -490,6 +492,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         columnKeys,
         processCellCallback: downloadCsvUseValueFormattersProcessCellCallback,
         ...csvExportParams,
+        fileName,
       });
     },
     [columnApi, gridApi],

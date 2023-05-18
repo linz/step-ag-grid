@@ -231,7 +231,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           ]}
         />
         <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton />
+        <GridFilterDownloadCsvButton fileName={"readOnlyGrid"} />
       </GridFilters>
       <Grid
         data-testid={"readonly"}
