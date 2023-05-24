@@ -2,6 +2,7 @@
 
 .GridPopoutMenu-burger {
   cursor: pointer;
+  display: block;
 
   svg {
     fill: colors.$sea;

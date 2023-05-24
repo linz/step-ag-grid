@@ -60,14 +60,10 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverEditDropDown(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Position",
         },
         {
@@ -82,15 +78,11 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
       GridCell({
         field: "age",
         headerName: "Age",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverTextArea(
         {
           field: "desc",
           headerName: "Description",
-          initialWidth: 150,
-          maxWidth: 200,
         },
         {},
       ),

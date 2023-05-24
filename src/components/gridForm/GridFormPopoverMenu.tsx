@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash-es";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
@@ -123,7 +124,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormPopupMenu"}>
       <>
-        {options?.length === 0 ? (
+        {isEmpty(options) ? (
           <MenuItem key={`GridPopoverMenu-empty`} className={"GridPopoverMenu-noOptions"} disabled={true}>
             No actions
           </MenuItem>

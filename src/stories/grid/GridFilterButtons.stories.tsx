@@ -58,21 +58,31 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
       GridCell({
         field: "id",
         headerName: "Id",
+        width: 100,
+        suppressSizeToFit: true,
       }),
       GridCell({
         field: "position",
         headerName: "Position",
+        width: 100,
+        suppressSizeToFit: true,
       }),
       GridCell({
         field: "desc",
         headerName: "Description",
+        flex: 1,
       }),
     ],
     [],
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Integration tester" },
+    {
+      id: 1000,
+      position: "Tester",
+      age: 30,
+      desc: "Integration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration tester",
+    },
     { id: 1001, position: "Developer", age: 12, desc: "Frontend developer" },
     { id: 1002, position: "Manager", age: 65, desc: "Technical Manager" },
     { id: 1003, position: "Tester", age: 30, desc: "E2E tester" },
@@ -102,7 +112,7 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
           ]}
         />
       </GridFilters>
-      <Grid {...props} columnDefs={columnDefs} rowData={rowData} />
+      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={"fit"} />
     </GridWrapper>
   );
 };

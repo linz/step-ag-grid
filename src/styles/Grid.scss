@@ -71,6 +71,11 @@
   padding: 0.375rem 0.75rem;
 }
 
+.ag-cell-value {
+  display: flex;
+  align-items: center;
+}
+
 .ag-cell .GridCell-editableIcon {
   fill: colors.$silver;
   visibility: hidden;

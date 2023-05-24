@@ -60,14 +60,11 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverTextInput(
         {
           field: "name",
           headerName: "Text input",
-          maxWidth: 140,
         },
         {
           multiEdit: true,
@@ -91,7 +88,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           field: "distance",
           headerName: "Number input",
-          maxWidth: 140,
           valueFormatter: (params) => {
             const v = params.data.distance;
             return v != null ? `${v}${params.colDef.cellEditorParams.units}` : "–";
@@ -121,7 +117,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           field: "plan",
           headerName: "Text area",
-          maxWidth: 140,
         },
         {
           multiEdit: true,
@@ -146,7 +141,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           colId: "plan2",
           field: "plan",
           headerName: "Multi-editor",
-          maxWidth: 140,
         },
         (_params) =>
           _params.rowIndex == 0
@@ -169,7 +163,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       ),
       GridPopoverMenu(
         {
-          headerName: "Delete menu",
+          headerName: "",
         },
         {
           multiEdit: true,

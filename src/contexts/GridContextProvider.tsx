@@ -2,7 +2,8 @@ import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
-import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
+import debounce from "debounce-promise";
+import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
@@ -329,12 +330,22 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Resize columns to fit container
    */
+  const autoSizeAllColumns = useCallback((): { width: number } | null => {
+    if (columnApi) {
+      columnApi.autoSizeAllColumns();
+      return { width: sumBy(columnApi.getColumnState(), "width") };
+    }
+    return null;
+  }, [columnApi]);
+
+  /**
+   * Resize columns to fit container
+   */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApiOp((gridApi) => {
-      // Hide size columns to fit errors in tests
-      document.body.clientWidth && gridApi.sizeColumnsToFit();
-    });
-  }, [gridApiOp]);
+    if (gridApi) {
+      gridApi.sizeColumnsToFit();
+    }
+  }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
     if (prePopupFocusedCell.current) {
@@ -523,6 +534,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         ensureRowVisible,
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
+        autoSizeAllColumns,
         stopEditing,
         updatingCells,
         redrawRows,

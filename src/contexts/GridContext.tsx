@@ -25,6 +25,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   focusByRowById: (rowId: number) => void;
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
+  autoSizeAllColumns: (props?: { skipHeader?: boolean }) => { width: number } | null;
   sizeColumnsToFit: () => void;
   stopEditing: () => void;
   updatingCells: (
@@ -42,6 +43,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
   getColumns: () => ColDefT<RowType>[];
+
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
@@ -111,8 +113,13 @@ export const GridContext = createContext<GridContextType<any>>({
   ensureSelectedRowIsVisible: () => {
     console.error("no context provider for ensureSelectedRowIsVisible");
   },
+  autoSizeAllColumns: () => {
+    console.error("no context provider for autoSizeAllColumns");
+    return null;
+  },
   sizeColumnsToFit: () => {
-    console.error("no context provider for sizeColumnsToFit");
+    console.error("no context provider for autoSizeAllColumns");
+    return null;
   },
   editingCells: () => {
     console.error("no context provider for editingCells");

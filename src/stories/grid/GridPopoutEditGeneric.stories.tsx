@@ -36,14 +36,11 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridCell(
         {
           field: "name",
           headerName: "Popout Generic Edit",
-          maxWidth: 140,
         },
         {
           multiEdit: true,

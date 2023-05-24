@@ -1,7 +1,12 @@
-import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
+import { CellClickedEvent, ColDef, GridSizeChangedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  CellEvent,
+  FirstDataRenderedEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
@@ -40,6 +45,17 @@ export interface GridProps {
   onGridSizeChanged?: GridOptions["onGridSizeChanged"];
   onFirstDataRendered?: GridOptions["onFirstDataRendered"];
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
+  /**
+   * When the grid is rendered this is called initially with the required container size to fit all content.
+   * This allows you set the size of the panel to fit perfectly.
+   */
+  onContainerContentSize?: (props: { width: number }) => void;
+  /**
+   * "fit" will adjust columns to fit within panel
+   * "auto" will size columns ignoring container width.
+   * If you want to stretch to container width if width is greater than the container add a flex column.
+   */
+  sizeColumns?: "fit" | "auto" | "auto-skip-headers" | "none";
 }
 
 /**
@@ -50,6 +66,7 @@ export const Grid = ({
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
   theme = "ag-theme-alpine",
+  sizeColumns = "auto",
   ...params
 }: GridProps): JSX.Element => {
   const {
@@ -60,6 +77,7 @@ export const Grid = ({
     selectRowsById,
     focusByRowById,
     ensureSelectedRowIsVisible,
+    autoSizeAllColumns,
     sizeColumnsToFit,
     externallySelectedItemsAreInSync,
     setExternallySelectedItemsAreInSync,
@@ -71,6 +89,26 @@ export const Grid = ({
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
+
+  const setInitialContentSize = useCallback(() => {
+    const skipHeaders = sizeColumns === "auto-skip-headers";
+    if (sizeColumns === "auto" || skipHeaders || params.onContainerContentSize) {
+      const result = autoSizeAllColumns({ skipHeader: skipHeaders || !isEmpty(params.rowData) });
+      params.onContainerContentSize && result && params.onContainerContentSize(result);
+    }
+
+    if (sizeColumns === "fit") {
+      sizeColumnsToFit();
+    }
+  }, [autoSizeAllColumns, params, sizeColumns, sizeColumnsToFit]);
+
+  const onFirstDataRendered = useCallback(
+    (event: FirstDataRenderedEvent) => {
+      params.onFirstDataRendered && params.onFirstDataRendered(event);
+      setInitialContentSize();
+    },
+    [params, setInitialContentSize],
+  );
 
   /**
    * On data load select the first row of the grid if required.
@@ -227,6 +265,21 @@ export const Grid = ({
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
+  /**
+   * When the grid is being initialized the data may be empty.
+   * This will resize columns when we have at least one row.
+   */
+  const previousRowDataLength = useRef(0);
+  useEffect(() => {
+    const length = params.rowData?.length ?? 0;
+    if (previousRowDataLength.current !== length) {
+      if (previousRowDataLength.current === 0 && length > 0) {
+        setInitialContentSize();
+      }
+      previousRowDataLength.current = length;
+    }
+  }, [params.rowData?.length, setInitialContentSize]);
+
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
   }, []);
@@ -299,12 +352,13 @@ export const Grid = ({
     [startCellEditing],
   );
 
-  // When rows added or removed then resize columns
-  useEffect(() => {
-    if (columnDefs?.length) {
-      sizeColumnsToFit();
-    }
-  }, [columnDefs?.length, sizeColumnsToFit]);
+  const onGridSizeChanged = useCallback(
+    (e: GridSizeChangedEvent) => {
+      params.onGridSizeChanged && params.onGridSizeChanged(e);
+      sizeColumns === "fit" && sizeColumnsToFit();
+    },
+    [params, sizeColumns, sizeColumnsToFit],
+  );
 
   return (
     <div
@@ -323,10 +377,9 @@ export const Grid = ({
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
-          suppressBrowserResizeObserver={true}
-          colResizeDefault={"shift"}
-          onFirstDataRendered={params.onFirstDataRendered ?? sizeColumnsToFit}
-          onGridSizeChanged={params.onGridSizeChanged ?? sizeColumnsToFit}
+          suppressBrowserResizeObserver={false}
+          onFirstDataRendered={onFirstDataRendered}
+          onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}

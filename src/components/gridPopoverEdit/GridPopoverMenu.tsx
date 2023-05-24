@@ -18,7 +18,7 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
       width: 40,
       editable: colDef.editable != null ? colDef.editable : true,
       exportable: false,
-      cellStyle: { justifyContent: "center" },
+      cellStyle: { flex: 1, justifyContent: "center" },
       cellRenderer: GridRenderPopoutMenuCell,
       ...colDef,
       cellRendererParams: {

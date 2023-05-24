@@ -24,7 +24,7 @@ import {
   wait,
 } from "../..";
 import { GridFilterColumnsToggle } from "../../components";
-import { GridFilterDownloadCsvButton } from "../../components/gridFilter/GridFilterDownloadCsvButton";
+import { GridFilterDownloadCsvButton } from "../../components";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -40,7 +40,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1024, height: 400, display: "flex", flexDirection: "column" }}>
+      <div style={{ maxWidth: 1024, height: 400, display: "flex", flexDirection: "column" }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -66,15 +66,11 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
         lockVisible: true,
       }),
       GridCell({
         field: "position",
         headerName: "Position",
-        initialWidth: 65,
-        maxWidth: 150,
         cellRendererParams: {
           warning: (props) => props.value === "Tester" && "Testers are testing",
           info: (props) => props.value === "Developer" && "Developers are awesome",
@@ -83,19 +79,15 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridCell({
         field: "age",
         headerName: "Age",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridCell({
         field: "desc",
         headerName: "Description",
-        initialWidth: 150,
-        maxWidth: 200,
+        flex: 1,
       }),
       GridPopoverMessage(
         {
           headerName: "Popout message",
-          maxWidth: 150,
           cellRenderer: () => <>Single Click me!</>,
           exportable: false,
         },
@@ -111,7 +103,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       ),
       GridCell({
         headerName: "Custom edit",
-        maxWidth: 100,
         editable: true,
         valueFormatter: () => "Press E",
         cellRendererParams: {
@@ -191,25 +182,19 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           },
         },
       ),
-      GridPopoverMenu(
-        {
-          editable: () => false,
-        },
-        {
-          editorParams: {
-            options: async () => {
-              return [];
-            },
-          },
-        },
-      ),
     ],
     [],
   );
 
   const [rowData] = useState([
     { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
+    {
+      id: 1001,
+      position: "Developer",
+      age: 12,
+      desc: "Develops application extra text extra text extra text extra text extra textextra text extra text extra text extra text extra textextra text extra text extra text extra text extra textextra text extra text extra text extra text extra text",
+      dd: "2",
+    },
     { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
   ]);
 
@@ -242,6 +227,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
+        sizeColumns={"fit"}
       />
     </GridWrapper>
   );

@@ -34,25 +34,25 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   if (Array.isArray(warningText)) warningText = warningText.join("\n");
   if (Array.isArray(infoText)) infoText = infoText.join("\n");
 
-  return (
-    <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
-      <>
-        {!!warningText && (
-          <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+  return checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id) ? (
+    <GridLoadableCell />
+  ) : (
+    <>
+      {!!warningText && (
+        <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+      )}
+      {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
+      <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {colDef.cellRendererParams?.originalCellRenderer ? (
+          <colDef.cellRendererParams.originalCellRenderer {...props} />
+        ) : (
+          <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
         )}
-        {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          {colDef.cellRendererParams?.originalCellRenderer ? (
-            <colDef.cellRendererParams.originalCellRenderer {...props} />
-          ) : (
-            <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
-          )}
-        </div>
-        {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
-          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
-        )}
-      </>
-    </GridLoadableCell>
+      </div>
+      {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
+        <div style={{ position: "absolute", right: 0 }}>{rendererParams?.rightHoverElement}</div>
+      )}
+    </>
   );
 };
 
@@ -122,6 +122,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     colId: props.field,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
+    minWidth: 32,
     editable: props.editable ?? false,
     ...(custom?.editor && {
       cellClassRules: GridCellMultiSelectClassRules,

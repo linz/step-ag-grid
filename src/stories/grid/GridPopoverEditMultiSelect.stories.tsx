@@ -65,14 +65,10 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoutEditMultiSelect(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 250,
           headerName: "Position",
           valueFormatter: ({ value }) => {
             if (value == null) return "";
@@ -117,8 +113,6 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
       GridPopoutEditMultiSelect(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 250,
           headerName: "Parcel picker",
           valueFormatter: ({ value }) => {
             if (value == null) return "";
