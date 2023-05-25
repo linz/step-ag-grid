@@ -363,7 +363,7 @@ export const Grid = ({
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent) => {
       params.onGridSizeChanged && params.onGridSizeChanged(event);
-      //sizeColumns !== "none" && sizeColumnsToFit();
+      sizeColumns !== "none" && sizeColumnsToFit();
     },
     [params, sizeColumns, sizeColumnsToFit],
   );
