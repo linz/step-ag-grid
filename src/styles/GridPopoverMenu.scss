@@ -1,6 +1,6 @@
 @use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
 
-.GridPopoutMenu-burger {
+.ag-cell .GridPopoutMenu-burger {
   cursor: pointer;
   display: block;
 
@@ -9,6 +9,6 @@
   }
 }
 
-.GridPopoutMenu-burgerDisabled svg {
+.ag-cell .GridPopoutMenu-burgerDisabled svg {
   fill: colors.$disabled-color;
 }
