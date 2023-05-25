@@ -302,7 +302,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
-        sizeColumns={"auto-skip-headers"}
       />
     </GridWrapper>
   );

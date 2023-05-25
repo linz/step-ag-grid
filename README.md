@@ -79,15 +79,11 @@ const GridDemo = () => {
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
         export: false,
       }),
       GridCell({
         field: "name",
         headerName: "Name",
-        initialWidth: 65,
-        maxWidth: 150,
         cellRendererParams: {
           warning: ({ value }) => value === "Tester" && "Testers are testing",
           info: ({ value }) => value === "Developer" && "Developers are awesome",
@@ -96,8 +92,6 @@ const GridDemo = () => {
       GridPopoverEditDropDown(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Position",
         },
         {
@@ -157,13 +151,24 @@ const GridDemo = () => {
             <GridFilterColumnsToggle/>
             <GridFilterDownloadCsvButton fileName={"exportFile"}/>
           </GridFilters>
-          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData}/>
+          <Grid selectable={true}
+                columnDefs={columnDefs}
+                rowData={rowData}
+                onContainerContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
   );
 };
 ```
+
+## Grid sizing
+Grid uses ```<Grid sizeColumns="auto"/>``` which sizes by cell content by default.
+To ignore cell content use "fit" instead.
+
+If you are within a resizable window/dialog/container there is a callback parameter
+```<Grid onContainerContentSize={({ width }) => setPanelSize(width)}/>```
+to receive the recommended container width.
 
 ## CSV Download
 CSV download relies on column valueFormatters vs ag-grid's default valueGetter implementation.

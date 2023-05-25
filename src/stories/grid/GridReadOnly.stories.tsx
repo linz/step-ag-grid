@@ -188,13 +188,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
 
   const [rowData] = useState([
     { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-    {
-      id: 1001,
-      position: "Developer",
-      age: 12,
-      desc: "Develops application extra text extra text extra text extra text extra textextra text extra text extra text extra text extra textextra text extra text extra text extra text extra textextra text extra text extra text extra text extra text",
-      dd: "2",
-    },
+    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
     { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
   ]);
 
@@ -227,7 +221,6 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        sizeColumns={"auto"}
       />
     </GridWrapper>
   );
