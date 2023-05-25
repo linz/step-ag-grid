@@ -374,9 +374,9 @@ export const Grid = ({
    */
   const columnDefsAdjusted = useMemo(
     () =>
-      columnDefs.map((c) => ({
-        ...c,
-        suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !c.flex,
+      columnDefs.map((colDef) => ({
+        ...colDef,
+        suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
       })),
     [columnDefs, sizeColumns],
   );
