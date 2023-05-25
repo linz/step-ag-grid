@@ -101,6 +101,7 @@ export const Grid = ({
   const setInitialContentSize = useCallback(() => {
     const skipHeaders = sizeColumns === "auto-skip-headers";
     if (sizeColumns === "auto" || skipHeaders) {
+      // If we aren't skipping headers and there's no data, then don't skip headers
       const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
       params.onContainerContentSize && result && params.onContainerContentSize(result);
     }
