@@ -43,7 +43,6 @@ export interface GridContextType<RowType extends GridBaseRow> {
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
   getColumns: () => ColDefT<RowType>[];
-
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;

@@ -63,7 +63,7 @@ export interface GridProps {
    *
    * If you want to stretch to container width if width is greater than the container add a flex column.
    */
-  sizeColumns?: "fit" | "auto" | "auto-skip-headers" | "none";
+  sizeColumns: "fit" | "auto" | "auto-skip-headers" | "none";
 }
 
 /**
@@ -101,11 +101,11 @@ export const Grid = ({
   const setInitialContentSize = useCallback(() => {
     const skipHeaders = sizeColumns === "auto-skip-headers";
     if (sizeColumns === "auto" || skipHeaders) {
-      const result = autoSizeAllColumns({ skipHeader: skipHeaders || !isEmpty(params.rowData) });
+      const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
       params.onContainerContentSize && result && params.onContainerContentSize(result);
-      sizeColumnsToFit();
     }
-    if (sizeColumns === "fit") {
+
+    if (sizeColumns !== "none") {
       sizeColumnsToFit();
     }
   }, [autoSizeAllColumns, params, sizeColumns, sizeColumnsToFit]);
@@ -363,9 +363,22 @@ export const Grid = ({
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent) => {
       params.onGridSizeChanged && params.onGridSizeChanged(event);
-      sizeColumns !== "none" && sizeColumnsToFit();
+      //sizeColumns !== "none" && sizeColumnsToFit();
     },
     [params, sizeColumns, sizeColumnsToFit],
+  );
+
+  /**
+   * Once the grid has auto-sized we want to run fit to fit the grid in its container,
+   * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
+   */
+  const columnDefsAdjusted = useMemo(
+    () =>
+      columnDefs.map((c) => ({
+        ...c,
+        suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !c.flex,
+      })),
+    [columnDefs, sizeColumns],
   );
 
   return (
@@ -395,7 +408,7 @@ export const Grid = ({
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
-          columnDefs={columnDefs}
+          columnDefs={columnDefsAdjusted}
           rowData={params.rowData}
           noRowsOverlayComponent={GridNoRowsOverlay}
           noRowsOverlayComponentParams={{ rowData: params.rowData, noRowsOverlayText: params.noRowsOverlayText }}
