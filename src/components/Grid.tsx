@@ -50,7 +50,7 @@ export interface GridProps {
    * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
    * This allows you set the size of the panel to fit perfectly.
    */
-  onContainerContentSize?: (props: { width: number }) => void;
+  onContentSize?: (props: { width: number }) => void;
   /**
    * <ul>
    * <li>"none" to use aggrid defaults.</li>
@@ -103,7 +103,7 @@ export const Grid = ({
     if (sizeColumns === "auto" || skipHeaders) {
       // If we aren't skipping headers and there's no data, then don't skip headers
       const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
-      params.onContainerContentSize && result && params.onContainerContentSize(result);
+      params.onContentSize && result && params.onContentSize(result);
     }
 
     if (sizeColumns !== "none") {

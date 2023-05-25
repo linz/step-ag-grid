@@ -154,7 +154,7 @@ const GridDemo = () => {
           <Grid selectable={true}
                 columnDefs={columnDefs}
                 rowData={rowData}
-                onContainerContentSize={({ width }) => setPanelSize(width)} />
+                onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
@@ -164,10 +164,10 @@ const GridDemo = () => {
 
 ## Grid sizing
 Grid uses ```<Grid sizeColumns="auto"/>``` which sizes by cell content by default.
-To ignore cell content use "fit" instead.
+To ignore cell content use "fit", to disable use "none".
 
 If you are within a resizable window/dialog/container there is a callback parameter
-```<Grid onContainerContentSize={({ width }) => setPanelSize(width)}/>```
+```<Grid onContentSize={({ width }) => setPanelSize(width)}/>```
 to receive the recommended container width.
 
 ## CSV Download
