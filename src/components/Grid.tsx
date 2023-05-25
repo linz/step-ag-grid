@@ -63,7 +63,7 @@ export interface GridProps {
    *
    * If you want to stretch to container width if width is greater than the container add a flex column.
    */
-  sizeColumns: "fit" | "auto" | "auto-skip-headers" | "none";
+  sizeColumns?: "fit" | "auto" | "auto-skip-headers" | "none";
 }
 
 /**
