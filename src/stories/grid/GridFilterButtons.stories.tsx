@@ -58,14 +58,10 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
       GridCell({
         field: "id",
         headerName: "Id",
-        width: 100,
-        suppressSizeToFit: true,
       }),
       GridCell({
         field: "position",
         headerName: "Position",
-        width: 100,
-        suppressSizeToFit: true,
       }),
       GridCell({
         field: "desc",
@@ -81,7 +77,7 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
       id: 1000,
       position: "Tester",
       age: 30,
-      desc: "Integration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration testerIntegration tester",
+      desc: "Integration tester - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a lectus neque. Nunc congue magna ut lorem pretium, vitae congue lorem malesuada. Etiam eget eleifend sapien, sed egestas felis. Aliquam ac augue sapien.",
     },
     { id: 1001, position: "Developer", age: 12, desc: "Frontend developer" },
     { id: 1002, position: "Manager", age: 65, desc: "Technical Manager" },
@@ -112,7 +108,7 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
           ]}
         />
       </GridFilters>
-      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={"fit"} />
+      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={"auto-skip-headers"} />
     </GridWrapper>
   );
 };

@@ -57,7 +57,6 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
       }),
       GridPopoverEditBearingCorrection(
         {

@@ -1,10 +1,11 @@
-import { CellClickedEvent, ColDef, GridSizeChangedEvent, ModelUpdatedEvent } from "ag-grid-community";
+import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import {
   CellEvent,
   FirstDataRenderedEvent,
   GridReadyEvent,
+  GridSizeChangedEvent,
   SelectionChangedEvent,
 } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
@@ -46,13 +47,20 @@ export interface GridProps {
   onFirstDataRendered?: GridOptions["onFirstDataRendered"];
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
-   * When the grid is rendered this is called initially with the required container size to fit all content.
+   * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
    * This allows you set the size of the panel to fit perfectly.
    */
   onContainerContentSize?: (props: { width: number }) => void;
   /**
-   * "fit" will adjust columns to fit within panel
-   * "auto" will size columns ignoring container width.
+   * <ul>
+   * <li>"none" to use aggrid defaults.</li>
+   * <li>"fit" will adjust columns to fit within panel via min/max/initial sizing.
+   * <b>Note:</b> This is only really needed if you have auto-height columns which prevents "auto" from working.
+   * </li>
+   * <li>"auto" (default) will size columns based on their content but still obeying min/max sizing.</li>
+   * <li>"auto-skip-headers" same as auto but does not take headers into account.</li>
+   * </ul>
+   *
    * If you want to stretch to container width if width is greater than the container add a flex column.
    */
   sizeColumns?: "fit" | "auto" | "auto-skip-headers" | "none";
@@ -92,11 +100,11 @@ export const Grid = ({
 
   const setInitialContentSize = useCallback(() => {
     const skipHeaders = sizeColumns === "auto-skip-headers";
-    if (sizeColumns === "auto" || skipHeaders || params.onContainerContentSize) {
+    if (sizeColumns === "auto" || skipHeaders) {
       const result = autoSizeAllColumns({ skipHeader: skipHeaders || !isEmpty(params.rowData) });
       params.onContainerContentSize && result && params.onContainerContentSize(result);
+      sizeColumnsToFit();
     }
-
     if (sizeColumns === "fit") {
       sizeColumnsToFit();
     }
@@ -224,12 +232,12 @@ export const Grid = ({
           {
             colId: "selection",
             editable: false,
-            minWidth: 42,
+            width: 42,
+            suppressAutoSize: true,
+            suppressSizeToFit: true,
             headerComponentParams: {
               exportable: false,
             },
-            maxWidth: 42,
-            suppressSizeToFit: true,
             checkboxSelection: true,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
@@ -353,9 +361,9 @@ export const Grid = ({
   );
 
   const onGridSizeChanged = useCallback(
-    (e: GridSizeChangedEvent) => {
-      params.onGridSizeChanged && params.onGridSizeChanged(e);
-      sizeColumns === "fit" && sizeColumnsToFit();
+    (event: GridSizeChangedEvent) => {
+      params.onGridSizeChanged && params.onGridSizeChanged(event);
+      sizeColumns !== "none" && sizeColumnsToFit();
     },
     [params, sizeColumns, sizeColumnsToFit],
   );
@@ -377,7 +385,7 @@ export const Grid = ({
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
-          suppressBrowserResizeObserver={false}
+          suppressBrowserResizeObserver={true}
           onFirstDataRendered={onFirstDataRendered}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}

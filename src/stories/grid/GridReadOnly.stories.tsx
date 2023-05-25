@@ -227,7 +227,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        sizeColumns={"fit"}
+        sizeColumns={"auto"}
       />
     </GridWrapper>
   );

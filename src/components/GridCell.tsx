@@ -119,11 +119,12 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   delete props.exportable;
 
   return {
-    colId: props.field,
+    colId: props.field ?? props.field,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
-    minWidth: 32,
+    minWidth: props.flex ? 150 : undefined,
     editable: props.editable ?? false,
+    suppressSizeToFit: !props.flex,
     ...(custom?.editor && {
       cellClassRules: GridCellMultiSelectClassRules,
       editable: props.editable ?? true,
