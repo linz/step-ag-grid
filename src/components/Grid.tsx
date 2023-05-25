@@ -232,9 +232,8 @@ export const Grid = ({
           {
             colId: "selection",
             editable: false,
-            width: 42,
-            suppressAutoSize: true,
-            suppressSizeToFit: true,
+            minWidth: 42,
+            maxWidth: 42,
             headerComponentParams: {
               exportable: false,
             },
