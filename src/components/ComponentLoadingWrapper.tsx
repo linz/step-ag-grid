@@ -13,19 +13,7 @@ export const ComponentLoadingWrapper = (props: {
     <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading", style: { padding: 16 } }} />
   ) : (
     <div style={{ pointerEvents: props.saving ? "none" : "inherit" }} className={props.className}>
-      {props.saving && (
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            bottom: 0,
-            right: 0,
-            backgroundColor: "rgba(64,64,64,0.1)",
-            zIndex: 1000,
-          }}
-        />
-      )}
+      {props.saving && <div className={"ComponentLoadingWrapper-saveOverlay"} />}
       {props.children}
     </div>
   );

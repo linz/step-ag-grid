@@ -42,7 +42,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
       )}
       {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
-      <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <div className={"GridCell-container"}>
         {colDef.cellRendererParams?.originalCellRenderer ? (
           <colDef.cellRendererParams.originalCellRenderer {...props} />
         ) : (
@@ -50,7 +50,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         )}
       </div>
       {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
-        <div style={{ position: "absolute", right: 0 }}>{rendererParams?.rightHoverElement}</div>
+        <div className={"GridCell-hoverRight"}>{rendererParams?.rightHoverElement}</div>
       )}
     </>
   );
