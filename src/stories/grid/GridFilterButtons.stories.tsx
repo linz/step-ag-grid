@@ -66,13 +66,19 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
       GridCell({
         field: "desc",
         headerName: "Description",
+        flex: 1,
       }),
     ],
     [],
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Integration tester" },
+    {
+      id: 1000,
+      position: "Tester",
+      age: 30,
+      desc: "Integration tester - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a lectus neque. Nunc congue magna ut lorem pretium, vitae congue lorem malesuada. Etiam eget eleifend sapien, sed egestas felis. Aliquam ac augue sapien.",
+    },
     { id: 1001, position: "Developer", age: 12, desc: "Frontend developer" },
     { id: 1002, position: "Manager", age: 65, desc: "Technical Manager" },
     { id: 1003, position: "Tester", age: 30, desc: "E2E tester" },
@@ -102,7 +108,7 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
           ]}
         />
       </GridFilters>
-      <Grid {...props} columnDefs={columnDefs} rowData={rowData} />
+      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={"auto-skip-headers"} />
     </GridWrapper>
   );
 };

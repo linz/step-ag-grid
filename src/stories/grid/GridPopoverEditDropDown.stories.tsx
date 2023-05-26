@@ -96,13 +96,10 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverEditDropDown(
         {
           field: "position2",
-          maxWidth: 100,
           headerName: "Multi-edit",
         },
         {
@@ -125,8 +122,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Custom callback",
         },
         {
@@ -145,8 +140,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Options Fn",
         },
         {
@@ -161,8 +154,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filtered",
         },
         {
@@ -177,8 +168,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position4",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filtered (object)",
           valueGetter: (params) => params.data.position4?.desc,
         },
@@ -196,8 +185,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "code",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filter Selectable",
         },
         {
@@ -225,8 +212,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "sub",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Subcomponent",
           valueGetter: (params) => params.data.sub,
         },

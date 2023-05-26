@@ -1,4 +1,5 @@
 import { ICellRendererParams } from "ag-grid-community";
+import clsx from "clsx";
 
 import { LuiIcon } from "@linzjs/lui";
 
@@ -12,7 +13,7 @@ export const GridRenderPopoutMenuCell = (props: ICellRendererParams) => {
       name={"ic_more_vert"}
       alt={"More actions"}
       size={"md"}
-      className={disabled ? `GridPopoutMenu-burgerDisabled` : `GridPopoutMenu-burger`}
+      className={clsx("GridPopoutMenu-burger", disabled && "GridPopoutMenu-burgerDisabled")}
     />
   );
 };

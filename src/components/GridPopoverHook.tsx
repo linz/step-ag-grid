@@ -81,17 +81,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               closeMenuExclusionClassName={"ReactModal__Content"}
             >
               {saving && ( // This is the overlay that prevents editing when the editor is saving
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: "rgba(64,64,64,0.1)",
-                    zIndex: 1000,
-                  }}
-                />
+                <div className={"ComponentLoadingWrapper-saveOverlay"} />
               )}
               {children}
               <button

@@ -68,14 +68,10 @@ const GridKeyboardInteractionsTemplate: ComponentStory<typeof Grid> = (props: Gr
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridCell({
         field: "position",
         headerName: "Position",
-        initialWidth: 65,
-        maxWidth: 150,
         cellRendererParams: {
           warning: (props) => props.value === "Tester" && "Testers are testing",
           info: (props) => props.value === "Developer" && "Developers are awesome",
@@ -84,14 +80,10 @@ const GridKeyboardInteractionsTemplate: ComponentStory<typeof Grid> = (props: Gr
       GridCell({
         field: "age",
         headerName: "Age",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridCell({
         field: "desc",
         headerName: "Description",
-        initialWidth: 150,
-        maxWidth: 200,
       }),
       GridPopoverMessage(
         {
