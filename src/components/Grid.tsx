@@ -418,6 +418,9 @@ export const Grid = ({
           postSortRows={params.postSortRows ?? postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
+          onColumnResized={() => {
+            sizeColumns !== "none" && sizeColumnsToFit();
+          }}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
