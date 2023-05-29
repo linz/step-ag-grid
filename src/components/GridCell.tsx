@@ -120,6 +120,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
 
   return {
     colId: props.field ?? props.field,
+    headerTooltip: props.headerName,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     minWidth: props.flex ? 150 : 48,

@@ -27,7 +27,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "@linzjs/lui": ">=17",
+    "@linzjs/lui": ">=17.60.0",
     "ag-grid-community": ">=27",
     "ag-grid-react": ">=27",
     "lodash-es": ">=4",
@@ -35,7 +35,7 @@
     "react-dom": ">=17"
   },
   "dependencies": {
-    "@linzjs/lui": ">=17",
+    "@linzjs/lui": ">=17.60.0",
     "ag-grid-community": ">=27",
     "ag-grid-react": ">=27",
     "debounce-promise": "^3.1.2",
