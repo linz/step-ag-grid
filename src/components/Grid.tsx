@@ -74,7 +74,7 @@ export const Grid = ({
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
   theme = "ag-theme-alpine",
-  sizeColumns = "auto",
+  sizeColumns = "auto-skip-headers",
   ...params
 }: GridProps): JSX.Element => {
   const {
