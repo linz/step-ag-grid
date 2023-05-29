@@ -74,7 +74,7 @@ export const Grid = ({
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
   theme = "ag-theme-alpine",
-  sizeColumns = "auto",
+  sizeColumns = "auto-skip-headers",
   ...params
 }: GridProps): JSX.Element => {
   const {
@@ -418,6 +418,9 @@ export const Grid = ({
           postSortRows={params.postSortRows ?? postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
+          onColumnResized={() => {
+            sizeColumns !== "none" && sizeColumnsToFit();
+          }}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
