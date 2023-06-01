@@ -111,13 +111,9 @@ export const Grid = ({
     }
   }, [autoSizeAllColumns, params, sizeColumns, sizeColumnsToFit]);
 
-  const onFirstDataRendered = useCallback(
-    (event: FirstDataRenderedEvent) => {
-      params.onFirstDataRendered && params.onFirstDataRendered(event);
-      setInitialContentSize();
-    },
-    [params, setInitialContentSize],
-  );
+  useEffect(() => {
+    gridReady && setInitialContentSize();
+  }, [gridReady, setInitialContentSize]);
 
   /**
    * On data load select the first row of the grid if required.
@@ -399,7 +395,7 @@ export const Grid = ({
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
-          onFirstDataRendered={onFirstDataRendered}
+          onFirstDataRendered={params.onFirstDataRendered}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
