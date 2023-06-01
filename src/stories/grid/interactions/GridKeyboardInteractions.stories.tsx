@@ -213,6 +213,9 @@ const GridKeyboardInteractionsTemplate: ComponentStory<typeof Grid> = (props: Gr
 
 export const GridKeyboardInteractions = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
+  multiEditAction.mockReset();
+  eAction.mockReset();
+
   // Ensure first row/cell is selected on render
   await waitFor(async () => {
     const activeCell = canvasElement.ownerDocument.activeElement;
