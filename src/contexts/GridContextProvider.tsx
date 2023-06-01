@@ -74,6 +74,20 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApiOp],
   );
 
+  const getFirstRowId = useCallback((): number => {
+    let id = 0;
+    try {
+      gridApi?.forEachNodeAfterFilterAndSort((rowNode) => {
+        id = parseInt(rowNode.id ?? "0");
+        // this is the only way to get out of the loop
+        throw "expected exception - exit_loop";
+      });
+    } catch (ex) {
+      // ignore
+    }
+    return id;
+  }, [gridApi]);
+
   /**
    * Set the grid api when the grid is ready.
    */
@@ -533,6 +547,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         getFilteredSelectedRows,
         getSelectedRowIds,
         getFilteredSelectedRowIds,
+        getFirstRowId,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,

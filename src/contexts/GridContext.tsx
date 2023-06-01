@@ -25,6 +25,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   focusByRowById: (rowId: number) => void;
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
+  getFirstRowId: () => number;
   autoSizeAllColumns: (props?: { skipHeader?: boolean }) => { width: number } | null;
   sizeColumnsToFit: () => void;
   stopEditing: () => void;
@@ -111,6 +112,10 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   ensureSelectedRowIsVisible: () => {
     console.error("no context provider for ensureSelectedRowIsVisible");
+  },
+  getFirstRowId: () => {
+    console.error("no context provider for getFirstRowId");
+    return -1;
   },
   autoSizeAllColumns: () => {
     console.error("no context provider for autoSizeAllColumns");
