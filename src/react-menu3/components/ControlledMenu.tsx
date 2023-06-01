@@ -148,49 +148,21 @@ export const ControlledMenuFr = (
       const isTextArea = activeElement.nodeName === "TEXTAREA";
       const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") == "true" || isTextArea;
 
-      // Handle tabs
-      switch (activeElement.nodeName) {
-        case "TEXTAREA":
-        case "INPUT": {
-          // If there's only one input element, we support tab and enter
-          if ((activeElement === lastInputEl && activeElement === firstInputEl) || allowTabToSave) {
-            if (ev.key === "Tab") {
-              // Can't forward/backwards tab out of popup
-              ev.preventDefault();
-              ev.stopPropagation();
-              if (isDown) {
-                lastTabDownEl.current = activeElement;
-              } else {
-                lastTabDownEl.current == activeElement &&
-                  invokeSave(ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD);
-              }
-            }
-          } else if (activeElement === lastInputEl) {
-            if (ev.key === "Tab" && !ev.shiftKey) {
-              // Can't backward tab out of popup
-              ev.preventDefault();
-              ev.stopPropagation();
+      if (ev.key === "Tab") {
+        const tabDirection = ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD;
+        if (
+          (activeElement === lastInputEl && !ev.shiftKey) ||
+          (activeElement === firstInputEl && ev.shiftKey) ||
+          allowTabToSave
+        ) {
+          ev.preventDefault();
+          ev.stopPropagation();
 
-              if (isDown) {
-                lastTabDownEl.current = activeElement;
-              } else {
-                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_FORWARD);
-              }
-            }
-          } else if (activeElement === firstInputEl) {
-            if (ev.key === "Tab" && ev.shiftKey) {
-              // Can't backward tab out of popup
-              ev.preventDefault();
-              ev.stopPropagation();
-
-              if (isDown) {
-                lastTabDownEl.current = activeElement;
-              } else {
-                lastTabDownEl.current == activeElement && invokeSave(CloseReason.TAB_BACKWARD);
-              }
-            }
+          if (isDown) {
+            lastTabDownEl.current = activeElement;
+          } else {
+            lastTabDownEl.current == activeElement && invokeSave(tabDirection);
           }
-          break;
         }
       }
 
@@ -198,7 +170,6 @@ export const ControlledMenuFr = (
         "type" in activeElement &&
         (activeElement.type === "text" || activeElement.type == null || activeElement.type === "textarea");
 
-      // Handle enter
       switch (activeElement.nodeName) {
         case "INPUT":
           {
