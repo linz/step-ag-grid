@@ -330,13 +330,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Resize columns to fit container
    */
-  const autoSizeAllColumns = useCallback((): { width: number } | null => {
-    if (columnApi) {
-      columnApi.autoSizeAllColumns();
-      return { width: sumBy(columnApi.getColumnState(), "width") };
-    }
-    return null;
-  }, [columnApi]);
+  const autoSizeAllColumns = useCallback(
+    ({ skipHeader }): { width: number } | null => {
+      if (columnApi) {
+        columnApi.autoSizeAllColumns(skipHeader);
+        return { width: sumBy(columnApi.getColumnState(), "width") };
+      }
+      return null;
+    },
+    [columnApi],
+  );
 
   /**
    * Resize columns to fit container
