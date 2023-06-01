@@ -57,8 +57,8 @@ export interface GridProps {
    * <li>"fit" will adjust columns to fit within panel via min/max/initial sizing.
    * <b>Note:</b> This is only really needed if you have auto-height columns which prevents "auto" from working.
    * </li>
-   * <li>"auto" (default) will size columns based on their content but still obeying min/max sizing.</li>
-   * <li>"auto-skip-headers" same as auto but does not take headers into account.</li>
+   * <li>"auto" will size columns based on their content but still obeying min/max sizing.</li>
+   * <li>"auto-skip-headers" (default) same as auto but does not take headers into account.</li>
    * </ul>
    *
    * If you want to stretch to container width if width is greater than the container add a flex column.
