@@ -1,13 +1,7 @@
 import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import {
-  CellEvent,
-  FirstDataRenderedEvent,
-  GridReadyEvent,
-  GridSizeChangedEvent,
-  SelectionChangedEvent,
-} from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { difference, isEmpty, last, xorBy } from "lodash-es";
@@ -43,8 +37,6 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   alwaysShowVerticalScroll?: boolean;
-  onGridSizeChanged?: GridOptions["onGridSizeChanged"];
-  onFirstDataRendered?: GridOptions["onFirstDataRendered"];
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
    * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
@@ -57,8 +49,8 @@ export interface GridProps {
    * <li>"fit" will adjust columns to fit within panel via min/max/initial sizing.
    * <b>Note:</b> This is only really needed if you have auto-height columns which prevents "auto" from working.
    * </li>
-   * <li>"auto" (default) will size columns based on their content but still obeying min/max sizing.</li>
-   * <li>"auto-skip-headers" same as auto but does not take headers into account.</li>
+   * <li>"auto" will size columns based on their content but still obeying min/max sizing.</li>
+   * <li>"auto-skip-headers" (default) same as auto but does not take headers into account.</li>
    * </ul>
    *
    * If you want to stretch to container width if width is greater than the container add a flex column.
@@ -82,6 +74,7 @@ export const Grid = ({
     setApis,
     prePopupOps,
     ensureRowVisible,
+    getFirstRowId,
     selectRowsById,
     focusByRowById,
     ensureSelectedRowIsVisible,
@@ -111,13 +104,9 @@ export const Grid = ({
     }
   }, [autoSizeAllColumns, params, sizeColumns, sizeColumnsToFit]);
 
-  const onFirstDataRendered = useCallback(
-    (event: FirstDataRenderedEvent) => {
-      params.onFirstDataRendered && params.onFirstDataRendered(event);
-      setInitialContentSize();
-    },
-    [params, setInitialContentSize],
-  );
+  useEffect(() => {
+    gridReady && setInitialContentSize();
+  }, [gridReady, setInitialContentSize]);
 
   /**
    * On data load select the first row of the grid if required.
@@ -127,7 +116,7 @@ export const Grid = ({
     if (!gridReady || hasSelectedFirstItem.current || !params.rowData || !externallySelectedItemsAreInSync) return;
     hasSelectedFirstItem.current = true;
     if (isNotEmpty(params.rowData) && isEmpty(params.externalSelectedItems)) {
-      const firstRowId = params.rowData[0].id;
+      const firstRowId = getFirstRowId();
       if (params.autoSelectFirstRow) {
         selectRowsById([firstRowId]);
       } else {
@@ -142,6 +131,7 @@ export const Grid = ({
     params.autoSelectFirstRow,
     params.rowData,
     selectRowsById,
+    getFirstRowId,
   ]);
 
   /**
@@ -360,13 +350,9 @@ export const Grid = ({
     [startCellEditing],
   );
 
-  const onGridSizeChanged = useCallback(
-    (event: GridSizeChangedEvent) => {
-      params.onGridSizeChanged && params.onGridSizeChanged(event);
-      sizeColumns !== "none" && sizeColumnsToFit();
-    },
-    [params, sizeColumns, sizeColumnsToFit],
-  );
+  const onGridSizeChanged = useCallback(() => {
+    sizeColumns !== "none" && sizeColumnsToFit();
+  }, [sizeColumns, sizeColumnsToFit]);
 
   /**
    * Once the grid has auto-sized we want to run fit to fit the grid in its container,
@@ -399,7 +385,6 @@ export const Grid = ({
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
-          onFirstDataRendered={onFirstDataRendered}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
@@ -418,9 +403,6 @@ export const Grid = ({
           postSortRows={params.postSortRows ?? postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
-          onColumnResized={() => {
-            sizeColumns !== "none" && sizeColumnsToFit();
-          }}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}

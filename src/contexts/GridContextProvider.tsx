@@ -74,6 +74,20 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApiOp],
   );
 
+  const getFirstRowId = useCallback((): number => {
+    let id = 0;
+    try {
+      gridApi?.forEachNodeAfterFilterAndSort((rowNode) => {
+        id = parseInt(rowNode.id ?? "0");
+        // this is the only way to get out of the loop
+        throw "expected exception - exit_loop";
+      });
+    } catch (ex) {
+      // ignore
+    }
+    return id;
+  }, [gridApi]);
+
   /**
    * Set the grid api when the grid is ready.
    */
@@ -330,13 +344,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Resize columns to fit container
    */
-  const autoSizeAllColumns = useCallback((): { width: number } | null => {
-    if (columnApi) {
-      columnApi.autoSizeAllColumns();
-      return { width: sumBy(columnApi.getColumnState(), "width") };
-    }
-    return null;
-  }, [columnApi]);
+  const autoSizeAllColumns = useCallback(
+    ({ skipHeader }): { width: number } | null => {
+      if (columnApi) {
+        columnApi.autoSizeAllColumns(skipHeader);
+        return { width: sumBy(columnApi.getColumnState(), "width") };
+      }
+      return null;
+    },
+    [columnApi],
+  );
 
   /**
    * Resize columns to fit container
@@ -530,6 +547,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         getFilteredSelectedRows,
         getSelectedRowIds,
         getFilteredSelectedRowIds,
+        getFirstRowId,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,
