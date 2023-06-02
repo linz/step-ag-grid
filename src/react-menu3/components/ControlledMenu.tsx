@@ -166,9 +166,8 @@ export const ControlledMenuFr = (
         }
       }
 
-      const isTextInput =
-        "type" in activeElement &&
-        (activeElement.type === "text" || activeElement.type == null || activeElement.type === "textarea");
+      const type = activeElement.getAttribute("type");
+      const isTextInput = type === "text" || type == null || type === "textarea";
 
       switch (activeElement.nodeName) {
         case "INPUT":
