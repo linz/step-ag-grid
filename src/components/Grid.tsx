@@ -91,12 +91,25 @@ export const Grid = ({
   const [staleGrid, setStaleGrid] = useState(false);
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
+  const hasSetContentSize = useRef(false);
+  const hasSetContentSizeEmpty = useRef(false);
+
   const setInitialContentSize = useCallback(() => {
-    const skipHeaders = sizeColumns === "auto-skip-headers";
-    if (sizeColumns === "auto" || skipHeaders) {
-      // If we aren't skipping headers and there's no data, then don't skip headers
-      const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
-      params.onContentSize && result && params.onContentSize(result);
+    if (
+      (!isEmpty(params.rowData) && !hasSetContentSize.current) ||
+      (isEmpty(params.rowData) && !hasSetContentSizeEmpty.current)
+    ) {
+      const skipHeaders = sizeColumns === "auto-skip-headers";
+      if (sizeColumns === "auto" || skipHeaders) {
+        // If we aren't skipping headers and there's no data, then don't skip headers
+        const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
+        if (isEmpty(params.rowData)) {
+          hasSetContentSizeEmpty.current = true;
+        } else {
+          hasSetContentSize.current = true;
+        }
+        params.onContentSize && result && params.onContentSize(result);
+      }
     }
 
     if (sizeColumns !== "none") {
@@ -269,6 +282,8 @@ export const Grid = ({
    */
   const previousRowDataLength = useRef(0);
   useEffect(() => {
+    if (!gridReady) return;
+
     const length = params.rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
       if (previousRowDataLength.current === 0 && length > 0) {
@@ -276,7 +291,7 @@ export const Grid = ({
       }
       previousRowDataLength.current = length;
     }
-  }, [params.rowData?.length, setInitialContentSize]);
+  }, [gridReady, params.rowData?.length, setInitialContentSize]);
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
@@ -350,10 +365,6 @@ export const Grid = ({
     [startCellEditing],
   );
 
-  const onGridSizeChanged = useCallback(() => {
-    sizeColumns !== "none" && sizeColumnsToFit();
-  }, [sizeColumns, sizeColumnsToFit]);
-
   /**
    * Once the grid has auto-sized we want to run fit to fit the grid in its container,
    * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
@@ -385,7 +396,7 @@ export const Grid = ({
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
-          onGridSizeChanged={onGridSizeChanged}
+          onGridSizeChanged={setInitialContentSize}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}

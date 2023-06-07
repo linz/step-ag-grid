@@ -348,7 +348,12 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     ({ skipHeader }): { width: number } | null => {
       if (columnApi) {
         columnApi.autoSizeAllColumns(skipHeader);
-        return { width: sumBy(columnApi.getColumnState(), "width") };
+        return {
+          width: sumBy(
+            columnApi.getColumnState().filter((col) => col.hide !== true),
+            "width",
+          ),
+        };
       }
       return null;
     },
