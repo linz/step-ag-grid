@@ -47,6 +47,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
+  setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
@@ -161,6 +162,9 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   downloadCsv: () => {
     console.error("no context provider for downloadCsv");
+  },
+  setOnCellEditingComplete: () => {
+    console.error("no context provider for setOnCellEditingComplete");
   },
 });
 

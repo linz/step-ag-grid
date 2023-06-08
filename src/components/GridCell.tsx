@@ -105,6 +105,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   props: GenericCellColDef<RowType>,
   custom?: {
     multiEdit?: boolean;
+    preventAutoEdit?: boolean;
     editor?: (editorProps: Props) => JSX.Element;
     editorParams?: Props;
   },
@@ -132,7 +133,11 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     }),
     suppressKeyboardEvent: suppressCellKeyboardEvents,
     ...(custom?.editorParams && {
-      cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
+      cellEditorParams: {
+        ...custom.editorParams,
+        multiEdit: custom.multiEdit,
+        preventAutoEdit: custom.preventAutoEdit ?? false,
+      },
     }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
     filterValueGetter,

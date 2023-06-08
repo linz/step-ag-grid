@@ -477,7 +477,27 @@ export const MenuList = ({
         top: menuPosition.y,
       }}
     >
-      <div ref={focusRef} tabIndex={-1} style={{ position: "absolute", left: 0, top: 0 }} />
+      <div
+        ref={focusRef}
+        tabIndex={-1}
+        style={{ position: "absolute", left: 0, top: 0 }}
+        onKeyDown={(event) => {
+          if (event.key == "Tab") {
+            event.preventDefault();
+            event.stopPropagation();
+            safeCall(onClose, {
+              key: event.key,
+              shiftKey: event.shiftKey,
+              reason:
+                event.key === "Tab"
+                  ? event.shiftKey
+                    ? CloseReason.TAB_BACKWARD
+                    : CloseReason.TAB_FORWARD
+                  : CloseReason.CLICK,
+            });
+          }
+        }}
+      />
       {arrow && (
         <div
           className={_arrowClass}

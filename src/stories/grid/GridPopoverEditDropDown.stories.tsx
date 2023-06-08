@@ -155,6 +155,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         {
           field: "position3",
           headerName: "Filtered",
+          editable: false,
         },
         {
           multiEdit: true,
@@ -302,6 +303,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
+        onCellEditingComplete={() => console.log("Cell editing complete")}
       />
     </GridWrapper>
   );

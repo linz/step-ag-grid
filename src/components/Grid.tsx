@@ -56,6 +56,11 @@ export interface GridProps {
    * If you want to stretch to container width if width is greater than the container add a flex column.
    */
   sizeColumns?: "fit" | "auto" | "auto-skip-headers" | "none";
+  /**
+   * When pressing tab whilst editing the grid will select and edit the next cell if available.
+   * Once the last cell to edit closes this callback is called.
+   */
+  onCellEditingComplete?: () => void;
 }
 
 /**
@@ -84,6 +89,7 @@ export const Grid = ({
     setExternallySelectedItemsAreInSync,
     isExternalFilterPresent,
     doesExternalFilterPass,
+    setOnCellEditingComplete,
   } = useContext(GridContext);
   const { checkUpdating } = useContext(GridUpdatingContext);
 
@@ -377,6 +383,8 @@ export const Grid = ({
       })),
     [columnDefs, sizeColumns],
   );
+
+  setOnCellEditingComplete(params.onCellEditingComplete);
 
   return (
     <div
