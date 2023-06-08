@@ -115,14 +115,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
             : item,
         );
 
-        if (props.filtered) {
-          // This is needed otherwise when filter input is rendered and sets autofocus
-          // the mouse up of the double click edit triggers the cell to cancel editing
-          setOptions(optionsList);
-          //delay(() => setOptions(optionsList), 100);
-        } else {
-          setOptions(optionsList);
-        }
+        setOptions(optionsList);
       }
     })();
   }, [filter, options, props, selectedRows]);

@@ -377,6 +377,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     gridApi.stopEditing();
   }, [gridApi]);
 
+  /**
+   * This differs from stopEdit in that it will also invoke cellEditingCompleteCallback
+   */
+  const cancelEdit = useCallback((): void => {
+    stopEditing();
+    cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+  }, [stopEditing]);
+
   const cellEditingCompleteCallbackRef = useRef<() => void>();
   const setOnCellEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
     cellEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
@@ -386,7 +394,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Returns true if an editable cell on same row was selected, else false.
    */
   const selectNextEditableCell = useCallback(
-    async (tabDirection: -1 | 1): Promise<boolean> => {
+    (tabDirection: -1 | 1): boolean => {
       // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
       if (!gridApi) return true;
 
@@ -398,7 +406,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         return (
           !!(rowNode && nextColumn && nextColDef) &&
           nextColumn.isCellEditable(rowNode) &&
-          !nextColDef.cellEditorParams.preventAutoEdit
+          !nextColDef.cellEditorParams?.preventAutoEdit
         );
       };
 
@@ -485,7 +493,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          if (!tabDirection || (await selectNextEditableCell(tabDirection))) {
+          if (!tabDirection || selectNextEditableCell(tabDirection)) {
             cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
           }
         }
@@ -611,6 +619,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         sizeColumnsToFit,
         autoSizeAllColumns,
         stopEditing,
+        cancelEdit,
         updatingCells,
         redrawRows,
         externallySelectedItemsAreInSync,

@@ -303,7 +303,10 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
-        onCellEditingComplete={() => console.log("Cell editing complete")}
+        onCellEditingComplete={() => {
+          /* eslint-disable-next-line no-console */
+          console.log("Cell editing complete");
+        }}
       />
     </GridWrapper>
   );
