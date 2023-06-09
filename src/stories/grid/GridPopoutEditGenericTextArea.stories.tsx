@@ -192,7 +192,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       setRowData([
         ...rowData,
         {
-          id: lastRow.id + 1,
+          id: (lastRow?.id ?? 0) + 1,
           name: "?",
           nameType: "?",
           numba: "?",
@@ -212,6 +212,12 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
+        defaultColDef={{ minWidth: 70 }}
+        sizeColumns={"auto"}
+        onCellEditingComplete={() => {
+          /* eslint-disable-next-line no-console */
+          console.log("Cell editing complete");
+        }}
       />
       <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onClick={addRowAction} />
     </>

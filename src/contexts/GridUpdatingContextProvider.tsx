@@ -1,4 +1,4 @@
-import { castArray, flatten, remove } from "lodash-es";
+import { castArray, flatten, isEmpty, remove } from "lodash-es";
 import { ReactNode, useRef, useState } from "react";
 
 import { GridUpdatingContext } from "./GridUpdatingContext";
@@ -21,11 +21,16 @@ export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps)
   const resetUpdating = () => {
     const mergedUpdatingBlocks: GridUpdatingContextStatus = {};
     for (const key in updatingBlocks.current) {
-      mergedUpdatingBlocks[key] = flatten(updatingBlocks.current[key]);
+      const arr = flatten(updatingBlocks.current[key]);
+      if (arr.length) {
+        mergedUpdatingBlocks[key] = arr;
+      }
     }
     updating.current = mergedUpdatingBlocks;
     setUpdatedDep((updatedDep) => updatedDep + 1);
   };
+
+  const isUpdating = () => !isEmpty(updating.current);
 
   const modifyUpdating = async (
     fields: string | string[],
@@ -50,7 +55,7 @@ export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps)
     castArray(fields).some((f) => updating.current[f]?.includes(id));
 
   return (
-    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating, updatedDep }}>
+    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating, isUpdating, updatedDep }}>
       {props.children}
     </GridUpdatingContext.Provider>
   );

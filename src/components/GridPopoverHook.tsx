@@ -21,7 +21,7 @@ export interface GridPopoverHookProps<RowType> {
 }
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
-  const { stopEditing } = useContext(GridContext);
+  const { stopEditing, cancelEdit } = useContext(GridContext);
   const { anchorRef, saving, updateValue } = useGridPopoverContext<RowType>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -33,7 +33,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
   const triggerSave = useCallback(
     async (reason?: string) => {
       if (reason == CloseReason.CANCEL) {
-        stopEditing();
+        cancelEdit();
         return;
       }
       if (props.invalid && props.invalid()) {
@@ -41,7 +41,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       }
 
       if (!props.save) {
-        stopEditing();
+        cancelEdit();
       } else if (props.save) {
         // forms that don't provide an invalid fn must wait until they have saved to close
         if (props.invalid) stopEditing();
@@ -55,7 +55,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
         }
       }
     },
-    [props, stopEditing, updateValue],
+    [cancelEdit, props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

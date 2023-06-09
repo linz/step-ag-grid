@@ -162,6 +162,15 @@ const GridDemo = () => {
 };
 ```
 
+## Bulk editing
+If you are editing a cell and tab out of the cell, the grid will edit the next editable cell.
+
+At this point you can send the change to the back-end immediately and then wait for an update response
+_OR_
+you could cache the required change, update then cell locally, and then wait for the callback
+```<Grid onCellEditingComplete={fn}/>``` which will get invoked when the grid cannot find any
+more editable cells on the grid row, which will speed up editing.
+
 ## Grid sizing
 Grid uses ```<Grid sizeColumns="auto"/>``` which sizes by cell content by default.
 To ignore cell content use "fit", to disable use "none".

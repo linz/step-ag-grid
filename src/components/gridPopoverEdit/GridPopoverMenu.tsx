@@ -28,6 +28,7 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
     },
     {
       editor: GridFormPopoverMenu,
+      preventAutoEdit: true,
       ...custom,
     },
   );

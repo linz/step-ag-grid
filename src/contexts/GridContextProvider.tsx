@@ -8,7 +8,7 @@ import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, u
 
 import { ColDefT, GridBaseRow } from "../components";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
-import { GridContext, GridFilterExternal } from "./GridContext";
+import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
 interface GridContextProps {
@@ -64,14 +64,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const ensureRowVisible = useCallback(
     (id: number | string): boolean => {
-      return gridApiOp((gridApi) => {
-        const node = gridApi.getRowNode(`${id}`);
-        if (!node) return false;
-        gridApi.ensureNodeVisible(node);
-        return true;
-      });
+      if (!gridApi) return false;
+      const node = gridApi?.getRowNode(`${id}`);
+      if (!node) return false;
+      defer(() => gridApi.ensureNodeVisible(node));
+      return true;
     },
-    [gridApiOp],
+    [gridApi],
   );
 
   const getFirstRowId = useCallback((): number => {
@@ -211,17 +210,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         );
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
-          gridApi.ensureNodeVisible(firstNode);
+          defer(() => gridApi.ensureNodeVisible(firstNode));
           const colDefs = gridApi.getColumnDefs();
-          if (colDefs && colDefs.length) {
+          if (colDefs?.length) {
             const col = colDefs[0] as ColDef; // We don't support ColGroupDef
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
               // We need to make sure we aren't currently editing a cell otherwise tests will fail
               // as they will start to edit the cell before this stuff has a chance to run
-              colId != null &&
-                defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+              colId && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
             }
           }
         }
@@ -337,25 +335,30 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     gridApiOp((gridApi) => {
       const selectedNodes = gridApi.getSelectedNodes();
       if (isEmpty(selectedNodes)) return;
-      gridApi.ensureNodeVisible(last(selectedNodes));
+      defer(() => gridApi.ensureNodeVisible(last(selectedNodes)));
     });
   }, [gridApiOp]);
 
   /**
    * Resize columns to fit container
    */
-  const autoSizeAllColumns = useCallback(
-    ({ skipHeader }): { width: number } | null => {
-      if (columnApi) {
-        columnApi.autoSizeAllColumns(skipHeader);
-        return {
-          width: sumBy(
-            columnApi.getColumnState().filter((col) => col.hide !== true),
-            "width",
-          ),
-        };
-      }
-      return null;
+  const autoSizeColumns = useCallback(
+    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+      if (!columnApi) return null;
+      const colIdsSet = colIds instanceof Set ? colIds : new Set<string>(colIds ?? []);
+      columnApi.getColumnState().forEach((col) => {
+        const colId = col.colId;
+        if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
+          columnApi.autoSizeColumn(colId, skipHeader);
+        }
+      });
+
+      return {
+        width: sumBy(
+          columnApi.getColumnState().filter((col) => !col.hide),
+          "width",
+        ),
+      };
     },
     [columnApi],
   );
@@ -364,26 +367,83 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Resize columns to fit container
    */
   const sizeColumnsToFit = useCallback((): void => {
-    if (gridApi) {
-      gridApi.sizeColumnsToFit();
-    }
+    gridApi && gridApi.sizeColumnsToFit();
   }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
+    if (!gridApi) return;
     if (prePopupFocusedCell.current) {
       gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
     }
-    gridApiOp((gridApi) => gridApi.stopEditing());
-  }, [gridApi, gridApiOp]);
+    gridApi.stopEditing();
+  }, [gridApi]);
 
-  const selectNextCell = useCallback(
-    (tabDirection: -1 | 0 | 1 = 0) => {
-      gridApiOp((gridApi) => {
-        if (tabDirection == 1) gridApi.tabToNextCell();
-        if (tabDirection == -1) gridApi.tabToPreviousCell();
-      });
+  /**
+   * This differs from stopEdit in that it will also invoke cellEditingCompleteCallback
+   */
+  const cancelEdit = useCallback((): void => {
+    stopEditing();
+    cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+  }, [stopEditing]);
+
+  const cellEditingCompleteCallbackRef = useRef<() => void>();
+  const setOnCellEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
+    cellEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
+  }, []);
+
+  /**
+   * Returns true if an editable cell on same row was selected, else false.
+   */
+  const selectNextEditableCell = useCallback(
+    (tabDirection: -1 | 1): boolean => {
+      // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
+      if (!gridApi) return true;
+
+      const focusedCellIsEditable = () => {
+        const focusedCell = gridApi.getFocusedCell();
+        const nextColumn = focusedCell?.column;
+        const nextColDef = nextColumn?.getColDef();
+        const rowNode = focusedCell && gridApi.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+        return (
+          !!(rowNode && nextColumn && nextColDef) &&
+          nextColumn.isCellEditable(rowNode) &&
+          !nextColDef.cellEditorParams?.preventAutoEdit &&
+          !nextColDef.cellRendererParams?.editAction
+        );
+      };
+
+      let foundEditableCell = false;
+
+      // Just in case I've missed something, we don't want the loop to hang everything
+      let maxIterations = 50;
+      let preRow: CellPosition | null = null;
+      let postRow: CellPosition | null = null;
+      do {
+        preRow = gridApi.getFocusedCell();
+        tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        postRow = gridApi.getFocusedCell();
+        foundEditableCell = focusedCellIsEditable();
+      } while (
+        preRow?.rowIndex === postRow?.rowIndex &&
+        preRow?.column !== postRow?.column &&
+        !foundEditableCell &&
+        maxIterations-- > 0
+      );
+
+      if (foundEditableCell) {
+        prePopupOps();
+        const focusedCell = gridApi?.getFocusedCell();
+        if (focusedCell) {
+          gridApi.startEditingCell({
+            rowIndex: focusedCell.rowIndex,
+            colKey: focusedCell.column.getColId(),
+          });
+          return false;
+        }
+      }
+      return true;
     },
-    [gridApiOp],
+    [gridApi, prePopupOps],
   );
 
   const updatingCells = useCallback(
@@ -398,6 +458,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const selectedRows = props.selectedRows;
 
         let ok = false;
+
         await modifyUpdating(
           props.field ?? "",
           selectedRows.map((data) => data.id),
@@ -429,19 +490,20 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         // Only focus next cell if user hasn't already manually changed focus
         const postPopupFocusedCell = gridApi.getFocusedCell();
         if (
-          tabDirection &&
           prePopupFocusedCell.current &&
           postPopupFocusedCell &&
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          selectNextCell(tabDirection);
+          if (!tabDirection || selectNextEditableCell(tabDirection)) {
+            cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+          }
         }
 
         return ok;
       });
     },
-    [gridApiOp, modifyUpdating, selectNextCell],
+    [gridApiOp, modifyUpdating, selectNextEditableCell],
   );
 
   const redrawRows = useCallback(
@@ -557,8 +619,9 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         ensureRowVisible,
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
-        autoSizeAllColumns,
+        autoSizeColumns,
         stopEditing,
+        cancelEdit,
         updatingCells,
         redrawRows,
         externallySelectedItemsAreInSync,
@@ -569,6 +632,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         isExternalFilterPresent,
         doesExternalFilterPass,
         downloadCsv,
+        setOnCellEditingComplete,
       }}
     >
       {props.children}
@@ -617,6 +681,7 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   }
 
   const result = valueFormatter({ ...params, data: params.node?.data, colDef } as ValueFormatterParams);
+  // type may not be string due to casting, leave the type check in
   if (params.value != null && typeof result !== "string") {
     console.error(`downloadCsv: valueFormatter is returning non string values, colDef:", colId: ${colDef.colId}`);
   }

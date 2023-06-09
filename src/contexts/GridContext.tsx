@@ -6,6 +6,14 @@ import { ColDefT, GridBaseRow } from "../components";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
+export interface AutoSizeColumnsProps {
+  skipHeader?: boolean;
+  colIds?: Set<string> | string[];
+  userSizedColIds?: Set<string>;
+}
+
+export type AutoSizeColumnsResult = { width: number } | null;
+
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
@@ -26,8 +34,9 @@ export interface GridContextType<RowType extends GridBaseRow> {
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
-  autoSizeAllColumns: (props?: { skipHeader?: boolean }) => { width: number } | null;
+  autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
+  cancelEdit: () => void;
   stopEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
@@ -47,6 +56,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
+  setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
@@ -117,8 +127,8 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getFirstRowId");
     return -1;
   },
-  autoSizeAllColumns: () => {
-    console.error("no context provider for autoSizeAllColumns");
+  autoSizeColumns: () => {
+    console.error("no context provider for autoSizeColumns");
     return null;
   },
   sizeColumnsToFit: () => {
@@ -128,6 +138,9 @@ export const GridContext = createContext<GridContextType<any>>({
   editingCells: () => {
     console.error("no context provider for editingCells");
     return false;
+  },
+  cancelEdit: () => {
+    console.error("no context provider for cancelEdit");
   },
   stopEditing: () => {
     console.error("no context provider for stopEditing");
@@ -161,6 +174,9 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   downloadCsv: () => {
     console.error("no context provider for downloadCsv");
+  },
+  setOnCellEditingComplete: () => {
+    console.error("no context provider for setOnCellEditingComplete");
   },
 });
 

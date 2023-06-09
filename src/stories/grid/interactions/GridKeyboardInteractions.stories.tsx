@@ -248,7 +248,9 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   await test(() => userEvent.keyboard("{Enter}"), "8", "2");
   await test(() => userEvent.tab(), "9", "2");
   userEvent.tab({ shift: true });
-  await test(() => userEvent.tab({ shift: true }), "7", "2");
+  await test(() => userEvent.tab({ shift: true }), "6", "2");
+  userEvent.keyboard("{Esc}");
+  userEvent.tab();
 
   userEvent.keyboard("{Enter}");
   await wait(250);
