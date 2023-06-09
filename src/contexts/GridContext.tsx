@@ -6,6 +6,14 @@ import { ColDefT, GridBaseRow } from "../components";
 
 export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
 
+export interface AutoSizeColumnsProps {
+  skipHeader?: boolean;
+  colIds?: Set<string> | string[];
+  userSizedColIds?: Set<string>;
+}
+
+export type AutoSizeColumnsResult = { width: number } | null;
+
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
@@ -26,11 +34,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
-  autoSizeAllColumns: (props?: {
-    skipHeader?: boolean;
-    colIds?: string[];
-    userSizedColIds?: Set<string>;
-  }) => { width: number } | null;
+  autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
   cancelEdit: () => void;
   stopEditing: () => void;
@@ -123,8 +127,8 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getFirstRowId");
     return -1;
   },
-  autoSizeAllColumns: () => {
-    console.error("no context provider for autoSizeAllColumns");
+  autoSizeColumns: () => {
+    console.error("no context provider for autoSizeColumns");
     return null;
   },
   sizeColumnsToFit: () => {

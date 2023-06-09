@@ -8,7 +8,7 @@ import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, u
 
 import { ColDefT, GridBaseRow } from "../components";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
-import { GridContext, GridFilterExternal } from "./GridContext";
+import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
 interface GridContextProps {
@@ -342,12 +342,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Resize columns to fit container
    */
-  const autoSizeAllColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds }): { width: number } | null => {
+  const autoSizeColumns = useCallback(
+    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
+      const colIdsSet = colIds instanceof Set ? colIds : new Set<string>(colIds ?? []);
       columnApi.getColumnState().forEach((col) => {
         const colId = col.colId;
-        if ((!colIds || colIds.includes(colId)) && !userSizedColIds.has(colId)) {
+        if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
           columnApi.autoSizeColumn(colId, skipHeader);
         }
       });
@@ -617,7 +618,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         ensureRowVisible,
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
-        autoSizeAllColumns,
+        autoSizeColumns,
         stopEditing,
         cancelEdit,
         updatingCells,
