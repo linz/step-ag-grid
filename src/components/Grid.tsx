@@ -230,9 +230,7 @@ export const Grid = ({
   /**
    * Synchronise externally selected items to grid on externalSelectedItems change
    */
-  useEffect(() => {
-    synchroniseExternallySelectedItemsToGrid();
-  }, [synchroniseExternallySelectedItemsToGrid]);
+  useEffect(() => synchroniseExternallySelectedItemsToGrid(), [synchroniseExternallySelectedItemsToGrid]);
 
   const columnDefs = useMemo((): ColDef[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
@@ -297,15 +295,14 @@ export const Grid = ({
    * This will resize columns when we have at least one row.
    */
   const previousRowDataLength = useRef(0);
-  useEffect(() => {
-    if (!gridReady) return;
 
+  const onRowDataChanged = useCallback(() => {
     const length = params.rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
       setInitialContentSize();
       previousRowDataLength.current = length;
     }
-  }, [gridReady, params.rowData?.length, setInitialContentSize]);
+  }, [params.rowData?.length, setInitialContentSize]);
 
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.getDisplayedRowCount() === 0 ? event.api.showNoRowsOverlay() : event.api.hideOverlay();
@@ -456,6 +453,7 @@ export const Grid = ({
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
+          onRowDataChanged={onRowDataChanged}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
