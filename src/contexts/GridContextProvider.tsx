@@ -407,7 +407,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         return (
           !!(rowNode && nextColumn && nextColDef) &&
           nextColumn.isCellEditable(rowNode) &&
-          !nextColDef.cellEditorParams?.preventAutoEdit
+          !nextColDef.cellEditorParams?.preventAutoEdit &&
+          !nextColDef.cellRendererParams?.editAction
         );
       };
 
