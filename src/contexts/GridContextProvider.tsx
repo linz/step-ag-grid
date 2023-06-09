@@ -64,14 +64,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const ensureRowVisible = useCallback(
     (id: number | string): boolean => {
-      return gridApiOp((gridApi) => {
-        const node = gridApi.getRowNode(`${id}`);
-        if (!node) return false;
-        gridApi.ensureNodeVisible(node);
-        return true;
-      });
+      if (!gridApi) return false;
+      const node = gridApi?.getRowNode(`${id}`);
+      if (!node) return false;
+      defer(() => gridApi.ensureNodeVisible(node));
+      return true;
     },
-    [gridApiOp],
+    [gridApi],
   );
 
   const getFirstRowId = useCallback((): number => {
@@ -211,19 +210,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         );
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
-          gridApi.ensureNodeVisible(firstNode);
+          defer(() => gridApi.ensureNodeVisible(firstNode));
           const colDefs = gridApi.getColumnDefs();
-          if (colDefs && colDefs.length) {
+          if (colDefs?.length) {
             const col = colDefs[0] as ColDef; // We don't support ColGroupDef
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
               // We need to make sure we aren't currently editing a cell otherwise tests will fail
               // as they will start to edit the cell before this stuff has a chance to run
-              colId != null &&
-                defer(() => {
-                  isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId);
-                });
+              colId && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
             }
           }
         }
@@ -339,7 +335,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     gridApiOp((gridApi) => {
       const selectedNodes = gridApi.getSelectedNodes();
       if (isEmpty(selectedNodes)) return;
-      gridApi.ensureNodeVisible(last(selectedNodes));
+      defer(() => gridApi.ensureNodeVisible(last(selectedNodes)));
     });
   }, [gridApiOp]);
 
@@ -347,17 +343,21 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Resize columns to fit container
    */
   const autoSizeAllColumns = useCallback(
-    ({ skipHeader }): { width: number } | null => {
-      if (columnApi) {
-        columnApi.autoSizeAllColumns(skipHeader);
-        return {
-          width: sumBy(
-            columnApi.getColumnState().filter((col) => col.hide !== true),
-            "width",
-          ),
-        };
-      }
-      return null;
+    ({ skipHeader, colIds, userSizedColIds }): { width: number } | null => {
+      if (!columnApi) return null;
+      columnApi.getColumnState().forEach((col) => {
+        const colId = col.colId;
+        if ((!colIds || colIds.includes(colId)) && !userSizedColIds.has(colId)) {
+          columnApi.autoSizeColumn(colId, skipHeader);
+        }
+      });
+
+      return {
+        width: sumBy(
+          columnApi.getColumnState().filter((col) => !col.hide),
+          "width",
+        ),
+      };
     },
     [columnApi],
   );

@@ -124,7 +124,6 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     headerTooltip: props.headerName,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
-    minWidth: props.flex ? 150 : 48,
     editable: props.editable ?? false,
     ...(custom?.editor && {
       cellClassRules: GridCellMultiSelectClassRules,

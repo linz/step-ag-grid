@@ -212,6 +212,8 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
+        defaultColDef={{ minWidth: 70 }}
+        sizeColumns={"auto"}
         onCellEditingComplete={() => {
           /* eslint-disable-next-line no-console */
           console.log("Cell editing complete");

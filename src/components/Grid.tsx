@@ -1,10 +1,15 @@
 import { CellClickedEvent, ColDef, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  CellEditingStoppedEvent,
+  CellEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
-import { difference, isEmpty, last, xorBy } from "lodash-es";
+import { difference, isEmpty, last, omit, xorBy } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
@@ -91,7 +96,7 @@ export const Grid = ({
     doesExternalFilterPass,
     setOnCellEditingComplete,
   } = useContext(GridContext);
-  const { checkUpdating } = useContext(GridUpdatingContext);
+  const { checkUpdating, updatedDep, isUpdating } = useContext(GridUpdatingContext);
 
   const lastSelectedIds = useRef<number[]>([]);
   const [staleGrid, setStaleGrid] = useState(false);
@@ -101,20 +106,19 @@ export const Grid = ({
   const hasSetContentSizeEmpty = useRef(false);
 
   const setInitialContentSize = useCallback(() => {
-    if (
-      (!isEmpty(params.rowData) && !hasSetContentSize.current) ||
-      (isEmpty(params.rowData) && !hasSetContentSizeEmpty.current)
-    ) {
-      const skipHeaders = sizeColumns === "auto-skip-headers";
-      if (sizeColumns === "auto" || skipHeaders) {
-        // If we aren't skipping headers and there's no data, then don't skip headers
-        const result = autoSizeAllColumns({ skipHeader: skipHeaders && !isEmpty(params.rowData) });
-        if (isEmpty(params.rowData)) {
+    const skipHeader = sizeColumns === "auto-skip-headers";
+    if (sizeColumns === "auto" || skipHeader) {
+      const result = autoSizeAllColumns({ skipHeader, userSizedColIds: userSizedColIds.current });
+      if (isEmpty(params.rowData)) {
+        if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
-        } else {
-          hasSetContentSize.current = true;
+          params.onContentSize && result && params.onContentSize(result);
         }
-        params.onContentSize && result && params.onContentSize(result);
+      } else {
+        if (!hasSetContentSize.current) {
+          hasSetContentSize.current = true;
+          params.onContentSize && result && params.onContentSize(result);
+        }
       }
     }
 
@@ -123,8 +127,12 @@ export const Grid = ({
     }
   }, [autoSizeAllColumns, params, sizeColumns, sizeColumnsToFit]);
 
+  const previousGridReady = useRef(gridReady);
   useEffect(() => {
-    gridReady && setInitialContentSize();
+    if (!previousGridReady.current && gridReady) {
+      previousGridReady.current = true;
+      setInitialContentSize();
+    }
   }, [gridReady, setInitialContentSize]);
 
   /**
@@ -201,7 +209,9 @@ export const Grid = ({
 
     const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
     const lastNewId = last(difference(selectedIds, lastSelectedIds.current));
-    if (lastNewId != null) ensureRowVisible(lastNewId);
+    if (lastNewId != null) {
+      ensureRowVisible(lastNewId);
+    }
     lastSelectedIds.current = selectedIds;
     selectRowsById(selectedIds);
     setExternallySelectedItemsAreInSync(true);
@@ -292,9 +302,7 @@ export const Grid = ({
 
     const length = params.rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
-      if (previousRowDataLength.current === 0 && length > 0) {
-        setInitialContentSize();
-      }
+      setInitialContentSize();
       previousRowDataLength.current = length;
     }
   }, [gridReady, params.rowData?.length, setInitialContentSize]);
@@ -384,7 +392,48 @@ export const Grid = ({
     [columnDefs, sizeColumns],
   );
 
+  const colIdsEdited = useRef<string[]>([]);
+  const onCellEditingStopped = useCallback(
+    (e: CellEditingStoppedEvent) => {
+      const skipHeader = sizeColumns === "auto-skip-headers";
+      if (sizeColumns === "auto" || skipHeader) {
+        // This may be wrong as the cell update hasn't completed?
+        const colId = e.colDef.colId;
+        if (colId && !e.colDef.flex) {
+          // This auto-sizes based on updatingContext completing
+          colIdsEdited.current.push(colId);
+          // This auto-sizes immediately in case it was an in place update
+          !isUpdating() &&
+            autoSizeAllColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: [colId] });
+        }
+      }
+    },
+    [autoSizeAllColumns, isUpdating, sizeColumns],
+  );
+
+  const lastUpdatedDep = useRef(updatedDep);
+  useEffect(() => {
+    if (lastUpdatedDep.current === updatedDep || isEmpty(colIdsEdited.current)) return;
+
+    lastUpdatedDep.current = updatedDep;
+
+    // Don't update while there are spinners
+    if (isUpdating()) return;
+
+    const skipHeader = sizeColumns === "auto-skip-headers";
+    autoSizeAllColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
+    colIdsEdited.current = [];
+  }, [autoSizeAllColumns, updatedDep, sizeColumns, isUpdating]);
+
+  const onGridSizeChanged = useCallback(() => {
+    if (sizeColumns !== "none") {
+      sizeColumnsToFit();
+    }
+  }, [sizeColumns, sizeColumnsToFit]);
+
   setOnCellEditingComplete(params.onCellEditingComplete);
+
+  const userSizedColIds = useRef(new Set<string>());
 
   return (
     <div
@@ -404,7 +453,7 @@ export const Grid = ({
           suppressRowClickSelection={true}
           rowSelection={rowSelection}
           suppressBrowserResizeObserver={true}
-          onGridSizeChanged={setInitialContentSize}
+          onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onCellKeyPress={onCellKeyPress}
@@ -412,6 +461,20 @@ export const Grid = ({
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
+          onCellEditingStopped={onCellEditingStopped}
+          onColumnResized={(e) => {
+            const colId = e.column?.getColId();
+            if (colId == null) return;
+            switch (e.source) {
+              case "uiColumnDragged":
+                userSizedColIds.current.add(colId);
+                break;
+              case "autosizeColumns":
+                userSizedColIds.current.delete(colId);
+                break;
+            }
+          }}
+          defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
           rowData={params.rowData}
           noRowsOverlayComponent={GridNoRowsOverlay}

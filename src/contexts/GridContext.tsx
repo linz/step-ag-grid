@@ -26,7 +26,11 @@ export interface GridContextType<RowType extends GridBaseRow> {
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
-  autoSizeAllColumns: (props?: { skipHeader?: boolean }) => { width: number } | null;
+  autoSizeAllColumns: (props?: {
+    skipHeader?: boolean;
+    colIds?: string[];
+    userSizedColIds?: Set<string>;
+  }) => { width: number } | null;
   sizeColumnsToFit: () => void;
   cancelEdit: () => void;
   stopEditing: () => void;
