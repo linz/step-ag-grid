@@ -544,6 +544,11 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     return externalFilters.current.every((filter) => filter(node.data, node));
   };
 
+  const getColDef = useCallback(
+    (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,
+    [gridApi],
+  );
+
   const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
 
   useEffect(() => {
@@ -588,6 +593,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   return (
     <GridContext.Provider
       value={{
+        getColDef,
         getColumns,
         invisibleColumnIds,
         setInvisibleColumnIds,

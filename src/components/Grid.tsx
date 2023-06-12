@@ -1,12 +1,7 @@
 import { CellClickedEvent, ColDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import {
-  CellEditingStoppedEvent,
-  CellEvent,
-  GridReadyEvent,
-  SelectionChangedEvent,
-} from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { difference, isEmpty, last, omit, xorBy } from "lodash-es";
@@ -101,8 +96,9 @@ export const Grid = ({
     isExternalFilterPresent,
     doesExternalFilterPass,
     setOnCellEditingComplete,
+    getColDef,
   } = useContext(GridContext);
-  const { checkUpdating, updatedDep, isUpdating } = useContext(GridUpdatingContext);
+  const { checkUpdating, updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
 
@@ -351,12 +347,12 @@ export const Grid = ({
     lastUpdatedDep.current = updatedDep;
 
     // Don't update while there are spinners
-    if (isUpdating()) return;
+    if (!isEmpty(updatingCols())) return;
 
     const skipHeader = sizeColumns === "auto-skip-headers";
     autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
     colIdsEdited.current.clear();
-  }, [autoSizeColumns, isUpdating, params.rowData?.length, setInitialContentSize, sizeColumns, updatedDep]);
+  }, [autoSizeColumns, params.rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
 
   /**
    * Show/hide no rows overlay when model changes.
@@ -478,48 +474,39 @@ export const Grid = ({
    * Set of colIds that need auto-sizing.
    */
   const colIdsEdited = useRef(new Set<string>());
-
-  /**
-   * When cell editing has completed tag the colId as needing auto-sizing
-   */
-  const onCellEditingStopped = useCallback(
-    (e: CellEditingStoppedEvent) => {
-      const skipHeader = sizeColumns === "auto-skip-headers";
-      if (sizeColumns === "auto" || skipHeader) {
-        // This may be wrong as the cell update hasn't completed?
-        const colId = e.colDef.colId;
-        if (colId && !e.colDef.flex) {
-          // This auto-sizes based on updatingContext completing
-          colIdsEdited.current.add(colId);
-          // This auto-sizes immediately in case it was an in place update
-          !isUpdating() &&
-            autoSizeColumns({
-              skipHeader,
-              userSizedColIds: userSizedColIds.current,
-              colIds: [colId],
-            });
-        }
-      }
-    },
-    [autoSizeColumns, isUpdating, sizeColumns],
-  );
-
   const lastUpdatedDep = useRef(updatedDep);
 
   /**
-   * If columns are edited, wait for the updating context to complete then auto-size them.
+   * When cell editing has completed the colId as needing auto-sizing
    */
   useEffect(() => {
-    if (lastUpdatedDep.current === updatedDep || isEmpty(colIdsEdited.current)) return;
+    if (lastUpdatedDep.current === updatedDep) return;
     lastUpdatedDep.current = updatedDep;
 
-    // Don't update while there are spinners
-    if (isUpdating()) return;
-
-    const skipHeader = sizeColumns === "auto-skip-headers";
-    autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
-    colIdsEdited.current.clear();
-  }, [autoSizeColumns, updatedDep, sizeColumns, isUpdating]);
+    const colIds = updatingCols();
+    // Updating possibly completed
+    if (isEmpty(colIds)) {
+      // Columns to resize?
+      if (!isEmpty(colIdsEdited.current)) {
+        const skipHeader = sizeColumns === "auto-skip-headers";
+        if (sizeColumns === "auto" || skipHeader) {
+          autoSizeColumns({
+            skipHeader,
+            userSizedColIds: userSizedColIds.current,
+            colIds: colIdsEdited.current,
+          });
+        }
+        colIdsEdited.current.clear();
+      }
+    } else {
+      // Updates not complete, add them to a list of columns needing resize
+      colIds.forEach((colId) => {
+        if (colId && !getColDef(colId)?.flex) {
+          colIdsEdited.current.add(colId);
+        }
+      });
+    }
+  }, [autoSizeColumns, getColDef, sizeColumns, updatedDep, updatingCols]);
 
   /**
    * Resize columns to fit if required on window/container resize
@@ -583,7 +570,6 @@ export const Grid = ({
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
-          onCellEditingStopped={onCellEditingStopped}
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
