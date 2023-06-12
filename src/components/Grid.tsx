@@ -82,7 +82,7 @@ export const Grid = ({
   suppressColumnVirtualization = true,
   theme = "ag-theme-alpine",
   sizeColumns = "auto",
-  selectColumnPinned = "left",
+  selectColumnPinned = null,
   ...params
 }: GridProps): JSX.Element => {
   const {
