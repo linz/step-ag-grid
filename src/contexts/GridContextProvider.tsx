@@ -411,36 +411,29 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         );
       };
 
-      let foundEditableCell = false;
-
       // Just in case I've missed something, we don't want the loop to hang everything
-      let maxIterations = 50;
-      let preRow: CellPosition | null = null;
-      let postRow: CellPosition | null = null;
-      do {
-        preRow = gridApi.getFocusedCell();
+      for (let maxIterations = 0; maxIterations < 50; maxIterations++) {
+        const preRow = gridApi.getFocusedCell();
         tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
-        postRow = gridApi.getFocusedCell();
-        foundEditableCell = focusedCellIsEditable();
-      } while (
-        preRow?.rowIndex === postRow?.rowIndex &&
-        preRow?.column !== postRow?.column &&
-        !foundEditableCell &&
-        maxIterations-- > 0
-      );
-
-      if (foundEditableCell) {
-        prePopupOps();
-        const focusedCell = gridApi?.getFocusedCell();
-        if (focusedCell) {
-          gridApi.startEditingCell({
-            rowIndex: focusedCell.rowIndex,
-            colKey: focusedCell.column.getColId(),
-          });
-          return false;
+        const postRow = gridApi.getFocusedCell();
+        if (preRow?.rowIndex !== postRow?.rowIndex || preRow?.column === postRow?.column) {
+          // We didn't find an editable cell in the same row, or the cell column didn't change
+          // implying it was start/end of grid
+          break;
+        }
+        if (focusedCellIsEditable()) {
+          const focusedCell = gridApi?.getFocusedCell();
+          if (focusedCell) {
+            prePopupOps();
+            gridApi.startEditingCell({
+              rowIndex: focusedCell.rowIndex,
+              colKey: focusedCell.column.getColId(),
+            });
+            return true;
+          }
         }
       }
-      return true;
+      return false;
     },
     [gridApi, prePopupOps],
   );
@@ -494,7 +487,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          if (!tabDirection || selectNextEditableCell(tabDirection)) {
+          if (!tabDirection || !selectNextEditableCell(tabDirection)) {
             cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
           }
         }
