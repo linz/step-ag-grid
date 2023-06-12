@@ -352,7 +352,6 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
           columnApi.autoSizeColumn(colId, skipHeader);
         }
       });
-
       return {
         width: sumBy(
           columnApi.getColumnState().filter((col) => !col.hide),
@@ -538,12 +537,12 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const addExternalFilter = (filter: GridFilterExternal<RowType>) => {
     externalFilters.current.push(filter);
-    onFilterChanged();
+    onFilterChanged().then();
   };
 
   const removeExternalFilter = (filter: GridFilterExternal<RowType>) => {
     remove(externalFilters.current, (v) => v === filter);
-    onFilterChanged();
+    onFilterChanged().then();
   };
 
   const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
