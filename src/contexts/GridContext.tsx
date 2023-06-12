@@ -1,4 +1,4 @@
-import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
+import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
 import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { createContext, useContext } from "react";
 
@@ -16,6 +16,8 @@ export type AutoSizeColumnsResult = { width: number } | null;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
+  getColDef: (colId?: string) => ColDef | undefined;
+  getColumns: () => ColDefT<RowType>[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
@@ -52,7 +54,6 @@ export interface GridContextType<RowType extends GridBaseRow> {
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
-  getColumns: () => ColDefT<RowType>[];
   invisibleColumnIds: string[];
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
@@ -61,6 +62,10 @@ export interface GridContextType<RowType extends GridBaseRow> {
 
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
+  getColDef: () => {
+    console.error("no context provider for getColDef");
+    return undefined;
+  },
   getColumns: () => {
     console.error("no context provider for getColumns");
     return [];
