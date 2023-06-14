@@ -21,7 +21,7 @@ interface GridContextProps {
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
 export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
-  const { modifyUpdating } = useContext(GridUpdatingContext);
+  const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
@@ -377,6 +377,41 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     gridApi.stopEditing();
   }, [gridApi]);
 
+  const startCellEditing = useCallback(
+    async ({ rowId, colId }: { rowId: number; colId: string }) => {
+      if (!gridApi) return;
+
+      const colDef = gridApi.getColumnDef(colId);
+      if (!colDef) return;
+
+      // Cell already being edited, so don't re-edit until finished
+      if (checkUpdating([colDef.field ?? ""], rowId)) {
+        return;
+      }
+      const rowNode = gridApi.getRowNode(`${rowId}`);
+      if (!rowNode) {
+        return;
+      }
+
+      if (!rowNode.isSelected()) {
+        rowNode.setSelected(true, true);
+      }
+      prePopupOps();
+
+      const rowIndex = rowNode.rowIndex;
+      if (rowIndex != null) {
+        const focusAndEdit = () => {
+          gridApi.startEditingCell({
+            rowIndex,
+            colKey: colId,
+          });
+        };
+        defer(focusAndEdit);
+      }
+    },
+    [checkUpdating, gridApi, prePopupOps],
+  );
+
   /**
    * This differs from stopEdit in that it will also invoke cellEditingCompleteCallback
    */
@@ -618,6 +653,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
         autoSizeColumns,
+        startCellEditing,
         stopEditing,
         cancelEdit,
         updatingCells,
