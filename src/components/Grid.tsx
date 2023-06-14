@@ -83,7 +83,6 @@ export const Grid = ({
   const {
     gridReady,
     setApis,
-    prePopupOps,
     ensureRowVisible,
     getFirstRowId,
     selectRowsById,
@@ -98,7 +97,8 @@ export const Grid = ({
     setOnCellEditingComplete,
     getColDef,
   } = useContext(GridContext);
-  const { checkUpdating, updatedDep, updatingCols } = useContext(GridUpdatingContext);
+  const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
+  const gridContext = useContext(GridContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
 
@@ -387,23 +387,13 @@ export const Grid = ({
    */
   const startCellEditing = useCallback(
     (event: CellEvent) => {
-      prePopupOps();
-      if (!event.node.isSelected()) {
-        event.node.setSelected(true, true);
-      }
-      // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([event.colDef.field ?? ""], event.data.id)) {
-        return;
-      }
-
-      if (event.rowIndex !== null) {
-        event.api.startEditingCell({
-          rowIndex: event.rowIndex,
-          colKey: event.column.getColId(),
+      event.data.id &&
+        gridContext.startCellEditing({
+          rowId: event.data.id,
+          colId: event.column.getColId(),
         });
-      }
     },
-    [checkUpdating, prePopupOps],
+    [gridContext],
   );
 
   /**

@@ -39,6 +39,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
   cancelEdit: () => void;
+  startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => void;
   stopEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
@@ -146,6 +147,9 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   cancelEdit: () => {
     console.error("no context provider for cancelEdit");
+  },
+  startCellEditing: () => {
+    console.error("no context provider for startCellEditing");
   },
   stopEditing: () => {
     console.error("no context provider for stopEditing");
