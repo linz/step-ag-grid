@@ -384,19 +384,20 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       const colDef = gridApi.getColumnDef(colId);
       if (!colDef) return;
 
-      // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([colDef.field ?? ""], rowId)) {
-        return;
-      }
+      prePopupOps();
       const rowNode = gridApi.getRowNode(`${rowId}`);
       if (!rowNode) {
         return;
       }
 
       if (!rowNode.isSelected()) {
-        rowNode.setSelected(true, true);
+        rowNode.setSelected(true, false);
       }
-      prePopupOps();
+
+      // Cell already being edited, so don't re-edit until finished
+      if (checkUpdating([colDef.field ?? ""], rowId)) {
+        return;
+      }
 
       const rowIndex = rowNode.rowIndex;
       if (rowIndex != null) {

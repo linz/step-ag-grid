@@ -456,8 +456,9 @@ export const Grid = ({
       columnDefs.map((colDef) => ({
         ...colDef,
         suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
+        sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
       })),
-    [columnDefs, sizeColumns],
+    [columnDefs, params.defaultColDef?.sortable, sizeColumns],
   );
 
   /**
