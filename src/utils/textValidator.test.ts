@@ -69,6 +69,13 @@ describe("TextInputValidator", () => {
         ],
       },
       {
+        numberFormat: { notZero: true },
+        tests: [
+          ["1", null],
+          ["0", "Must not be 0"],
+        ],
+      },
+      {
         required: true,
         tests: [
           ["xx", null],
