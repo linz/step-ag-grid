@@ -31,6 +31,8 @@ describe("bearing", () => {
     expect(convertDDToDMS(300, false, false)).toBe("300° 00'");
     expect(convertDDToDMS(300.1, false, false)).toBe("300° 10'");
     expect(convertDDToDMS(0, false)).toBe("0° 00'");
+    expect(convertDDToDMS(300, false, false, true)).toBe("300° 00' 00\"");
+    expect(convertDDToDMS(0, false, false, true)).toBe("0° 00' 00\"");
   });
 
   test("bearingStringValidator", () => {

@@ -12,9 +12,9 @@ export const bearingCorrectionValueFormatter = (value: any): string => {
     return "–";
   }
   if (typeof safeValue === "string") {
-    return convertDDToDMS(bearingNumberParser(safeValue), true, true);
+    return convertDDToDMS(bearingNumberParser(safeValue), true, true, true);
   }
-  return convertDDToDMS(safeValue, true, true);
+  return convertDDToDMS(safeValue, true, true, true);
 };
 
 export const bearingNumberParser = (value: string): number | null => {
@@ -41,7 +41,12 @@ export const bearingStringValidator = (
 };
 
 // Decimal-ish degrees to Degrees Minutes Seconds converter
-export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, addTrailingZeros = true): string => {
+export const convertDDToDMS = (
+  dd: number | null,
+  showPositiveSymbol = true,
+  addTrailingZeros = true,
+  showZeroSeconds = false,
+): string => {
   if (dd == null) return "–";
 
   if (dd === 0) addTrailingZeros = false;
@@ -75,6 +80,8 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
     dmsString += `\xa0${minString}'\xa0${secString}.${deciSecString}"`; // "\xa0" is here for non-breaking space
   } else if (secNumeric != 0) {
     dmsString += `\xa0${minString}'\xa0${secString}"`;
+  } else if (showZeroSeconds && secNumeric == 0) {
+    dmsString += `\xa0${minString}'\xa000"`;
   } else {
     dmsString += `\xa0${minString}'`;
   }
