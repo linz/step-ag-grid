@@ -54,7 +54,7 @@ GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
   // Test formatting a bearing
   expect(inputField).toBeInTheDocument();
   userEvent.type(inputField, "1.2345");
-  expect(await canvas.findByText("+1° 23' 45.0\"")).toBeInTheDocument();
+  expect(await canvas.findByText("+1° 23' 45\"")).toBeInTheDocument();
 
   // Test enter to save
   updateValue.mockClear();
