@@ -8,6 +8,8 @@ export const wait = (timeoutMs: number) =>
     setTimeout(resolve, timeoutMs);
   });
 
+// This regexp only works if you parseFloat first, it won't validate a float on its own
+// It prevents scientific 1e10, or trailing decimal 1.2.3, or trailing garbage 1.2xyz
 const isFloatRegExp = /^-?\d*\.?\d*$/;
 export const isFloat = (value: string) => {
   try {
