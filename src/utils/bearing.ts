@@ -3,7 +3,7 @@ export const bearingValueFormatter = (value: any): string => {
   if (safeValue == null) {
     return "–";
   }
-  return convertDDToDMS(safeValue, false, false);
+  return convertDDToDMS(safeValue, false);
 };
 
 export const bearingCorrectionValueFormatter = (value: any): string => {
@@ -12,9 +12,9 @@ export const bearingCorrectionValueFormatter = (value: any): string => {
     return "–";
   }
   if (typeof safeValue === "string") {
-    return convertDDToDMS(bearingNumberParser(safeValue), true, true);
+    return convertDDToDMS(bearingNumberParser(safeValue), true, 4);
   }
-  return convertDDToDMS(safeValue, true, true);
+  return convertDDToDMS(safeValue, true, 4);
 };
 
 export const bearingNumberParser = (value: string): number | null => {
@@ -40,11 +40,20 @@ export const bearingStringValidator = (
   return customInvalid ? customInvalid(bearing) : null;
 };
 
-// Decimal-ish degrees to Degrees Minutes Seconds converter
-export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, addTrailingZeros = true): string => {
+/**
+ *Decimal-ish degrees to Degrees Minutes Seconds converter
+ *
+ * @param dd Decimal-ish degrees
+ * @param showPositiveSymbol whether the + sign appears before the number
+ * @param trailingZeroDp 2 | 4 | 5
+ * Example:
+ * 2 = 300° 00'
+ * 4 = 300° 00' 00"
+ * 5 = 300° 00' 00.0"
+ * @returns Degrees Minutes Seconds
+ */
+export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, trailingZeroDp: 2 | 4 | 5 = 2): string => {
   if (dd == null) return "–";
-
-  if (dd === 0) addTrailingZeros = false;
 
   // toFixed rounds parts up greater than 60, which has to be corrected below
   const [bearingWholeString, bearingDecimalString] = dd.toFixed(5).split(".");
@@ -71,14 +80,13 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, add
   const deciSecString = bearingDecimalString?.substring(4, 5);
 
   let dmsString = `${showPositiveSymbol && dd > 0 ? "+" : ""}${dd < 0 ? "-" : ""}${bearingWhole}°`;
-  if (addTrailingZeros || deciSecString != "0") {
+  if (trailingZeroDp === 5 || deciSecString != "0") {
     dmsString += `\xa0${minString}'\xa0${secString}.${deciSecString}"`; // "\xa0" is here for non-breaking space
-  } else if (secNumeric != 0) {
+  } else if (trailingZeroDp === 4 || secNumeric != 0) {
     dmsString += `\xa0${minString}'\xa0${secString}"`;
   } else {
     dmsString += `\xa0${minString}'`;
   }
-
   return dmsString;
 };
 
