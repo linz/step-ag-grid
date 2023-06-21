@@ -11,13 +11,10 @@ export const wait = (timeoutMs: number) =>
 const isFloatRegExp = /^-?\d*\.?\d*$/;
 export const isFloat = (value: string) => {
   try {
-    if (Number.isNaN(parseFloat(value))) {
-      return false;
-    }
-    // Just checking it's not scientific notation here.
+    // Just checking it's not scientific notation or "NaN" here.
     // Also parse float will parse up to the first invalid character,
     // so we need to check there's no remaining invalids e.g. "1.2xyz" would parse as 1.2
-    return isFloatRegExp.test(value);
+    return !Number.isNaN(parseFloat(value)) && isFloatRegExp.test(value);
   } catch {
     return false;
   }
