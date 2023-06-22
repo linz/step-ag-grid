@@ -1,6 +1,5 @@
 import { KeyboardEvent, Ref, useContext, useMemo } from "react";
 
-import { findParentWithClass } from "../../utils/util";
 import { EventHandlersContext } from "../contexts/EventHandlersContext";
 import { RadioGroupContext } from "../contexts/RadioGroupContext";
 import { useBEM, useCombinedRef, useItemState } from "../hooks";
