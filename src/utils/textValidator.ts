@@ -13,6 +13,7 @@ export interface TextInputValidatorProps<RowType extends GridBaseRow> {
     geMin?: number;
     ltMax?: number;
     leMax?: number;
+    notZero?: boolean;
   };
 }
 
@@ -44,17 +45,20 @@ export const TextInputValidator = <RowType extends GridBaseRow>(
     }
     if (value != "") {
       const number = parseFloat(value);
+      if (nf.notZero && number === 0) {
+        return `Must not be 0`;
+      }
       if (nf.gtMin != null && number <= nf.gtMin) {
-        return `Must be greater than ${nf.gtMin}`;
+        return `Must be greater than ${nf.gtMin.toLocaleString()}`;
       }
       if (nf.geMin != null && number < nf.geMin) {
-        return `Must not be less than ${nf.geMin}`;
+        return `Must not be less than ${nf.geMin.toLocaleString()}`;
       }
       if (nf.ltMax != null && number >= nf.ltMax) {
-        return `Must be less than ${nf.ltMax}`;
+        return `Must be less than ${nf.ltMax.toLocaleString()}`;
       }
       if (nf.leMax != null && number > nf.leMax) {
-        return `Must not be greater than ${nf.leMax}`;
+        return `Must not be greater than ${nf.leMax.toLocaleString()}`;
       }
 
       if (nf.precision != null && value != "") {
