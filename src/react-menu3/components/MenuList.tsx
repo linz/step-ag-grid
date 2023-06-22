@@ -100,7 +100,7 @@ export const MenuList = ({
     findParentWithClass("szh-menu", menuItemEl)
       ?.querySelectorAll<HTMLLIElement>(".szh-menu__item")
       ?.forEach((item, i) => {
-        // Must be at some height as currently focused menu-item
+        // Must be at same height as currently focused menu-item
         if (item.offsetTop === menuItemEl.offsetTop) {
           // Find the least positive distance and most negative distance (for wrap around)
           const d = (item.offsetLeft - menuItemEl.offsetLeft) * direction;
