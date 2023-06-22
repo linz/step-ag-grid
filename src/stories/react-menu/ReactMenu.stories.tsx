@@ -89,6 +89,8 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   // Test tab to select
   await openMenu();
   await keyboard("{arrowdown}");
+  // For some reason arrow down takes a little time to activate
+  await wait(10);
   await keyboard("{Tab}");
   expect(menuItemClickAction).toHaveBeenCalled();
   expect(newFileAction).toHaveBeenCalled();

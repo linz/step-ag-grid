@@ -5,7 +5,7 @@ import { HoverItemContext } from "../contexts/HoverItemContext";
 export interface withHoveringResultProps {
   isHovering?: boolean;
   externalRef?: MutableRefObject<any>;
-  menuItemRef?: MutableRefObject<any>;
+  menuItemRef?: MutableRefObject<HTMLLIElement>;
 }
 
 export const withHovering = <T,>(name: string, WrappedComponent: (props: T) => JSX.Element) => {
