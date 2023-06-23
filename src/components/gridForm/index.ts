@@ -2,6 +2,7 @@ export * from "./GridFormDropDown";
 export * from "./GridFormEditBearing";
 export * from "./GridFormMessage";
 export * from "./GridFormMultiSelect";
+export * from "./GridFormMultiSelectGrid";
 export * from "./GridFormPopoverMenu";
 export * from "./GridFormSubComponentTextArea";
 export * from "./GridFormSubComponentTextInput";

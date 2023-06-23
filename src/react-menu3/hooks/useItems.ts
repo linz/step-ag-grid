@@ -85,7 +85,9 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
           sortItems();
           index = nextIndex;
           newItem = items[index];
-          defer(() => (newItem as HTMLElement).scrollIntoView({ behavior: "smooth", inline: "nearest" }));
+          defer(() =>
+            (newItem as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" }),
+          );
           break;
 
         case HoverActionTypes.INCREASE:

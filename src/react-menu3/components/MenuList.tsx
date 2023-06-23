@@ -143,11 +143,15 @@ export const MenuList = ({
         break;
 
       case Keys.LEFT:
-        if (!focusSideways(elementTarget, -1)) return;
+        if (!focusSideways(elementTarget, -1)) {
+          return; // Unhandled
+        }
         break;
 
       case Keys.RIGHT:
-        if (!focusSideways(elementTarget, 1)) return;
+        if (!focusSideways(elementTarget, 1)) {
+          return; // Unhandled
+        }
         break;
 
       // prevent browser from scrolling the page when SPACE is pressed
