@@ -12,9 +12,7 @@ import {
   GridFormMultiSelectGrid,
   GridFormMultiSelectGridProps,
   GridFormMultiSelectGridSaveProps,
-  GridFormSubComponentTextInput,
-  MultiSelectOption,
-  wait,
+  MultiSelectGridOption,
 } from "../../..";
 
 export default {
@@ -32,7 +30,7 @@ const onSave = jest
   .mockImplementation(async () => true);
 const onSelectFilter = jest.fn();
 
-let options: MultiSelectOption[] = [];
+let options: MultiSelectGridOption[] = [];
 const Template: ComponentStory<typeof GridFormMultiSelectGrid> = (props) => {
   options = [
     { label: "Zero", value: 0 },
