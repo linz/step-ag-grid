@@ -13,6 +13,7 @@
   - Text area
   - Drop-down
   - Multi-select
+  - Multi-select-grid
   - Bearing/Bearing Correction
   - Popover message
   - Custom form
