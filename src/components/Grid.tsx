@@ -121,6 +121,15 @@ export const Grid = ({
       needsAutoSize.current = true;
       return;
     }
+
+    const headerCellCount = gridDivRef.current?.getElementsByClassName("ag-header-cell-label")?.length;
+    if (headerCellCount != params.columnDefs.length) {
+      // Don't resize grids until all the columns are visible
+      // as `autoSizeColumns` will fail silently in this case
+      needsAutoSize.current = true;
+      return;
+    }
+
     const skipHeader = sizeColumns === "auto-skip-headers" && !isEmpty(params.rowData);
     if (sizeColumns === "auto" || skipHeader) {
       const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current });
