@@ -5,7 +5,6 @@ import { LuiCheckboxInput } from "@linzjs/lui";
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { MenuItem } from "../../react-menu3";
 import { ClickEvent } from "../../react-menu3/types";
-import { wait } from "../../utils/util";
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { GridIcon } from "../GridIcon";
@@ -33,6 +32,7 @@ export interface GridFormMultiSelectGridProps<RowType extends GridBaseRow> exten
     | MultiSelectGridOption[]
     | ((selectedRows: RowType[]) => Promise<MultiSelectGridOption[]> | MultiSelectGridOption[]);
   invalid?: (props: GridFormMultiSelectGridSaveProps<RowType>) => boolean;
+  maxRowCount?: number;
 }
 
 export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
@@ -64,12 +64,9 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
   const save = useCallback(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (!options || !props.onSave) return true;
-
       // Any changes to save?
       if (JSON.stringify(initialValues) === JSON.stringify(options)) return true;
-
       if (!props.onSave) return true;
-      await wait(1);
       return await props.onSave(genSave(selectedRows));
     },
     [genSave, initialValues, options, props],
@@ -116,7 +113,7 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
           style={{
             display: "grid",
             gridAutoFlow: "column",
-            gridTemplateRows: "repeat(10, auto)",
+            gridTemplateRows: `repeat(${props.maxRowCount ?? 10}, auto)`,
             maxWidth: "calc(min(100vw,500px))",
             overflowX: "auto",
           }}
@@ -125,6 +122,7 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
             options.map((o) => (
               <>
                 <MenuItem
+                  key={o.label}
                   onClick={(e: ClickEvent) => {
                     // Global react-menu MenuItem handler handles tabs
                     if (e.key !== "Tab" && e.key !== "Enter") {
@@ -134,7 +132,6 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
                   }}
                 >
                   <LuiCheckboxInput
-                    key={o.label}
                     isChecked={!!o.checked ?? false}
                     isIndeterminate={o.checked === "partial"}
                     value={`${o.value}`}
