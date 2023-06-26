@@ -165,13 +165,13 @@ export const Grid = ({
     timeoutMs: 1000,
   });
 
-  /*const previousGridReady = useRef(gridReady);
+  const previousGridReady = useRef(gridReady);
   useEffect(() => {
     if (!previousGridReady.current && gridReady) {
       previousGridReady.current = true;
       setInitialContentSize();
     }
-  }, [gridReady, setInitialContentSize]);*/
+  }, [gridReady, setInitialContentSize]);
 
   /**
    * On data load select the first row of the grid if required.
@@ -504,7 +504,7 @@ export const Grid = ({
             autoSizeColumns({
               skipHeader,
               userSizedColIds: userSizedColIds.current,
-              colIds: new Set(colIdsEdited.current),
+              colIds: colIdsEdited.current,
             }),
           );
         }
@@ -576,7 +576,6 @@ export const Grid = ({
           onColumnVisible={() => {
             setInitialContentSize();
           }}
-          onFirstDataRendered={setInitialContentSize}
           onRowDataChanged={onRowDataChanged}
           onCellKeyPress={onCellKeyPress}
           onCellClicked={onCellClicked}
