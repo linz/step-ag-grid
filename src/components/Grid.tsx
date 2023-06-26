@@ -4,7 +4,7 @@ import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
-import { difference, isEmpty, last, omit, xorBy } from "lodash-es";
+import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
@@ -500,11 +500,13 @@ export const Grid = ({
       if (!isEmpty(colIdsEdited.current)) {
         const skipHeader = sizeColumns === "auto-skip-headers";
         if (sizeColumns === "auto" || skipHeader) {
-          autoSizeColumns({
-            skipHeader,
-            userSizedColIds: userSizedColIds.current,
-            colIds: colIdsEdited.current,
-          });
+          defer(() =>
+            autoSizeColumns({
+              skipHeader,
+              userSizedColIds: userSizedColIds.current,
+              colIds: colIdsEdited.current,
+            }),
+          );
         }
         colIdsEdited.current.clear();
       }

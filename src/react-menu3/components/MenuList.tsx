@@ -2,6 +2,7 @@ import { debounce } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 
+import { findParentWithClass } from "../../utils/util";
 import { HoverItemContext } from "../contexts/HoverItemContext";
 import { MenuListContext } from "../contexts/MenuListContext";
 import { MenuListItemContext } from "../contexts/MenuListItemContext";
@@ -88,6 +89,32 @@ export const MenuList = ({
   const closeTransition = getTransition(transition, "close");
   const scrollNodes = scrollNodesRef.current;
 
+  /**
+   * Given the menu-item we are on, find the closest or furthest next menu-item horizontally and focus it.
+   * @return true if element found else false.
+   */
+  const focusSideways = (menuItemEl: HTMLElement | null, direction: 1 | -1): boolean => {
+    if (!menuItemEl) return false;
+
+    let [best, worst]: { i: number; d: number }[] = [];
+    findParentWithClass("szh-menu", menuItemEl)
+      ?.querySelectorAll<HTMLLIElement>(".szh-menu__item")
+      ?.forEach((item, i) => {
+        // Must be at same height as currently focused menu-item
+        if (item.offsetTop === menuItemEl.offsetTop) {
+          // Find the least positive distance and most negative distance (for wrap around)
+          const d = (item.offsetLeft - menuItemEl.offsetLeft) * direction;
+          if (d > 0 && (!best || d < best.d)) best = { i, d };
+          if (d < 0 && (!worst || d < worst.d)) worst = { i, d };
+        }
+      });
+    const r = best ?? worst;
+    if (!r) return false;
+
+    dispatch(HoverActionTypes.SET_INDEX, undefined, r["i"]);
+    return true;
+  };
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
     const elementTarget = e.target instanceof HTMLElement ? (e.target as HTMLElement) : null;
     const isTextInputTarget =
@@ -113,6 +140,18 @@ export const MenuList = ({
 
       case Keys.DOWN:
         dispatch(HoverActionTypes.INCREASE, hoverItem, 0);
+        break;
+
+      case Keys.LEFT:
+        if (!focusSideways(elementTarget, -1)) {
+          return; // Unhandled
+        }
+        break;
+
+      case Keys.RIGHT:
+        if (!focusSideways(elementTarget, 1)) {
+          return; // Unhandled
+        }
         break;
 
       // prevent browser from scrolling the page when SPACE is pressed
