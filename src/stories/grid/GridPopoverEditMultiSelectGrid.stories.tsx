@@ -87,16 +87,6 @@ const GridEditMultiSelectGridTemplate: ComponentStory<typeof Grid> = (props: Gri
       ),
     ];
   }, []);
-  /**
-   *                 { value: "50024", label: "50024" },
-   *                 { value: "50025", label: "50025" },
-   *                 { value: "50026", label: "50026" },
-   *                 { value: "50027", label: "50027", checked: true },
-   *                 { value: "50028", label: "50028", checked: "partial" },
-   *                 { value: "50029", label: "50029", checked: "partial", canSelectPartial: true },
-   *                 { value: "50030", label: "50030", warning: "there" },
-   *                 { value: "50031", label: "50031", warning: "Hello" },
-   */
 
   const [rowData] = useState([
     { id: 1000, position: [50024, 50025], position2: "lot1" },
