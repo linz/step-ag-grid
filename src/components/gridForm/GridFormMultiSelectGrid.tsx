@@ -1,4 +1,4 @@
-import { clone, isEqual } from "lodash-es";
+import { isEqual } from "lodash-es";
 import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 import { LuiCheckboxInput } from "@linzjs/lui";
