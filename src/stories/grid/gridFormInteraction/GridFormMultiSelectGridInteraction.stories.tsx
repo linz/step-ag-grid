@@ -38,7 +38,7 @@ const Template: ComponentStory<typeof GridFormMultiSelectGrid> = (props) => {
     { label: "Two", value: 2 },
     { label: "Three", value: 3 },
     { label: "Four", value: 4 },
-    { label: "Five", value: 5 },
+    { label: <div>Five</div>, value: 5 },
   ];
   const config: GridFormMultiSelectGridProps<any> = {
     onSave,
