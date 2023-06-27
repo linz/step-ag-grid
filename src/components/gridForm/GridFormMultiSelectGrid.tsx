@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { isEqual } from "lodash-es";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 import { LuiCheckboxInput } from "@linzjs/lui";
 
@@ -12,7 +13,7 @@ import { useGridPopoverHook } from "../GridPopoverHook";
 
 export interface MultiSelectGridOption {
   value: any;
-  label?: string;
+  label?: string | ReactElement;
   checked?: boolean | "partial";
   canSelectPartial?: boolean;
   warning?: string | undefined;
@@ -37,7 +38,7 @@ export interface GridFormMultiSelectGridProps<RowType extends GridBaseRow> exten
 
 export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
   props: GridFormMultiSelectGridProps<RowType>,
-): JSX.Element => {
+): ReactElement => {
   const { selectedRows } = useGridPopoverContext<RowType>();
   const optionsInitialising = useRef(false);
 
@@ -65,7 +66,14 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
     async (selectedRows: RowType[]): Promise<boolean> => {
       if (!options || !props.onSave) return true;
       // Any changes to save?
-      if (JSON.stringify(initialValues) === JSON.stringify(options)) return true;
+      if (
+        isEqual(
+          initialValues?.map((o) => o.checked),
+          options.map((o) => o.checked),
+        )
+      ) {
+        return true;
+      }
       if (!props.onSave) return true;
       return await props.onSave(genSave(selectedRows));
     },
@@ -90,7 +98,7 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
 
     (async () => {
       const optionsList = typeof props.options === "function" ? await props.options(selectedRows) : props.options;
-      setInitialValues(JSON.parse(JSON.stringify(optionsList)));
+      setInitialValues(optionsList.map((o) => ({ ...o, label: "" })));
       setOptions(optionsList);
       optionsInitialising.current = false;
     })();
@@ -122,7 +130,7 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
             options.map((o) => (
               <>
                 <MenuItem
-                  key={o.label}
+                  key={JSON.stringify(o.value)}
                   onClick={(e: ClickEvent) => {
                     // Global react-menu MenuItem handler handles tabs
                     if (e.key !== "Tab" && e.key !== "Enter") {
@@ -138,10 +146,7 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
                     label={
                       <>
                         {o.warning && <GridIcon icon={"ic_warning_outline"} title={o.warning} />}
-                        <span
-                          className={"GridMultiSelectGrid-Label"}
-                          style={{ fontWeight: o.label?.endsWith("0") ? "bold" : "regular" }}
-                        >
+                        <span className={"GridMultiSelectGrid-Label"}>
                           {o.label ?? (o.value == null ? `<${o.value}>` : `${o.value}`)}
                         </span>
                       </>

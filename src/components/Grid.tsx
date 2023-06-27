@@ -37,6 +37,7 @@ export interface GridProps {
   noRowsOverlayText?: string;
   postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
+  rowHeight?: number;
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
@@ -564,6 +565,7 @@ export const Grid = ({
     >
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          rowHeight={params.rowHeight}
           animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
