@@ -12,7 +12,17 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
   //if this is not wrapped in an act console errors are logged during testing
   let row!: HTMLDivElement;
   await act(async () => {
-    row = await findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
+    row = await findQuick<HTMLDivElement>({ tagName: `.ag-center-cols-container div[row-id='${rowId}']:not(:empty)` }, within);
+    const leftCols = await findQuick<HTMLDivElement>(
+      { tagName: `.ag-pinned-left-cols-container div[row-id='${rowId}']` },
+      within,
+    );
+    const rightCols = await findQuick<HTMLDivElement>(
+      { tagName: `.ag-pinned-right-cols-container div[row-id='${rowId}']` },
+      within,
+    );
+    const combineChildren = [...leftCols.children, ...row.children, ...rightCols.children];
+    row.replaceChildren(...combineChildren);
   });
   return row;
 };
