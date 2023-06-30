@@ -122,26 +122,28 @@ const GridDemo = () => {
     [],
   );
 
-  const contextMenu = useCallback(
-    (selectedRows: IFormTestRow[]): GridContextMenuItem[] => [
-      {
-        label: "Clear cell...",
-        onSelect: async ({ colDef }) => {
-          selectedRows.forEach((row) => {
-            switch (colDef.field) {
-              case "name":
-                row.name = "";
-                break;
-              case "position":
-                row.position = "";
-                break;
-            }
-          });
-        },
-      },
-    ],
-    [],
-  );
+  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<IFormTestRow>): ReactElement => {
+    const onClick = useCallback(() => {
+      selectedRows.forEach((row) => {
+        switch (colDef.field) {
+          case "name":
+            row.name = "";
+            break;
+          case "distance":
+            row.distance = null;
+            break;
+        }
+      });
+      close();
+    }, [close, colDef.field, selectedRows]);
+
+    return (
+            <>
+              <button onClick={onClick}>Button - Clear cell</button>
+              <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+            </>
+    );
+  };
   
   const rowData: ITestRow[] = useMemo(
     () => [
@@ -179,6 +181,7 @@ const GridDemo = () => {
                 columnDefs={columnDefs}
                 rowData={rowData}
                 contextMenu={contextMenu}
+                contextMenuSelectRow={false}
                 onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>

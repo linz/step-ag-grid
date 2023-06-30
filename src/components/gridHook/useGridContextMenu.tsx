@@ -63,7 +63,6 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
     [contextMenuSelectRow, getSelectedRows, openMenu],
   );
 
-  // global onclick
   return {
     openMenu,
     cellContextMenu,
@@ -76,11 +75,7 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
           onClose={() => closeMenu()}
         >
           {ContextMenu && (
-            <ContextMenu
-              selectedRows={selectedRowsRef.current}
-              colDef={clickedColDefRef.current ?? {}}
-              close={closeMenu}
-            />
+            <ContextMenu selectedRows={selectedRowsRef.current} colDef={clickedColDefRef.current} close={closeMenu} />
           )}
         </ControlledMenu>
       </>
