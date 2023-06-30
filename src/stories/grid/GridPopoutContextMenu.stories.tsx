@@ -41,20 +41,18 @@ export default {
   ],
 } as ComponentMeta<typeof Grid>;
 
-const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<IFormTestRow>): ReactElement => {
+const ContextMenu = ({ clickedRow, colDef, close }: GridContextMenuComponentProps<IFormTestRow>): ReactElement => {
   const onClick = useCallback(() => {
-    selectedRows.forEach((row) => {
-      switch (colDef.field) {
-        case "name":
-          row.name = "";
-          break;
-        case "distance":
-          row.distance = null;
-          break;
-      }
-    });
+    switch (colDef.field) {
+      case "name":
+        clickedRow.name = "";
+        break;
+      case "distance":
+        clickedRow.distance = null;
+        break;
+    }
     close();
-  }, [close, colDef.field, selectedRows]);
+  }, [close, colDef.field, clickedRow]);
 
   return (
     <>

@@ -138,10 +138,10 @@ const GridDemo = () => {
     }, [close, colDef.field, selectedRows]);
 
     return (
-            <>
-              <button onClick={onClick}>Button - Clear cell</button>
-              <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
-            </>
+      <>
+        <button onClick={onClick}>Button - Clear cell</button>
+        <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+      </>
     );
   };
   

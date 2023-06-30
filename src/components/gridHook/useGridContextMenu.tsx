@@ -8,6 +8,7 @@ import { GridBaseRow } from "../Grid";
 
 export interface GridContextMenuComponentProps<RowType extends GridBaseRow> {
   selectedRows: RowType[];
+  clickedRow: RowType;
   colDef: ColDef;
   close: () => void;
 }
@@ -31,6 +32,7 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const clickedColDefRef = useRef<ColDef>(null!);
   const selectedRowsRef = useRef<any[]>([]);
+  const clickedRowRef = useRef<any>(null);
 
   const openMenu = useCallback(
     (e: PointerEvent | null | undefined) => {
@@ -53,10 +55,11 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
       if (contextMenuSelectRow && !event.node.isSelected()) {
         event.node.setSelected(true, true);
       }
-      const selectedRows = contextMenuSelectRow ? getSelectedRows() : [event.data];
 
       clickedColDefRef.current = event.colDef;
-      selectedRowsRef.current = selectedRows;
+      selectedRowsRef.current = getSelectedRows();
+      clickedRowRef.current = event.data;
+
       // This is actually a pointer event
       openMenu(event.event as PointerEvent);
     },
@@ -75,7 +78,12 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
           onClose={() => closeMenu()}
         >
           {ContextMenu && (
-            <ContextMenu selectedRows={selectedRowsRef.current} colDef={clickedColDefRef.current} close={closeMenu} />
+            <ContextMenu
+              selectedRows={selectedRowsRef.current}
+              clickedRow={clickedRowRef.current}
+              colDef={clickedColDefRef.current}
+              close={closeMenu}
+            />
           )}
         </ControlledMenu>
       </>
