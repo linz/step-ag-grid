@@ -125,6 +125,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   }, [gridApi]);
 
   /**
+   * After a popup refocus the cell.
+   */
+  const postPopupOps = useCallback(() => {
+    if (!gridApi) return;
+    if (prePopupFocusedCell.current) {
+      gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+    }
+  }, [gridApi]);
+
+  /**
    * Get all row id's in grid.
    */
   const _getAllRowIds = useCallback(() => {
@@ -635,6 +645,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         setInvisibleColumnIds,
         gridReady,
         prePopupOps,
+        postPopupOps,
         setApis,
         setQuickFilter,
         selectRowsById,

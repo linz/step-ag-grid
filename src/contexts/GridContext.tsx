@@ -20,6 +20,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   getColumns: () => ColDefT<RowType>[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
+  postPopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
@@ -76,6 +77,9 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for setInvisibleColumnIds");
   },
   prePopupOps: () => {
+    console.error("no context provider for prePopupOps");
+  },
+  postPopupOps: () => {
     console.error("no context provider for prePopupOps");
   },
   externallySelectedItemsAreInSync: false,

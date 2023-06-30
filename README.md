@@ -120,6 +120,28 @@ const GridDemo = () => {
     [],
   );
 
+  const contextMenu = useCallback(
+    (selectedRows: IFormTestRow[]): GridContextMenuItem[] => [
+      {
+        label: "Clear cell...",
+        onSelect: async ({ colDef }) => {
+          // eslint-disable-next-line no-console
+          selectedRows.forEach((row) => {
+            switch (colDef.field) {
+              case "name":
+                row.name = "";
+                break;
+              case "position":
+                row.position = "";
+                break;
+            }
+          });
+        },
+      },
+    ],
+    [],
+  );
+  
   const rowData: ITestRow[] = useMemo(
     () => [
       { id: 1000, name: "Tom", position: "Tester" },
@@ -155,6 +177,7 @@ const GridDemo = () => {
           <Grid selectable={true}
                 columnDefs={columnDefs}
                 rowData={rowData}
+                contextMenu={contextMenu}
                 onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>

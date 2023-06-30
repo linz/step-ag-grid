@@ -1,7 +1,12 @@
 import { CellClickedEvent, ColDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  CellContextMenuEvent,
+  CellEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
@@ -11,6 +16,7 @@ import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { useIntervalHook } from "../lui/timeoutHook";
 import { fnOrVar, isNotEmpty } from "../utils/util";
+import { GridContextMenuItem, useGridContextMenu } from "./GridContextMenu";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
@@ -67,6 +73,11 @@ export interface GridProps {
    * Once the last cell to edit closes this callback is called.
    */
   onCellEditingComplete?: () => void;
+
+  /**
+   * Context menu definition if required.
+   */
+  contextMenu?: (selectedRows: any[]) => GridContextMenuItem[] | null;
 }
 
 /**
@@ -551,6 +562,19 @@ export const Grid = ({
     }
   }, []);
 
+  const gridContextMenu = useGridContextMenu(params.contextMenu);
+
+  const cellContextMenu = useCallback(
+    (event: CellContextMenuEvent) => {
+      if (!event.node.isSelected()) {
+        event.node.setSelected(true, true);
+      }
+      gridContextMenu.cellContextMenu(event);
+    },
+    [gridContextMenu],
+  );
+
+  // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
   return (
@@ -563,6 +587,7 @@ export const Grid = ({
         gridReady && params.rowData && "Grid-ready",
       )}
     >
+      {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
           rowHeight={params.rowHeight}
@@ -603,6 +628,8 @@ export const Grid = ({
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
           maintainColumnOrder={true}
+          preventDefaultOnContextMenu={true}
+          onCellContextMenu={cellContextMenu}
         />
       </div>
     </div>
