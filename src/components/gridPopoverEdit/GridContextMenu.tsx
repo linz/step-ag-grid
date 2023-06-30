@@ -2,8 +2,8 @@ import { ColDef } from "ag-grid-community";
 import { CellContextMenuEvent } from "ag-grid-community/dist/lib/events";
 import { ReactElement, useCallback, useContext, useRef, useState } from "react";
 
-import { GridContext } from "../contexts/GridContext";
-import { ControlledMenu, MenuItem } from "../react-menu3";
+import { GridContext } from "../../contexts/GridContext";
+import { ControlledMenu, MenuItem } from "../../react-menu3";
 
 export interface GridContextMenuItem {
   label: ReactElement | string | number;

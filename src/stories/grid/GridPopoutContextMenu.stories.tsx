@@ -15,7 +15,7 @@ import {
   GridUpdatingContextProvider,
   wait,
 } from "../..";
-import { GridContextMenuItem } from "../../components/GridContextMenu";
+import { GridContextMenuItem } from "../../components/gridPopoverEdit/GridContextMenu";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import { IFormTestRow } from "./FormTest";

@@ -16,10 +16,10 @@ import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { useIntervalHook } from "../lui/timeoutHook";
 import { fnOrVar, isNotEmpty } from "../utils/util";
-import { GridContextMenuItem, useGridContextMenu } from "./GridContextMenu";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
+import { GridContextMenuItem, useGridContextMenu } from "./gridPopoverEdit/GridContextMenu";
 
 export interface GridBaseRow {
   id: string | number;

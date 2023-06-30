@@ -17,6 +17,7 @@
   - Bearing/Bearing Correction
   - Popover message
   - Custom form
+  - Context menu
 
 _Please note this requires React >=17, ag-grid-community >=27, and sass._
 
@@ -55,6 +56,7 @@ import {
   ColDefT,
   GridCell,
   GridContextProvider,
+  GridContextMenu,
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
