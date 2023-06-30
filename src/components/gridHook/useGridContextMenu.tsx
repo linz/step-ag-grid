@@ -1,17 +1,27 @@
 import { ColDef } from "ag-grid-community";
 import { CellContextMenuEvent } from "ag-grid-community/dist/lib/events";
-import { useCallback, useContext, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useRef, useState } from "react";
 
 import { GridContext } from "../../contexts/GridContext";
 import { ControlledMenu } from "../../react-menu3";
-import { GridContextMenuComponent } from "../Grid";
+import { GridBaseRow } from "../Grid";
 
-export const useGridContextMenu = ({
+export interface GridContextMenuComponentProps<RowType extends GridBaseRow> {
+  selectedRows: RowType[];
+  colDef: ColDef;
+  close: () => void;
+}
+
+export type GridContextMenuComponent<RowType extends GridBaseRow> = (
+  props: GridContextMenuComponentProps<RowType>,
+) => ReactElement | null;
+
+export const useGridContextMenu = <RowType extends GridBaseRow>({
   contextMenuSelectRow,
   contextMenu: ContextMenu,
 }: {
   contextMenuSelectRow: boolean;
-  contextMenu?: GridContextMenuComponent;
+  contextMenu?: GridContextMenuComponent<RowType>;
 }) => {
   const { redrawRows, prePopupOps, postPopupOps, getSelectedRows } = useContext(GridContext);
 
@@ -20,7 +30,6 @@ export const useGridContextMenu = ({
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const clickedColDefRef = useRef<ColDef>(null!);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const selectedRowsRef = useRef<any[]>([]);
 
   const openMenu = useCallback(

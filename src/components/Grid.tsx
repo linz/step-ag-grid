@@ -5,29 +5,20 @@ import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-commun
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
-import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { useIntervalHook } from "../lui/timeoutHook";
-import { IFormTestRow } from "../stories/grid/FormTest";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
-import { useGridContextMenu } from "./gridHook";
+import { GridContextMenuComponent, useGridContextMenu } from "./gridHook";
 
 export interface GridBaseRow {
   id: string | number;
 }
-
-export interface GridContextMenuComponentProps {
-  selectedRows: IFormTestRow[];
-  colDef: ColDef;
-  close: () => void;
-}
-
-export type GridContextMenuComponent = (props: GridContextMenuComponentProps) => ReactElement | null;
 
 export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
@@ -81,7 +72,7 @@ export interface GridProps {
   /**
    * Context menu definition if required.
    */
-  contextMenu?: GridContextMenuComponent;
+  contextMenu?: GridContextMenuComponent<any>;
 
   /**
    * Whether to select row on context menu.
