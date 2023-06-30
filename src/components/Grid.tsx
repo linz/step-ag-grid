@@ -1,29 +1,33 @@
 import { CellClickedEvent, ColDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import {
-  CellContextMenuEvent,
-  CellEvent,
-  GridReadyEvent,
-  SelectionChangedEvent,
-} from "ag-grid-community/dist/lib/events";
+import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
 import { useIntervalHook } from "../lui/timeoutHook";
+import { IFormTestRow } from "../stories/grid/FormTest";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
-import { GridContextMenuItem, useGridContextMenu } from "./gridPopoverEdit/GridContextMenu";
+import { useGridContextMenu } from "./gridHook";
 
 export interface GridBaseRow {
   id: string | number;
 }
+
+export interface GridContextMenuComponentProps {
+  selectedRows: IFormTestRow[];
+  colDef: ColDef;
+  close: () => void;
+}
+
+export type GridContextMenuComponent = (props: GridContextMenuComponentProps) => ReactElement | null;
 
 export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
@@ -77,7 +81,12 @@ export interface GridProps {
   /**
    * Context menu definition if required.
    */
-  contextMenu?: (selectedRows: any[]) => GridContextMenuItem[] | null;
+  contextMenu?: GridContextMenuComponent;
+
+  /**
+   * Whether to select row on context menu.
+   */
+  contextMenuSelectRow?: boolean;
 }
 
 /**
@@ -90,6 +99,7 @@ export const Grid = ({
   theme = "ag-theme-alpine",
   sizeColumns = "auto",
   selectColumnPinned = null,
+  contextMenuSelectRow = false,
   ...params
 }: GridProps): JSX.Element => {
   const {
@@ -562,17 +572,7 @@ export const Grid = ({
     }
   }, []);
 
-  const gridContextMenu = useGridContextMenu(params.contextMenu);
-
-  const cellContextMenu = useCallback(
-    (event: CellContextMenuEvent) => {
-      if (!event.node.isSelected()) {
-        event.node.setSelected(true, true);
-      }
-      gridContextMenu.cellContextMenu(event);
-    },
-    [gridContextMenu],
-  );
+  const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
@@ -629,7 +629,7 @@ export const Grid = ({
           doesExternalFilterPass={doesExternalFilterPass}
           maintainColumnOrder={true}
           preventDefaultOnContextMenu={true}
-          onCellContextMenu={cellContextMenu}
+          onCellContextMenu={gridContextMenu.cellContextMenu}
         />
       </div>
     </div>

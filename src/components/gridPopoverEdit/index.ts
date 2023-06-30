@@ -1,4 +1,3 @@
-export * from "./GridContextMenu";
 export * from "./GridPopoutEditMultiSelect";
 export * from "./GridPopoutEditMultiSelectGrid";
 export * from "./GridPopoverMenu";

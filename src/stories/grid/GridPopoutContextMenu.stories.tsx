@@ -1,5 +1,5 @@
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { ReactElement, useCallback, useContext, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
 import "@linzjs/lui/dist/scss/base.scss";
@@ -10,12 +10,13 @@ import {
   Grid,
   GridCell,
   GridContext,
+  GridContextMenuComponentProps,
   GridContextProvider,
   GridProps,
   GridUpdatingContextProvider,
+  MenuItem,
   wait,
 } from "../..";
-import { GridContextMenuItem } from "../../components/gridPopoverEdit/GridContextMenu";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import { IFormTestRow } from "./FormTest";
@@ -39,6 +40,29 @@ export default {
     ),
   ],
 } as ComponentMeta<typeof Grid>;
+
+const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps): ReactElement => {
+  const onClick = useCallback(() => {
+    selectedRows.forEach((row) => {
+      switch (colDef.field) {
+        case "name":
+          row.name = "";
+          break;
+        case "distance":
+          row.distance = null;
+          break;
+      }
+    });
+    close();
+  }, [close, colDef.field, selectedRows]);
+
+  return (
+    <>
+      <button onClick={onClick}>Button - Clear cell</button>
+      <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+    </>
+  );
+};
 
 const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
   const { selectRowsWithFlashDiff } = useContext(GridContext);
@@ -89,29 +113,6 @@ const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridP
     });
   }, [rowData, selectRowsWithFlashDiff]);
 
-  const contextMenu = useCallback(
-    (selectedRows: IFormTestRow[]): GridContextMenuItem[] => [
-      {
-        label: "Clear cell...",
-        onSelect: async ({ colDef }) => {
-          selectedRows.forEach((row) => {
-            switch (colDef.field) {
-              case "name":
-                row.name = "";
-                break;
-              case "distance":
-                row.distance = null;
-                break;
-            }
-          });
-        },
-      },
-      { label: "Should be invisible", visible: false, onSelect: () => {} },
-      { label: "Disabled", disabled: true, onSelect: () => {} },
-    ],
-    [],
-  );
-
   return (
     <>
       <Grid
@@ -127,7 +128,7 @@ const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridP
           /* eslint-disable-next-line no-console */
           console.log("Cell editing complete");
         }}
-        contextMenu={contextMenu}
+        contextMenu={ContextMenu}
       />
       <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onClick={addRowAction} />
     </>
