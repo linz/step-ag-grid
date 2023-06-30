@@ -56,7 +56,7 @@ import {
   ColDefT,
   GridCell,
   GridContextProvider,
-  GridContextMenu,
+  GridContextMenuComponentProps,
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
@@ -122,7 +122,7 @@ const GridDemo = () => {
     [],
   );
 
-  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<IFormTestRow>): ReactElement => {
+  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<ITestRow>): ReactElement => {
     const onClick = useCallback(() => {
       selectedRows.forEach((row) => {
         switch (colDef.field) {
