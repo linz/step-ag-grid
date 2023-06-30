@@ -94,7 +94,6 @@ const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridP
       {
         label: "Clear cell...",
         onSelect: async ({ colDef }) => {
-          // eslint-disable-next-line no-console
           selectedRows.forEach((row) => {
             switch (colDef.field) {
               case "name":
