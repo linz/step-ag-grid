@@ -69,15 +69,15 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
   return {
     openMenu,
     cellContextMenu,
-    component: isOpen ? (
+    component: (
       <>
         <ControlledMenu
           anchorPoint={anchorPoint}
           state={isOpen ? "open" : "closed"}
           direction="right"
-          onClose={() => closeMenu()}
+          onClose={closeMenu}
         >
-          {ContextMenu && (
+          {isOpen && ContextMenu && (
             <ContextMenu
               selectedRows={selectedRowsRef.current}
               clickedRow={clickedRowRef.current}
@@ -87,6 +87,6 @@ export const useGridContextMenu = <RowType extends GridBaseRow>({
           )}
         </ControlledMenu>
       </>
-    ) : null,
+    ),
   };
 };
