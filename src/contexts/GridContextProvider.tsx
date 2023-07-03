@@ -391,7 +391,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       }
 
       if (!rowNode.isSelected()) {
-        rowNode.setSelected(true, false);
+        rowNode.setSelected(true, true);
       }
 
       // Cell already being edited, so don't re-edit until finished
