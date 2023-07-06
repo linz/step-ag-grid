@@ -124,7 +124,7 @@ export const Grid = ({
     }
 
     const headerCellCount = gridDivRef.current?.getElementsByClassName("ag-header-cell-label")?.length;
-    if (headerCellCount != params.columnDefs.length) {
+    if (headerCellCount > 1) {
       // Don't resize grids until all the columns are visible
       // as `autoSizeColumns` will fail silently in this case
       needsAutoSize.current = true;

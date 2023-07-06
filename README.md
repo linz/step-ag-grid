@@ -1,7 +1,6 @@
 # step-ag-grid
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
-
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
 ## Features
@@ -25,13 +24,13 @@ _Please note this requires React >=17, ag-grid-community >=27, and sass._
 with npm
 
 ```bash
-npm install @linz/step-ag-grid
+npm install @linzjs/step-ag-grid
 ```
 
 or with Yarn
 
 ```bash
-yarn add @linz/step-ag-grid
+yarn add @linzjs/step-ag-grid
 ```
 
 ## Demo
