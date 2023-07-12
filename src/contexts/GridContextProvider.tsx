@@ -8,6 +8,7 @@ import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, u
 
 import { ColDefT, GridBaseRow } from "../components";
 import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
+import { getColId, isFlexColumn } from "../components/gridUtil";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
@@ -600,27 +601,29 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApi],
   );
 
+  /**
+   * Apply column visibility
+   */
   useEffect(() => {
-    if (columnApi && invisibleColumnIds) {
-      // show all columns that aren't invisible
-      const newVisibleColumns = getColumns().filter(
-        (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
-      );
-      // If there's no flex column showing add the filler column if defined
-      const visibleColumnsContainsAFlex = newVisibleColumns.some((col) => !!col.flex && !isGridCellFiller(col));
-      if (!visibleColumnsContainsAFlex) {
-        const fillerColumn = getColumns().find((col) => isGridCellFiller(col));
-        fillerColumn && newVisibleColumns.push(fillerColumn);
-      }
-      columnApi.setColumnsVisible(compact(newVisibleColumns.map((col) => col.colId)), true);
-      // hide all invisible columns
-      const invisibleColumnIdsWithOptionalFiller = [...invisibleColumnIds];
-      if (visibleColumnsContainsAFlex) {
-        // Hide the filler column if there's already a flex column
-        invisibleColumnIdsWithOptionalFiller.push(GridCellFillerColId);
-      }
-      columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
+    if (!columnApi || !invisibleColumnIds) return;
+
+    // show all columns that aren't invisible
+    const newVisibleColumns = getColumns().filter(
+      (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
+    );
+    // If there's no flex column showing add the filler column if defined
+    const visibleColumnsContainsAFlex = newVisibleColumns.some(isFlexColumn);
+    if (!visibleColumnsContainsAFlex) {
+      const fillerColumn = getColumns().find(isGridCellFiller);
+      fillerColumn && newVisibleColumns.push(fillerColumn);
     }
+    columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
+
+    // Hide the filler column if there's already a flex column
+    const invisibleColumnIdsWithOptionalFiller = visibleColumnsContainsAFlex
+      ? [...invisibleColumnIds, GridCellFillerColId]
+      : invisibleColumnIds;
+    columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
   }, [invisibleColumnIds, columnApi, getColumns]);
 
   /**
@@ -634,7 +637,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
       const columnKeys = columnApi
         ?.getColumnState()
-        .filter((cs) => !cs.hide && gridApi.getColumnDef(cs.colId)?.headerComponentParams?.exportable !== false)
+        .filter((cs) => {
+          const colDef = gridApi.getColumnDef(cs.colId);
+          return !cs.hide && colDef && !isGridCellFiller(colDef) && colDef.headerComponentParams?.exportable !== false;
+        })
         .map((cs) => cs.colId);
       gridApi.exportDataAsCsv({
         columnKeys,

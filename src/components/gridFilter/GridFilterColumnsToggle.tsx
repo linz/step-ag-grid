@@ -8,6 +8,7 @@ import { Menu, MenuDivider, MenuItem } from "../../react-menu3";
 import { ClickEvent } from "../../react-menu3/types";
 import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
+import { getColId } from "../gridUtil";
 import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
 
 export interface GridFilterColumnsToggleProps {
@@ -22,10 +23,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
     () =>
       isEmpty(getColumns())
         ? null // Grid hasn't been initialised yet
-        : "stepAgGrid_invisibleColumnIds_" +
-          getColumns()
-            .map((col) => col.colId || "")
-            .join("_"),
+        : "stepAgGrid_invisibleColumnIds_" + getColumns().map(getColId).join("_"),
     [getColumns],
   );
 
@@ -41,7 +39,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
             compact(
               getColumns()
                 .filter((col) => col.initialHide)
-                .map((col) => col.colId),
+                .map(getColId),
             ),
           );
         } else {
