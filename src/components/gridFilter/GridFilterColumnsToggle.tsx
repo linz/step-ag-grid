@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash-es";
+import { compact, isEmpty } from "lodash-es";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { LuiCheckboxInput, LuiIcon } from "@linzjs/lui";
@@ -35,20 +35,31 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
     if (saveState) {
       try {
         const stored = window.localStorage.getItem(columnStorageKey);
-        const invisibleIds = JSON.parse(stored ?? "[]");
-        if (!Array.isArray(invisibleIds)) {
-          console.error(`stored invisible ids not an array: ${stored}`);
-        } else if (!invisibleIds.every((id) => typeof id === "string")) {
-          console.error(`stored invisible ids not strings: ${stored}`);
+        if (!stored) {
+          // infer the invisible ids from colDefs
+          setInvisibleColumnIds(
+            compact(
+              getColumns()
+                .filter((col) => col.initialHide)
+                .map((col) => col.colId),
+            ),
+          );
         } else {
-          invisibleIds && setInvisibleColumnIds(invisibleIds);
+          const invisibleIds = JSON.parse(stored ?? "[]");
+          if (!Array.isArray(invisibleIds)) {
+            console.error(`stored invisible ids not an array: ${stored}`);
+          } else if (!invisibleIds.every((id) => typeof id === "string")) {
+            console.error(`stored invisible ids not strings: ${stored}`);
+          } else {
+            invisibleIds && setInvisibleColumnIds(invisibleIds);
+          }
         }
       } catch (ex) {
         console.error(ex);
       }
       setLoaded(true);
     }
-  }, [columnStorageKey, loaded, saveState, setInvisibleColumnIds]);
+  }, [columnStorageKey, getColumns, loaded, saveState, setInvisibleColumnIds]);
 
   // Save state on column visibility change
   useEffect(() => {
@@ -60,7 +71,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
 
   const toggleColumn = useCallback(
     (colId?: string) => {
-      if (!colId) return;
+      if (!colId || !invisibleColumnIds) return;
       setInvisibleColumnIds(
         invisibleColumnIds.includes(colId)
           ? invisibleColumnIds.filter((id) => id !== colId)
@@ -104,7 +115,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
               }}
             >
               <LuiCheckboxInput
-                isChecked={!invisibleColumnIds.includes(col.colId ?? "")}
+                isChecked={!!invisibleColumnIds && !invisibleColumnIds.includes(col.colId ?? "")}
                 value={`${col.colId}`}
                 label={col.headerName ?? ""}
                 isDisabled={isNonManageableColumn(col)}

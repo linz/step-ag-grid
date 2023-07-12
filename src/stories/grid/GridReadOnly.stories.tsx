@@ -55,6 +55,7 @@ interface ITestRow {
   id: number;
   position: string;
   age: number;
+  height: number;
   desc: string;
   dd: string;
 }
@@ -76,14 +77,25 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           info: (props) => props.value === "Developer" && "Developers are awesome",
         },
       }),
-      GridCell({
-        field: "age",
-        headerName: "Age",
-      }),
+      {
+        headerName: "Metrics",
+        marryChildren: true,
+        children: [
+          GridCell({
+            field: "age",
+            headerName: "Age",
+          }),
+          GridCell({
+            field: "height",
+            headerName: "Height",
+          }),
+        ],
+      },
       GridCell({
         field: "desc",
         headerName: "Description",
         flex: 1,
+        initialHide: true,
       }),
       GridPopoverMessage(
         {
@@ -187,9 +199,9 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
-    { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
+    { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
+    { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
+    { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
   ]);
 
   return (
