@@ -53,6 +53,7 @@ import "@linzjs/lui/dist/scss/base.scss";
 import {
   ColDefT,
   GridCell,
+  GridCellFiller,
   GridContextProvider,
   GridPopoverEditDropDown,
   GridPopoverMessage,
@@ -81,9 +82,11 @@ const GridDemo = () => {
         headerName: "Id",
         export: false,
       }),
+      // This is the flex column that will expand to fit
       GridCell({
         field: "name",
         headerName: "Name",
+        flex: 1,
         cellRendererParams: {
           warning: ({ value }) => value === "Tester" && "Testers are testing",
           info: ({ value }) => value === "Developer" && "Developers are awesome",
@@ -115,6 +118,8 @@ const GridDemo = () => {
           },
         },
       ),
+      // If your flex column gets hidden this will become active
+      GridCellFiller(),
     ],
     [],
   );
