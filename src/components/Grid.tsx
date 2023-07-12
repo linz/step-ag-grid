@@ -153,11 +153,21 @@ export const Grid = ({
     needsAutoSize.current = false;
   }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
 
+  const windowRef = useRef<any>();
+
   /**
    * Auto-size windows that had deferred auto-size
    */
   useIntervalHook({
     callback: () => {
+      // Check if window has been popped out and needs resize
+      const currentView = gridDivRef.current?.ownerDocument.defaultView;
+      if (currentView !== windowRef.current) {
+        windowRef.current = currentView;
+        if (currentView) {
+          needsAutoSize.current = true;
+        }
+      }
       if (needsAutoSize.current) {
         needsAutoSize.current = false;
         setInitialContentSize();
