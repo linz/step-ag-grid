@@ -76,15 +76,22 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
           info: (props) => props.value === "Developer" && "Developers are awesome",
         },
       }),
-      GridCell({
-        field: "age",
-        headerName: "Age",
-      }),
-      GridCell({
-        field: "desc",
-        headerName: "Description",
-        flex: 1,
-      }),
+      {
+        headerName: "xxx",
+        marryChildren: true,
+        children: [
+          GridCell({
+            field: "age",
+            headerName: "Age",
+          }),
+          GridCell({
+            field: "desc",
+            headerName: "Description",
+            flex: 1,
+            initialHide: true,
+          }),
+        ],
+      },
       GridPopoverMessage(
         {
           headerName: "Popout message",

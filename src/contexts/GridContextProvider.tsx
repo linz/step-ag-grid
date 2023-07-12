@@ -26,7 +26,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>([]);
+  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
@@ -179,6 +179,21 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   );
 
   /**
+   * Get ColDefs, with flattened ColGroupDefs
+   */
+  const getColumns: () => ColDefT<RowType>[] = useCallback(() => {
+    const result: ColDef[] = [];
+    (gridApi?.getColumnDefs() ?? []).forEach((col) => {
+      if ("children" in col) {
+        col.children.forEach((subCol) => result.push(subCol));
+      } else {
+        result.push(col);
+      }
+    });
+    return result;
+  }, [gridApi]);
+
+  /**
    * Internal method for selecting and flashing rows.
    *
    * @param rowIds RowIds to select and flash. If undefined a diff is done with beforeUpdate and current state to select
@@ -211,8 +226,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
           defer(() => gridApi.ensureNodeVisible(firstNode));
-          const colDefs = gridApi.getColumnDefs();
-          if (colDefs?.length) {
+          const colDefs = getColumns();
+          if (!isEmpty(colDefs)) {
             const col = colDefs[0] as ColDef; // We don't support ColGroupDef
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
@@ -244,7 +259,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         }
       });
     },
-    [_getNewNodes, _rowIdsToNodes, gridApiOp],
+    [_getNewNodes, _rowIdsToNodes, getColumns, gridApiOp],
   );
 
   const selectRowsById = useCallback(
@@ -585,10 +600,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApi],
   );
 
-  const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
-
   useEffect(() => {
-    if (columnApi) {
+    if (columnApi && invisibleColumnIds) {
       // show all columns that aren't invisible
       columnApi.setColumnsVisible(
         compact(

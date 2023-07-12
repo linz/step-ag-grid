@@ -55,7 +55,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: RowNode) => boolean;
-  invisibleColumnIds: string[];
+  invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
   setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
@@ -71,7 +71,7 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error("no context provider for getColumns");
     return [];
   },
-  invisibleColumnIds: [],
+  invisibleColumnIds: undefined,
   setInvisibleColumnIds: () => {
     console.error("no context provider for setInvisibleColumnIds");
   },
