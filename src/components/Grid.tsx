@@ -1,4 +1,4 @@
-import { CellClickedEvent, ColDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
+import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
@@ -277,7 +277,7 @@ export const Grid = ({
   /**
    * Add selectable column to colDefs.  Adjust column defs to block fit for auto sized columns.
    */
-  const columnDefs = useMemo((): ColDef[] => {
+  const columnDefs = useMemo((): (ColDef | ColGroupDef)[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
       const colDefEditable = colDef.editable;
       const editable = combineEditables(params.readOnly !== true, params.defaultColDef?.editable, colDefEditable);
@@ -471,15 +471,23 @@ export const Grid = ({
    * Once the grid has auto-sized we want to run fit to fit the grid in its container,
    * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
    */
-  const columnDefsAdjusted = useMemo(
-    () =>
-      columnDefs.map((colDef) => ({
-        ...colDef,
-        suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
-        sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
-      })),
-    [columnDefs, params.defaultColDef?.sortable, sizeColumns],
-  );
+  const columnDefsAdjusted = useMemo(() => {
+    const adjustColDefOrGroup = (colDef: ColDef | ColGroupDef) =>
+      "children" in colDef ? adjustGroupColDef(colDef) : adjustColDef(colDef);
+
+    const adjustGroupColDef = (colDef: ColGroupDef): ColGroupDef => ({
+      ...colDef,
+      children: colDef.children.map((colDef) => adjustColDefOrGroup(colDef)),
+    });
+
+    const adjustColDef = (colDef: ColDef): ColDef => ({
+      ...colDef,
+      suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
+      sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
+    });
+
+    return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
+  }, [columnDefs, params.defaultColDef?.sortable, sizeColumns]);
 
   /**
    * Set of colIds that need auto-sizing.
