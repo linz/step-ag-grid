@@ -7,6 +7,7 @@ import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
+import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
@@ -26,12 +27,18 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>();
+  const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
+
+  /**
+   * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
+   */
+  const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
+    _setInvisibleColumnIds(invisibleColumnIds.filter((colId) => colId !== GridCellFillerColId));
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -596,16 +603,23 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   useEffect(() => {
     if (columnApi && invisibleColumnIds) {
       // show all columns that aren't invisible
-      columnApi.setColumnsVisible(
-        compact(
-          getColumns()
-            .filter((col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId))
-            .map((col) => col.colId),
-        ),
-        true,
+      const newVisibleColumns = getColumns().filter(
+        (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
       );
+      // If there's no flex column showing add the filler column if defined
+      const visibleColumnsContainsAFlex = newVisibleColumns.some((col) => !!col.flex && !isGridCellFiller(col));
+      if (!visibleColumnsContainsAFlex) {
+        const fillerColumn = getColumns().find((col) => isGridCellFiller(col));
+        fillerColumn && newVisibleColumns.push(fillerColumn);
+      }
+      columnApi.setColumnsVisible(compact(newVisibleColumns.map((col) => col.colId)), true);
       // hide all invisible columns
-      columnApi.setColumnsVisible(invisibleColumnIds, false);
+      const invisibleColumnIdsWithOptionalFiller = [...invisibleColumnIds];
+      if (visibleColumnsContainsAFlex) {
+        // Hide the filler column if there's already a flex column
+        invisibleColumnIdsWithOptionalFiller.push(GridCellFillerColId);
+      }
+      columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
     }
   }, [invisibleColumnIds, columnApi, getColumns]);
 
