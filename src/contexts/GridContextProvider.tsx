@@ -6,8 +6,7 @@ import debounce from "debounce-promise";
 import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { ColDefT, GridBaseRow } from "../components";
-import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
+import { ColDefT, GridBaseRow, GridCellFillerColId, isGridCellFiller } from "../components";
 import { getColId, isFlexColumn } from "../components/gridUtil";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
@@ -552,9 +551,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const redrawRows = useCallback(
     (rowNodes?: RowNode[]) => {
-      gridApiOp((gridApi) => {
-        gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-      });
+      gridApiOp((gridApi) => gridApi.redrawRows(rowNodes ? { rowNodes } : undefined));
     },
     [gridApiOp],
   );
@@ -590,11 +587,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     onFilterChanged().then();
   };
 
-  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+  const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean => {
-    return externalFilters.current.every((filter) => filter(node.data, node));
-  };
+  const doesExternalFilterPass = (node: RowNode): boolean =>
+    externalFilters.current.every((filter) => filter(node.data, node));
 
   const getColDef = useCallback(
     (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,
