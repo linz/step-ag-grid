@@ -3,10 +3,12 @@ import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
-import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
+import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
+import { getColId, isFlexColumn } from "../components/gridUtil";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
@@ -26,12 +28,18 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>();
+  const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
+
+  /**
+   * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
+   */
+  const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
+    _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId));
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -152,9 +160,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const _getNewNodes = useCallback((): RowNode[] => {
     return gridApiOp(
       (gridApi) =>
-        difference(_getAllRowIds(), idsBeforeUpdate.current)
-          .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
+        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -168,10 +174,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const _rowIdsToNodes = useCallback(
     (rowIds: number[]): RowNode[] => {
       return gridApiOp(
-        (gridApi) =>
-          rowIds
-            .map((rowId) => gridApi.getRowNode("" + rowId)) //
-            .filter((r) => r) as RowNode[],
+        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
       );
     },
@@ -181,9 +184,18 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Get ColDefs, with flattened ColGroupDefs
    */
-  const getColumns: () => ColDefT<RowType>[] = useCallback(
-    () => columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [],
+  const getColumns = useCallback(
+    (
+      filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
+    ): ColDefT<RowType>[] =>
+      filter(columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
     [columnApi],
+  );
+
+  const getColumnIds = useCallback(
+    (filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true): string[] =>
+      compact(getColumns(filterDef).map(getColId)),
+    [getColumns],
   );
 
   /**
@@ -544,9 +556,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const redrawRows = useCallback(
     (rowNodes?: RowNode[]) => {
-      gridApiOp((gridApi) => {
-        gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-      });
+      gridApiOp((gridApi) => gridApi.redrawRows(rowNodes ? { rowNodes } : undefined));
     },
     [gridApiOp],
   );
@@ -582,31 +592,39 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     onFilterChanged().then();
   };
 
-  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+  const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean => {
-    return externalFilters.current.every((filter) => filter(node.data, node));
-  };
+  const doesExternalFilterPass = (node: RowNode): boolean =>
+    externalFilters.current.every((filter) => filter(node.data, node));
 
   const getColDef = useCallback(
     (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,
     [gridApi],
   );
 
+  /**
+   * Apply column visibility
+   */
   useEffect(() => {
-    if (columnApi && invisibleColumnIds) {
-      // show all columns that aren't invisible
-      columnApi.setColumnsVisible(
-        compact(
-          getColumns()
-            .filter((col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId))
-            .map((col) => col.colId),
-        ),
-        true,
-      );
-      // hide all invisible columns
-      columnApi.setColumnsVisible(invisibleColumnIds, false);
+    if (!columnApi || !invisibleColumnIds) return;
+
+    // show all columns that aren't invisible
+    const newVisibleColumns = getColumns(
+      (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
+    );
+    // If there's no flex column showing add the filler column if defined
+    const visibleColumnsContainsAFlex = newVisibleColumns.some(isFlexColumn);
+    if (!visibleColumnsContainsAFlex) {
+      const fillerColumn = getColumns(isGridCellFiller)[0];
+      fillerColumn && newVisibleColumns.push(fillerColumn);
     }
+    columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
+
+    // Hide the filler column if there's already a flex column
+    const invisibleColumnIdsWithOptionalFiller = visibleColumnsContainsAFlex
+      ? [...invisibleColumnIds, GridCellFillerColId]
+      : invisibleColumnIds;
+    columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
   }, [invisibleColumnIds, columnApi, getColumns]);
 
   /**
@@ -620,7 +638,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
       const columnKeys = columnApi
         ?.getColumnState()
-        .filter((cs) => !cs.hide && gridApi.getColumnDef(cs.colId)?.headerComponentParams?.exportable !== false)
+        .filter((cs) => {
+          const colDef = gridApi.getColumnDef(cs.colId);
+          return !cs.hide && colDef && !isGridCellFiller(colDef) && colDef.headerComponentParams?.exportable !== false;
+        })
         .map((cs) => cs.colId);
       gridApi.exportDataAsCsv({
         columnKeys,
@@ -637,6 +658,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       value={{
         getColDef,
         getColumns,
+        getColumnIds,
         invisibleColumnIds,
         setInvisibleColumnIds,
         gridReady,

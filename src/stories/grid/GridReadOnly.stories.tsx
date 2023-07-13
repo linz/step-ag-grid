@@ -25,6 +25,7 @@ import {
 } from "../..";
 import { GridFilterColumnsToggle } from "../../components";
 import { GridFilterDownloadCsvButton } from "../../components";
+import { GridCellFiller } from "../../components/GridCellFiller";
 import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 
@@ -97,6 +98,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
         flex: 1,
         initialHide: true,
       }),
+      GridCellFiller(),
       GridPopoverMessage(
         {
           headerName: "Popout message",

@@ -1,6 +1,7 @@
 export * from "./ComponentLoadingWrapper";
 export * from "./Grid";
 export * from "./GridCell";
+export * from "./GridCellFiller";
 export * from "./GridCellMultiEditor";
 export * from "./GridCellMultiSelectClassRules";
 export * from "./gridFilter";
