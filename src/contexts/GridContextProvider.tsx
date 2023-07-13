@@ -3,7 +3,7 @@ import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
-import { compact, defer, delay, difference, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
@@ -184,9 +184,18 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   /**
    * Get ColDefs, with flattened ColGroupDefs
    */
-  const getColumns: () => ColDefT<RowType>[] = useCallback(
-    () => columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [],
+  const getColumns = useCallback(
+    (
+      filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
+    ): ColDefT<RowType>[] =>
+      filter(columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
     [columnApi],
+  );
+
+  const getColumnIds = useCallback(
+    (filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true): string[] =>
+      compact(getColumns(filterDef).map(getColId)),
+    [getColumns],
   );
 
   /**
@@ -600,13 +609,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     if (!columnApi || !invisibleColumnIds) return;
 
     // show all columns that aren't invisible
-    const newVisibleColumns = getColumns().filter(
+    const newVisibleColumns = getColumns(
       (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
     );
     // If there's no flex column showing add the filler column if defined
     const visibleColumnsContainsAFlex = newVisibleColumns.some(isFlexColumn);
     if (!visibleColumnsContainsAFlex) {
-      const fillerColumn = getColumns().find(isGridCellFiller);
+      const fillerColumn = getColumns(isGridCellFiller)[0];
       fillerColumn && newVisibleColumns.push(fillerColumn);
     }
     columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
@@ -649,6 +658,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       value={{
         getColDef,
         getColumns,
+        getColumnIds,
         invisibleColumnIds,
         setInvisibleColumnIds,
         gridReady,

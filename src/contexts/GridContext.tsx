@@ -17,7 +17,10 @@ export type AutoSizeColumnsResult = { width: number } | null;
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
   getColDef: (colId?: string) => ColDef | undefined;
-  getColumns: () => ColDefT<RowType>[];
+  getColumns: (
+    filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
+  ) => ColDefT<RowType>[];
+  getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
@@ -69,6 +72,10 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   getColumns: () => {
     console.error("no context provider for getColumns");
+    return [];
+  },
+  getColumnIds: () => {
+    console.error("no context provider for getColumnIds");
     return [];
   },
   invisibleColumnIds: undefined,
