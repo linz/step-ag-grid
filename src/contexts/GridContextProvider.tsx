@@ -6,7 +6,8 @@ import debounce from "debounce-promise";
 import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { ColDefT, GridBaseRow, GridCellFillerColId, isGridCellFiller } from "../components";
+import { ColDefT, GridBaseRow } from "../components";
+import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
 import { getColId, isFlexColumn } from "../components/gridUtil";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
