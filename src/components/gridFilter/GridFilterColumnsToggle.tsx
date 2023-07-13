@@ -27,6 +27,19 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
     [getColumns],
   );
 
+  // infer the invisible ids from colDefs
+  const resetColumns = useCallback(
+    () =>
+      setInvisibleColumnIds(
+        compact(
+          getColumns()
+            .filter((col) => col.initialHide)
+            .map(getColId),
+        ),
+      ),
+    [getColumns, setInvisibleColumnIds],
+  );
+
   // Load state on start
   useEffect(() => {
     if (!columnStorageKey || loaded) return;
@@ -34,14 +47,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
       try {
         const stored = window.localStorage.getItem(columnStorageKey);
         if (!stored) {
-          // infer the invisible ids from colDefs
-          setInvisibleColumnIds(
-            compact(
-              getColumns()
-                .filter((col) => col.initialHide)
-                .map(getColId),
-            ),
-          );
+          resetColumns();
         } else {
           const invisibleIds = JSON.parse(stored ?? "[]");
           if (!Array.isArray(invisibleIds)) {
@@ -57,7 +63,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
       }
       setLoaded(true);
     }
-  }, [columnStorageKey, getColumns, loaded, saveState, setInvisibleColumnIds]);
+  }, [columnStorageKey, getColumns, loaded, resetColumns, saveState, setInvisibleColumnIds]);
 
   // Save state on column visibility change
   useEffect(() => {
@@ -78,10 +84,6 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
     },
     [invisibleColumnIds, setInvisibleColumnIds],
   );
-
-  const resetColumns = () => {
-    setInvisibleColumnIds([]);
-  };
 
   const numericRegExp = /^\d+$/;
   const isNonManageableColumn = (col: ColDefT<GridBaseRow>) => {
