@@ -3,7 +3,7 @@ import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
-import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
+import { compact, defer, delay, difference, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
@@ -39,7 +39,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
    */
   const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
-    _setInvisibleColumnIds(invisibleColumnIds.filter((colId) => colId !== GridCellFillerColId));
+    _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId));
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -160,9 +160,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const _getNewNodes = useCallback((): RowNode[] => {
     return gridApiOp(
       (gridApi) =>
-        difference(_getAllRowIds(), idsBeforeUpdate.current)
-          .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
+        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -176,10 +174,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const _rowIdsToNodes = useCallback(
     (rowIds: number[]): RowNode[] => {
       return gridApiOp(
-        (gridApi) =>
-          rowIds
-            .map((rowId) => gridApi.getRowNode("" + rowId)) //
-            .filter((r) => r) as RowNode[],
+        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
       );
     },
