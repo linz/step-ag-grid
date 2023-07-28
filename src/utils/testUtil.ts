@@ -176,17 +176,17 @@ export const findMultiSelectOption = async (value: string): Promise<HTMLElement>
 
 export const clickMultiSelectOption = async (value: string): Promise<void> => {
   const menuItem = await findMultiSelectOption(value);
-  menuItem.parentElement && userEvent.click(menuItem.parentElement);
+  menuItem.parentElement && (await userEvent.click(menuItem.parentElement));
 };
 
 const typeInput = async (value: string, filter: IQueryQuick): Promise<void> =>
   act(async () => {
     const openMenu = await findOpenPopover();
     const input = await findQuick(filter, openMenu);
-    userEvent.clear(input);
-    //'typing' an empty string will cause a console error and it's also unnecessary after the previous clear call
+    await userEvent.clear(input);
+    //'typing' an empty string will cause a console error, and it's also unnecessary after the previous clear call
     if (value.length > 0) {
-      userEvent.type(input, value);
+      await userEvent.type(input, value);
     }
   });
 
