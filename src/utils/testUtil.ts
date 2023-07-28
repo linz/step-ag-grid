@@ -31,7 +31,7 @@ const _selectRow = async (
     const isSelected = row.className.includes("ag-row-selected");
     if (select === "toggle" || (select === "select" && !isSelected) || (select === "deselect" && isSelected)) {
       const cell = await findCell(rowId, "selection", within);
-      userEvent.click(cell);
+      await userEvent.click(cell);
       await waitFor(async () => {
         const row = await findRow(rowId, within);
         const nowSelected = row.className.includes("ag-row-selected");
@@ -75,14 +75,14 @@ export const findCellContains = async (
 export const selectCell = async (rowId: string | number, colId: string, within?: HTMLElement): Promise<void> => {
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
-    userEvent.click(cell);
+    await userEvent.click(cell);
   });
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
-    userEvent.dblClick(cell);
+    await userEvent.dblClick(cell);
   });
   await waitFor(findOpenPopover);
 };
@@ -129,8 +129,7 @@ export const validateMenuOptions = async (
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
   await act(async () => {
     const menuOption = await findMenuOption(menuOptionText);
-    // eslint-disable-next-line testing-library/await-async-utils
-    userEvent.click(menuOption);
+    await userEvent.click(menuOption);
   });
 };
 
@@ -173,17 +172,17 @@ export const findMultiSelectOption = async (value: string): Promise<HTMLElement>
 
 export const clickMultiSelectOption = async (value: string): Promise<void> => {
   const menuItem = await findMultiSelectOption(value);
-  menuItem.parentElement && userEvent.click(menuItem.parentElement);
+  menuItem.parentElement && (await userEvent.click(menuItem.parentElement));
 };
 
 const typeInput = async (value: string, filter: IQueryQuick): Promise<void> =>
   act(async () => {
     const openMenu = await findOpenPopover();
     const input = await findQuick(filter, openMenu);
-    userEvent.clear(input);
-    //'typing' an empty string will cause a console error and it's also unnecessary after the previous clear call
+    await userEvent.clear(input);
+    //'typing' an empty string will cause a console error, and it's also unnecessary after the previous clear call
     if (value.length > 0) {
-      userEvent.type(input, value);
+      await userEvent.type(input, value);
     }
   });
 
@@ -222,6 +221,6 @@ export const findActionButton = (text: string, container?: HTMLElement): Promise
 export const clickActionButton = async (text: string, container?: HTMLElement): Promise<void> => {
   await act(async () => {
     const button = await findActionButton(text, container);
-    userEvent.click(button);
+    await userEvent.click(button);
   });
 };
