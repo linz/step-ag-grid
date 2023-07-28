@@ -31,7 +31,8 @@ const _selectRow = async (
     const isSelected = row.className.includes("ag-row-selected");
     if (select === "toggle" || (select === "select" && !isSelected) || (select === "deselect" && isSelected)) {
       const cell = await findCell(rowId, "selection", within);
-      userEvent.click(cell);
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      await userEvent.click(cell);
       await waitFor(async () => {
         const row = await findRow(rowId, within);
         const nowSelected = row.className.includes("ag-row-selected");
@@ -75,14 +76,16 @@ export const findCellContains = async (
 export const selectCell = async (rowId: string | number, colId: string, within?: HTMLElement): Promise<void> => {
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
-    userEvent.click(cell);
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await userEvent.click(cell);
   });
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
   await act(async () => {
     const cell = await findCell(rowId, colId, within);
-    userEvent.dblClick(cell);
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await userEvent.dblClick(cell);
   });
   await waitFor(findOpenPopover);
 };
@@ -129,8 +132,8 @@ export const validateMenuOptions = async (
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
   await act(async () => {
     const menuOption = await findMenuOption(menuOptionText);
-    // eslint-disable-next-line testing-library/await-async-utils
-    userEvent.click(menuOption);
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await userEvent.click(menuOption);
   });
 };
 
@@ -222,6 +225,7 @@ export const findActionButton = (text: string, container?: HTMLElement): Promise
 export const clickActionButton = async (text: string, container?: HTMLElement): Promise<void> => {
   await act(async () => {
     const button = await findActionButton(text, container);
-    userEvent.click(button);
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await userEvent.click(button);
   });
 };
