@@ -7,6 +7,7 @@ export * from "./GridCellMultiSelectClassRules";
 export * from "./gridFilter";
 export * from "./gridForm";
 export * from "./gridHeader";
+export * from "./gridHook";
 export * from "./GridIcon";
 export * from "./GridLoadableCell";
 export * from "./GridNoRowsOverlay";

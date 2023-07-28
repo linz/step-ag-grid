@@ -16,6 +16,7 @@
   - Bearing/Bearing Correction
   - Popover message
   - Custom form
+  - Context menu
 
 _Please note this requires React >=17, ag-grid-community >=27, and sass._
 
@@ -55,6 +56,7 @@ import {
   GridCell,
   GridCellFiller,
   GridContextProvider,
+  GridContextMenuComponentProps,
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
@@ -124,6 +126,29 @@ const GridDemo = () => {
     [],
   );
 
+  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<ITestRow>): ReactElement => {
+    const onClick = useCallback(() => {
+      selectedRows.forEach((row) => {
+        switch (colDef.field) {
+          case "name":
+            row.name = "";
+            break;
+          case "distance":
+            row.distance = null;
+            break;
+        }
+      });
+      close();
+    }, [close, colDef.field, selectedRows]);
+
+    return (
+      <>
+        <button onClick={onClick}>Button - Clear cell</button>
+        <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+      </>
+    );
+  };
+  
   const rowData: ITestRow[] = useMemo(
     () => [
       { id: 1000, name: "Tom", position: "Tester" },
@@ -159,6 +184,8 @@ const GridDemo = () => {
           <Grid selectable={true}
                 columnDefs={columnDefs}
                 rowData={rowData}
+                contextMenu={contextMenu}
+                contextMenuSelectRow={false}
                 onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>
