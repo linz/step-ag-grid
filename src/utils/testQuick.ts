@@ -131,14 +131,14 @@ export const getQuick = (filter: IQueryQuick, container?: HTMLElement): HTMLElem
 };
 
 /**
- * Find by filter.  Waits up to 4 seconds to find filter.
+ * Find by filter.  Waits up to 5 seconds to find filter.
  *
  * @param filter Filter
  * @param container Optional container to look in
  * @return HTMLElement.  Throws exception if not found.
  */
 export const findQuick = async <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): Promise<T> => {
-  const endTime = Date.now() + 4000;
+  const endTime = Date.now() + 5000;
   while (Date.now() < endTime) {
     const el = queryQuick<T>(filter, container);
     if (el) return el;
