@@ -202,12 +202,8 @@ export const typeOtherInput = async (value: string): Promise<void> =>
 export const typeOtherTextArea = async (value: string): Promise<void> =>
   typeInput(value, { classes: ".subComponent", child: { tagName: "textarea" } });
 
-export const closeMenu = async () => {
-  await user.click(document.body);
-};
-export const closePopover = async () => {
-  await user.click(document.body);
-};
+export const closeMenu = () => userEvent.click(document.body);
+export const closePopover = () => userEvent.click(document.body);
 
 export const findActionButton = (text: string, container?: HTMLElement): Promise<HTMLElement> =>
   findQuick({ tagName: "button", child: { classes: ".ActionButton-minimalAreaDisplay", text: text } }, container);
