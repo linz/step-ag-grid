@@ -34,6 +34,14 @@ export default {
     selectable: false,
     rowSelection: "single",
   },
+  // Storybook hangs otherwise
+  parameters: {
+    docs: {
+      source: {
+        type: "code",
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ width: 1024, height: 400 }}>
@@ -223,14 +231,14 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     expect(activeCell).toHaveAttribute("aria-colindex", "1");
     expect(activeCell?.parentElement).toHaveAttribute("row-index", "0");
   });
-  userEvent.keyboard("{arrowdown}{arrowdown}");
-  userEvent.keyboard("{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}");
+  await userEvent.keyboard("{arrowdown}{arrowdown}");
+  await userEvent.keyboard("{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}");
 
   // Test enter post focus
   const test = async (fn: () => any, colId: string, rowId: string) => {
-    userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{Enter}");
     await wait(1000);
-    userEvent.keyboard("{arrowdown}{arrowdown}");
+    await userEvent.keyboard("{arrowdown}{arrowdown}");
     fn();
     await waitFor(async () => {
       expect(multiEditAction).toHaveBeenCalled();
@@ -247,16 +255,16 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
 
   await test(() => userEvent.keyboard("{Enter}"), "8", "2");
   await test(() => userEvent.tab(), "9", "2");
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   await test(() => userEvent.tab({ shift: true }), "6", "2");
-  userEvent.keyboard("{Esc}");
-  userEvent.tab();
+  await userEvent.keyboard("{Esc}");
+  await userEvent.tab();
 
-  userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Enter}");
   await wait(250);
   expect(eAction).not.toHaveBeenCalled();
 
-  userEvent.keyboard("e");
+  await userEvent.keyboard("e");
   await waitFor(async () => {
     expect(eAction).toHaveBeenCalled();
   });

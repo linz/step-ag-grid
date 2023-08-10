@@ -19,7 +19,8 @@ module.exports = {
     "plugin:jest/recommended",
     "plugin:jest/style",
     "plugin:testing-library/react",
-    "plugin:prettier/recommended", // must be last
+    "plugin:prettier/recommended",
+    "plugin:storybook/recommended"
   ],
   ignorePatterns: ["react-app-env.d.ts"],
   rules: {

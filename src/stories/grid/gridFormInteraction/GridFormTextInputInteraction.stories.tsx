@@ -47,28 +47,28 @@ GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
   const inputField = canvas.getByPlaceholderText("Type here");
-  userEvent.type(inputField, "Hello");
+  await userEvent.type(inputField, "Hello");
 
   expect(canvas.getByText("Press enter or tab to save")).toBeInTheDocument();
 
   // Test enter to save
   updateValue.mockClear();
-  userEvent.type(inputField, "{Enter}");
+  await userEvent.type(inputField, "{Enter}");
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 0); // 0 = Enter
 
   // Test tab to save
   updateValue.mockClear();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
 
   // Test shift+tab to save
   updateValue.mockClear();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
 
   // Test escape not to save
   updateValue.mockClear();
-  userEvent.type(inputField, "{Escape}");
+  await userEvent.type(inputField, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
@@ -76,10 +76,10 @@ GridFormTextInputInteractions_.play = async ({ canvasElement }) => {
   userEvent.clear(inputField);
 
   expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
-  userEvent.type(inputField, "{Enter}");
+  await userEvent.type(inputField, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).not.toHaveBeenCalled();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).not.toHaveBeenCalled();
 };

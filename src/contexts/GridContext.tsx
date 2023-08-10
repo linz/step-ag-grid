@@ -36,7 +36,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   selectRowsByIdWithFlash: (rowIds?: number[]) => void;
   flashRows: (rowIds?: number[]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  focusByRowById: (rowId: number) => void;
+  focusByRowById: (rowId: number, ifNoCellFocused?: boolean) => void;
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;

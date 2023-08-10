@@ -86,8 +86,8 @@ GridFormMultiSelectGridInteractions_.play = async ({ canvasElement }) => {
   const zeroMenuOption = await getOption(/Zero/);
   expect(zeroMenuOption).toBeInTheDocument();
 
-  userEvent.click(zeroMenuOption);
-  userEvent.keyboard("{Tab}");
+  await userEvent.click(zeroMenuOption);
+  await userEvent.keyboard("{Tab}");
   expect(updateValue).toHaveBeenCalled();
   await waitFor(() => expect(onSave).toHaveBeenCalledWith({ selectedRows: [], addValues: [0], removeValues: [] }));
 
@@ -97,19 +97,19 @@ GridFormMultiSelectGridInteractions_.play = async ({ canvasElement }) => {
   };
 
   // Test left/right arrow
-  userEvent.keyboard("{ArrowRight}");
+  await userEvent.keyboard("{ArrowRight}");
   check("Three");
-  userEvent.keyboard("{ArrowRight}");
+  await userEvent.keyboard("{ArrowRight}");
   check("Zero");
-  userEvent.keyboard("{ArrowLeft}");
+  await userEvent.keyboard("{ArrowLeft}");
   check("Three");
-  userEvent.keyboard("{ArrowLeft}");
+  await userEvent.keyboard("{ArrowLeft}");
   check("Zero");
 
   // Test tab to save
   updateValue.mockClear();
   onSave.mockClear();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
   expect(onSave).toHaveBeenCalledWith({
     selectedRows: [],
@@ -120,7 +120,7 @@ GridFormMultiSelectGridInteractions_.play = async ({ canvasElement }) => {
   // Test shift+tab to save
   updateValue.mockClear();
   onSave.mockClear();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
   expect(onSave).toHaveBeenCalled();
 };

@@ -42,7 +42,7 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
   const keyboard = async (key: string) => {
-    userEvent.keyboard(key);
+    await userEvent.keyboard(key);
     await wait(100); // Wait for debounce
   };
 
@@ -51,13 +51,13 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
 
   const openMenu = async () => {
     await wait(500); // Wait for debounce
-    userEvent.click(menuButton);
+    await userEvent.click(menuButton);
     expect(await canvas.findByRole("menuitem", { name: "New File" })).toBeInTheDocument();
   };
 
   // Check menu closes on click outside
   await openMenu();
-  userEvent.click(menuButton.parentElement as Element);
+  await userEvent.click(menuButton.parentElement as Element);
   expect(canvas.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
 
   // Test arrow down/up
@@ -73,7 +73,7 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   expect(document.activeElement?.innerHTML).toBe("Print...");
 
   // Escape close
-  userEvent.type(menuButton.parentElement as Element, "{Escape}");
+  await userEvent.type(menuButton.parentElement as Element, "{Escape}");
   expect(canvas.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
 
   // Test enter to select

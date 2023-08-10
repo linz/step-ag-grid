@@ -82,7 +82,7 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   const enabledMenuOption = await getOption("Enabled");
   expect(enabledMenuOption).toBeInTheDocument();
 
-  userEvent.click(enabledMenuOption);
+  await userEvent.click(enabledMenuOption);
   expect(updateValue).toHaveBeenCalled();
   expect(onSelectedItem).toHaveBeenCalled();
 
@@ -90,7 +90,7 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   updateValue.mockClear();
   onSelectedItem.mockClear();
   const disabledMenuOption = await getOption("Disabled");
-  userEvent.click(disabledMenuOption);
+  await userEvent.click(disabledMenuOption);
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSelectedItem).not.toHaveBeenCalled();
 
@@ -100,38 +100,38 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
 
   expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
 
-  userEvent.click(subTextInput);
+  await userEvent.click(subTextInput);
   const textInput = await canvas.findByPlaceholderText("Text input");
   expect(textInput).toBeInTheDocument();
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
-  userEvent.type(textInput, "Hello");
+  await userEvent.type(textInput, "Hello");
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
 
   // Test shift+tab to save
   updateValue.mockClear();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
 
   // Test escape to not save
   updateValue.mockClear();
-  userEvent.type(textInput, "{Escape}");
+  await userEvent.type(textInput, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   userEvent.clear(textInput);
-  userEvent.type(textInput, "{Enter}");
+  await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test filter
   const filterText = await canvas.findByPlaceholderText("Filter...");
-  userEvent.type(filterText, "ena");
+  await userEvent.type(filterText, "ena");
   expect(canvas.queryByText("Enabled")).toBeInTheDocument();
   expect(canvas.queryByText("Disabled")).not.toBeInTheDocument();
   expect(canvas.queryByText("Sub menu...")).not.toBeInTheDocument();

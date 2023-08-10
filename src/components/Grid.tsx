@@ -208,7 +208,7 @@ export const Grid = ({
       if (params.autoSelectFirstRow) {
         selectRowsById([firstRowId]);
       } else {
-        focusByRowById(firstRowId);
+        focusByRowById(firstRowId, true);
       }
     }
   }, [

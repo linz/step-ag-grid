@@ -221,6 +221,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       rowIds: number[] | undefined,
       select: boolean,
       flash: boolean,
+      ifNoCellFocused = false,
       retryCount = 15, // We retry for approximately 5x200ms=1s
     ) => {
       return gridApiOp((gridApi) => {
@@ -249,7 +250,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
               const colId = col.colId;
               // We need to make sure we aren't currently editing a cell otherwise tests will fail
               // as they will start to edit the cell before this stuff has a chance to run
-              colId && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+              colId &&
+                delay(() => {
+                  if (isEmpty(gridApi.getEditingCells()) && (!ifNoCellFocused || gridApi.getFocusedCell() == null)) {
+                    // ifNoCellFocused
+                    gridApi.setFocusedCell(rowIndex, colId);
+                  }
+                }, 100);
             }
           }
         }
@@ -320,7 +327,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   );
 
   const focusByRowById = useCallback(
-    (rowId: number) => _selectRowsWithOptionalFlash([rowId], false, false),
+    (rowId: number, ifNoCellFocused?: boolean) => _selectRowsWithOptionalFlash([rowId], false, false, ifNoCellFocused),
     [_selectRowsWithOptionalFlash],
   );
 

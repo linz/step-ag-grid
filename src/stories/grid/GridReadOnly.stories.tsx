@@ -39,6 +39,14 @@ export default {
     selectable: false,
     rowSelection: "single",
   },
+  // Storybook hangs otherwise
+  parameters: {
+    docs: {
+      source: {
+        type: "code",
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 1024, height: 400, display: "flex", flexDirection: "column" }}>
