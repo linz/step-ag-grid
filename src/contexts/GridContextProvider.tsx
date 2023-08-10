@@ -218,11 +218,19 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const _selectRowsWithOptionalFlash = useCallback(
     (
-      rowIds: number[] | undefined,
-      select: boolean,
-      flash: boolean,
-      ifNoCellFocused = false,
-      retryCount = 15, // We retry for approximately 5x200ms=1s
+      {
+        rowIds,
+        select,
+        flash,
+        ifNoCellFocused = false,
+        retryCount = 15,
+      }: {
+        rowIds: number[] | undefined;
+        select: boolean;
+        flash: boolean;
+        ifNoCellFocused?: boolean;
+        retryCount?: number;
+      }, // We retry for approximately 5x200ms=1s
     ) => {
       return gridApiOp((gridApi) => {
         const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
@@ -231,7 +239,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
         // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
         if (gridHasNotUpdated && retryCount > 0) {
-          delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
+          delay(
+            () => _selectRowsWithOptionalFlash({ rowIds, select, flash, ifNoCellFocused, retryCount: retryCount - 1 }),
+            250,
+          );
           return;
         }
 
@@ -285,17 +296,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   );
 
   const selectRowsById = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: false }),
     [_selectRowsWithOptionalFlash],
   );
 
   const selectRowsByIdWithFlash = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
   const flashRows = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: false, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -303,7 +314,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, false);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: false });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -312,7 +323,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -321,13 +332,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, false, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: false, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
 
   const focusByRowById = useCallback(
-    (rowId: number, ifNoCellFocused?: boolean) => _selectRowsWithOptionalFlash([rowId], false, false, ifNoCellFocused),
+    (rowId: number, ifNoCellFocused?: boolean) =>
+      _selectRowsWithOptionalFlash({ rowIds: [rowId], select: false, flash: false, ifNoCellFocused }),
     [_selectRowsWithOptionalFlash],
   );
 
