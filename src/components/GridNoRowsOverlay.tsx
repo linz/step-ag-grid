@@ -1,12 +1,9 @@
-import { isEmpty } from "lodash-es";
-
 export const GridNoRowsOverlay = (params: {
-  rowData: any[] | null | undefined;
+  rowCount: number | undefined | null;
+  filteredRowCount: number;
   noRowsOverlayText: string | undefined;
-}) => (
-  <span>
-    {isEmpty(params.rowData)
-      ? params.noRowsOverlayText ?? "There are currently no rows"
-      : "All rows have been filtered"}
-  </span>
-);
+}) => {
+  if (params.rowCount === 0) return <span>{params.noRowsOverlayText ?? "There are currently no rows"}</span>;
+  if (params.filteredRowCount === 0) return <span>All rows have been filtered</span>;
+  return <span />;
+};

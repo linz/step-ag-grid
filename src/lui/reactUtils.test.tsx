@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/dom";
-import { act, render } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { useEffect, useState } from "react";
 
 import { usePrevious } from "./reactUtils";
@@ -39,10 +40,10 @@ describe("usePrevious", () => {
 
     expect(extPrevious).toBeUndefined();
 
-    act(() => button.click());
+    await userEvent.click(button);
     expect(extPrevious).toBe(false);
 
-    act(() => button.click());
+    await userEvent.click(button);
     expect(extPrevious).toBe(true);
   });
 });

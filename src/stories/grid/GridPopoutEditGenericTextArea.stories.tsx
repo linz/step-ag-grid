@@ -172,7 +172,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               {
                 label: "Delete",
                 action: async ({ selectedRows }) => {
-                  await wait(1500);
+                  await wait(1000);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
                 },
               },
