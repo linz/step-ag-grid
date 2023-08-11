@@ -6,7 +6,7 @@ module.exports = {
   tabWidth: 2,
   singleQuote: false,
   endOfLine: "lf",
-  importOrder: ["<THIRD_PARTY_MODULES>", "^@linzjs/(.*)$", "^@step-ag-grid", "^[./]"],
+  importOrder: ["^(.*).(.?)css$", "<THIRD_PARTY_MODULES>", "^@linzjs/(.*)$", "^@step-ag-grid", "^[./]"],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
 };

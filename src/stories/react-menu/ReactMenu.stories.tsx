@@ -1,3 +1,5 @@
+import "../../react-menu3/styles/index.scss";
+
 import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { userEvent, within } from "@storybook/testing-library";
