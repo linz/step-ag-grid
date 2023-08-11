@@ -1,7 +1,7 @@
 import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
@@ -208,7 +208,7 @@ export const Grid = ({
       if (params.autoSelectFirstRow) {
         selectRowsById([firstRowId]);
       } else {
-        focusByRowById(firstRowId);
+        focusByRowById(firstRowId, true);
       }
     }
   }, [
@@ -357,6 +357,7 @@ export const Grid = ({
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
       setApis(event.api, event.columnApi, dataTestId);
+      event.api.showNoRowsOverlay();
       synchroniseExternallySelectedItemsToGrid();
     },
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
@@ -389,19 +390,8 @@ export const Grid = ({
   /**
    * Show/hide no rows overlay when model changes.
    */
-  const isShowingNoRowsOverlay = useRef(false);
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
-    if (event.api.getDisplayedRowCount() === 0) {
-      if (!isShowingNoRowsOverlay.current) {
-        event.api.showNoRowsOverlay();
-        isShowingNoRowsOverlay.current = true;
-      }
-    } else {
-      if (isShowingNoRowsOverlay.current) {
-        event.api.hideOverlay();
-        isShowingNoRowsOverlay.current = false;
-      }
-    }
+    event.api.showNoRowsOverlay();
   }, []);
 
   /**
@@ -622,10 +612,16 @@ export const Grid = ({
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
           rowData={params.rowData}
-          noRowsOverlayComponent={GridNoRowsOverlay}
-          noRowsOverlayComponentParams={{
-            rowData: params.rowData,
-            noRowsOverlayText: params.noRowsOverlayText,
+          noRowsOverlayComponent={(event: AgGridEvent) => {
+            let rowCount = 0;
+            event.api.forEachNode(() => rowCount++);
+            return (
+              <GridNoRowsOverlay
+                rowCount={rowCount}
+                filteredRowCount={event.api.getDisplayedRowCount()}
+                noRowsOverlayText={params.noRowsOverlayText}
+              />
+            );
           }}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}

@@ -14,6 +14,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        env:
+          STORYBOOK_BUILD_TIMEOUT: 1200000
+          NODE_ENV: test
       - name: Publish Chromatic and auto accept changes for master and beta
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
         uses: chromaui/action@v1
@@ -21,3 +24,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           autoAcceptChanges: true # 👈 Option to accept all changes
+        env:
+          STORYBOOK_BUILD_TIMEOUT: 1200000
+          NODE_ENV: test

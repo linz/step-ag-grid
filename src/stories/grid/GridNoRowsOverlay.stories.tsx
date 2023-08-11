@@ -19,7 +19,8 @@ const GridNoRowsOverlayTemplate: ComponentStory<typeof GridNoRowsOverlay> = (par
 
 export const GridNoRowsEmpty = GridNoRowsOverlayTemplate.bind({});
 GridNoRowsEmpty.args = {
-  rowData: [],
+  rowCount: 0,
+  filteredRowCount: 0,
 };
 GridNoRowsEmpty.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
@@ -28,7 +29,8 @@ GridNoRowsEmpty.play = async ({ canvasElement }) => {
 
 export const GridNoRowsFiltered = GridNoRowsOverlayTemplate.bind({});
 GridNoRowsFiltered.args = {
-  rowData: [{}],
+  rowCount: 1,
+  filteredRowCount: 0,
 };
 GridNoRowsFiltered.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);

@@ -1,3 +1,7 @@
+import "../../../react-menu3/styles/index.scss";
+import "../../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { userEvent, within } from "@storybook/testing-library";
@@ -5,7 +9,6 @@ import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopover
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   GridBaseRow,
@@ -90,13 +93,13 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   const enabledMenuOption = await getOption("Enabled");
   expect(enabledMenuOption).toBeInTheDocument();
-  userEvent.click(enabledMenuOption);
+  await userEvent.click(enabledMenuOption);
   expect(enabledAction).toHaveBeenCalled();
 
   enabledAction.mockClear();
   const disabledMenuOption = await getOption("Disabled");
   expect(disabledMenuOption).toBeInTheDocument();
-  userEvent.click(disabledMenuOption);
+  await userEvent.click(disabledMenuOption);
   expect(disabledAction).not.toHaveBeenCalled();
 
   // Sub input tests
@@ -108,34 +111,34 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   expect(subTextArea).toBeInTheDocument();
   expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
 
-  userEvent.click(subTextInput);
+  await userEvent.click(subTextInput);
   const textInput = await canvas.findByPlaceholderText("Text input");
   expect(textInput).toBeInTheDocument();
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
   expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
 
-  userEvent.type(textInput, "Hello");
+  await userEvent.type(textInput, "Hello");
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
 
   // Test shift+tab to save
   updateValue.mockClear();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
 
   // Test escape to not save
   updateValue.mockClear();
-  userEvent.type(textInput, "{Escape}");
+  await userEvent.type(textInput, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   userEvent.clear(textInput);
-  userEvent.type(textInput, "{Enter}");
+  await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Sub text area tests
@@ -146,27 +149,27 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
   expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
 
-  userEvent.type(textArea, "Hello");
+  await userEvent.type(textArea, "Hello");
   expect(await canvas.findByText("Press tab to save")).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
-  userEvent.tab();
+  await userEvent.tab();
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
 
   // Test shift+tab to save
   updateValue.mockClear();
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), -1); // -1 = Shift + tab
 
   // Test escape to not save
   updateValue.mockClear();
-  userEvent.type(textArea, "{Escape}");
+  await userEvent.type(textArea, "{Escape}");
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   userEvent.clear(textArea);
-  userEvent.type(textArea, "{Enter}");
+  await userEvent.type(textArea, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 };
