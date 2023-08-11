@@ -1,3 +1,7 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { ColDef } from "ag-grid-community";
 import { GridPopoverEditDropDown } from "components/gridPopoverEdit/GridPopoverEditDropDown";
@@ -5,7 +9,6 @@ import { GridPopoverTextArea } from "components/gridPopoverEdit/GridPopoverTextA
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
@@ -20,8 +23,6 @@ import {
   MenuOption,
   wait,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
 
 export default {
   title: "Components / Grids",
