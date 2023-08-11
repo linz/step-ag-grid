@@ -1,4 +1,5 @@
 import "../../../react-menu3/styles/index.scss";
+import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect, jest } from "@storybook/jest";
