@@ -24,7 +24,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=17"
   },
   "peerDependencies": {
     "@linzjs/lui": ">=17.60.0",
