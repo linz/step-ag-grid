@@ -1,5 +1,5 @@
 import clsx, { ClassValue } from "clsx";
-import { useMemo, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 
 import { LuiButton, LuiButtonGroup } from "@linzjs/lui";
 import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
@@ -24,7 +24,7 @@ export const GridFilterButtons = <RowType extends GridBaseRow>({
   className,
   luiButtonProps,
   options,
-}: GridFilterButtonsProps<RowType>): JSX.Element => {
+}: GridFilterButtonsProps<RowType>): ReactElement => {
   // Select defaultSelected option, otherwise first option.  If no options select none.
   const [selectedOption, setSelectedOption] = useState(options.find((option) => option.defaultSelected) ?? options[0]);
 

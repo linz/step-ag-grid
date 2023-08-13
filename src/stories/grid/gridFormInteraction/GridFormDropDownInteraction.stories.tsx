@@ -32,7 +32,7 @@ const onSelectedItem = jest
   .fn<Promise<void>, [GridPopoutEditDropDownSelectedItem<any>]>()
   .mockImplementation(async () => undefined);
 
-const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
+const Template: ComponentStory<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
   const config: GridFormDropDownProps<any> = {
     filtered: "local",
     onSelectedItem,

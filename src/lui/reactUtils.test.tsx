@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 
 import { usePrevious } from "./reactUtils";
 
@@ -11,7 +11,7 @@ interface WrapperProps {
 
 let extPrevious: boolean | undefined = undefined;
 
-const UsePreviousWrapper = ({ value }: WrapperProps): JSX.Element => {
+const UsePreviousWrapper = ({ value }: WrapperProps): ReactElement => {
   const previous = usePrevious<boolean>(value);
   useEffect(() => {
     extPrevious = previous;
@@ -20,7 +20,7 @@ const UsePreviousWrapper = ({ value }: WrapperProps): JSX.Element => {
   return <div />;
 };
 
-const TestComponent = (): JSX.Element => {
+const TestComponent = (): ReactElement => {
   const [value, setValue] = useState(false);
 
   const toggleValue = () => setValue((value) => !value);

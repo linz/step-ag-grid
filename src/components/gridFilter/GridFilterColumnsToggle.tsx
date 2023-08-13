@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { LuiCheckboxInput, LuiIcon } from "@linzjs/lui";
 
@@ -14,7 +14,7 @@ export interface GridFilterColumnsToggleProps {
   saveState?: boolean;
 }
 
-export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsToggleProps): JSX.Element => {
+export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsToggleProps): ReactElement => {
   const [loaded, setLoaded] = useState(false);
   const { getColumns, getColumnIds, invisibleColumnIds, setInvisibleColumnIds } = useContext(GridContext);
 

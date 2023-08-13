@@ -14,6 +14,7 @@ import {
   GridBaseRow,
   GridContextProvider,
   GridFormPopoverMenu,
+  GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
   GridFormSubComponentTextInput,
   PopoutMenuSeparator,
@@ -40,7 +41,7 @@ const disabledAction = jest
   .fn<Promise<void>, [{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }]>()
   .mockResolvedValue(undefined);
 
-const Template: ComponentStory<typeof GridFormPopoverMenu> = (props) => {
+const Template: ComponentStory<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (

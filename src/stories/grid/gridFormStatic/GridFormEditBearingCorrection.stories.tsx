@@ -21,7 +21,7 @@ export default {
   args: {},
 } as ComponentMeta<typeof GridFormEditBearing>;
 
-const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
+const Template: ComponentStory<typeof GridFormEditBearing> = (props: GridFormEditBearingProps<any>) => {
   const values: [string, GridFormEditBearingProps<any>, number | null][] = [
     ["Null value", {}, null],
     ["Custom placeholder", { placeHolder: "Custom placeholder" }, null],

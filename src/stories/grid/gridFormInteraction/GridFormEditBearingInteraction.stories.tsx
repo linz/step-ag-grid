@@ -10,7 +10,12 @@ import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { GridContextProvider, GridFormEditBearing, GridPopoverEditBearingEditorParams } from "../../..";
+import {
+  GridContextProvider,
+  GridFormEditBearing,
+  GridFormEditBearingProps,
+  GridPopoverEditBearingEditorParams,
+} from "../../..";
 
 export default {
   title: "GridForm / Interactions",
@@ -20,7 +25,7 @@ export default {
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormEditBearing> = (props) => {
+const Template: ComponentStory<typeof GridFormEditBearing> = (props: GridFormEditBearingProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (

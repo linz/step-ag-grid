@@ -3,7 +3,7 @@ import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { useCallback, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
@@ -249,7 +249,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
   );
 };
 
-const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): JSX.Element => {
+const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): ReactElement => {
   const [value, setValue] = useState<number>();
 
   const filter = useCallback(

@@ -1,6 +1,6 @@
 import "./FormTest.scss";
 
-import { useCallback, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 
 import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from "@linzjs/lui";
 
@@ -15,7 +15,7 @@ export interface IFormTestRow {
   distance: number | null;
 }
 
-export const FormTest = (props: CellEditorCommon): JSX.Element => {
+export const FormTest = (props: CellEditorCommon): ReactElement => {
   const { value } = useGridPopoverContext<IFormTestRow>();
   const [v1, ...v2] = value.split(" ");
 

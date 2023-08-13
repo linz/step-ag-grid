@@ -3,6 +3,7 @@ import {
   Dispatch,
   Fragment,
   KeyboardEvent,
+  ReactElement,
   SetStateAction,
   useCallback,
   useEffect,
@@ -31,7 +32,7 @@ type HeaderGroupType = Record<string, MultiSelectOption[]> | undefined;
 export interface MultiSelectOption {
   value: any;
   label?: string;
-  subComponent?: (props: any) => JSX.Element;
+  subComponent?: (props: any) => ReactElement;
   subValue?: any;
   filter?: string;
   checked?: boolean;

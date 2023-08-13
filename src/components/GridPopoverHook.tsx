@@ -10,8 +10,8 @@ import { GridBaseRow } from "./Grid";
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
   invalid?: () =>
-    | Promise<JSX.Element | boolean | string | null | undefined>
-    | JSX.Element
+    | Promise<ReactElement | boolean | string | null | undefined>
+    | ReactElement
     | boolean
     | string
     | null

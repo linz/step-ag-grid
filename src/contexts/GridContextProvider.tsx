@@ -18,7 +18,7 @@ import { GridUpdatingContext } from "./GridUpdatingContext";
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren<void>): ReactElement => {
+export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();

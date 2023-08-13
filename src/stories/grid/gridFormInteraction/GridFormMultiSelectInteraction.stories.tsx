@@ -34,7 +34,7 @@ const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().
 const onSelectFilter = jest.fn();
 
 let options: MultiSelectOption[] = [];
-const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
+const Template: ComponentStory<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
   options = [
     { label: "Zero", value: 0 },
     { label: "One", value: 1 },

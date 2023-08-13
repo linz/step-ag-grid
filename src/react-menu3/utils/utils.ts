@@ -25,7 +25,7 @@ export function safeCall<T, R>(fn: (arg?: T) => R, arg?: T): T | R {
 
 const internalKey = "_szhsinMenu";
 export const getName = (component: Record<string, any | undefined>) => component[internalKey];
-//export const defineName = <T extends any[]>(name: string, component: (...args: T) => JSX.Element) =>
+//export const defineName = <T extends any[]>(name: string, component: (...args: T) => ReactElement) =>
 //  Object.defineProperty(component, internalKey, { value: name });
 
 export const defineName = (

@@ -5,7 +5,7 @@ import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "a
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
@@ -92,7 +92,7 @@ export const Grid = ({
   selectColumnPinned = null,
   contextMenuSelectRow = false,
   ...params
-}: GridProps): JSX.Element => {
+}: GridProps): ReactElement => {
   const {
     gridReady,
     setApis,

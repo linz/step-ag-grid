@@ -1,7 +1,7 @@
 import "./ActionButton.scss";
 
 import clsx from "clsx";
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, ReactElement, useEffect, useState } from "react";
 
 import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
 import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
@@ -43,7 +43,7 @@ export const ActionButton = ({
   iconPosition = "left",
   level = "tertiary",
   "aria-label": ariaLabel,
-}: ActionButtonProps): JSX.Element => {
+}: ActionButtonProps): ReactElement => {
   const [inProgress, setInProgress] = useState(false);
   const lastInProgress = usePrevious(inProgress ?? false);
   const [localInProgress, setLocalInProgress, setLocalInProgressDeferred] = useStateDeferred<boolean>(inProgress);

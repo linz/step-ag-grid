@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { TextAreaInput } from "../../lui/TextAreaInput";
@@ -16,7 +16,7 @@ export interface GridFormTextAreaProps<RowType extends GridBaseRow>
   helpText?: string;
 }
 
-export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>): JSX.Element => {
+export const GridFormTextArea = <RowType extends GridBaseRow>(props: GridFormTextAreaProps<RowType>): ReactElement => {
   const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
 
   const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);

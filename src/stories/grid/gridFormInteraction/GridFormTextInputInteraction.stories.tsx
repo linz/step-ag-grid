@@ -10,7 +10,7 @@ import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { GridContextProvider, GridFormTextInput } from "../../..";
+import { GridContextProvider, GridFormTextInput, GridFormTextInputProps } from "../../..";
 
 export default {
   title: "GridForm / Interactions",
@@ -20,7 +20,7 @@ export default {
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
+const Template: ComponentStory<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (

@@ -8,7 +8,7 @@ import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { GridContextProvider, GridFormMessage } from "../../..";
+import { GridContextProvider, GridFormMessage, GridFormMessageProps } from "../../..";
 
 export default {
   title: "GridForm / Static Tests",
@@ -16,7 +16,7 @@ export default {
   args: {},
 } as ComponentMeta<typeof GridFormMessage>;
 
-const Template: ComponentStory<typeof GridFormMessage> = (props) => {
+const Template: ComponentStory<typeof GridFormMessage> = (props: GridFormMessageProps<any>) => {
   const anchorRef1 = useRef<HTMLHeadingElement>(null);
 
   return (

@@ -34,7 +34,7 @@ const onSave = jest
 const onSelectFilter = jest.fn();
 
 let options: MultiSelectGridOption[] = [];
-const Template: ComponentStory<typeof GridFormMultiSelectGrid> = (props) => {
+const Template: ComponentStory<typeof GridFormMultiSelectGrid> = (props: GridFormMultiSelectGridProps<any>) => {
   options = [
     { label: "Zero", value: 0 },
     { label: "One", value: 1 },

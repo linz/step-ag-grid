@@ -9,7 +9,7 @@ type FieldName = string;
 type IdList = (number | string)[];
 type UpdatingBlock = Record<FieldName, IdList[]>;
 
-export const GridUpdatingContextProvider = (props: PropsWithChildren<void>) => {
+export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
   const updatingBlocks = useRef<UpdatingBlock>({});
   const updating = useRef<GridUpdatingContextStatus>({});
   const [updatedDep, setUpdatedDep] = useState(0);
