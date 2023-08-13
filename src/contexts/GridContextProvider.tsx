@@ -4,7 +4,7 @@ import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
-import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
@@ -13,16 +13,12 @@ import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
-interface GridContextProps {
-  children: ReactNode;
-}
-
 /**
  * Context for AgGrid operations.
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
+export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren<void>): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
@@ -240,7 +236,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
         if (gridHasNotUpdated && retryCount > 0) {
           delay(
-            () => _selectRowsWithOptionalFlash({ rowIds, select, flash, ifNoCellFocused, retryCount: retryCount - 1 }),
+            () =>
+              _selectRowsWithOptionalFlash({
+                rowIds,
+                select,
+                flash,
+                ifNoCellFocused,
+                retryCount: retryCount - 1,
+              }),
             250,
           );
           return;
@@ -394,13 +397,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const autoSizeColumns = useCallback(
     ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
-      const colIdsSet = colIds instanceof Set ? colIds : new Set<string>(colIds ?? []);
-      columnApi.getColumnState().forEach((col) => {
-        const colId = col.colId;
-        if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
-          columnApi.autoSizeColumn(colId, skipHeader);
-        }
-      });
+      if (!colIds) {
+        columnApi.autoSizeAllColumns(skipHeader);
+      } else {
+        const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
+        columnApi.getColumnState().forEach((col) => {
+          const colId = col.colId;
+          if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
+            columnApi.autoSizeColumn(colId, skipHeader);
+          }
+        });
+      }
       return {
         width: sumBy(
           columnApi.getColumnState().filter((col) => !col.hide),

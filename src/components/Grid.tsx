@@ -114,9 +114,11 @@ export const Grid = ({
   const { prePopupOps } = useContext(GridContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
-
   const lastSelectedIds = useRef<number[]>([]);
+
   const [staleGrid, setStaleGrid] = useState(false);
+  const [autoSized, setAutoSized] = useState(false);
+
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
   /**
@@ -162,6 +164,7 @@ export const Grid = ({
     if (sizeColumns !== "none") {
       sizeColumnsToFit();
     }
+    setAutoSized(true);
     needsAutoSize.current = false;
   }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
 
@@ -583,7 +586,7 @@ export const Grid = ({
         "Grid-container",
         theme,
         staleGrid && "Grid-sortIsStale",
-        gridReady && params.rowData && "Grid-ready",
+        gridReady && params.rowData && autoSized && "Grid-ready",
       )}
     >
       {gridContextMenu.component}
