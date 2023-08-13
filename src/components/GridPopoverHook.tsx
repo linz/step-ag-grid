@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { useGridPopoverContext } from "../contexts/GridPopoverContext";
@@ -59,7 +59,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
   );
 
   const popoverWrapper = useCallback(
-    (children: JSX.Element) => {
+    (children: ReactElement) => {
       return (
         <>
           {anchorRef.current && (
