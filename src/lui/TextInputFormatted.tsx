@@ -1,9 +1,10 @@
+import "./TextInputFormatted.scss";
+
 import clsx from "clsx";
 import { omit } from "lodash-es";
 import { DetailedHTMLProps, InputHTMLAttributes } from "react";
 
 import { FormError } from "./FormError";
-import "./TextInputFormatted.scss";
 
 export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   // overrides value in base class to be string type only

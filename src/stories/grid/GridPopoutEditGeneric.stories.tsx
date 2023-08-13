@@ -1,12 +1,13 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
 import { FormTest, IFormTestRow } from "./FormTest";
 
 export default {
