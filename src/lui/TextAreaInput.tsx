@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { omit } from "lodash-es";
-import { InputHTMLAttributes, useState } from "react";
+import { InputHTMLAttributes, ReactElement, useState } from "react";
 import { v4 as uuidVersion4 } from "uuid";
 
 import { FormError } from "./FormError";
@@ -15,10 +15,10 @@ export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaE
   value: string;
 
   // Custom fields
-  label?: JSX.Element | string;
+  label?: ReactElement | string;
   mandatory?: boolean;
   helpText?: string;
-  error?: JSX.Element | string | boolean | null;
+  error?: ReactElement | string | boolean | null;
   allowTabToSave?: boolean;
 }
 

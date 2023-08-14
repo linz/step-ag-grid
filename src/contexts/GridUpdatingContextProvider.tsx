@@ -1,11 +1,7 @@
 import { castArray, flatten, remove } from "lodash-es";
-import { ReactNode, useRef, useState } from "react";
+import { PropsWithChildren, useRef, useState } from "react";
 
 import { GridUpdatingContext } from "./GridUpdatingContext";
-
-interface UpdatingContextProviderProps {
-  children: ReactNode;
-}
 
 export type GridUpdatingContextStatus = Record<string, (number | string)[] | undefined>;
 
@@ -13,7 +9,7 @@ type FieldName = string;
 type IdList = (number | string)[];
 type UpdatingBlock = Record<FieldName, IdList[]>;
 
-export const GridUpdatingContextProvider = (props: UpdatingContextProviderProps) => {
+export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
   const updatingBlocks = useRef<UpdatingBlock>({});
   const updating = useRef<GridUpdatingContextStatus>({});
   const [updatedDep, setUpdatedDep] = useState(0);

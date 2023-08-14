@@ -32,7 +32,7 @@ const onSelectedItem = jest
   .fn<Promise<void>, [GridPopoutEditDropDownSelectedItem<any>]>()
   .mockImplementation(async () => undefined);
 
-const Template: ComponentStory<typeof GridFormDropDown> = (props) => {
+const Template: ComponentStory<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
   const config: GridFormDropDownProps<any> = {
     filtered: "local",
     onSelectedItem,
@@ -128,7 +128,7 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(textInput);
+  await userEvent.clear(textInput);
   await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 

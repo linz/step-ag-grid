@@ -14,6 +14,7 @@ import {
   GridBaseRow,
   GridContextProvider,
   GridFormPopoverMenu,
+  GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
   GridFormSubComponentTextInput,
   PopoutMenuSeparator,
@@ -40,7 +41,7 @@ const disabledAction = jest
   .fn<Promise<void>, [{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }]>()
   .mockResolvedValue(undefined);
 
-const Template: ComponentStory<typeof GridFormPopoverMenu> = (props) => {
+const Template: ComponentStory<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
@@ -137,7 +138,7 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(textInput);
+  await userEvent.clear(textInput);
   await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 
@@ -169,7 +170,7 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(textArea);
+  await userEvent.clear(textArea);
   await userEvent.type(textArea, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 };

@@ -1,10 +1,9 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
-import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
+import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
-import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
@@ -13,16 +12,12 @@ import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
-interface GridContextProps {
-  children: ReactNode;
-}
-
 /**
  * Context for AgGrid operations.
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
+export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
@@ -167,7 +162,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = useCallback((): RowNode[] => {
+  const _getNewNodes = useCallback((): IRowNode[] => {
     return gridApiOp(
       (gridApi) =>
         compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
@@ -182,7 +177,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * @param rowIds Row ids to get from grid.
    */
   const _rowIdsToNodes = useCallback(
-    (rowIds: number[]): RowNode[] => {
+    (rowIds: number[]): IRowNode[] => {
       return gridApiOp(
         (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
@@ -240,7 +235,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
         if (gridHasNotUpdated && retryCount > 0) {
           delay(
-            () => _selectRowsWithOptionalFlash({ rowIds, select, flash, ifNoCellFocused, retryCount: retryCount - 1 }),
+            () =>
+              _selectRowsWithOptionalFlash({
+                rowIds,
+                select,
+                flash,
+                ifNoCellFocused,
+                retryCount: retryCount - 1,
+              }),
             250,
           );
           return;
@@ -394,13 +396,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   const autoSizeColumns = useCallback(
     ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
-      const colIdsSet = colIds instanceof Set ? colIds : new Set<string>(colIds ?? []);
-      columnApi.getColumnState().forEach((col) => {
-        const colId = col.colId;
-        if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
-          columnApi.autoSizeColumn(colId, skipHeader);
-        }
+      const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
+      const colsToResize = columnApi.getColumnState().filter((colState) => {
+        const colId = colState.colId;
+        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId) && !colState.flex;
       });
+      if (!isEmpty(colsToResize)) {
+        columnApi.autoSizeColumns(
+          colsToResize.map((colState) => colState.colId),
+          skipHeader,
+        );
+      }
       return {
         width: sumBy(
           columnApi.getColumnState().filter((col) => !col.hide),
@@ -415,7 +421,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Resize columns to fit container
    */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApi && gridApi.sizeColumnsToFit();
+    gridApi?.sizeColumnsToFit();
   }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
@@ -584,7 +590,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   );
 
   const redrawRows = useCallback(
-    (rowNodes?: RowNode[]) => {
+    (rowNodes?: IRowNode[]) => {
       gridApiOp((gridApi) => gridApi.redrawRows(rowNodes ? { rowNodes } : undefined));
     },
     [gridApiOp],
@@ -623,7 +629,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean =>
+  const doesExternalFilterPass = (node: IRowNode): boolean =>
     externalFilters.current.every((filter) => filter(node.data, node));
 
   const getColDef = useCallback(

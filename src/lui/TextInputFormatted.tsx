@@ -1,9 +1,10 @@
+import "./TextInputFormatted.scss";
+
 import clsx from "clsx";
 import { omit } from "lodash-es";
-import { DetailedHTMLProps, InputHTMLAttributes } from "react";
+import { DetailedHTMLProps, InputHTMLAttributes, ReactElement } from "react";
 
 import { FormError } from "./FormError";
-import "./TextInputFormatted.scss";
 
 export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   // overrides value in base class to be string type only
@@ -11,12 +12,12 @@ export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes
 
   // Custom fields
   helpText?: string;
-  error?: JSX.Element | string | boolean | null;
+  error?: ReactElement | string | boolean | null;
   formatted?: string;
   allowTabToSave?: boolean;
 }
 
-export const TextInputFormatted = (props: LuiTextInputProps): JSX.Element => {
+export const TextInputFormatted = (props: LuiTextInputProps): ReactElement => {
   return (
     <div className={clsx("LuiTextInput Grid-popoverContainer", props.error && "hasError", props.className)}>
       <span className="LuiTextInput-inputWrapper">

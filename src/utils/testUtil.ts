@@ -18,6 +18,9 @@ export const countRows = async (within?: HTMLElement): Promise<number> => {
 };
 
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
+  await waitFor(async () => {
+    expect(getAllQuick({ classes: ".ag-row" }).length > 0).toBe(true);
+  });
   return await findQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
 };
 

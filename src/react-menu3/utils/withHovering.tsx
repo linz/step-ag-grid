@@ -1,4 +1,4 @@
-import { MutableRefObject, PropsWithRef, forwardRef, memo, useContext, useRef } from "react";
+import { MutableRefObject, PropsWithRef, ReactElement, forwardRef, memo, useContext, useRef } from "react";
 
 import { HoverItemContext } from "../contexts/HoverItemContext";
 
@@ -8,7 +8,7 @@ export interface withHoveringResultProps {
   menuItemRef?: MutableRefObject<HTMLLIElement>;
 }
 
-export const withHovering = <T,>(name: string, WrappedComponent: (props: T) => JSX.Element) => {
+export const withHovering = <T,>(name: string, WrappedComponent: (props: T) => ReactElement) => {
   const Component = memo(WrappedComponent);
   const WithHovering = forwardRef((props: PropsWithRef<T>, ref) => {
     const menuItemRef = useRef<any>(null);

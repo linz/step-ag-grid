@@ -1,13 +1,13 @@
 import { CellEditorSelectorResult } from "ag-grid-community/dist/lib/entities/colDef";
 import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
-import { ComponentProps } from "react";
+import { ComponentProps, ReactElement } from "react";
 
 import { GridBaseRow } from "./Grid";
 import { ColDefT, GenericCellEditorComponentWrapper, GridCell } from "./GridCell";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
 import { GenericCellColDef } from "./gridRender";
 
-export const Editor = <FN extends (param: any) => JSX.Element>(props: {
+export const Editor = <FN extends (param: any) => ReactElement>(props: {
   multiEdit: boolean;
   editor: FN;
   editorParams: ComponentProps<FN>;

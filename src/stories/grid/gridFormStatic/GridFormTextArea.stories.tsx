@@ -16,7 +16,7 @@ export default {
   args: {},
 } as ComponentMeta<typeof GridFormTextArea>;
 
-const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
+const Template: ComponentStory<typeof GridFormTextArea> = (props: GridFormTextAreaProps<any>) => {
   const configs: [string, GridFormTextAreaProps<GridBaseRow>, string?][] = [
     ["Text area", {}],
     ["Text area with text", {}, "Some text"],

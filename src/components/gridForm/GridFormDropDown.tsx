@@ -1,6 +1,6 @@
 import debounce from "debounce-promise";
 import { isEmpty } from "lodash-es";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
@@ -23,7 +23,7 @@ export interface GridPopoutEditDropDownSelectedItem<RowType> {
 
 interface FinalSelectOption {
   value: any;
-  label?: JSX.Element | string;
+  label?: ReactElement | string;
   disabled?: boolean | string;
   subComponent?: (props: any, ref: any) => any;
 }
@@ -189,8 +189,8 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
     dontSaveOnExternalClick: true,
   });
 
-  let lastHeader: JSX.Element | null = null;
-  let showHeader: JSX.Element | null = null;
+  let lastHeader: ReactElement | null = null;
+  let showHeader: ReactElement | null = null;
 
   return popoverWrapper(
     <>

@@ -16,7 +16,7 @@ export default {
   args: {},
 } as ComponentMeta<typeof GridFormTextInput>;
 
-const Template: ComponentStory<typeof GridFormTextInput> = (props) => {
+const Template: ComponentStory<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
   const configs: [string, GridFormTextInputProps<GridBaseRow>, string?][] = [
     ["Text input", {}],
     ["Text input with text", {}, "Some text"],

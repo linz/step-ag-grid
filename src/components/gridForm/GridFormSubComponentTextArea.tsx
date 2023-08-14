@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useContext, useEffect } from "react";
+import { ReactElement, useCallback, useContext, useEffect } from "react";
 
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { TextAreaInput } from "../../lui/TextAreaInput";
@@ -19,7 +19,7 @@ export interface GridSubComponentTextAreaProps<RowType extends GridBaseRow>
 
 export const GridFormSubComponentTextArea = <RowType extends GridBaseRow>(
   props: GridSubComponentTextAreaProps<RowType>,
-): JSX.Element => {
+): ReactElement => {
   const { value, data, setValue, setValid, context } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press tab to save";

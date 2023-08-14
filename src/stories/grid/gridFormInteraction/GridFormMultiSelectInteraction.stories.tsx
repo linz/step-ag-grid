@@ -34,7 +34,7 @@ const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().
 const onSelectFilter = jest.fn();
 
 let options: MultiSelectOption[] = [];
-const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
+const Template: ComponentStory<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
   options = [
     { label: "Zero", value: 0 },
     { label: "One", value: 1 },
@@ -145,7 +145,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   // Test invalid value doesn't save
   updateValue.mockClear();
   onSave.mockClear();
-  userEvent.clear(textInput);
+  await userEvent.clear(textInput);
   await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSave).not.toHaveBeenCalled();

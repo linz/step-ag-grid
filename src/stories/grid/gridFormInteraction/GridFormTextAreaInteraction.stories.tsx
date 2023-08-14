@@ -10,7 +10,7 @@ import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { GridContextProvider, GridFormTextArea } from "../../..";
+import { GridContextProvider, GridFormTextArea, GridFormTextAreaProps } from "../../..";
 
 export default {
   title: "GridForm / Interactions",
@@ -20,7 +20,7 @@ export default {
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
+const Template: ComponentStory<typeof GridFormTextArea> = (props: GridFormTextAreaProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
@@ -71,7 +71,7 @@ GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(inputField);
+  await userEvent.clear(inputField);
 
   expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
   await userEvent.tab();

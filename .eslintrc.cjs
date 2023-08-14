@@ -32,6 +32,7 @@ module.exports = {
     "jest/no-standalone-expect": "off",
     "jest/valid-expect": "off",
     "jest/prefer-to-be": "error",
+    "testing-library/no-await-sync-events": "off",
     "testing-library/no-unnecessary-act": "off",
     "testing-library/prefer-presence-queries": "off",
     "testing-library/no-wait-for-multiple-assertions": "off",

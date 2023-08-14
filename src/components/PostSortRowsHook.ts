@@ -1,6 +1,6 @@
-import { RowNode } from "ag-grid-community";
+import { IRowNode } from "ag-grid-community";
 import { ColumnState } from "ag-grid-community/dist/lib/columns/columnModel";
-import { PostSortRowsParams } from "ag-grid-community/dist/lib/entities/iCallbackParams";
+import { PostSortRowsParams } from "ag-grid-community/dist/lib/interfaces/iCallbackParams";
 import { isEmpty } from "lodash-es";
 import { useCallback, useContext, useRef } from "react";
 
@@ -44,7 +44,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
 
       const previousRowSortIndex = previousRowSortIndexRef.current;
 
-      const hashNode = (node: RowNode | undefined) => {
+      const hashNode = (node: IRowNode | undefined) => {
         return node ? JSON.stringify(node.data) : "";
       };
 
@@ -124,7 +124,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
         }
       } else {
         let firstChangedNodeIndex = -1;
-        let lastNewNode: RowNode | undefined = undefined;
+        let lastNewNode: IRowNode | undefined = undefined;
         let changedRowCount = 0;
         let newRowCount = 0;
         let index = 0;

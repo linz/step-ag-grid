@@ -1,11 +1,17 @@
 import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  AgGridEvent,
+  CellEvent,
+  CellKeyDownEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
@@ -87,12 +93,12 @@ export const Grid = ({
   "data-testid": dataTestId,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
-  theme = "ag-theme-alpine",
+  theme = "ag-theme-step-default",
   sizeColumns = "auto",
   selectColumnPinned = null,
   contextMenuSelectRow = false,
   ...params
-}: GridProps): JSX.Element => {
+}: GridProps): ReactElement => {
   const {
     gridReady,
     setApis,
@@ -114,9 +120,11 @@ export const Grid = ({
   const { prePopupOps } = useContext(GridContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
-
   const lastSelectedIds = useRef<number[]>([]);
+
   const [staleGrid, setStaleGrid] = useState(false);
+  const [autoSized, setAutoSized] = useState(false);
+
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
   /**
@@ -162,6 +170,7 @@ export const Grid = ({
     if (sizeColumns !== "none") {
       sizeColumnsToFit();
     }
+    setAutoSized(true);
     needsAutoSize.current = false;
   }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
 
@@ -471,7 +480,7 @@ export const Grid = ({
    * Start editing on pressing Enter
    */
   const onCellKeyPress = useCallback(
-    (e: CellEvent) => {
+    (e: CellKeyDownEvent) => {
       if ((e.event as KeyboardEvent).key === "Enter") {
         if (!invokeEditAction(e)) startCellEditing(e);
       }
@@ -551,7 +560,7 @@ export const Grid = ({
   }, [sizeColumns, sizeColumnsToFit]);
 
   /**
-   * Set of column Id's that are prevented from auto-sizing as they are user set
+   * Set of column I'd's that are prevented from auto-sizing as they are user set
    */
   const userSizedColIds = useRef(new Set<string>());
 
@@ -583,7 +592,7 @@ export const Grid = ({
         "Grid-container",
         theme,
         staleGrid && "Grid-sortIsStale",
-        gridReady && params.rowData && "Grid-ready",
+        gridReady && params.rowData && autoSized && "Grid-ready",
       )}
     >
       {gridContextMenu.component}
@@ -602,8 +611,8 @@ export const Grid = ({
           onColumnVisible={() => {
             setInitialContentSize();
           }}
-          onRowDataChanged={onRowDataChanged}
-          onCellKeyPress={onCellKeyPress}
+          onRowDataUpdated={onRowDataChanged}
+          onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
