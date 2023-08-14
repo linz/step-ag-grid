@@ -22,7 +22,7 @@ import {
   wait,
 } from "../..";
 import { waitFor } from "@storybook/testing-library";
-import { expect, jest } from "@storybook/jest";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",

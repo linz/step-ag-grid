@@ -11,8 +11,9 @@ import "@linzjs/lui/dist/fonts";
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
 import { MultiSelectGridOption } from "../../components/gridForm/GridFormMultiSelectGrid";
 import { GridPopoutEditMultiSelectGrid } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelectGrid";
-import { expect, waitFor } from "@storybook/testing-library";
+import { waitFor } from "@storybook/testing-library";
 import { EditMultiSelect } from "./GridPopoverEditMultiSelect.stories";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",
