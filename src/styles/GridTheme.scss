@@ -1,5 +1,5 @@
 @use "@linzjs/lui/dist/scss/Core" as lui;
-@use "ag-grid-community/styles" as ag;
+@use "node_modules/ag-grid-community/styles" as ag;
 
 // ag-grid likes to add 1px to this, so we subtract to compensate
 $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
@@ -22,7 +22,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
       ),
     ),
 
-    // ag-grid likes to add 1px to this, so we substract to compensate
     alpine-active-color: lui.$sea,
     background-color: lui.$white,
     border-color: lui.$dew,
@@ -120,7 +119,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 .ag-row .ag-cell-data-changed {
   // ag-grid natively has !important on this style so we have to use it here :(
-  background-color: lightgoldenrodyellow !important;
+  background-color: lightgoldenrodyellow;
 }
 
 .ag-center-cols-clipper {

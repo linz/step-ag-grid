@@ -93,7 +93,7 @@ export const Grid = ({
   "data-testid": dataTestId,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
-  theme = "ag-theme-alpine",
+  theme = "ag-theme-step-default",
   sizeColumns = "auto",
   selectColumnPinned = null,
   contextMenuSelectRow = false,

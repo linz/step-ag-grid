@@ -94,10 +94,6 @@
   color: colors.$fuscous;
 }
 
-.Grid-container.ag-theme-alpine .ag-cell {
-  font-weight: 400;
-}
-
 .Grid-container.ag-theme-alpine .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
   visibility: hidden;
 }
