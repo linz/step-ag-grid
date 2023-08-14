@@ -21,6 +21,8 @@ import {
   MultiSelectOption,
   wait,
 } from "../..";
+import { waitFor } from "@storybook/testing-library";
+import { expect, jest } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",
@@ -194,3 +196,8 @@ const GridEditMultiSelectTemplate: ComponentStory<typeof Grid> = (props: GridPro
 };
 
 export const EditMultiSelect = GridEditMultiSelectTemplate.bind({});
+EditMultiSelect.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

@@ -11,6 +11,8 @@ import "@linzjs/lui/dist/fonts";
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
 import { MultiSelectGridOption } from "../../components/gridForm/GridFormMultiSelectGrid";
 import { GridPopoutEditMultiSelectGrid } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelectGrid";
+import { expect, waitFor } from "@storybook/testing-library";
+import { EditMultiSelect } from "./GridPopoverEditMultiSelect.stories";
 
 export default {
   title: "Components / Grids",
@@ -108,3 +110,8 @@ const GridEditMultiSelectGridTemplate: ComponentStory<typeof Grid> = (props: Gri
 };
 
 export const EditMultiSelectGrid = GridEditMultiSelectGridTemplate.bind({});
+EditMultiSelect.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};
