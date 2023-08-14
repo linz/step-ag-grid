@@ -1,7 +1,13 @@
 import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { AgGridEvent, CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  AgGridEvent,
+  CellEvent,
+  CellKeyDownEvent,
+  GridReadyEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
@@ -474,7 +480,7 @@ export const Grid = ({
    * Start editing on pressing Enter
    */
   const onCellKeyPress = useCallback(
-    (e: CellEvent) => {
+    (e: CellKeyDownEvent) => {
       if ((e.event as KeyboardEvent).key === "Enter") {
         if (!invokeEditAction(e)) startCellEditing(e);
       }
@@ -554,7 +560,7 @@ export const Grid = ({
   }, [sizeColumns, sizeColumnsToFit]);
 
   /**
-   * Set of column Id's that are prevented from auto-sizing as they are user set
+   * Set of column I'd's that are prevented from auto-sizing as they are user set
    */
   const userSizedColIds = useRef(new Set<string>());
 
@@ -605,8 +611,8 @@ export const Grid = ({
           onColumnVisible={() => {
             setInitialContentSize();
           }}
-          onRowDataChanged={onRowDataChanged}
-          onCellKeyPress={onCellKeyPress}
+          onRowDataUpdated={onRowDataChanged}
+          onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}

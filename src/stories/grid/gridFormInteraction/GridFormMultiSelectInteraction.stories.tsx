@@ -145,7 +145,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   // Test invalid value doesn't save
   updateValue.mockClear();
   onSave.mockClear();
-  userEvent.clear(textInput);
+  await userEvent.clear(textInput);
   await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSave).not.toHaveBeenCalled();

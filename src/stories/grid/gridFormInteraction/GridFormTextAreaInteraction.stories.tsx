@@ -71,7 +71,7 @@ GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(inputField);
+  await userEvent.clear(inputField);
 
   expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
   await userEvent.tab();

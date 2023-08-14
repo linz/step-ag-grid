@@ -1,5 +1,4 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
-import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
+import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
@@ -163,7 +162,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = useCallback((): RowNode[] => {
+  const _getNewNodes = useCallback((): IRowNode[] => {
     return gridApiOp(
       (gridApi) =>
         compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
@@ -178,7 +177,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
    * @param rowIds Row ids to get from grid.
    */
   const _rowIdsToNodes = useCallback(
-    (rowIds: number[]): RowNode[] => {
+    (rowIds: number[]): IRowNode[] => {
       return gridApiOp(
         (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
@@ -397,16 +396,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   const autoSizeColumns = useCallback(
     ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
-      if (!colIds) {
-        columnApi.autoSizeAllColumns(skipHeader);
-      } else {
-        const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
-        columnApi.getColumnState().forEach((col) => {
-          const colId = col.colId;
-          if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
-            columnApi.autoSizeColumn(colId, skipHeader);
-          }
-        });
+      const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
+      const colsToResize = columnApi.getColumnState().filter((colState) => {
+        const colId = colState.colId;
+        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId) && !colState.flex;
+      });
+      if (!isEmpty(colsToResize)) {
+        columnApi.autoSizeColumns(
+          colsToResize.map((colState) => colState.colId),
+          skipHeader,
+        );
       }
       return {
         width: sumBy(
@@ -422,7 +421,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
    * Resize columns to fit container
    */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApi && gridApi.sizeColumnsToFit();
+    gridApi?.sizeColumnsToFit();
   }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
@@ -591,7 +590,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   );
 
   const redrawRows = useCallback(
-    (rowNodes?: RowNode[]) => {
+    (rowNodes?: IRowNode[]) => {
       gridApiOp((gridApi) => gridApi.redrawRows(rowNodes ? { rowNodes } : undefined));
     },
     [gridApiOp],
@@ -630,7 +629,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
 
   const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean =>
+  const doesExternalFilterPass = (node: IRowNode): boolean =>
     externalFilters.current.every((filter) => filter(node.data, node));
 
   const getColDef = useCallback(

@@ -1,10 +1,10 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
+import { ColDef, ColumnApi, GridApi, IRowNode } from "ag-grid-community";
 import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { createContext, useContext } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 
-export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
+export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: IRowNode) => boolean;
 
 export interface AutoSizeColumnsProps {
   skipHeader?: boolean;
@@ -51,14 +51,14 @@ export interface GridContextType<RowType extends GridBaseRow> {
     setSaving?: (saving: boolean) => void,
     tabDirection?: 1 | 0 | -1,
   ) => Promise<boolean>;
-  redrawRows: (rowNodes?: RowNode[]) => void;
+  redrawRows: (rowNodes?: IRowNode[]) => void;
   externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
   addExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
-  doesExternalFilterPass: (node: RowNode) => boolean;
+  doesExternalFilterPass: (node: IRowNode) => boolean;
   invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;

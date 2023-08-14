@@ -127,6 +127,7 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
       GridCell({
         headerName: "Custom edit",
         editable: true,
+        flex: 1,
         valueFormatter: () => "Press E",
         cellRendererParams: {
           rightHoverElement: (

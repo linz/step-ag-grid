@@ -138,7 +138,7 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(textInput);
+  await userEvent.clear(textInput);
   await userEvent.type(textInput, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 
@@ -170,7 +170,7 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  userEvent.clear(textArea);
+  await userEvent.clear(textArea);
   await userEvent.type(textArea, "{Enter}");
   expect(updateValue).not.toHaveBeenCalled();
 };
