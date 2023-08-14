@@ -2,7 +2,9 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
+import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { waitFor } from "@storybook/testing-library";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -103,4 +105,9 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
   );
 };
 
-export const FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+export const _FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+_FilterButtonsExample.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

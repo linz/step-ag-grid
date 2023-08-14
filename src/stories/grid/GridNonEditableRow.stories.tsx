@@ -2,7 +2,9 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
+import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { waitFor } from "@storybook/testing-library";
 import { ColDef } from "ag-grid-community";
 import { GridPopoverEditDropDown } from "components/gridPopoverEdit/GridPopoverEditDropDown";
 import { GridPopoverTextArea } from "components/gridPopoverEdit/GridPopoverTextArea";
@@ -176,5 +178,10 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
   );
 };
 
-export const NonEditableRow = GridNonEditableRowTemplate.bind({});
-NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
+export const _NonEditableRow = GridNonEditableRowTemplate.bind({});
+_NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
+_NonEditableRow.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

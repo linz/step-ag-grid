@@ -132,3 +132,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   // It's set to scroll by default, but this causes issues with selecting the last row
   overflow-x: auto;
 }
+
+.Grid-container .ag-cell {
+  font-weight: 400;
+}

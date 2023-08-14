@@ -2,7 +2,9 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
+import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { waitFor } from "@storybook/testing-library";
 import { ReactElement, useCallback, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -278,3 +280,8 @@ const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): Rea
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
+ReadOnlySingleSelection.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

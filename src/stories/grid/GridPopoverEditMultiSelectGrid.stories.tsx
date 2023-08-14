@@ -2,7 +2,9 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
+import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { waitFor } from "@storybook/testing-library";
 import { countBy, mergeWith, pull, range, union } from "lodash-es";
 import { useMemo, useState } from "react";
 
@@ -11,6 +13,7 @@ import "@linzjs/lui/dist/fonts";
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
 import { MultiSelectGridOption } from "../../components/gridForm/GridFormMultiSelectGrid";
 import { GridPopoutEditMultiSelectGrid } from "../../components/gridPopoverEdit/GridPopoutEditMultiSelectGrid";
+import { EditMultiSelect } from "./GridPopoverEditMultiSelect.stories";
 
 export default {
   title: "Components / Grids",
@@ -108,3 +111,8 @@ const GridEditMultiSelectGridTemplate: ComponentStory<typeof Grid> = (props: Gri
 };
 
 export const EditMultiSelectGrid = GridEditMultiSelectGridTemplate.bind({});
+EditMultiSelect.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

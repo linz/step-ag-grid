@@ -18,22 +18,22 @@ const GridNoRowsOverlayTemplate: ComponentStory<typeof GridNoRowsOverlay> = (par
   return <GridNoRowsOverlay {...params} />;
 };
 
-export const GridNoRowsEmpty = GridNoRowsOverlayTemplate.bind({});
-GridNoRowsEmpty.args = {
+export const _GridNoRowsEmpty = GridNoRowsOverlayTemplate.bind({});
+_GridNoRowsEmpty.args = {
   rowCount: 0,
   filteredRowCount: 0,
 };
-GridNoRowsEmpty.play = async ({ canvasElement }) => {
+_GridNoRowsEmpty.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   expect(await canvas.findByText("There are currently no rows")).toBeInTheDocument();
 };
 
-export const GridNoRowsFiltered = GridNoRowsOverlayTemplate.bind({});
-GridNoRowsFiltered.args = {
+export const _GridNoRowsFiltered = GridNoRowsOverlayTemplate.bind({});
+_GridNoRowsFiltered.args = {
   rowCount: 1,
   filteredRowCount: 0,
 };
-GridNoRowsFiltered.play = async ({ canvasElement }) => {
+_GridNoRowsFiltered.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   expect(await canvas.findByText("All rows have been filtered")).toBeInTheDocument();
 };
