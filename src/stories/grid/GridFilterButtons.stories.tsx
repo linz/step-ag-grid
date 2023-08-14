@@ -19,6 +19,9 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
 } from "../..";
+import {waitFor} from "@storybook/testing-library";
+import {expect} from "@storybook/jest";
+import {EditContextMenu} from "./GridPopoutContextMenu.stories";
 
 export default {
   title: "Components / Grids",
@@ -104,3 +107,8 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
 };
 
 export const FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+FilterButtonsExample.play = async ({ canvasElement }) => {
+    await waitFor(() => {
+        expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+    });
+};

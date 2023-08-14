@@ -27,6 +27,9 @@ import {
   wait,
 } from "../..";
 import { IFormTestRow } from "./FormTest";
+import {waitFor} from "@storybook/testing-library";
+import {expect} from "@storybook/jest";
+import {EditGeneric} from "./GridPopoutEditGeneric.stories";
 
 export default {
   title: "Components / Grids",
@@ -226,3 +229,8 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
 };
 
 export const EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
+EditGenericTextArea.play = async ({ canvasElement }) => {
+    await waitFor(() => {
+        expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+    });
+};

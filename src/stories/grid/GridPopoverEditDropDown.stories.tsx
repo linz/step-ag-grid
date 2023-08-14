@@ -28,6 +28,9 @@ import {
   MenuSeparatorString,
   wait,
 } from "../..";
+import {waitFor} from "@storybook/testing-library";
+import {expect} from "@storybook/jest";
+import {_GridPopoverEditBearing} from "./GridPopoverEditBearing.stories";
 
 export default {
   title: "Components / Grids",
@@ -314,3 +317,8 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
 };
 
 export const EditDropdown = GridEditDropDownTemplate.bind({});
+EditDropdown.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};

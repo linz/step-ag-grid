@@ -23,6 +23,9 @@ import {
   GridWrapper,
   wait,
 } from "../..";
+import {waitFor} from "@storybook/testing-library";
+import {expect} from "@storybook/jest";
+import {EditGenericTextArea} from "./GridPopoutEditGenericTextArea.stories";
 
 export default {
   title: "Components / Grids",
@@ -122,3 +125,8 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
 };
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
+_GridPopoverEditBearing.play = async ({ canvasElement }) => {
+    await waitFor(() => {
+        expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+    });
+};

@@ -225,6 +225,8 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   multiEditAction.mockReset();
   eAction.mockReset();
 
+  expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+
   // Ensure first row/cell is selected on render
   await waitFor(async () => {
     const activeCell = canvasElement.ownerDocument.activeElement;

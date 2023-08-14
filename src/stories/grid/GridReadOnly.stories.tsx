@@ -29,6 +29,9 @@ import {
 import { GridFilterColumnsToggle } from "../../components";
 import { GridFilterDownloadCsvButton } from "../../components";
 import { GridCellFiller } from "../../components/GridCellFiller";
+import {waitFor} from "@storybook/testing-library";
+import {expect} from "@storybook/jest";
+import {EditDropdown} from "./GridPopoverEditDropDown.stories";
 
 export default {
   title: "Components / Grids",
@@ -278,3 +281,8 @@ const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): Rea
 };
 
 export const ReadOnlySingleSelection = GridReadOnlyTemplate.bind({});
+ReadOnlySingleSelection.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
+};
