@@ -9,9 +9,8 @@ import "@linzjs/lui/dist/fonts";
 
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
 import { FormTest, IFormTestRow } from "./FormTest";
-import {NonEditableRow} from "./GridNonEditableRow.stories";
-import {waitFor} from "@storybook/testing-library";
-import {expect} from "@storybook/jest";
+import { waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",
@@ -73,9 +72,9 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
   );
 };
 
-export const EditGeneric = GridPopoutEditGenericTemplate.bind({});
-EditGeneric.play = async ({ canvasElement }) => {
-    await waitFor(() => {
-        expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
-    });
+export const _EditGeneric = GridPopoutEditGenericTemplate.bind({});
+_EditGeneric.play = async ({ canvasElement }) => {
+  await waitFor(() => {
+    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
+  });
 };

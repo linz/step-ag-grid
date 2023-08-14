@@ -28,9 +28,8 @@ import {
   MenuSeparatorString,
   wait,
 } from "../..";
-import {waitFor} from "@storybook/testing-library";
-import {expect} from "@storybook/jest";
-import {_GridPopoverEditBearing} from "./GridPopoverEditBearing.stories";
+import { waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",

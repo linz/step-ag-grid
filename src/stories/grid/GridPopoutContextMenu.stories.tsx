@@ -21,9 +21,8 @@ import {
   wait,
 } from "../..";
 import { IFormTestRow } from "./FormTest";
-import {EditMultiSelect} from "./GridPopoverEditMultiSelect.stories";
-import {waitFor} from "@storybook/testing-library";
-import {expect} from "@storybook/jest";
+import { waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",
@@ -137,8 +136,8 @@ const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridP
   );
 };
 
-export const EditContextMenu = GridPopoutContextMenuTemplate.bind({});
-EditContextMenu.play = async ({ canvasElement }) => {
+export const _EditContextMenu = GridPopoutContextMenuTemplate.bind({});
+_EditContextMenu.play = async ({ canvasElement }) => {
   await waitFor(() => {
     expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
   });

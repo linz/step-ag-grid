@@ -29,9 +29,8 @@ import {
 import { GridFilterColumnsToggle } from "../../components";
 import { GridFilterDownloadCsvButton } from "../../components";
 import { GridCellFiller } from "../../components/GridCellFiller";
-import {waitFor} from "@storybook/testing-library";
-import {expect} from "@storybook/jest";
-import {EditDropdown} from "./GridPopoverEditDropDown.stories";
+import { waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",

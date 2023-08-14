@@ -2,12 +2,11 @@ import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import {waitFor, within} from "@storybook/testing-library";
+import { within } from "@storybook/testing-library";
 
 import "@linzjs/lui/dist/fonts";
 
 import { GridNoRowsOverlay, GridNoRowsOverlayProps } from "../../components";
-import {NonEditableRow} from "./GridNonEditableRow.stories";
 
 export default {
   title: "Components / Grids / GridNoRowsOverlay",
@@ -19,22 +18,22 @@ const GridNoRowsOverlayTemplate: ComponentStory<typeof GridNoRowsOverlay> = (par
   return <GridNoRowsOverlay {...params} />;
 };
 
-export const GridNoRowsEmpty = GridNoRowsOverlayTemplate.bind({});
-GridNoRowsEmpty.args = {
+export const _GridNoRowsEmpty = GridNoRowsOverlayTemplate.bind({});
+_GridNoRowsEmpty.args = {
   rowCount: 0,
   filteredRowCount: 0,
 };
-GridNoRowsEmpty.play = async ({ canvasElement }) => {
+_GridNoRowsEmpty.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   expect(await canvas.findByText("There are currently no rows")).toBeInTheDocument();
 };
 
-export const GridNoRowsFiltered = GridNoRowsOverlayTemplate.bind({});
-GridNoRowsFiltered.args = {
+export const _GridNoRowsFiltered = GridNoRowsOverlayTemplate.bind({});
+_GridNoRowsFiltered.args = {
   rowCount: 1,
   filteredRowCount: 0,
 };
-GridNoRowsFiltered.play = async ({ canvasElement }) => {
+_GridNoRowsFiltered.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
   expect(await canvas.findByText("All rows have been filtered")).toBeInTheDocument();
 };

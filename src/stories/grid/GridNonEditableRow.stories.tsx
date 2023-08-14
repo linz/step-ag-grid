@@ -23,9 +23,8 @@ import {
   MenuOption,
   wait,
 } from "../..";
-import {waitFor} from "@storybook/testing-library";
-import {expect} from "@storybook/jest";
-import {FilterButtonsExample} from "./GridFilterButtons.stories";
+import { waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/jest";
 
 export default {
   title: "Components / Grids",
@@ -179,9 +178,9 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
   );
 };
 
-export const NonEditableRow = GridNonEditableRowTemplate.bind({});
-NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
-NonEditableRow.play = async ({ canvasElement }) => {
+export const _NonEditableRow = GridNonEditableRowTemplate.bind({});
+_NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
+_NonEditableRow.play = async ({ canvasElement }) => {
   await waitFor(() => {
     expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
   });
