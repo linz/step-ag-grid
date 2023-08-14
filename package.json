@@ -24,7 +24,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=17"
+    "node": ">=18"
   },
   "peerDependencies": {
     "@linzjs/lui": "^18",
@@ -104,7 +104,7 @@
     "@types/debounce-promise": "^3.1.6",
     "@types/jest": "^29.5.3",
     "@types/lodash-es": "^4.17.8",
-    "@types/node": "^20.5.0",
+    "@types/node": "^18.17.5",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.2",
