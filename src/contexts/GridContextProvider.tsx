@@ -193,7 +193,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     (
       filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
     ): ColDefT<RowType>[] =>
-      filter(columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
+      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
     [columnApi],
   );
 
@@ -589,15 +589,15 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     [gridApiOp, modifyUpdating, selectNextEditableCell],
   );
 
-  const redrawRows = useCallback(
-    (rowNodes?: IRowNode[]) => {
-      // redraw rows can throw exceptions in jest, so we ignore them
-      try {
-        gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-      } catch (ex) {
-        console.error(ex);
-      }
-    },
+  const redrawRows = useMemo(
+    () =>
+      debounce((rowNodes?: IRowNode[]) => {
+        try {
+          gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+        } catch (ex) {
+          console.error(ex);
+        }
+      }, 50),
     [gridApi],
   );
 

@@ -81,7 +81,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 }
 
 .ag-header .ag-header-cell[aria-colindex="1"] {
-  padding-left: lui.$unit-rg;
+  padding-left: 17px;
 }
 
 .ag-cell[role="gridcell"] {
@@ -90,7 +90,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 }
 
 .ag-cell[aria-colindex="1"] {
-  border-left: none;
+  border-left: 1px solid transparent;
   padding-left: lui.$unit-rg;
 }
 

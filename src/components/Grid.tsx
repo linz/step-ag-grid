@@ -326,8 +326,8 @@ export const Grid = ({
           {
             colId: "selection",
             editable: false,
-            minWidth: 42,
-            maxWidth: 42,
+            minWidth: 48,
+            maxWidth: 48,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,

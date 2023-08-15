@@ -18,7 +18,7 @@
   - Custom form
   - Context menu
 
-_Please note this requires React >=17, ag-grid-community >=27, and sass._
+_Please note this requires React >=17, ag-grid-community >=28, and SASS._
 
 ## Install
 

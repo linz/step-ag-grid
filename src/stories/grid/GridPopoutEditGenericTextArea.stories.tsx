@@ -2,9 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
-import { waitFor } from "@storybook/testing-library";
 import { useCallback, useContext, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -28,6 +26,7 @@ import {
   isFloat,
   wait,
 } from "../..";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 import { IFormTestRow } from "./FormTest";
 
 export default {
@@ -228,8 +227,4 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
 };
 
 export const _EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
-_EditGenericTextArea.play = async ({ canvasElement }) => {
-  await waitFor(() => {
-    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
-  });
-};
+_EditGenericTextArea.play = waitForGridReady;
