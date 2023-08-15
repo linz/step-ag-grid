@@ -193,7 +193,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     (
       filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
     ): ColDefT<RowType>[] =>
-      filter(columnApi?.getAllColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
+      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
     [columnApi],
   );
 
