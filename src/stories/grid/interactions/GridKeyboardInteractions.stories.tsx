@@ -24,6 +24,7 @@ import {
   MenuOption,
   wait,
 } from "../../../";
+import { waitForGridReady } from "../../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
@@ -225,9 +226,7 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   multiEditAction.mockReset();
   eAction.mockReset();
 
-  await waitFor(() => {
-    expect(canvasElement.querySelector(".Grid-ready")).toBeInTheDocument();
-  });
+  await waitForGridReady({ canvasElement });
 
   // Ensure first row/cell is selected on render
   await waitFor(async () => {
