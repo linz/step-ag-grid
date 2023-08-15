@@ -29,11 +29,9 @@ export default {
   title: "Components / Grids",
   component: Grid,
   args: {
-    quickFilter: true,
-    quickFilterValue: "",
-    quickFilterPlaceholder: "Quick filter...",
-    selectable: false,
+    selectable: true,
     rowSelection: "single",
+    autoSelectFirstRow: true,
   },
   decorators: [
     (Story) => (
@@ -178,5 +176,4 @@ const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProp
 };
 
 export const _NonEditableRow = GridNonEditableRowTemplate.bind({});
-_NonEditableRow.args = { autoSelectFirstRow: true, selectable: true };
 _NonEditableRow.play = waitForGridReady;
