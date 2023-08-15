@@ -13,6 +13,7 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
   width?: string | number;
   defaultValue: string;
   helpText?: string;
+  allowAutoFocus?: boolean;
 }
 
 export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
@@ -42,7 +43,7 @@ export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
       placeholder={props.placeholder}
       style={{ width: "100%" }}
       allowTabToSave={true}
-      autoFocus={true}
+      autoFocus={props.allowAutoFocus}
     />
   );
 };
