@@ -591,9 +591,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
 
   const redrawRows = useCallback(
     (rowNodes?: IRowNode[]) => {
-      gridApiOp((gridApi) => gridApi.redrawRows(rowNodes ? { rowNodes } : undefined));
+      // redraw rows can throw exceptions in jest, so we ignore them
+      try {
+        gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+      } catch (ex) {
+        console.error(ex);
+      }
     },
-    [gridApiOp],
+    [gridApi],
   );
 
   // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
