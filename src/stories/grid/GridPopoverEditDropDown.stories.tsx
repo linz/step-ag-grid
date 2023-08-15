@@ -156,6 +156,7 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       ),
       GridPopoverEditDropDown(
         {
+          colId: "position3filtered",
           field: "position3",
           headerName: "Filtered",
           editable: false,
