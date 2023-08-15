@@ -13,7 +13,6 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
   width?: string | number;
   defaultValue: string;
   helpText?: string;
-  allowAutoFocus?: boolean;
 }
 
 export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
