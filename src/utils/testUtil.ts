@@ -216,12 +216,12 @@ export const clickActionButton = async (text: string, container?: HTMLElement): 
   await user.click(button);
 };
 
-export const waitForGridReady = async (props?: { grid?: HTMLElement; timeout: number }) =>
+export const waitForGridReady = async (props?: { grid?: HTMLElement; timeout?: number }) =>
   waitFor(() => expect(getAllQuick({ classes: ".Grid-ready" }, props?.grid)).toBeInTheDocument(), {
     timeout: props?.timeout ?? 5000,
   });
 
-export const waitForGridRows = async (props?: { grid?: HTMLElement; timeout: number }) =>
+export const waitForGridRows = async (props?: { grid?: HTMLElement; timeout?: number }) =>
   waitFor(async () => expect(getAllQuick({ classes: ".ag-row" }, props?.grid).length > 0).toBe(true), {
     timeout: props?.timeout ?? 5000,
   });
