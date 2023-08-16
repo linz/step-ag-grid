@@ -215,3 +215,13 @@ export const clickActionButton = async (text: string, container?: HTMLElement): 
   const button = await findActionButton(text, container);
   await user.click(button);
 };
+
+export const waitForGridReady = async ({ grid, timeout = 5000 }: { grid?: HTMLElement; timeout: number }) =>
+  waitFor(() => expect(getAllQuick({ classes: ".Grid-ready" }, grid)).toBeInTheDocument(), {
+    timeout,
+  });
+
+export const waitForGridRows = async ({ grid, timeout = 5000 }: { grid?: HTMLElement; timeout: number }) =>
+  waitFor(async () => expect(getAllQuick({ classes: ".ag-row" }, grid).length > 0).toBe(true), {
+    timeout,
+  });

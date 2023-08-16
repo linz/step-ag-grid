@@ -595,7 +595,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
         try {
           gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
         } catch (ex) {
-          console.error(ex);
+          // Hide errors in jest, but log them in browser
+          if (typeof jest === "undefined") console.error(ex);
         }
       }, 50),
     [gridApi],
