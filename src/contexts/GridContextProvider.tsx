@@ -394,12 +394,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
    * Resize columns to fit container
    */
   const autoSizeColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
       const colsToResize = columnApi.getColumnState().filter((colState) => {
         const colId = colState.colId;
-        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId) && !colState.flex;
+        return (
+          (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
+          !userSizedColIds?.has(colId) &&
+          (includeFlex || !colState.flex)
+        );
       });
       if (!isEmpty(colsToResize)) {
         columnApi.autoSizeColumns(
