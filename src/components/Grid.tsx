@@ -6,6 +6,8 @@ import {
   CellEvent,
   CellKeyDownEvent,
   GridReadyEvent,
+  RowDragEndEvent,
+  RowDragMoveEvent,
   SelectionChangedEvent,
 } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
@@ -49,6 +51,7 @@ export interface GridProps {
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
+  onRowDragEnd?: (rowToMove: any, index: number) => void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -121,9 +124,11 @@ export const Grid = ({
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
+  const gridRef = useRef<AgGridReact<any>>(null);
 
   const [staleGrid, setStaleGrid] = useState(false);
   const [autoSized, setAutoSized] = useState(false);
+  const [rowData, setRowData] = useState(params.rowData);
 
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
@@ -321,20 +326,23 @@ export const Grid = ({
         },
       };
     });
-    return params.selectable
+
+    return params.selectable || params.onRowDragEnd
       ? [
           {
-            colId: "selection",
+            colId: params.selectable ? "selection" : "grabber",
             editable: false,
-            minWidth: 48,
-            maxWidth: 48,
+            rowDrag: params.onRowDragEnd != undefined,
+            minWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
+            maxWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,
             },
-            checkboxSelection: true,
+            checkboxSelection: params.selectable,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
+              if (!params.selectable) return false;
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
                 if (isEmpty(e.api.getSelectedRows())) {
                   e.api.selectAllFiltered();
@@ -353,6 +361,7 @@ export const Grid = ({
   }, [
     params.columnDefs,
     params.selectable,
+    params.onRowDragEnd,
     params.readOnly,
     params.defaultColDef?.editable,
     selectColumnPinned,
@@ -582,6 +591,55 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
+  const [rowDataBeforeMove, setRowDataBeforeMove] = useState<any[]>();
+  const onRowDragEnter = useCallback(() => {
+    rowData && setRowDataBeforeMove(rowData);
+  }, [rowData]);
+
+  const onRowDragLeave = useCallback(() => {
+    setRowData(rowDataBeforeMove);
+  }, [rowDataBeforeMove]);
+
+  const onRowDragMove = useCallback(
+    (event: RowDragMoveEvent) => {
+      if (rowData) {
+        const movingNode = event.node;
+        const overNode = event.overNode;
+        const rowNeedsToMove = movingNode !== overNode;
+        if (rowNeedsToMove) {
+          // the list of rows we have is data, not row nodes, so extract the data
+          const movingData = movingNode.data;
+          const overData = overNode?.data;
+          const fromIndex = rowData.indexOf(movingData);
+          const toIndex = rowData.indexOf(overData);
+          const newStore = rowData.slice();
+          moveInArray(newStore, fromIndex, toIndex);
+          setRowData(newStore);
+          gridRef.current?.api.clearFocusedCell();
+        }
+      }
+      function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
+        const element = arr[fromIndex];
+        arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, element);
+      }
+    },
+    [rowData],
+  );
+
+  const onRowDragEnd = useCallback(
+    (event: RowDragEndEvent) => {
+      //index is -1 if the row is dragged off the bottom of the table
+      if (event.overIndex < 0) {
+        setRowData(rowDataBeforeMove);
+        return;
+      }
+
+      params.onRowDragEnd && params.onRowDragEnd(event.node.data, event.overIndex);
+    },
+    [params, rowDataBeforeMove],
+  );
+
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
@@ -598,6 +656,7 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          ref={gridRef}
           rowHeight={params.rowHeight}
           animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
@@ -620,7 +679,7 @@ export const Grid = ({
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
-          rowData={params.rowData}
+          rowData={rowData}
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;
             event.api.forEachNode(() => rowCount++);
@@ -635,7 +694,7 @@ export const Grid = ({
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.postSortRows ?? postSortRows}
+          postSortRows={params.postSortRows ?? !params.onRowDragEnd ? postSortRows : undefined}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
@@ -644,6 +703,10 @@ export const Grid = ({
           maintainColumnOrder={true}
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
+          onRowDragEnd={onRowDragEnd}
+          onRowDragMove={onRowDragMove}
+          onRowDragEnter={onRowDragEnter}
+          onRowDragLeave={onRowDragLeave}
         />
       </div>
     </div>
