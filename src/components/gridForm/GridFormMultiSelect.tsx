@@ -198,6 +198,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                               options={options}
                               setOptions={setOptions}
                               onClick={() => {
+                                // Default to focus on first input in subComponent
                                 defer(() => {
                                   if (firstInputSubComponent.current) {
                                     (firstInputSubComponent.current as HTMLInputElement).focus();
@@ -425,13 +426,13 @@ function MenuSubComponentFr(
 ) {
   const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
   const focusableRef = React.useRef<HTMLElement | null>(null);
-  const findFirstInputElement = useCallback((element: HTMLElement): HTMLInputElement | null => {
+  const findFirstChildInputElement = useCallback((element: HTMLElement): HTMLInputElement | null => {
     if (element.tagName === "INPUT") {
       return element as HTMLInputElement;
     }
 
     for (const child of Array.from(element.children)) {
-      const foundInput = findFirstInputElement(child as HTMLElement);
+      const foundInput = findFirstChildInputElement(child as HTMLElement);
       if (foundInput) {
         return foundInput;
       }
@@ -442,12 +443,12 @@ function MenuSubComponentFr(
 
   useEffect(() => {
     if (focusableRef.current) {
-      const inputElement = findFirstInputElement(focusableRef.current);
+      const inputElement = findFirstChildInputElement(focusableRef.current);
       if (inputElement) {
         (ref as React.MutableRefObject<HTMLInputElement>).current = inputElement;
       }
     }
-  }, [findFirstInputElement, ref]);
+  }, [findFirstChildInputElement, ref]);
   return (
     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`} ref={focusableRef}>
       {() => (
