@@ -197,12 +197,10 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                               item={item}
                               options={options}
                               setOptions={setOptions}
-                              onClick={() => {
+                              onChecked={() => {
                                 // Default to focus on first input in subComponent
                                 defer(() => {
-                                  if (firstInputSubComponent.current) {
-                                    (firstInputSubComponent.current as HTMLInputElement).focus();
-                                  }
+                                  firstInputSubComponent.current?.focus();
                                 });
                               }}
                             />
@@ -364,7 +362,7 @@ const MenuRadioItem = (props: {
   item: MultiSelectOption;
   options: MultiSelectOption[];
   setOptions: (options: MultiSelectOption[]) => void;
-  onClick?: () => void;
+  onChecked?: () => void;
 }) => {
   const { item, options, setOptions } = props;
 
@@ -384,7 +382,7 @@ const MenuRadioItem = (props: {
           e.keepOpen = true;
           toggleValue(item);
         }
-        props.onClick && props.onClick();
+        props.onChecked && props.onChecked();
       }}
     >
       <LuiCheckboxInput
@@ -426,20 +424,10 @@ function MenuSubComponentFr(
 ) {
   const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
   const focusableRef = React.useRef<HTMLElement | null>(null);
-  const findFirstChildInputElement = useCallback((element: HTMLElement): HTMLInputElement | null => {
-    if (element.tagName === "INPUT") {
-      return element as HTMLInputElement;
-    }
-
-    for (const child of Array.from(element.children)) {
-      const foundInput = findFirstChildInputElement(child as HTMLElement);
-      if (foundInput) {
-        return foundInput;
-      }
-    }
-
-    return null;
-  }, []);
+  const findFirstChildInputElement = useCallback(
+    (element: HTMLElement): HTMLInputElement => element.querySelectorAll("input")[0],
+    [],
+  );
 
   useEffect(() => {
     if (focusableRef.current) {
