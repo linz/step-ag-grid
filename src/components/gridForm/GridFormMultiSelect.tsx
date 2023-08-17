@@ -1,6 +1,7 @@
-import { fromPairs, groupBy, isEmpty, pick, toPairs } from "lodash-es";
-import {
+import { defer, fromPairs, groupBy, isEmpty, pick, toPairs } from "lodash-es";
+import React, {
   Dispatch,
+  ForwardedRef,
   Fragment,
   KeyboardEvent,
   ReactElement,
@@ -73,6 +74,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
 
   const subComponentIsValidRef = useRef<Record<string, boolean>>({});
   const optionsInitialising = useRef(false);
+  const firstInputSubComponent = useRef<HTMLInputElement | null>(null);
 
   const [filter, setFilter] = useState("");
   const [initialValues, setInitialValues] = useState("");
@@ -191,11 +193,22 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                           <MenuDivider key={`div_${index}`} />
                         ) : (
                           <Fragment key={`val_${item.value}`}>
-                            <MenuRadioItem item={item} options={options} setOptions={setOptions} />
-
+                            <MenuRadioItem
+                              item={item}
+                              options={options}
+                              setOptions={setOptions}
+                              onClick={async () => {
+                                defer(() => {
+                                  if (firstInputSubComponent.current) {
+                                    (firstInputSubComponent.current as HTMLInputElement).focus();
+                                  }
+                                });
+                              }}
+                            />
                             {item.checked && item.subComponent && (
                               <MenuSubComponent
                                 {...{ item, options, setOptions, data, triggerSave }}
+                                ref={firstInputSubComponent}
                                 subComponentIsValid={subComponentIsValidRef.current}
                               />
                             )}
@@ -350,6 +363,7 @@ const MenuRadioItem = (props: {
   item: MultiSelectOption;
   options: MultiSelectOption[];
   setOptions: (options: MultiSelectOption[]) => void;
+  onClick?: () => void;
 }) => {
   const { item, options, setOptions } = props;
 
@@ -369,6 +383,7 @@ const MenuRadioItem = (props: {
           e.keepOpen = true;
           toggleValue(item);
         }
+        props.onClick && props.onClick();
       }}
     >
       <LuiCheckboxInput
@@ -395,17 +410,46 @@ const MenuRadioItem = (props: {
   );
 };
 
-const MenuSubComponent = (props: {
-  data: any;
-  item: MultiSelectOption;
-  options: MultiSelectOption[];
-  setOptions: (options: MultiSelectOption[]) => void;
-  subComponentIsValid: Record<string, boolean>;
-  triggerSave: () => Promise<void>;
-}) => {
+const MenuSubComponent = React.forwardRef(MenuSubComponentFr);
+
+function MenuSubComponentFr(
+  props: {
+    data: any;
+    item: MultiSelectOption;
+    options: MultiSelectOption[];
+    setOptions: (options: MultiSelectOption[]) => void;
+    subComponentIsValid: Record<string, boolean>;
+    triggerSave: () => Promise<void>;
+  },
+  ref: ForwardedRef<HTMLInputElement>,
+) {
   const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
+  const focusableRef = React.useRef<HTMLElement | null>(null);
+  const findFirstInputElement = useCallback((element: HTMLElement): HTMLInputElement | null => {
+    if (element.tagName === "INPUT") {
+      return element as HTMLInputElement;
+    }
+
+    for (const child of Array.from(element.children)) {
+      const foundInput = findFirstInputElement(child as HTMLElement);
+      if (foundInput) {
+        return foundInput;
+      }
+    }
+
+    return null;
+  }, []);
+
+  useEffect(() => {
+    if (focusableRef.current) {
+      const inputElement = findFirstInputElement(focusableRef.current);
+      if (inputElement) {
+        (ref as React.MutableRefObject<HTMLInputElement>).current = inputElement;
+      }
+    }
+  }, [findFirstInputElement, ref]);
   return (
-    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`}>
+    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`} ref={focusableRef}>
       {() => (
         <GridSubComponentContext.Provider
           value={{
@@ -427,4 +471,4 @@ const MenuSubComponent = (props: {
       )}
     </FocusableItem>
   );
-};
+}
