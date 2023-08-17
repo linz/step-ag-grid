@@ -111,7 +111,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   expect(textInput).toBeInTheDocument();
   expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
 
-  await userEvent.click(textInput);
+  // textInput should be autofocus
   await userEvent.type(textInput, "Hello");
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 
