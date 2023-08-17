@@ -382,7 +382,7 @@ const MenuRadioItem = (props: {
           e.keepOpen = true;
           toggleValue(item);
         }
-        props.onChecked && props.onChecked();
+        item.checked && props.onChecked && props.onChecked();
       }}
     >
       <LuiCheckboxInput
@@ -424,19 +424,18 @@ function MenuSubComponentFr(
 ) {
   const { data, item, options, setOptions, subComponentIsValid, triggerSave } = props;
   const focusableRef = React.useRef<HTMLElement | null>(null);
-  const findFirstChildInputElement = useCallback(
-    (element: HTMLElement): HTMLInputElement => element.querySelectorAll("input")[0],
-    [],
-  );
 
   useEffect(() => {
     if (focusableRef.current) {
-      const inputElement = findFirstChildInputElement(focusableRef.current);
-      if (inputElement) {
-        (ref as React.MutableRefObject<HTMLInputElement>).current = inputElement;
+      const firstInputElement = focusableRef.current.querySelectorAll("input")[0] ?? null;
+      if (typeof ref === "function") {
+        ref(firstInputElement);
+      } else if (ref) {
+        ref.current = firstInputElement;
       }
     }
-  }, [findFirstChildInputElement, ref]);
+  }, [ref]);
+
   return (
     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`} ref={focusableRef}>
       {() => (
