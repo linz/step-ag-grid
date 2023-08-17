@@ -97,6 +97,7 @@ export const Grid = ({
   sizeColumns = "auto",
   selectColumnPinned = null,
   contextMenuSelectRow = false,
+  rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
   ...params
 }: GridProps): ReactElement => {
   const {
@@ -598,7 +599,7 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
-          rowHeight={params.rowHeight}
+          rowHeight={rowHeight}
           animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
