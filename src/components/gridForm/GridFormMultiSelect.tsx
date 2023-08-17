@@ -197,7 +197,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
                               item={item}
                               options={options}
                               setOptions={setOptions}
-                              onClick={async () => {
+                              onClick={() => {
                                 defer(() => {
                                   if (firstInputSubComponent.current) {
                                     (firstInputSubComponent.current as HTMLInputElement).focus();
