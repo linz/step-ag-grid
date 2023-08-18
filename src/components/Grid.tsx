@@ -51,7 +51,8 @@ export interface GridProps {
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
-  onRowDragEnd?: (rowToMove: any, index: number) => void;
+  rowDragText?: GridOptions["rowDragText"];
+  onRowDragEnd?: (movedRow: any, targetRow: any) => void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -629,15 +630,16 @@ export const Grid = ({
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      //index is -1 if the row is dragged off the bottom of the table
-      if (event.overIndex < 0) {
-        setRowData(rowDataBeforeMove);
-        return;
-      }
+      if(rowDataBeforeMove){
+        const moved = event.node.data;
+        const target = rowDataBeforeMove[event.overIndex]
 
-      params.onRowDragEnd && params.onRowDragEnd(event.node.data, event.overIndex);
+        moved.id != target.id
+        && params.onRowDragEnd 
+        && params.onRowDragEnd(moved, target);
+      }
     },
-    [params, rowDataBeforeMove],
+    [params],
   );
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
@@ -658,7 +660,7 @@ export const Grid = ({
         <AgGridReact
           ref={gridRef}
           rowHeight={params.rowHeight}
-          animateRows={params.animateRows}
+          animateRows={params.animateRows}          
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
@@ -703,6 +705,7 @@ export const Grid = ({
           maintainColumnOrder={true}
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
+          rowDragText={params.rowDragText}
           onRowDragEnd={onRowDragEnd}
           onRowDragMove={onRowDragMove}
           onRowDragEnter={onRowDragEnter}
