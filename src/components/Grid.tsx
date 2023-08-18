@@ -101,6 +101,7 @@ export const Grid = ({
   sizeColumns = "auto",
   selectColumnPinned = null,
   contextMenuSelectRow = false,
+  rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
   ...params
 }: GridProps): ReactElement => {
   const {
@@ -159,7 +160,7 @@ export const Grid = ({
 
     const skipHeader = sizeColumns === "auto-skip-headers" && !isEmpty(params.rowData);
     if (sizeColumns === "auto" || skipHeader) {
-      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current });
+      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
       if (isEmpty(params.rowData)) {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
@@ -659,7 +660,7 @@ export const Grid = ({
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
           ref={gridRef}
-          rowHeight={params.rowHeight}
+          rowHeight={rowHeight}
           animateRows={params.animateRows}          
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
