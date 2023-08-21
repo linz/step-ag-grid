@@ -31,7 +31,6 @@ export const ControlledMenuFr = (
     onItemClick,
     onClose,
     saveButtonRef,
-    closeMenuExclusionClassName,
     ...restProps
   }: ControlledMenuProps & { saveButtonRef?: MutableRefObject<HTMLButtonElement | null> },
   externalRef: ForwardedRef<HTMLUListElement>,
@@ -68,10 +67,8 @@ export const ControlledMenuFr = (
   );
 
   const isWithinMenu = useCallback(
-    (target: EventTarget | null) =>
-      hasParentClass("szh-menu--state-open", target as Node) ||
-      (closeMenuExclusionClassName && hasParentClass(closeMenuExclusionClassName, target as Node)),
-    [closeMenuExclusionClassName],
+    (target: EventTarget | null) => hasParentClass("szh-menu--state-open", target as Node),
+    [],
   );
 
   const handleScreenEventForSave = useCallback(
