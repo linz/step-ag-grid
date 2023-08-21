@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "@linzjs/lui": "^18",
-    "@linzjs/step-ag-grid": "file:.yalc/@linzjs/step-ag-grid",
     "ag-grid-community": "^29",
     "ag-grid-react": "^29",
     "debounce-promise": "^3.1.2",
