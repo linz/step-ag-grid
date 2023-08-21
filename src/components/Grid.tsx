@@ -183,8 +183,8 @@ export const Grid = ({
   const lastOwnerDocumentRef = useRef<Document>();
 
   useEffect(() => {
-    setRowData(rowData);
-  }, [rowData, params.rowData]);
+    setRowData(params.rowData);
+  }, [params.rowData]);
   /**
    * Auto-size windows that had deferred auto-size
    */
