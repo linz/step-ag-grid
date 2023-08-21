@@ -126,7 +126,6 @@ export const Grid = ({
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
-  const gridRef = useRef<AgGridReact<any>>(null);
 
   const [staleGrid, setStaleGrid] = useState(false);
   const [autoSized, setAutoSized] = useState(false);
@@ -183,6 +182,9 @@ export const Grid = ({
 
   const lastOwnerDocumentRef = useRef<Document>();
 
+  useEffect(() => {
+    setRowData(rowData);
+  }, [rowData, params.rowData]);
   /**
    * Auto-size windows that had deferred auto-size
    */
@@ -332,9 +334,9 @@ export const Grid = ({
     return params.selectable || params.onRowDragEnd
       ? [
           {
-            colId: params.selectable ? "selection" : "grabber",
+            colId: "selection",
             editable: false,
-            rowDrag: params.onRowDragEnd != undefined,
+            rowDrag: !!params.onRowDragEnd,
             minWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
             maxWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
             pinned: selectColumnPinned,
@@ -617,13 +619,11 @@ export const Grid = ({
           const newStore = rowData.slice();
           moveInArray(newStore, fromIndex, toIndex);
           setRowData(newStore);
-          gridRef.current?.api.clearFocusedCell();
+          event.api.clearFocusedCell();
         }
       }
       function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
-        const element = arr[fromIndex];
-        arr.splice(fromIndex, 1);
-        arr.splice(toIndex, 0, element);
+        arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
       }
     },
     [rowData],
@@ -631,16 +631,14 @@ export const Grid = ({
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      if(rowDataBeforeMove){
+      if (rowDataBeforeMove) {
         const moved = event.node.data;
-        const target = rowDataBeforeMove[event.overIndex]
+        const target = rowDataBeforeMove[event.overIndex];
 
-        moved.id != target.id
-        && params.onRowDragEnd 
-        && params.onRowDragEnd(moved, target);
+        moved.id != target.id && params.onRowDragEnd && params.onRowDragEnd(moved, target);
       }
     },
-    [params],
+    [params, rowDataBeforeMove],
   );
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
@@ -659,9 +657,8 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
-          ref={gridRef}
           rowHeight={rowHeight}
-          animateRows={params.animateRows}          
+          animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}

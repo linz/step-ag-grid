@@ -1,4 +1,3 @@
-import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
@@ -111,7 +110,7 @@ const GridDragRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
         onRowDragEnd={(row, target) => {
           alert(`Row ${row.id} has been moved over ${target.id}.`);
         }}
-        rowDragText={(params)=> `${params.rowNode?.data.id} - ${params.rowNode?.data.position}`}
+        rowDragText={(params) => `${params.rowNode?.data.id} - ${params.rowNode?.data.position}`}
       />
     </GridWrapper>
   );
