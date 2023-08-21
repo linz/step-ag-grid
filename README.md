@@ -266,7 +266,7 @@ test("click Delete menu option removes row from the table", async () => {
   await screen.findByText("My component header");
   expect((await findRow(12345)).getAttribute("row-index")).toBe("1");
   await openAndClickMenuOption(12345, "actions", "Delete");
-  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined());
+  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined()));
 });
 ```
 
@@ -278,4 +278,3 @@ This will throw an exception if the row id is not found.
 ```tsx
 window.__stepAgGrid.grids[dataTestId].scrollRowIntoViewById("1000")
 ```
-
