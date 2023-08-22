@@ -43,7 +43,6 @@ export interface GridProps {
    */
   selectColumnPinned?: ColDef["pinned"];
   noRowsOverlayText?: string;
-  postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowHeight?: number;
   rowClassRules?: GridOptions["rowClassRules"];
@@ -518,15 +517,6 @@ export const Grid = ({
     return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
   }, [columnDefs, params.defaultColDef?.sortable, sizeColumns]);
 
-  const anyColDefSortable = useMemo(() => {
-    const sortable = params.defaultColDef?.sortable || params.columnDefs.find((c) => c.sortable);
-    if (sortable && params.onRowDragEnd) {
-      console.error("Columns can not be sortable if row dragging is enabled");
-    }
-
-    return sortable;
-  }, [params.defaultColDef, params.columnDefs, params.onRowDragEnd]);
-
   /**
    * Set of colIds that need auto-sizing.
    */
@@ -662,7 +652,7 @@ export const Grid = ({
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={anyColDefSortable ? undefined : params.postSortRows ?? postSortRows}
+          postSortRows={params.onRowDragEnd ? undefined : postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
