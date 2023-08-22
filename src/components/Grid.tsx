@@ -7,7 +7,6 @@ import {
   CellKeyDownEvent,
   GridReadyEvent,
   RowDragEndEvent,
-  RowDragMoveEvent,
   SelectionChangedEvent,
 } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
@@ -129,7 +128,6 @@ export const Grid = ({
 
   const [staleGrid, setStaleGrid] = useState(false);
   const [autoSized, setAutoSized] = useState(false);
-  const [rowData, setRowData] = useState(params.rowData);
 
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
@@ -182,9 +180,6 @@ export const Grid = ({
 
   const lastOwnerDocumentRef = useRef<Document>();
 
-  useEffect(() => {
-    setRowData(params.rowData);
-  }, [params.rowData]);
   /**
    * Auto-size windows that had deferred auto-size
    */
@@ -595,50 +590,14 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
-  const [rowDataBeforeMove, setRowDataBeforeMove] = useState<any[]>();
-  const onRowDragEnter = useCallback(() => {
-    rowData && setRowDataBeforeMove(rowData);
-  }, [rowData]);
-
-  const onRowDragLeave = useCallback(() => {
-    setRowData(rowDataBeforeMove);
-  }, [rowDataBeforeMove]);
-
-  const onRowDragMove = useCallback(
-    (event: RowDragMoveEvent) => {
-      if (rowData) {
-        const movingNode = event.node;
-        const overNode = event.overNode;
-        const rowNeedsToMove = movingNode !== overNode;
-        if (rowNeedsToMove) {
-          // the list of rows we have is data, not row nodes, so extract the data
-          const movingData = movingNode.data;
-          const overData = overNode?.data;
-          const fromIndex = rowData.indexOf(movingData);
-          const toIndex = rowData.indexOf(overData);
-          const newStore = rowData.slice();
-          moveInArray(newStore, fromIndex, toIndex);
-          setRowData(newStore);
-          event.api.clearFocusedCell();
-        }
-      }
-      function moveInArray(arr: any[], fromIndex: number, toIndex: number) {
-        arr.splice(toIndex, 0, arr.splice(fromIndex, 1)[0]);
-      }
-    },
-    [rowData],
-  );
-
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      if (rowDataBeforeMove) {
-        const moved = event.node.data;
-        const target = rowDataBeforeMove[event.overIndex];
+      const moved = event.node.data;
+      const target = event.overNode?.data;
 
-        moved.id != target.id && params.onRowDragEnd && params.onRowDragEnd(moved, target);
-      }
+      moved.id != target.id && params.onRowDragEnd && params.onRowDragEnd(moved, target);
     },
-    [params, rowDataBeforeMove],
+    [params],
   );
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
@@ -679,7 +638,7 @@ export const Grid = ({
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
-          rowData={rowData}
+          rowData={params.rowData}
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;
             event.api.forEachNode(() => rowCount++);
@@ -704,10 +663,9 @@ export const Grid = ({
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
           rowDragText={params.rowDragText}
+          rowDragManaged={!!params.onRowDragEnd}
+          suppressMoveWhenRowDragging={true}
           onRowDragEnd={onRowDragEnd}
-          onRowDragMove={onRowDragMove}
-          onRowDragEnter={onRowDragEnter}
-          onRowDragLeave={onRowDragLeave}
         />
       </div>
     </div>
