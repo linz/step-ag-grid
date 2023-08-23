@@ -47,9 +47,19 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-// Fix that when you click below checkbox it doesn't process a click
+
 .ag-cell[col-id="selection"] {
-  display: flex;
+  display: flex;// Fix that when you click below checkbox it doesn't process a click
+  justify-content: end; //fix alignment of cell content when grabber is present
+
+  .ag-selection-checkbox{
+    margin-right:0;
+  }
+}
+
+//fix alignment of cell content when grabber is present
+.ag-header-cell-comp-wrapper{
+  justify-content: end;
 }
 
 // Fix that when you click below checkbox it doesn't process a click

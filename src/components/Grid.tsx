@@ -50,7 +50,7 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   rowDragText?: GridOptions["rowDragText"];
-  onRowDragEnd?: (movedRow: any, targetRow: any) => void;
+  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -331,14 +331,15 @@ export const Grid = ({
             colId: "selection",
             editable: false,
             rowDrag: !!params.onRowDragEnd,
-            minWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
-            maxWidth: params.selectable && params.onRowDragEnd ? 72 : 48,
+            minWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
+            maxWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,
             },
             checkboxSelection: params.selectable,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
+            //headerCheckboxSelection:true,
             suppressHeaderKeyboardEvent: (e) => {
               if (!params.selectable) return false;
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
@@ -594,7 +595,10 @@ export const Grid = ({
       const moved = event.node.data;
       const target = event.overNode?.data;
 
-      moved.id != target.id && params.onRowDragEnd && params.onRowDragEnd(moved, target);
+      moved.id != target.id &&
+        event.node.rowIndex != null &&
+        params.onRowDragEnd &&
+        params.onRowDragEnd(moved, target, event.node.rowIndex);
     },
     [params],
   );
