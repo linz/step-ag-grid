@@ -6,6 +6,7 @@ import {
   CellEvent,
   CellKeyDownEvent,
   GridReadyEvent,
+  RowDragEndEvent,
   SelectionChangedEvent,
 } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
@@ -42,13 +43,14 @@ export interface GridProps {
    */
   selectColumnPinned?: ColDef["pinned"];
   noRowsOverlayText?: string;
-  postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowHeight?: number;
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
+  rowDragText?: GridOptions["rowDragText"];
+  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -322,20 +324,24 @@ export const Grid = ({
         },
       };
     });
-    return params.selectable
+
+    return params.selectable || params.onRowDragEnd
       ? [
           {
             colId: "selection",
             editable: false,
-            minWidth: 48,
-            maxWidth: 48,
+            rowDrag: !!params.onRowDragEnd,
+            minWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
+            maxWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,
             },
-            checkboxSelection: true,
+            checkboxSelection: params.selectable,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
+            //headerCheckboxSelection:true,
             suppressHeaderKeyboardEvent: (e) => {
+              if (!params.selectable) return false;
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
                 if (isEmpty(e.api.getSelectedRows())) {
                   e.api.selectAllFiltered();
@@ -354,6 +360,7 @@ export const Grid = ({
   }, [
     params.columnDefs,
     params.selectable,
+    params.onRowDragEnd,
     params.readOnly,
     params.defaultColDef?.editable,
     selectColumnPinned,
@@ -583,6 +590,19 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
+  const onRowDragEnd = useCallback(
+    (event: RowDragEndEvent) => {
+      const moved = event.node.data;
+      const target = event.overNode?.data;
+
+      moved.id != target.id &&
+        event.node.rowIndex != null &&
+        params.onRowDragEnd &&
+        params.onRowDragEnd(moved, target, event.node.rowIndex);
+    },
+    [params],
+  );
+
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
@@ -636,7 +656,7 @@ export const Grid = ({
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.postSortRows ?? postSortRows}
+          postSortRows={params.onRowDragEnd ? undefined : postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
@@ -645,6 +665,10 @@ export const Grid = ({
           maintainColumnOrder={true}
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
+          rowDragText={params.rowDragText}
+          rowDragManaged={!!params.onRowDragEnd}
+          suppressMoveWhenRowDragging={true}
+          onRowDragEnd={onRowDragEnd}
         />
       </div>
     </div>
