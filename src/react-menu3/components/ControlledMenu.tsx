@@ -67,7 +67,11 @@ export const ControlledMenuFr = (
   );
 
   const isWithinMenu = useCallback(
-    (target: EventTarget | null) => hasParentClass("szh-menu--state-open", target as Node),
+    (target: EventTarget | null) =>
+      hasParentClass("szh-menu--state-open", target as Node) ||
+      // This is temporary, it will be removed when the overlay click is fixed
+      hasParentClass("LuiModalPrefab", target as Node) ||
+      hasParentClass("prefab-modal", target as Node),
     [],
   );
 
