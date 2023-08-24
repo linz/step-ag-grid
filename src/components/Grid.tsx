@@ -611,9 +611,8 @@ export const Grid = ({
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-
       if (event.node.rowIndex) {
+        const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
         const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
         const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
 
@@ -626,12 +625,11 @@ export const Grid = ({
 
         const moved = event.node.data;
         const target = event.overNode?.data;
-        moved.id != target.id &&
-          moved.rowIndex != targetIndex &&
+        moved.id != target.id && //moved over a different row
+          moved.rowIndex != targetIndex && //moved to a different index
           params.onRowDragEnd &&
           params.onRowDragEnd(moved, target, targetIndex);
       }
-      clientSideRowModel.highlightRowAtPixel(null);
     },
     [params],
   );
