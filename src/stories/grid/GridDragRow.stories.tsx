@@ -95,6 +95,7 @@ const GridDragRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
     { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
     { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
     { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
+    { id: 1003, position: "BA", age: 42, height: `5'7"`, desc: "BAs", dd: "4" },
   ]);
 
   return (
@@ -109,7 +110,7 @@ const GridDragRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
         defaultColDef={{ sortable: false }}
         rowData={rowData}
         onRowDragEnd={(row, _, targetIndex) => {
-          alert(`Row ${row.id} has been moved to index ${targetIndex}.`);
+          alert(`Row ${row.id} request to be moved to index ${targetIndex}.`);
         }}
         rowDragText={(params) => `${params.rowNode?.data.id} - ${params.rowNode?.data.position}`}
       />
