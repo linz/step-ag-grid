@@ -1,4 +1,13 @@
-import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, IClientSideRowModel, ModelUpdatedEvent, RowHighlightPosition, RowNode } from "ag-grid-community";
+import {
+  CellClickedEvent,
+  ColDef,
+  ColGroupDef,
+  ColumnResizedEvent,
+  IClientSideRowModel,
+  ModelUpdatedEvent,
+  RowHighlightPosition, //RowHighlightPosition,
+  RowNode,
+} from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import {
@@ -340,7 +349,6 @@ export const Grid = ({
             },
             checkboxSelection: params.selectable,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
-            //headerCheckboxSelection:true,
             suppressHeaderKeyboardEvent: (e) => {
               if (!params.selectable) return false;
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
@@ -591,31 +599,38 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
-const onRowDragLeave = useCallback(
-  (event:RowDragMoveEvent) => {
+  const onRowDragLeave = useCallback((event: RowDragMoveEvent) => {
     const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
     clientSideRowModel.highlightRowAtPixel(null);
-  },[])
+  }, []);
 
-  const onRowDragMove = useCallback(
-    (event:RowDragMoveEvent) => {
-      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-      clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
-    }
-  ,[])
+  const onRowDragMove = useCallback((event: RowDragMoveEvent) => {
+    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+    clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+  }, []);
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
       const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-      const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
-      const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
-      const moved = event.node.data;
-      const target = event.overNode?.data;
 
-      moved.id != target.id &&
-        params.onRowDragEnd &&
-        params.onRowDragEnd(moved, target, event.overIndex + (isBelow ? 0 : -1));
+      if (event.overNode) {
+        const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
+        const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
 
+        const moved = event.node;
+        const target = event.overNode;
+        let targetIndex = event.overIndex;
+        if (moved.rowIndex! > event.overIndex) {
+          targetIndex += isBelow ? 1 : 0;
+        } else {
+          targetIndex += isBelow ? 0 : -1;
+        }
+
+        moved.data.id != target.data.id &&
+          moved.rowIndex != targetIndex &&
+          params.onRowDragEnd &&
+          params.onRowDragEnd(moved.data, target.data, targetIndex);
+      }
       clientSideRowModel.highlightRowAtPixel(null);
     },
     [params],
