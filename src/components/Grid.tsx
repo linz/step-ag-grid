@@ -5,7 +5,7 @@ import {
   ColumnResizedEvent,
   IClientSideRowModel,
   ModelUpdatedEvent,
-  RowHighlightPosition, //RowHighlightPosition,
+  RowHighlightPosition,
   RowNode,
 } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
