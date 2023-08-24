@@ -184,7 +184,7 @@ export const GridFormDropDown = <RowType extends GridBaseRow>(props: GridFormDro
 
   const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
-    invalid: () => !!(selectedItem && !subComponentIsValid.current),
+    invalid: () => !options || !!(selectedItem && !subComponentIsValid.current),
     save,
     dontSaveOnExternalClick: true,
   });
