@@ -38,3 +38,22 @@ export const useTimeoutHook = () => {
 
   return invoke;
 };
+
+interface IntervalHookProps {
+  timeoutMs: number;
+  callback: () => void;
+}
+
+export const useIntervalHook = ({ callback, timeoutMs }: IntervalHookProps) => {
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      callbackRef.current && callbackRef.current();
+    }, timeoutMs);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timeoutMs]);
+};

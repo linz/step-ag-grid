@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { useGridPopoverContext } from "../contexts/GridPopoverContext";
@@ -10,8 +10,8 @@ import { GridBaseRow } from "./Grid";
 export interface GridPopoverHookProps<RowType> {
   className: string | undefined;
   invalid?: () =>
-    | Promise<JSX.Element | boolean | string | null | undefined>
-    | JSX.Element
+    | Promise<ReactElement | boolean | string | null | undefined>
+    | ReactElement
     | boolean
     | string
     | null
@@ -21,7 +21,7 @@ export interface GridPopoverHookProps<RowType> {
 }
 
 export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
-  const { stopEditing } = useContext(GridContext);
+  const { stopEditing, cancelEdit } = useContext(GridContext);
   const { anchorRef, saving, updateValue } = useGridPopoverContext<RowType>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -33,7 +33,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
   const triggerSave = useCallback(
     async (reason?: string) => {
       if (reason == CloseReason.CANCEL) {
-        stopEditing();
+        cancelEdit();
         return;
       }
       if (props.invalid && props.invalid()) {
@@ -41,7 +41,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
       }
 
       if (!props.save) {
-        stopEditing();
+        cancelEdit();
       } else if (props.save) {
         // forms that don't provide an invalid fn must wait until they have saved to close
         if (props.invalid) stopEditing();
@@ -55,11 +55,11 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
         }
       }
     },
-    [props, stopEditing, updateValue],
+    [cancelEdit, props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(
-    (children: JSX.Element) => {
+    (children: ReactElement) => {
       return (
         <>
           {anchorRef.current && (
@@ -80,17 +80,7 @@ export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopov
               className={props.className}
             >
               {saving && ( // This is the overlay that prevents editing when the editor is saving
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: "rgba(64,64,64,0.1)",
-                    zIndex: 1000,
-                  }}
-                />
+                <div className={"ComponentLoadingWrapper-saveOverlay"} />
               )}
               {children}
               <button

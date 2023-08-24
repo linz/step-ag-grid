@@ -1,4 +1,5 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { isEmpty } from "lodash-es";
+import { Fragment, ReactElement, useCallback, useEffect, useRef, useState } from "react";
 
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
@@ -27,11 +28,11 @@ export interface SelectedMenuOptionResult<RowType extends GridBaseRow> extends M
 }
 
 export interface MenuOption<RowType extends GridBaseRow> {
-  label: JSX.Element | string | MenuSeparatorType;
+  label: ReactElement | string | MenuSeparatorType;
   action?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
-  subComponent?: (props: any) => JSX.Element;
+  subComponent?: (props: any) => ReactElement;
 }
 
 /**
@@ -123,7 +124,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   return popoverWrapper(
     <ComponentLoadingWrapper loading={!options} className={"GridFormPopupMenu"}>
       <>
-        {options?.length === 0 ? (
+        {isEmpty(options) ? (
           <MenuItem key={`GridPopoverMenu-empty`} className={"GridPopoverMenu-noOptions"} disabled={true}>
             No actions
           </MenuItem>
@@ -140,7 +141,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
                     disabled={!!item.disabled}
                     title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
                   >
-                    {item.label as JSX.Element | string}
+                    {item.label as ReactElement | string}
                   </MenuItem>
                   {item.subComponent && subComponentSelected === item && (
                     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>

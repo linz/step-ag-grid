@@ -1,8 +1,10 @@
 import "./FormError.scss";
 
+import { ReactElement } from "react";
+
 export interface FormErrorProps {
   helpText?: string;
-  error?: JSX.Element | string | boolean | null;
+  error?: ReactElement | string | boolean | null;
 }
 
 export const FormError = (props: FormErrorProps) => {

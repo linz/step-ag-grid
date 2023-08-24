@@ -1,27 +1,34 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useCallback, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
   Grid,
   GridCell,
   GridContextProvider,
+  GridFilterColumnsToggle,
+  GridFilterDownloadCsvButton,
+  GridFilterQuick,
+  GridFilters,
   GridFormSubComponentTextArea,
   GridFormSubComponentTextInput,
   GridPopoverEditDropDown,
   GridPopoverMenu,
   GridProps,
   GridUpdatingContextProvider,
+  GridWrapper,
   MenuHeaderItem,
   MenuSeparator,
   MenuSeparatorString,
   wait,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
@@ -91,13 +98,10 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverEditDropDown(
         {
           field: "position2",
-          maxWidth: 100,
           headerName: "Multi-edit",
         },
         {
@@ -120,8 +124,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Custom callback",
         },
         {
@@ -140,8 +142,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Options Fn",
         },
         {
@@ -155,10 +155,10 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       ),
       GridPopoverEditDropDown(
         {
+          colId: "position3filtered",
           field: "position3",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filtered",
+          editable: false,
         },
         {
           multiEdit: true,
@@ -172,8 +172,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "position4",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filtered (object)",
           valueGetter: (params) => params.data.position4?.desc,
         },
@@ -191,8 +189,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "code",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Filter Selectable",
         },
         {
@@ -220,8 +216,6 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
       GridPopoverEditDropDown(
         {
           field: "sub",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Subcomponent",
           valueGetter: (params) => params.data.sub,
         },
@@ -299,15 +293,27 @@ const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps)
   ] as ITestRow[]);
 
   return (
-    <Grid
-      {...props}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-    />
+    <GridWrapper maxHeight={300}>
+      <GridFilters>
+        <GridFilterQuick />
+        <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+      </GridFilters>
+      <Grid
+        {...props}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        domLayout={"autoHeight"}
+        onCellEditingComplete={() => {
+          /* eslint-disable-next-line no-console */
+          console.log("Cell editing complete");
+        }}
+      />
+    </GridWrapper>
   );
 };
 
 export const EditDropdown = GridEditDropDownTemplate.bind({});
+EditDropdown.play = waitForGridReady;

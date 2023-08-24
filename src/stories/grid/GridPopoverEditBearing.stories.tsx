@@ -1,22 +1,29 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
   Grid,
   GridCell,
   GridContextProvider,
+  GridFilterColumnsToggle,
+  GridFilterDownloadCsvButton,
+  GridFilterQuick,
+  GridFilters,
   GridPopoverEditBearing,
   GridPopoverEditBearingCorrection,
   GridProps,
   GridUpdatingContextProvider,
+  GridWrapper,
   wait,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
@@ -52,8 +59,6 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverEditBearingCorrection(
         {
@@ -97,17 +102,25 @@ const GridPopoverEditBearingTemplate: ComponentStory<typeof Grid> = (props: Grid
   ] as ITestRow[]);
 
   return (
-    <Grid
-      data-testid={"bearingsTestTable"}
-      {...props}
-      readOnly={false}
-      externalSelectedItems={externalSelectedItems}
-      setExternalSelectedItems={setExternalSelectedItems}
-      columnDefs={columnDefs}
-      rowData={rowData}
-      domLayout={"autoHeight"}
-    />
+    <GridWrapper maxHeight={300}>
+      <GridFilters>
+        <GridFilterQuick />
+        <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+      </GridFilters>
+      <Grid
+        data-testid={"bearingsTestTable"}
+        {...props}
+        readOnly={false}
+        externalSelectedItems={externalSelectedItems}
+        setExternalSelectedItems={setExternalSelectedItems}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        domLayout={"autoHeight"}
+      />
+    </GridWrapper>
   );
 };
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
+_GridPopoverEditBearing.play = waitForGridReady;

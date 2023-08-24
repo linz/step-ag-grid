@@ -1,3 +1,8 @@
 import { createContext } from "react";
 
-export const HoverItemContext = createContext(undefined);
+export const HoverItemContext = createContext<
+  | HTMLDivElement
+  | HTMLLIElement
+  | ((prevItem: HTMLDivElement | HTMLLIElement) => HTMLDivElement | HTMLLIElement | undefined)
+  | undefined
+>(undefined);

@@ -1,34 +1,40 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
-import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
-import { compact, debounce, defer, delay, difference, isEmpty, last, remove, sortBy } from "lodash-es";
-import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
+import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
+import debounce from "debounce-promise";
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
+import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
-import { isNotEmpty, wait } from "../utils/util";
-import { GridContext, GridFilterExternal } from "./GridContext";
+import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
+import { getColId, isFlexColumn } from "../components/gridUtil";
+import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
+import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
-
-interface GridContextProps {
-  children: ReactNode;
-}
 
 /**
  * Context for AgGrid operations.
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
-  const { modifyUpdating } = useContext(GridUpdatingContext);
+export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
+  const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>([]);
+  const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
+
+  /**
+   * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
+   */
+  const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
+    _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId));
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -61,15 +67,28 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const ensureRowVisible = useCallback(
     (id: number | string): boolean => {
-      return gridApiOp((gridApi) => {
-        const node = gridApi.getRowNode(`${id}`);
-        if (!node) return false;
-        gridApi.ensureNodeVisible(node);
-        return true;
-      });
+      if (!gridApi) return false;
+      const node = gridApi?.getRowNode(`${id}`);
+      if (!node) return false;
+      defer(() => gridApi.ensureNodeVisible(node));
+      return true;
     },
-    [gridApiOp],
+    [gridApi],
   );
+
+  const getFirstRowId = useCallback((): number => {
+    let id = 0;
+    try {
+      gridApi?.forEachNodeAfterFilterAndSort((rowNode) => {
+        id = parseInt(rowNode.id ?? "0");
+        // this is the only way to get out of the loop
+        throw "expected exception - exit_loop";
+      });
+    } catch (ex) {
+      // ignore
+    }
+    return id;
+  }, [gridApi]);
 
   /**
    * Set the grid api when the grid is ready.
@@ -109,6 +128,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   }, [gridApi]);
 
   /**
+   * After a popup refocus the cell.
+   */
+  const postPopupOps = useCallback(() => {
+    if (!gridApi) return;
+    if (prePopupFocusedCell.current) {
+      gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+    }
+  }, [gridApi]);
+
+  /**
    * Get all row id's in grid.
    */
   const _getAllRowIds = useCallback(() => {
@@ -133,12 +162,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = useCallback((): RowNode[] => {
+  const _getNewNodes = useCallback((): IRowNode[] => {
     return gridApiOp(
       (gridApi) =>
-        difference(_getAllRowIds(), idsBeforeUpdate.current)
-          .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
+        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -150,16 +177,30 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * @param rowIds Row ids to get from grid.
    */
   const _rowIdsToNodes = useCallback(
-    (rowIds: number[]): RowNode[] => {
+    (rowIds: number[]): IRowNode[] => {
       return gridApiOp(
-        (gridApi) =>
-          rowIds
-            .map((rowId) => gridApi.getRowNode("" + rowId)) //
-            .filter((r) => r) as RowNode[],
+        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
       );
     },
     [gridApiOp],
+  );
+
+  /**
+   * Get ColDefs, with flattened ColGroupDefs
+   */
+  const getColumns = useCallback(
+    (
+      filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
+    ): ColDefT<RowType>[] =>
+      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
+    [columnApi],
+  );
+
+  const getColumnIds = useCallback(
+    (filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true): string[] =>
+      compact(getColumns(filterDef).map(getColId)),
+    [getColumns],
   );
 
   /**
@@ -172,10 +213,19 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const _selectRowsWithOptionalFlash = useCallback(
     (
-      rowIds: number[] | undefined,
-      select: boolean,
-      flash: boolean,
-      retryCount = 15, // We retry for approximately 5x200ms=1s
+      {
+        rowIds,
+        select,
+        flash,
+        ifNoCellFocused = false,
+        retryCount = 15,
+      }: {
+        rowIds: number[] | undefined;
+        select: boolean;
+        flash: boolean;
+        ifNoCellFocused?: boolean;
+        retryCount?: number;
+      }, // We retry for approximately 5x200ms=1s
     ) => {
       return gridApiOp((gridApi) => {
         const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
@@ -184,7 +234,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
         // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
         if (gridHasNotUpdated && retryCount > 0) {
-          delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
+          delay(
+            () =>
+              _selectRowsWithOptionalFlash({
+                rowIds,
+                select,
+                flash,
+                ifNoCellFocused,
+                retryCount: retryCount - 1,
+              }),
+            250,
+          );
           return;
         }
 
@@ -194,17 +254,22 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         );
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
-          gridApi.ensureNodeVisible(firstNode);
-          const colDefs = gridApi.getColumnDefs();
-          if (colDefs && colDefs.length) {
-            const col = colDefs[0] as ColDef; // We don't support ColGroupDef
+          defer(() => gridApi.ensureNodeVisible(firstNode));
+          const colDefs = getColumns();
+          if (!isEmpty(colDefs)) {
+            const col = colDefs[0];
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
               // We need to make sure we aren't currently editing a cell otherwise tests will fail
               // as they will start to edit the cell before this stuff has a chance to run
-              colId != null &&
-                defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+              colId &&
+                delay(() => {
+                  if (isEmpty(gridApi.getEditingCells()) && (!ifNoCellFocused || gridApi.getFocusedCell() == null)) {
+                    // ifNoCellFocused
+                    gridApi.setFocusedCell(rowIndex, colId);
+                  }
+                }, 100);
             }
           }
         }
@@ -229,21 +294,21 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         }
       });
     },
-    [_getNewNodes, _rowIdsToNodes, gridApiOp],
+    [_getNewNodes, _rowIdsToNodes, getColumns, gridApiOp],
   );
 
   const selectRowsById = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: false }),
     [_selectRowsWithOptionalFlash],
   );
 
   const selectRowsByIdWithFlash = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
   const flashRows = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: false, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -251,7 +316,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, false);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: false });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -260,7 +325,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -269,13 +334,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, false, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: false, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
 
   const focusByRowById = useCallback(
-    (rowId: number) => _selectRowsWithOptionalFlash([rowId], false, false),
+    (rowId: number, ifNoCellFocused?: boolean) =>
+      _selectRowsWithOptionalFlash({ rowIds: [rowId], select: false, flash: false, ifNoCellFocused }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -320,35 +386,151 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     gridApiOp((gridApi) => {
       const selectedNodes = gridApi.getSelectedNodes();
       if (isEmpty(selectedNodes)) return;
-      gridApi.ensureNodeVisible(last(selectedNodes));
+      defer(() => gridApi.ensureNodeVisible(last(selectedNodes)));
     });
   }, [gridApiOp]);
 
   /**
    * Resize columns to fit container
    */
+  const autoSizeColumns = useCallback(
+    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+      if (!columnApi) return null;
+      const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
+      const colsToResize = columnApi.getColumnState().filter((colState) => {
+        const colId = colState.colId;
+        return (
+          (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
+          !userSizedColIds?.has(colId) &&
+          (includeFlex || !colState.flex)
+        );
+      });
+      if (!isEmpty(colsToResize)) {
+        columnApi.autoSizeColumns(
+          colsToResize.map((colState) => colState.colId),
+          skipHeader,
+        );
+      }
+      return {
+        width: sumBy(
+          columnApi.getColumnState().filter((col) => !col.hide),
+          "width",
+        ),
+      };
+    },
+    [columnApi],
+  );
+
+  /**
+   * Resize columns to fit container
+   */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApiOp((gridApi) => {
-      // Hide size columns to fit errors in tests
-      document.body.clientWidth && gridApi.sizeColumnsToFit();
-    });
-  }, [gridApiOp]);
+    gridApi?.sizeColumnsToFit();
+  }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
+    if (!gridApi) return;
     if (prePopupFocusedCell.current) {
       gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
     }
-    gridApiOp((gridApi) => gridApi.stopEditing());
-  }, [gridApi, gridApiOp]);
+    gridApi.stopEditing();
+  }, [gridApi]);
 
-  const selectNextCell = useCallback(
-    (tabDirection: -1 | 0 | 1 = 0) => {
-      gridApiOp((gridApi) => {
-        if (tabDirection == 1) gridApi.tabToNextCell();
-        if (tabDirection == -1) gridApi.tabToPreviousCell();
-      });
+  const startCellEditing = useCallback(
+    async ({ rowId, colId }: { rowId: number; colId: string }) => {
+      if (!gridApi) return;
+
+      const colDef = gridApi.getColumnDef(colId);
+      if (!colDef) return;
+
+      prePopupOps();
+      const rowNode = gridApi.getRowNode(`${rowId}`);
+      if (!rowNode) {
+        return;
+      }
+
+      if (!rowNode.isSelected()) {
+        rowNode.setSelected(true, true);
+      }
+
+      // Cell already being edited, so don't re-edit until finished
+      if (checkUpdating([colDef.field ?? ""], rowId)) {
+        return;
+      }
+
+      const rowIndex = rowNode.rowIndex;
+      if (rowIndex != null) {
+        const focusAndEdit = () => {
+          gridApi.startEditingCell({
+            rowIndex,
+            colKey: colId,
+          });
+        };
+        defer(focusAndEdit);
+      }
     },
-    [gridApiOp],
+    [checkUpdating, gridApi, prePopupOps],
+  );
+
+  /**
+   * This differs from stopEdit in that it will also invoke cellEditingCompleteCallback
+   */
+  const cancelEdit = useCallback((): void => {
+    stopEditing();
+    cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+  }, [stopEditing]);
+
+  const cellEditingCompleteCallbackRef = useRef<() => void>();
+  const setOnCellEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
+    cellEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
+  }, []);
+
+  /**
+   * Returns true if an editable cell on same row was selected, else false.
+   */
+  const selectNextEditableCell = useCallback(
+    (tabDirection: -1 | 1): boolean => {
+      // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
+      if (!gridApi) return true;
+
+      const focusedCellIsEditable = () => {
+        const focusedCell = gridApi.getFocusedCell();
+        const nextColumn = focusedCell?.column;
+        const nextColDef = nextColumn?.getColDef();
+        const rowNode = focusedCell && gridApi.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+        return (
+          !!(rowNode && nextColumn && nextColDef) &&
+          nextColumn.isCellEditable(rowNode) &&
+          !nextColDef.cellEditorParams?.preventAutoEdit &&
+          !nextColDef.cellRendererParams?.editAction
+        );
+      };
+
+      // Just in case I've missed something, we don't want the loop to hang everything
+      for (let maxIterations = 0; maxIterations < 50; maxIterations++) {
+        const preRow = gridApi.getFocusedCell();
+        tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        const postRow = gridApi.getFocusedCell();
+        if (preRow?.rowIndex !== postRow?.rowIndex || preRow?.column === postRow?.column) {
+          // We didn't find an editable cell in the same row, or the cell column didn't change
+          // implying it was start/end of grid
+          break;
+        }
+        if (focusedCellIsEditable()) {
+          const focusedCell = gridApi?.getFocusedCell();
+          if (focusedCell) {
+            prePopupOps();
+            gridApi.startEditingCell({
+              rowIndex: focusedCell.rowIndex,
+              colKey: focusedCell.column.getColId(),
+            });
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    [gridApi, prePopupOps],
   );
 
   const updatingCells = useCallback(
@@ -363,6 +545,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const selectedRows = props.selectedRows;
 
         let ok = false;
+
         await modifyUpdating(
           props.field ?? "",
           selectedRows.map((data) => data.id),
@@ -394,36 +577,47 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         // Only focus next cell if user hasn't already manually changed focus
         const postPopupFocusedCell = gridApi.getFocusedCell();
         if (
-          tabDirection &&
           prePopupFocusedCell.current &&
           postPopupFocusedCell &&
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          selectNextCell(tabDirection);
+          if (!tabDirection || !selectNextEditableCell(tabDirection)) {
+            cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+          }
         }
 
         return ok;
       });
     },
-    [gridApiOp, modifyUpdating, selectNextCell],
+    [gridApiOp, modifyUpdating, selectNextEditableCell],
   );
 
-  const redrawRows = useCallback(
-    (rowNodes?: RowNode[]) => {
-      gridApiOp((gridApi) => {
-        gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-      });
-    },
-    [gridApiOp],
+  const redrawRows = useMemo(
+    () =>
+      debounce((rowNodes?: IRowNode[]) => {
+        try {
+          gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+        } catch (ex) {
+          // Hide errors in jest, but log them in browser
+          if (typeof jest === "undefined") console.error(ex);
+        }
+      }, 50),
+    [gridApi],
   );
+
+  // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
+  const externallySelectedItemsAreInSyncRef = useRef(false);
+  useEffect(() => {
+    externallySelectedItemsAreInSyncRef.current = externallySelectedItemsAreInSync;
+  }, [externallySelectedItemsAreInSync]);
 
   const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
     // Wait for up to 5 seconds
-    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSync; i++) {
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSyncRef.current; i++) {
       await wait(200);
     }
-  }, [externallySelectedItemsAreInSync]);
+  }, []);
 
   const onFilterChanged = useMemo(
     () =>
@@ -435,46 +629,86 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
   const addExternalFilter = (filter: GridFilterExternal<RowType>) => {
     externalFilters.current.push(filter);
-    onFilterChanged();
+    onFilterChanged().then();
   };
 
   const removeExternalFilter = (filter: GridFilterExternal<RowType>) => {
     remove(externalFilters.current, (v) => v === filter);
-    onFilterChanged();
+    onFilterChanged().then();
   };
 
-  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+  const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean => {
-    return externalFilters.current.every((filter) => filter(node.data, node));
-  };
+  const doesExternalFilterPass = (node: IRowNode): boolean =>
+    externalFilters.current.every((filter) => filter(node.data, node));
 
-  const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
+  const getColDef = useCallback(
+    (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,
+    [gridApi],
+  );
 
+  /**
+   * Apply column visibility
+   */
   useEffect(() => {
-    if (columnApi) {
-      // show all columns that aren't invisible
-      columnApi.setColumnsVisible(
-        compact(
-          getColumns()
-            .filter((col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId))
-            .map((col) => col.colId),
-        ),
-        true,
-      );
-      // hide all invisible columns
-      columnApi.setColumnsVisible(invisibleColumnIds, false);
+    if (!columnApi || !invisibleColumnIds) return;
+
+    // show all columns that aren't invisible
+    const newVisibleColumns = getColumns(
+      (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
+    );
+    // If there's no flex column showing add the filler column if defined
+    const visibleColumnsContainsAFlex = newVisibleColumns.some(isFlexColumn);
+    if (!visibleColumnsContainsAFlex) {
+      const fillerColumn = getColumns(isGridCellFiller)[0];
+      fillerColumn && newVisibleColumns.push(fillerColumn);
     }
+    columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
+
+    // Hide the filler column if there's already a flex column
+    const invisibleColumnIdsWithOptionalFiller = visibleColumnsContainsAFlex
+      ? [...invisibleColumnIds, GridCellFillerColId]
+      : invisibleColumnIds;
+    columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
   }, [invisibleColumnIds, columnApi, getColumns]);
+
+  /**
+   * Download visible columns as a CSV
+   */
+  const downloadCsv = useCallback(
+    (csvExportParams?: CsvExportParams) => {
+      if (!gridApi || !columnApi) return;
+
+      const fileName = csvExportParams?.fileName && sanitiseFileName(csvExportParams.fileName);
+
+      const columnKeys = columnApi
+        ?.getColumnState()
+        .filter((cs) => {
+          const colDef = gridApi.getColumnDef(cs.colId);
+          return !cs.hide && colDef && !isGridCellFiller(colDef) && colDef.headerComponentParams?.exportable !== false;
+        })
+        .map((cs) => cs.colId);
+      gridApi.exportDataAsCsv({
+        columnKeys,
+        processCellCallback: downloadCsvUseValueFormattersProcessCellCallback,
+        ...csvExportParams,
+        fileName,
+      });
+    },
+    [columnApi, gridApi],
+  );
 
   return (
     <GridContext.Provider
       value={{
+        getColDef,
         getColumns,
+        getColumnIds,
         invisibleColumnIds,
         setInvisibleColumnIds,
         gridReady,
         prePopupOps,
+        postPopupOps,
         setApis,
         setQuickFilter,
         selectRowsById,
@@ -488,11 +722,15 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         getFilteredSelectedRows,
         getSelectedRowIds,
         getFilteredSelectedRowIds,
+        getFirstRowId,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
+        autoSizeColumns,
+        startCellEditing,
         stopEditing,
+        cancelEdit,
         updatingCells,
         redrawRows,
         externallySelectedItemsAreInSync,
@@ -502,9 +740,60 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         removeExternalFilter,
         isExternalFilterPresent,
         doesExternalFilterPass,
+        downloadCsv,
+        setOnCellEditingComplete,
       }}
     >
       {props.children}
     </GridContext.Provider>
   );
+};
+
+/**
+ * Aggrid defaults to using getters and ignores formatters.
+ * step-ag-grid by default has a valueFormatter for every column that defaults to the getter if no valueFormatter
+ * This function uses valueFormatter by default
+ */
+export const downloadCsvUseValueFormattersProcessCellCallback = (params: ProcessCellForExportParams): string => {
+  const encodeToString = (value: any): string => {
+    // Convert nullish values to blank
+    if (value === "-" || value === "–" || value == null) {
+      return "";
+    }
+    if (typeof value === "string") {
+      return value;
+    }
+    return JSON.stringify(value);
+  };
+
+  // Try to use valueFormatter
+  const colDef = params?.column?.getColDef();
+  if (!colDef) return encodeToString(params.value);
+
+  // All columns in step-ag-grid have a default valueFormatter
+  // If you have custom a renderer you need to define your own valueFormatter to produce the text value
+  const valueFormatter = colDef.valueFormatter;
+  // If no valueFormatter then value _must_ be a string
+  if (valueFormatter == null) {
+    if (params.value != null && typeof params.value !== "string") {
+      console.error(`downloadCsv: valueFormatter missing and getValue is not a string, colId: ${colDef.colId}`);
+    }
+    return encodeToString(params.value);
+  }
+
+  // We don't have access to registered functions, so we can't call them
+  if (typeof valueFormatter !== "function") {
+    console.error(
+      `downloadCsv: String type (registered) value formatters are unsupported in downloadCsv, colId: ${colDef.colId}`,
+    );
+    return encodeToString(params.value);
+  }
+
+  const result = valueFormatter({ ...params, data: params.node?.data, colDef } as ValueFormatterParams);
+  // type may not be string due to casting, leave the type check in
+  if (params.value != null && typeof result !== "string") {
+    console.error(`downloadCsv: valueFormatter is returning non string values, colDef:", colId: ${colDef.colId}`);
+  }
+  // We add an extra encodeToString here just in case valueFormatter is returning non string values
+  return encodeToString(result);
 };

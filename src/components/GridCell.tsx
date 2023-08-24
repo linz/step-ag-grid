@@ -1,6 +1,6 @@
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { forwardRef, useContext } from "react";
+import { ReactElement, forwardRef, useContext } from "react";
 
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
@@ -18,7 +18,7 @@ import {
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
-  editor?: (editorProps: E) => JSX.Element;
+  editor?: (editorProps: E) => ReactElement;
   editorParams?: E;
 }
 
@@ -34,32 +34,32 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   if (Array.isArray(warningText)) warningText = warningText.join("\n");
   if (Array.isArray(infoText)) infoText = infoText.join("\n");
 
-  return (
-    <GridLoadableCell isLoading={checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id)}>
-      <>
-        {!!warningText && (
-          <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+  return checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id) ? (
+    <GridLoadableCell />
+  ) : (
+    <>
+      {!!warningText && (
+        <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+      )}
+      {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
+      <div className={"GridCell-container"}>
+        {colDef.cellRendererParams?.originalCellRenderer ? (
+          <colDef.cellRendererParams.originalCellRenderer {...props} />
+        ) : (
+          <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
         )}
-        {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          {colDef.cellRendererParams?.originalCellRenderer ? (
-            <colDef.cellRendererParams.originalCellRenderer {...props} />
-          ) : (
-            <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
-          )}
-        </div>
-        {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
-          <div style={{ display: "flex", alignItems: "center" }}>{rendererParams?.rightHoverElement}</div>
-        )}
-      </>
-    </GridLoadableCell>
+      </div>
+      {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
+        <div className={"GridCell-hoverRight"}>{rendererParams?.rightHoverElement}</div>
+      )}
+    </>
   );
 };
 
 // This is so that typescript retains the row type to pass to the GridCells
 export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
   _?: RowType;
-  editor?: (editorProps: any) => JSX.Element;
+  editor?: (editorProps: any) => ReactElement;
 }
 
 export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
@@ -105,7 +105,8 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   props: GenericCellColDef<RowType>,
   custom?: {
     multiEdit?: boolean;
-    editor?: (editorProps: Props) => JSX.Element;
+    preventAutoEdit?: boolean;
+    editor?: (editorProps: Props) => ReactElement;
     editorParams?: Props;
   },
 ): ColDefT<RowType> => {
@@ -114,9 +115,13 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   // This is so that e.g. bearings can be searched for by DMS or raw number.
   const valueFormatter = props.valueFormatter;
   const filterValueGetter = generateFilterGetter(props.field, props.filterValueGetter, valueFormatter);
+  const exportable = props.exportable;
+  // Can't leave this here ag-grid will complain
+  delete props.exportable;
 
   return {
-    colId: props.field,
+    colId: props.field ?? props.field,
+    headerTooltip: props.headerName,
     sortable: !!(props?.field || props?.valueGetter),
     resizable: true,
     editable: props.editable ?? false,
@@ -127,7 +132,11 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
     }),
     suppressKeyboardEvent: suppressCellKeyboardEvents,
     ...(custom?.editorParams && {
-      cellEditorParams: { ...custom.editorParams, multiEdit: custom.multiEdit },
+      cellEditorParams: {
+        ...custom.editorParams,
+        multiEdit: custom.multiEdit,
+        preventAutoEdit: custom.preventAutoEdit ?? false,
+      },
     }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
     filterValueGetter,
@@ -144,6 +153,10 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
     },
+    headerComponentParams: {
+      exportable,
+      ...props.headerComponentParams,
+    },
   };
 };
 
@@ -151,7 +164,7 @@ export interface CellEditorCommon {
   className?: string | undefined;
 }
 
-export const GenericCellEditorComponentWrapper = (editor?: (props: any) => JSX.Element) => {
+export const GenericCellEditorComponentWrapper = (editor?: (props: any) => ReactElement) => {
   const obj = { editor };
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
     const valueFormatted = cellEditorParams.formatValue

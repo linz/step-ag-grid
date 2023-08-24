@@ -1,3 +1,5 @@
+import "../../react-menu3/styles/index.scss";
+
 import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { userEvent, within } from "@storybook/testing-library";
@@ -42,7 +44,7 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
   const keyboard = async (key: string) => {
-    userEvent.keyboard(key);
+    await userEvent.keyboard(key);
     await wait(100); // Wait for debounce
   };
 
@@ -51,15 +53,19 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
 
   const openMenu = async () => {
     await wait(500); // Wait for debounce
-    userEvent.click(menuButton);
+    await userEvent.click(menuButton);
     expect(await canvas.findByRole("menuitem", { name: "New File" })).toBeInTheDocument();
   };
 
   await openMenu();
+
   const overlay = await canvas.findByTestId("ReactMenu-overlay");
 
   // Check menu closes on click outside
-  userEvent.click(overlay);
+  await userEvent.click(overlay);
+
+  await userEvent.click(menuButton.parentElement as Element);
+
   expect(canvas.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
 
   // Test arrow down/up
@@ -75,7 +81,7 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   expect(document.activeElement?.innerHTML).toBe("Print...");
 
   // Escape close
-  userEvent.type(menuButton.parentElement as Element, "{Escape}");
+  await userEvent.type(menuButton.parentElement as Element, "{Escape}");
   expect(canvas.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
 
   // Test enter to select
@@ -91,6 +97,8 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
   // Test tab to select
   await openMenu();
   await keyboard("{arrowdown}");
+  // For some reason arrow down takes a little time to activate
+  await wait(10);
   await keyboard("{Tab}");
   expect(menuItemClickAction).toHaveBeenCalled();
   expect(newFileAction).toHaveBeenCalled();

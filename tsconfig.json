@@ -6,6 +6,7 @@
     "baseUrl": "./src",
     "module": "esnext",
     "lib": ["dom", "esnext"],
+    "target": "ESNext",
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,

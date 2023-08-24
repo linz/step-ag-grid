@@ -1,7 +1,5 @@
-import { ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
-export interface GridFiltersProps {
-  children: ReactNode;
-}
-
-export const GridFilters = ({ children }: GridFiltersProps) => <div className="Grid-container-filters">{children}</div>;
+export const GridFilters = ({ children }: PropsWithChildren) => (
+  <div className="Grid-container-filters">{children}</div>
+);

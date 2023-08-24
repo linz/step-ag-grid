@@ -1,4 +1,4 @@
-import { LegacyRef, useContext, useMemo, useRef } from "react";
+import { LegacyRef, ReactElement, useContext, useMemo, useRef } from "react";
 
 import { EventHandlersContext } from "../contexts/EventHandlersContext";
 import { useBEM, useCombinedRef, useItemState } from "../hooks";
@@ -8,7 +8,7 @@ import { withHoveringResultProps } from "../utils/withHovering";
 
 export interface FocusableItemProps extends BaseProps, withHoveringResultProps {
   disabled?: boolean;
-  children: (ref: LegacyRef<any>) => JSX.Element;
+  children: (ref: LegacyRef<any>) => ReactElement;
 }
 
 export const FocusableItemFr = ({

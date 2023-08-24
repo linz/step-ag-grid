@@ -1,17 +1,19 @@
 const path = require("path");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 module.exports = {
-  core: { builder: 'webpack5', },
   // Specifying the location of the stories and file formats of what stories can be
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+
   // Specifying the add-ons for Storybook if requiring specific addons to make a story work then add them here
   addons: [
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
   ],
+
   webpackFinal: async (config) => {
     config.resolve.fallback = {
       crypto: false,
+      assert: false,
     };
 
     // Handling scss files when used within components consumed by a story
@@ -57,4 +59,13 @@ module.exports = {
     // Return the altered config
     return config;
   },
+
+  framework: {
+    name: "@storybook/react-webpack5",
+    options: {}
+  },
+
+  docs: {
+    autodocs: false
+  }
 };

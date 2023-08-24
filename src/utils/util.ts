@@ -7,9 +7,18 @@ export const wait = (timeoutMs: number) =>
     setTimeout(resolve, timeoutMs);
   });
 
+// This regexp only works if you parseFloat first, it won't validate a float on its own
+// It prevents scientific 1e10, or trailing decimal 1.2.3, or trailing garbage 1.2xyz
+const isFloatRegExp = /^-?\d*\.?\d*$/;
 export const isFloat = (value: string) => {
-  const regexp = /^-?\d*(\.\d+)?$/;
-  return regexp.test(value);
+  try {
+    // Just checking it's not scientific notation or "NaN" here.
+    // Also parse float will parse up to the first invalid character,
+    // so we need to check there's no remaining invalids e.g. "1.2xyz" would parse as 1.2
+    return !Number.isNaN(parseFloat(value)) && isFloatRegExp.test(value);
+  } catch {
+    return false;
+  }
 };
 
 export const findParentWithClass = function (className: string, child: Node): HTMLElement | null {
@@ -36,3 +45,16 @@ export const stringByteLengthIsInvalid = (str: string, maxBytes: number) =>
   new TextEncoder().encode(str).length > maxBytes;
 
 export const fnOrVar = (fn: any, param: any) => (typeof fn === "function" ? fn(param) : fn);
+
+export const sanitiseFileName = (filename: string): string => {
+  const valid = filename
+    .trim()
+    .replaceAll(/(\/|\\)+/g, "-")
+    .replaceAll(/\s+/g, "_")
+    .replaceAll(/[^\w\-āēīōūĀĒĪŌŪ.]/g, "");
+  const parts = valid.split(".");
+  const fileExt = parts.length > 1 ? parts.pop() : undefined;
+  // Arbitrary max filename length of 64 chars + extension
+  if (!fileExt) return valid.slice().slice(0, 64);
+  return valid.slice(0, -fileExt.length - 1).slice(0, 64) + "." + fileExt;
+};

@@ -1,7 +1,6 @@
 # step-ag-grid
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
-
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
 ## Features
@@ -13,24 +12,26 @@
   - Text area
   - Drop-down
   - Multi-select
+  - Multi-select-grid
   - Bearing/Bearing Correction
   - Popover message
   - Custom form
+  - Context menu
 
-_Please note this requires React >=17, ag-grid-community >=27, and sass._
+_Please note this requires React >=17, ag-grid-community >=28, and SASS._
 
 ## Install
 
 with npm
 
 ```bash
-npm install @linz/step-ag-grid
+npm install @linzjs/step-ag-grid
 ```
 
 or with Yarn
 
 ```bash
-yarn add @linz/step-ag-grid
+yarn add @linzjs/step-ag-grid
 ```
 
 ## Demo
@@ -53,7 +54,9 @@ import "@linzjs/lui/dist/scss/base.scss";
 import {
   ColDefT,
   GridCell,
+  GridCellFiller,
   GridContextProvider,
+  GridContextMenuComponentProps,
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
@@ -65,6 +68,7 @@ import {
 // Only required for LINZ themes otherwise import the default theme from ag-grid
 import "@linzjs/step-ag-grid/dist/GridTheme.scss";
 import "@linzjs/step-ag-grid/dist/index.css";
+import { GridFilterDownloadCsvButton } from "./GridFilterDownloadCsvButton";
 
 const GridDemo = () => {
   interface ITestRow {
@@ -78,14 +82,13 @@ const GridDemo = () => {
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
+        export: false,
       }),
+      // This is the flex column that will expand to fit
       GridCell({
         field: "name",
         headerName: "Name",
-        initialWidth: 65,
-        maxWidth: 150,
+        flex: 1,
         cellRendererParams: {
           warning: ({ value }) => value === "Tester" && "Testers are testing",
           info: ({ value }) => value === "Developer" && "Developers are awesome",
@@ -94,8 +97,6 @@ const GridDemo = () => {
       GridPopoverEditDropDown(
         {
           field: "position",
-          initialWidth: 65,
-          maxWidth: 150,
           headerName: "Position",
         },
         {
@@ -113,16 +114,41 @@ const GridDemo = () => {
         {
           multiEdit: true,
           editorParams: {
-            message: async ({ selectedRows }) => {
+            message: async ({selectedRows}) => {
               return `There are ${selectedRows.length} row(s) selected`;
             },
           },
         },
       ),
+      // If your flex column gets hidden this will become active
+      GridCellFiller(),
     ],
     [],
   );
 
+  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<ITestRow>): ReactElement => {
+    const onClick = useCallback(() => {
+      selectedRows.forEach((row) => {
+        switch (colDef.field) {
+          case "name":
+            row.name = "";
+            break;
+          case "distance":
+            row.distance = null;
+            break;
+        }
+      });
+      close();
+    }, [close, colDef.field, selectedRows]);
+
+    return (
+      <>
+        <button onClick={onClick}>Button - Clear cell</button>
+        <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+      </>
+    );
+  };
+  
   const rowData: ITestRow[] = useMemo(
     () => [
       { id: 1000, name: "Tom", position: "Tester" },
@@ -136,31 +162,62 @@ const GridDemo = () => {
       <GridContextProvider>
         <GridWrapper>
           <GridFilters>
-            <GridFilterQuick quickFilterPlaceholder={"Search..."} />
+            <GridFilterQuick/>
             <GridFilterButtons<ITestRow>
-                    options={[
-                      {
-                        label: "All",
-                      },
-                      {
-                        label: "Developers",
-                        filter: (row) => row.position === "Developer",
-                      },
-                      {
-                        label: "Testers",
-                        filter: (row) => row.position === "Tester",
-                      },
-                    ]}
+              options={[
+                {
+                  label: "All",
+                },
+                {
+                  label: "Developers",
+                  filter: (row) => row.position === "Developer",
+                },
+                {
+                  label: "Testers",
+                  filter: (row) => row.position === "Tester",
+                },
+              ]}
             />
             <GridFilterColumnsToggle/>
+            <GridFilterDownloadCsvButton fileName={"exportFile"}/>
           </GridFilters>
-          <Grid selectable={true} columnDefs={columnDefs} rowData={rowData} />
+          <Grid selectable={true}
+                columnDefs={columnDefs}
+                rowData={rowData}
+                contextMenu={contextMenu}
+                contextMenuSelectRow={false}
+                onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
   );
 };
 ```
+
+## Bulk editing
+If you are editing a cell and tab out of the cell, the grid will edit the next editable cell.
+
+At this point you can send the change to the back-end immediately and then wait for an update response
+_OR_
+you could cache the required change, update then cell locally, and then wait for the callback
+```<Grid onCellEditingComplete={fn}/>``` which will get invoked when the grid cannot find any
+more editable cells on the grid row, which will speed up editing.
+
+## Grid sizing
+Grid uses ```<Grid sizeColumns="auto"/>``` which sizes by cell content by default.
+To ignore cell content use "fit", to disable use "none".
+
+If you are within a resizable window/dialog/container there is a callback parameter
+```<Grid onContentSize={({ width }) => setPanelSize(width)}/>```
+to receive the recommended container width.
+
+## CSV Download
+CSV download relies on column valueFormatters vs ag-grid's default valueGetter implementation.
+If you use a customRenderer for a column be sure to include a valueFormatter.
+To disable this behaviour pass undefined to processCellCallback.
+```<GridFilterDownloadCsvButton processCellCallback={undefined}/>```
+
+To exclude a column from CSV download add ```export: false``` to the GridCell definition. 
 
 ## Writing tests
 
@@ -209,7 +266,7 @@ test("click Delete menu option removes row from the table", async () => {
   await screen.findByText("My component header");
   expect((await findRow(12345)).getAttribute("row-index")).toBe("1");
   await openAndClickMenuOption(12345, "actions", "Delete");
-  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined());
+  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined()));
 });
 ```
 
@@ -221,4 +278,3 @@ This will throw an exception if the row id is not found.
 ```tsx
 window.__stepAgGrid.grids[dataTestId].scrollRowIntoViewById("1000")
 ```
-

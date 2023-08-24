@@ -1,4 +1,5 @@
 export * from "./GridPopoutEditMultiSelect";
+export * from "./GridPopoutEditMultiSelectGrid";
 export * from "./GridPopoverMenu";
 export * from "./GridPopoverEditBearing";
 export * from "./GridPopoverEditBearing";

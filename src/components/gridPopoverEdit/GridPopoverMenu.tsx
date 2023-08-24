@@ -16,8 +16,10 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
       minWidth: 48,
       maxWidth: 48,
       width: 40,
+      sortable: false,
       editable: colDef.editable != null ? colDef.editable : true,
-      cellStyle: { justifyContent: "center" },
+      exportable: false,
+      cellStyle: { flex: 1, justifyContent: "center" },
       cellRenderer: GridRenderPopoutMenuCell,
       ...colDef,
       cellRendererParams: {
@@ -27,6 +29,7 @@ export const GridPopoverMenu = <RowType extends GridBaseRow>(
     },
     {
       editor: GridFormPopoverMenu,
+      preventAutoEdit: true,
       ...custom,
     },
   );

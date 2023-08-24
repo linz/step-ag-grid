@@ -1,14 +1,30 @@
-import { ColumnApi, GridApi, RowNode } from "ag-grid-community";
+import { ColDef, ColumnApi, GridApi, IRowNode } from "ag-grid-community";
+import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import { createContext, useContext } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 
-export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: RowNode) => boolean;
+export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: IRowNode) => boolean;
+
+export interface AutoSizeColumnsProps {
+  skipHeader?: boolean;
+  colIds?: Set<string> | string[];
+  userSizedColIds?: Set<string>;
+  includeFlex?: boolean;
+}
+
+export type AutoSizeColumnsResult = { width: number } | null;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
+  getColDef: (colId?: string) => ColDef | undefined;
+  getColumns: (
+    filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
+  ) => ColDefT<RowType>[];
+  getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
+  postPopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
@@ -21,10 +37,14 @@ export interface GridContextType<RowType extends GridBaseRow> {
   selectRowsByIdWithFlash: (rowIds?: number[]) => void;
   flashRows: (rowIds?: number[]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  focusByRowById: (rowId: number) => void;
+  focusByRowById: (rowId: number, ifNoCellFocused?: boolean) => void;
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
+  getFirstRowId: () => number;
+  autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
+  cancelEdit: () => void;
+  startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => void;
   stopEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
@@ -32,30 +52,42 @@ export interface GridContextType<RowType extends GridBaseRow> {
     setSaving?: (saving: boolean) => void,
     tabDirection?: 1 | 0 | -1,
   ) => Promise<boolean>;
-  redrawRows: (rowNodes?: RowNode[]) => void;
+  redrawRows: (rowNodes?: IRowNode[]) => void;
   externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
   addExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
   isExternalFilterPresent: () => boolean;
-  doesExternalFilterPass: (node: RowNode) => boolean;
-  getColumns: () => ColDefT<RowType>[];
-  invisibleColumnIds: string[];
+  doesExternalFilterPass: (node: IRowNode) => boolean;
+  invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
+  downloadCsv: (csvExportParams?: CsvExportParams) => void;
+  setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
+  getColDef: () => {
+    console.error("no context provider for getColDef");
+    return undefined;
+  },
   getColumns: () => {
     console.error("no context provider for getColumns");
     return [];
   },
-  invisibleColumnIds: [],
+  getColumnIds: () => {
+    console.error("no context provider for getColumnIds");
+    return [];
+  },
+  invisibleColumnIds: undefined,
   setInvisibleColumnIds: () => {
     console.error("no context provider for setInvisibleColumnIds");
   },
   prePopupOps: () => {
+    console.error("no context provider for prePopupOps");
+  },
+  postPopupOps: () => {
     console.error("no context provider for prePopupOps");
   },
   externallySelectedItemsAreInSync: false,
@@ -109,12 +141,27 @@ export const GridContext = createContext<GridContextType<any>>({
   ensureSelectedRowIsVisible: () => {
     console.error("no context provider for ensureSelectedRowIsVisible");
   },
+  getFirstRowId: () => {
+    console.error("no context provider for getFirstRowId");
+    return -1;
+  },
+  autoSizeColumns: () => {
+    console.error("no context provider for autoSizeColumns");
+    return null;
+  },
   sizeColumnsToFit: () => {
-    console.error("no context provider for sizeColumnsToFit");
+    console.error("no context provider for autoSizeAllColumns");
+    return null;
   },
   editingCells: () => {
     console.error("no context provider for editingCells");
     return false;
+  },
+  cancelEdit: () => {
+    console.error("no context provider for cancelEdit");
+  },
+  startCellEditing: () => {
+    console.error("no context provider for startCellEditing");
   },
   stopEditing: () => {
     console.error("no context provider for stopEditing");
@@ -145,6 +192,12 @@ export const GridContext = createContext<GridContextType<any>>({
   doesExternalFilterPass: () => {
     console.error("no context provider for doesExternalFilterPass");
     return true;
+  },
+  downloadCsv: () => {
+    console.error("no context provider for downloadCsv");
+  },
+  setOnCellEditingComplete: () => {
+    console.error("no context provider for setOnCellEditingComplete");
   },
 });
 

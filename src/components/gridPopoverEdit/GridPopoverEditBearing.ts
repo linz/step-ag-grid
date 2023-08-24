@@ -19,8 +19,6 @@ const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
 ): ColDefT<RowType> =>
   GridCell(
     {
-      initialWidth: 65,
-      maxWidth: 150,
       valueFormatter: (params: ValueFormatterParams) => props.editorParams?.formatValue(params.value) ?? "",
       ...colDef,
     },

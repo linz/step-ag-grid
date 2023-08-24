@@ -1,0 +1,13 @@
+.GridCell-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.GridCell-hoverRight {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+}

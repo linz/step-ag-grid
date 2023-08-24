@@ -1,9 +1,12 @@
+import "../../../react-menu3/styles/index.scss";
+import "../../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import { GridBaseRow, GridContextProvider, GridFormTextArea, GridFormTextAreaProps } from "../../..";
 
@@ -13,7 +16,7 @@ export default {
   args: {},
 } as ComponentMeta<typeof GridFormTextArea>;
 
-const Template: ComponentStory<typeof GridFormTextArea> = (props) => {
+const Template: ComponentStory<typeof GridFormTextArea> = (props: GridFormTextAreaProps<any>) => {
   const configs: [string, GridFormTextAreaProps<GridBaseRow>, string?][] = [
     ["Text area", {}],
     ["Text area with text", {}, "Some text"],

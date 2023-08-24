@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from "react";
+import { ReactElement, useCallback, useContext, useEffect } from "react";
 
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
 import { TextInputFormatted } from "../../lui/TextInputFormatted";
@@ -17,7 +17,7 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
 
 export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
   props: GridFormSubComponentTextInputProps<RowType>,
-): JSX.Element => {
+): ReactElement => {
   const { value, setValue, setValid, data, context } = useContext(GridSubComponentContext);
 
   const helpText = props.helpText ?? "Press enter or tab to save";

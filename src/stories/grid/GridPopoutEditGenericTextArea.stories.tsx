@@ -1,8 +1,11 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useCallback, useContext, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ActionButton,
@@ -23,8 +26,7 @@ import {
   isFloat,
   wait,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 import { IFormTestRow } from "./FormTest";
 
 export default {
@@ -60,14 +62,11 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       GridCell({
         field: "id",
         headerName: "Id",
-        initialWidth: 65,
-        maxWidth: 85,
       }),
       GridPopoverTextInput(
         {
           field: "name",
           headerName: "Text input",
-          maxWidth: 140,
         },
         {
           multiEdit: true,
@@ -91,7 +90,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           field: "distance",
           headerName: "Number input",
-          maxWidth: 140,
           valueFormatter: (params) => {
             const v = params.data.distance;
             return v != null ? `${v}${params.colDef.cellEditorParams.units}` : "–";
@@ -121,7 +119,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         {
           field: "plan",
           headerName: "Text area",
-          maxWidth: 140,
         },
         {
           multiEdit: true,
@@ -146,7 +143,6 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
           colId: "plan2",
           field: "plan",
           headerName: "Multi-editor",
-          maxWidth: 140,
         },
         (_params) =>
           _params.rowIndex == 0
@@ -169,7 +165,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       ),
       GridPopoverMenu(
         {
-          headerName: "Delete menu",
+          headerName: "",
         },
         {
           multiEdit: true,
@@ -178,7 +174,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               {
                 label: "Delete",
                 action: async ({ selectedRows }) => {
-                  await wait(1500);
+                  await wait(1000);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
                 },
               },
@@ -198,7 +194,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
       setRowData([
         ...rowData,
         {
-          id: lastRow.id + 1,
+          id: (lastRow?.id ?? 0) + 1,
           name: "?",
           nameType: "?",
           numba: "?",
@@ -218,10 +214,17 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={"autoHeight"}
+        defaultColDef={{ minWidth: 70 }}
+        sizeColumns={"auto"}
+        onCellEditingComplete={() => {
+          /* eslint-disable-next-line no-console */
+          console.log("Cell editing complete");
+        }}
       />
       <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onClick={addRowAction} />
     </>
   );
 };
 
-export const EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
+export const _EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
+_EditGenericTextArea.play = waitForGridReady;

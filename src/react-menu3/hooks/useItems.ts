@@ -1,19 +1,25 @@
+import { defer } from "lodash-es";
 import { MutableRefObject, useCallback, useRef, useState } from "react";
 
 import { FocusPosition } from "../types";
 import { HoverActionTypes, focusFirstInput, indexOfNode } from "../utils";
 
 export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObject<any> | undefined) => {
-  const [hoverItem, setHoverItem] = useState<any>();
+  const [hoverItem, setHoverItem] = useState<
+    | HTMLDivElement
+    | HTMLLIElement
+    | ((prevItem: HTMLDivElement | HTMLLIElement) => HTMLDivElement | HTMLLIElement | undefined)
+    | undefined
+  >();
   const stateRef = useRef({
-    items: [] as any[],
+    items: [] as (HTMLDivElement | HTMLLIElement)[],
     hoverIndex: -1,
     sorted: false,
   });
   const mutableState = stateRef.current;
 
   const updateItems = useCallback(
-    (item?: any, isMounted?: boolean) => {
+    (item?: HTMLDivElement | HTMLLIElement, isMounted?: boolean) => {
       const { items } = mutableState;
       if (!item) {
         mutableState.items = [];
@@ -45,8 +51,11 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
         mutableState.sorted = true;
       };
 
-      let index = -1,
-        newItem = undefined;
+      let index = -1;
+      let newItem: HTMLDivElement | HTMLLIElement | undefined = undefined;
+      let newItemFn:
+        | ((prevItem: HTMLDivElement | HTMLLIElement) => HTMLDivElement | HTMLLIElement | undefined)
+        | undefined = undefined;
       switch (actionType) {
         case HoverActionTypes.RESET:
           break;
@@ -56,7 +65,7 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
           break;
 
         case HoverActionTypes.UNSET:
-          newItem = (prevItem: any) => (prevItem === item ? undefined : prevItem);
+          newItemFn = (prevItem: HTMLDivElement | HTMLLIElement) => (prevItem === item ? undefined : prevItem);
           break;
 
         case HoverActionTypes.FIRST:
@@ -76,6 +85,9 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
           sortItems();
           index = nextIndex;
           newItem = items[index];
+          defer(() =>
+            (newItem as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" }),
+          );
           break;
 
         case HoverActionTypes.INCREASE:
@@ -104,8 +116,8 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
             throw new Error(`[React-Menu] Unknown hover action type: ${actionType}`);
       }
 
-      if (!newItem) index = -1;
-      setHoverItem(newItem);
+      if (!newItem && !newItemFn) index = -1;
+      setHoverItem(newItem ?? newItemFn);
       mutableState.hoverIndex = index;
     },
     [menuRef, mutableState],

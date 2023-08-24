@@ -8,12 +8,17 @@ export type GridUpdatingContextType = {
     fn: () => void | Promise<void>,
   ) => Promise<void>;
   updatedDep: number;
+  updatingCols: () => string[];
 };
 
 export const GridUpdatingContext = createContext<GridUpdatingContextType>({
   checkUpdating: () => {
     console.error("Missing GridUpdatingContext");
     return false;
+  },
+  updatingCols: () => {
+    console.error("Missing GridUpdatingContext");
+    return [];
   },
   modifyUpdating: async () => {
     console.error("Missing GridUpdatingContext");

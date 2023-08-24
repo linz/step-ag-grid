@@ -1,8 +1,11 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
@@ -16,26 +19,14 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
   component: Grid,
   decorators: [
     (Story) => (
-      <div
-        style={{
-          border: "1px solid #eee",
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          maxHeight: 500,
-          maxWidth: "100%",
-          minWidth: "480px",
-          padding: "1em",
-        }}
-      >
+      <div style={{ width: 1024, height: 400, display: "flex" }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -66,13 +57,19 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
       GridCell({
         field: "desc",
         headerName: "Description",
+        flex: 1,
       }),
     ],
     [],
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Integration tester" },
+    {
+      id: 1000,
+      position: "Tester",
+      age: 30,
+      desc: "Integration tester - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a lectus neque. Nunc congue magna ut lorem pretium, vitae congue lorem malesuada. Etiam eget eleifend sapien, sed egestas felis. Aliquam ac augue sapien.",
+    },
     { id: 1001, position: "Developer", age: 12, desc: "Frontend developer" },
     { id: 1002, position: "Manager", age: 65, desc: "Technical Manager" },
     { id: 1003, position: "Tester", age: 30, desc: "E2E tester" },
@@ -102,9 +99,10 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
           ]}
         />
       </GridFilters>
-      <Grid {...props} columnDefs={columnDefs} rowData={rowData} />
+      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={"auto-skip-headers"} />
     </GridWrapper>
   );
 };
 
-export const FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+export const _FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+_FilterButtonsExample.play = waitForGridReady;
