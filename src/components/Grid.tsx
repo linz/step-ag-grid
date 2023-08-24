@@ -60,7 +60,7 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   rowDragText?: GridOptions["rowDragText"];
-  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => void;
+  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => Promise<void>;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -610,9 +610,9 @@ export const Grid = ({
   }, []);
 
   const onRowDragEnd = useCallback(
-    (event: RowDragEndEvent) => {
+    async (event: RowDragEndEvent) => {
+      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
       if (event.node.rowIndex) {
-        const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
         const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
         const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
 
@@ -628,8 +628,9 @@ export const Grid = ({
         moved.id != target.id && //moved over a different row
           moved.rowIndex != targetIndex && //moved to a different index
           params.onRowDragEnd &&
-          params.onRowDragEnd(moved, target, targetIndex);
+          (await params.onRowDragEnd(moved, target, targetIndex));
       }
+      clientSideRowModel.highlightRowAtPixel(null);
     },
     [params],
   );
