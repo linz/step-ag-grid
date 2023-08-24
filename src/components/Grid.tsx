@@ -1,4 +1,4 @@
-import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
+import { CellClickedEvent, ColDef, ColGroupDef, ColumnResizedEvent, IClientSideRowModel, ModelUpdatedEvent, RowHighlightPosition, RowNode } from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
 import {
@@ -7,6 +7,7 @@ import {
   CellKeyDownEvent,
   GridReadyEvent,
   RowDragEndEvent,
+  RowDragMoveEvent,
   SelectionChangedEvent,
 } from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
@@ -590,15 +591,32 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
+const onRowDragLeave = useCallback(
+  (event:RowDragMoveEvent) => {
+    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+    clientSideRowModel.highlightRowAtPixel(null);
+  },[])
+
+  const onRowDragMove = useCallback(
+    (event:RowDragMoveEvent) => {
+      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+      clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+    }
+  ,[])
+
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
+      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+      const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
+      const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
       const moved = event.node.data;
       const target = event.overNode?.data;
 
       moved.id != target.id &&
-        event.node.rowIndex != null &&
         params.onRowDragEnd &&
-        params.onRowDragEnd(moved, target, event.node.rowIndex);
+        params.onRowDragEnd(moved, target, event.overIndex + (isBelow ? 0 : -1));
+
+      clientSideRowModel.highlightRowAtPixel(null);
     },
     [params],
   );
@@ -666,9 +684,9 @@ export const Grid = ({
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
           rowDragText={params.rowDragText}
-          rowDragManaged={!!params.onRowDragEnd}
-          suppressMoveWhenRowDragging={true}
+          onRowDragMove={onRowDragMove}
           onRowDragEnd={onRowDragEnd}
+          onRowDragLeave={onRowDragLeave}
         />
       </div>
     </div>
