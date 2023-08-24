@@ -613,23 +613,23 @@ export const Grid = ({
     (event: RowDragEndEvent) => {
       const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
 
-      if (event.overNode) {
+      if (event.node.rowIndex) {
         const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
         const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
 
-        const moved = event.node;
-        const target = event.overNode;
         let targetIndex = event.overIndex;
-        if (moved.rowIndex! > event.overIndex) {
+        if (event.node.rowIndex > event.overIndex) {
           targetIndex += isBelow ? 1 : 0;
         } else {
           targetIndex += isBelow ? 0 : -1;
         }
 
-        moved.data.id != target.data.id &&
+        const moved = event.node.data;
+        const target = event.overNode?.data;
+        moved.id != target.id &&
           moved.rowIndex != targetIndex &&
           params.onRowDragEnd &&
-          params.onRowDragEnd(moved.data, target.data, targetIndex);
+          params.onRowDragEnd(moved, target, targetIndex);
       }
       clientSideRowModel.highlightRowAtPixel(null);
     },
