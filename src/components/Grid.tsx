@@ -114,6 +114,7 @@ export const Grid = ({
 }: GridProps): ReactElement => {
   const {
     gridReady,
+    hasGridRendered,
     setApis,
     ensureRowVisible,
     getFirstRowId,
@@ -156,10 +157,8 @@ export const Grid = ({
       return;
     }
 
-    const headerCellCount = gridDivRef.current?.getElementsByClassName("ag-header-cell-label")?.length;
-    if (headerCellCount < 2) {
-      // Don't resize grids until all the columns are visible
-      // as `autoSizeColumns` will fail silently in this case
+    if (!hasGridRendered()) {
+      // Don't resize until grid has rendered, or it has 0 rows.
       needsAutoSize.current = true;
       return;
     }
@@ -185,7 +184,7 @@ export const Grid = ({
     }
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
+  }, [autoSizeColumns, hasGridRendered, params, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
 

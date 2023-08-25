@@ -105,6 +105,13 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   );
 
   /**
+   * Used to check if it's OK to autosize.
+   */
+  const hasGridRendered = useCallback(() => {
+    return gridApi?.getModel().isEmpty() || !isEmpty(gridApi?.getRenderedNodes());
+  }, [gridApi]);
+
+  /**
    * Expose scrollRowIntoView for playwright tests.
    */
   useEffect(() => {
@@ -701,6 +708,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   return (
     <GridContext.Provider
       value={{
+        hasGridRendered,
         getColDef,
         getColumns,
         getColumnIds,
