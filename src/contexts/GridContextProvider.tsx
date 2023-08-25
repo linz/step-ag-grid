@@ -107,9 +107,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   /**
    * Used to check if it's OK to autosize.
    */
-  const hasGridRendered = useCallback(() => {
-    return gridApi?.getModel().isEmpty() || !isEmpty(gridApi?.getRenderedNodes());
-  }, [gridApi]);
+  const hasGridRendered = useCallback(
+    () => !!(gridApi && (!gridApi.getModel().isRowsToRender() || !isEmpty(gridApi.getRenderedNodes()))),
+    [gridApi],
+  );
 
   /**
    * Expose scrollRowIntoView for playwright tests.
