@@ -85,6 +85,25 @@
   visibility: visible;
 }
 
+.ag-drag-handle.ag-row-drag{
+  opacity: 0;
+
+  .ag-icon-grip{
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%239999B3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2Zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2Zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z' /%3E%3C/svg%3E");
+    background-repeat: no-repeat no-repeat;
+    background-position: center center;
+    background-size: cover;
+    color:transparent;
+  }
+}
+
+.ag-row:hover{
+  .ag-drag-handle.ag-row-drag{
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
+}
+
 .GridFormMessage-container {
   padding: 4px 8px;
   max-width: 400px;
@@ -92,10 +111,6 @@
 
 .GridCell-readonly {
   color: colors.$fuscous;
-}
-
-.Grid-container.ag-theme-alpine .ag-cell {
-  font-weight: 400;
 }
 
 .Grid-container.ag-theme-alpine .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {

@@ -1,8 +1,11 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
@@ -16,26 +19,14 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
   component: Grid,
   decorators: [
     (Story) => (
-      <div
-        style={{
-          border: "1px solid #eee",
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          maxHeight: 500,
-          maxWidth: "100%",
-          minWidth: "480px",
-          padding: "1em",
-        }}
-      >
+      <div style={{ width: 1024, height: 400, display: "flex" }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -113,4 +104,5 @@ const GridFilterButtonsTemplate: ComponentStory<typeof Grid> = (props: GridProps
   );
 };
 
-export const FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+export const _FilterButtonsExample = GridFilterButtonsTemplate.bind({});
+_FilterButtonsExample.play = waitForGridReady;

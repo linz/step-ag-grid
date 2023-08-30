@@ -1,11 +1,28 @@
-import { CellClickedEvent, ColDef, ColumnResizedEvent, ModelUpdatedEvent } from "ag-grid-community";
+import {
+  CellClickedEvent,
+  ColDef,
+  ColGroupDef,
+  ColumnResizedEvent,
+  IClientSideRowModel,
+  ModelUpdatedEvent,
+  RowHighlightPosition,
+  RowNode,
+} from "ag-grid-community";
 import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
-import { CellEvent, GridReadyEvent, SelectionChangedEvent } from "ag-grid-community/dist/lib/events";
+import {
+  AgGridEvent,
+  CellEvent,
+  CellKeyDownEvent,
+  GridReadyEvent,
+  RowDragEndEvent,
+  RowDragMoveEvent,
+  SelectionChangedEvent,
+} from "ag-grid-community/dist/lib/events";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
@@ -14,6 +31,7 @@ import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
+import { GridContextMenuComponent, useGridContextMenu } from "./gridHook";
 
 export interface GridBaseRow {
   id: string | number;
@@ -35,13 +53,14 @@ export interface GridProps {
    */
   selectColumnPinned?: ColDef["pinned"];
   noRowsOverlayText?: string;
-  postSortRows?: GridOptions["postSortRows"];
   animateRows?: boolean;
   rowHeight?: number;
   rowClassRules?: GridOptions["rowClassRules"];
   rowSelection?: "single" | "multiple";
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
+  rowDragText?: GridOptions["rowDragText"];
+  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => Promise<void>;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
@@ -67,6 +86,16 @@ export interface GridProps {
    * Once the last cell to edit closes this callback is called.
    */
   onCellEditingComplete?: () => void;
+
+  /**
+   * Context menu definition if required.
+   */
+  contextMenu?: GridContextMenuComponent<any>;
+
+  /**
+   * Whether to select row on context menu.
+   */
+  contextMenuSelectRow?: boolean;
 }
 
 /**
@@ -76,11 +105,13 @@ export const Grid = ({
   "data-testid": dataTestId,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
-  theme = "ag-theme-alpine",
+  theme = "ag-theme-step-default",
   sizeColumns = "auto",
   selectColumnPinned = null,
+  contextMenuSelectRow = false,
+  rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
   ...params
-}: GridProps): JSX.Element => {
+}: GridProps): ReactElement => {
   const {
     gridReady,
     setApis,
@@ -102,9 +133,11 @@ export const Grid = ({
   const { prePopupOps } = useContext(GridContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
-
   const lastSelectedIds = useRef<number[]>([]);
+
   const [staleGrid, setStaleGrid] = useState(false);
+  const [autoSized, setAutoSized] = useState(false);
+
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
   /**
@@ -124,7 +157,7 @@ export const Grid = ({
     }
 
     const headerCellCount = gridDivRef.current?.getElementsByClassName("ag-header-cell-label")?.length;
-    if (headerCellCount != params.columnDefs.length) {
+    if (headerCellCount < 2) {
       // Don't resize grids until all the columns are visible
       // as `autoSizeColumns` will fail silently in this case
       needsAutoSize.current = true;
@@ -133,7 +166,7 @@ export const Grid = ({
 
     const skipHeader = sizeColumns === "auto-skip-headers" && !isEmpty(params.rowData);
     if (sizeColumns === "auto" || skipHeader) {
-      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current });
+      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
       if (isEmpty(params.rowData)) {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
@@ -150,14 +183,25 @@ export const Grid = ({
     if (sizeColumns !== "none") {
       sizeColumnsToFit();
     }
+    setAutoSized(true);
     needsAutoSize.current = false;
   }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
+
+  const lastOwnerDocumentRef = useRef<Document>();
 
   /**
    * Auto-size windows that had deferred auto-size
    */
   useIntervalHook({
     callback: () => {
+      // Check if window has been popped out and needs resize
+      const currentDocument = gridDivRef.current?.ownerDocument;
+      if (currentDocument !== lastOwnerDocumentRef.current) {
+        lastOwnerDocumentRef.current = currentDocument;
+        if (currentDocument) {
+          needsAutoSize.current = true;
+        }
+      }
       if (needsAutoSize.current) {
         needsAutoSize.current = false;
         setInitialContentSize();
@@ -186,7 +230,7 @@ export const Grid = ({
       if (params.autoSelectFirstRow) {
         selectRowsById([firstRowId]);
       } else {
-        focusByRowById(firstRowId);
+        focusByRowById(firstRowId, true);
       }
     }
   }, [
@@ -277,7 +321,7 @@ export const Grid = ({
   /**
    * Add selectable column to colDefs.  Adjust column defs to block fit for auto sized columns.
    */
-  const columnDefs = useMemo((): ColDef[] => {
+  const columnDefs = useMemo((): (ColDef | ColGroupDef)[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
       const colDefEditable = colDef.editable;
       const editable = combineEditables(params.readOnly !== true, params.defaultColDef?.editable, colDefEditable);
@@ -290,20 +334,23 @@ export const Grid = ({
         },
       };
     });
-    return params.selectable
+
+    return params.selectable || params.onRowDragEnd
       ? [
           {
             colId: "selection",
             editable: false,
-            minWidth: 42,
-            maxWidth: 42,
+            rowDrag: !!params.onRowDragEnd,
+            minWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
+            maxWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,
             },
-            checkboxSelection: true,
+            checkboxSelection: params.selectable,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
+              if (!params.selectable) return false;
               if ((e.event.key === "Enter" || e.event.key === " ") && !e.event.repeat) {
                 if (isEmpty(e.api.getSelectedRows())) {
                   e.api.selectAllFiltered();
@@ -322,6 +369,7 @@ export const Grid = ({
   }, [
     params.columnDefs,
     params.selectable,
+    params.onRowDragEnd,
     params.readOnly,
     params.defaultColDef?.editable,
     selectColumnPinned,
@@ -335,6 +383,7 @@ export const Grid = ({
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
       setApis(event.api, event.columnApi, dataTestId);
+      event.api.showNoRowsOverlay();
       synchroniseExternallySelectedItemsToGrid();
     },
     [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
@@ -367,19 +416,8 @@ export const Grid = ({
   /**
    * Show/hide no rows overlay when model changes.
    */
-  const isShowingNoRowsOverlay = useRef(false);
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
-    if (event.api.getDisplayedRowCount() === 0) {
-      if (!isShowingNoRowsOverlay.current) {
-        event.api.showNoRowsOverlay();
-        isShowingNoRowsOverlay.current = true;
-      }
-    } else {
-      if (isShowingNoRowsOverlay.current) {
-        event.api.hideOverlay();
-        isShowingNoRowsOverlay.current = false;
-      }
-    }
+    event.api.showNoRowsOverlay();
   }, []);
 
   /**
@@ -459,7 +497,7 @@ export const Grid = ({
    * Start editing on pressing Enter
    */
   const onCellKeyPress = useCallback(
-    (e: CellEvent) => {
+    (e: CellKeyDownEvent) => {
       if ((e.event as KeyboardEvent).key === "Enter") {
         if (!invokeEditAction(e)) startCellEditing(e);
       }
@@ -471,15 +509,23 @@ export const Grid = ({
    * Once the grid has auto-sized we want to run fit to fit the grid in its container,
    * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
    */
-  const columnDefsAdjusted = useMemo(
-    () =>
-      columnDefs.map((colDef) => ({
-        ...colDef,
-        suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
-        sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
-      })),
-    [columnDefs, params.defaultColDef?.sortable, sizeColumns],
-  );
+  const columnDefsAdjusted = useMemo(() => {
+    const adjustColDefOrGroup = (colDef: ColDef | ColGroupDef) =>
+      "children" in colDef ? adjustGroupColDef(colDef) : adjustColDef(colDef);
+
+    const adjustGroupColDef = (colDef: ColGroupDef): ColGroupDef => ({
+      ...colDef,
+      children: colDef.children.map((colDef) => adjustColDefOrGroup(colDef)),
+    });
+
+    const adjustColDef = (colDef: ColDef): ColDef => ({
+      ...colDef,
+      suppressSizeToFit: (sizeColumns === "auto" || sizeColumns === "auto-skip-headers") && !colDef.flex,
+      sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
+    });
+
+    return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
+  }, [columnDefs, params.defaultColDef?.sortable, sizeColumns]);
 
   /**
    * Set of colIds that need auto-sizing.
@@ -531,7 +577,7 @@ export const Grid = ({
   }, [sizeColumns, sizeColumnsToFit]);
 
   /**
-   * Set of column Id's that are prevented from auto-sizing as they are user set
+   * Set of column I'd's that are prevented from auto-sizing as they are user set
    */
   const userSizedColIds = useRef(new Set<string>());
 
@@ -551,6 +597,45 @@ export const Grid = ({
     }
   }, []);
 
+  const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
+
+  const onRowDragLeave = useCallback((event: RowDragMoveEvent) => {
+    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+    clientSideRowModel.highlightRowAtPixel(null);
+  }, []);
+
+  const onRowDragMove = useCallback((event: RowDragMoveEvent) => {
+    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+    clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+  }, []);
+
+  const onRowDragEnd = useCallback(
+    async (event: RowDragEndEvent) => {
+      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+      if (event.node.rowIndex != null) {
+        const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
+        const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
+
+        let targetIndex = event.overIndex;
+        if (event.node.rowIndex > event.overIndex) {
+          targetIndex += isBelow ? 1 : 0;
+        } else {
+          targetIndex += isBelow ? 0 : -1;
+        }
+
+        const moved = event.node.data;
+        const target = event.overNode?.data;
+        moved.id != target.id && //moved over a different row
+          event.node.rowIndex != targetIndex && //moved to a different index
+          params.onRowDragEnd &&
+          (await params.onRowDragEnd(moved, target, targetIndex));
+      }
+      clientSideRowModel.highlightRowAtPixel(null);
+    },
+    [params],
+  );
+
+  // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
   return (
@@ -560,12 +645,13 @@ export const Grid = ({
         "Grid-container",
         theme,
         staleGrid && "Grid-sortIsStale",
-        gridReady && params.rowData && "Grid-ready",
+        gridReady && params.rowData && autoSized && "Grid-ready",
       )}
     >
+      {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
-          rowHeight={params.rowHeight}
+          rowHeight={rowHeight}
           animateRows={params.animateRows}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
@@ -578,8 +664,8 @@ export const Grid = ({
           onColumnVisible={() => {
             setInitialContentSize();
           }}
-          onRowDataChanged={onRowDataChanged}
-          onCellKeyPress={onCellKeyPress}
+          onRowDataUpdated={onRowDataChanged}
+          onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStarted={refreshSelectedRows}
@@ -588,21 +674,33 @@ export const Grid = ({
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
           rowData={params.rowData}
-          noRowsOverlayComponent={GridNoRowsOverlay}
-          noRowsOverlayComponentParams={{
-            rowData: params.rowData,
-            noRowsOverlayText: params.noRowsOverlayText,
+          noRowsOverlayComponent={(event: AgGridEvent) => {
+            let rowCount = 0;
+            event.api.forEachNode(() => rowCount++);
+            return (
+              <GridNoRowsOverlay
+                rowCount={rowCount}
+                filteredRowCount={event.api.getDisplayedRowCount()}
+                noRowsOverlayText={params.noRowsOverlayText}
+              />
+            );
           }}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.postSortRows ?? postSortRows}
+          postSortRows={params.onRowDragEnd ? undefined : postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
           maintainColumnOrder={true}
+          preventDefaultOnContextMenu={true}
+          onCellContextMenu={gridContextMenu.cellContextMenu}
+          rowDragText={params.rowDragText}
+          onRowDragMove={onRowDragMove}
+          onRowDragEnd={onRowDragEnd}
+          onRowDragLeave={onRowDragLeave}
         />
       </div>
     </div>

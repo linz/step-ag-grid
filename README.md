@@ -1,7 +1,6 @@
 # step-ag-grid
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
-
 > Reusable [ag-grid](https://www.ag-grid.com/) component for LINZ / Toitū te whenua.
 
 ## Features
@@ -17,21 +16,22 @@
   - Bearing/Bearing Correction
   - Popover message
   - Custom form
+  - Context menu
 
-_Please note this requires React >=17, ag-grid-community >=27, and sass._
+_Please note this requires React >=17, ag-grid-community >=28, and SASS._
 
 ## Install
 
 with npm
 
 ```bash
-npm install @linz/step-ag-grid
+npm install @linzjs/step-ag-grid
 ```
 
 or with Yarn
 
 ```bash
-yarn add @linz/step-ag-grid
+yarn add @linzjs/step-ag-grid
 ```
 
 ## Demo
@@ -54,7 +54,9 @@ import "@linzjs/lui/dist/scss/base.scss";
 import {
   ColDefT,
   GridCell,
+  GridCellFiller,
   GridContextProvider,
+  GridContextMenuComponentProps,
   GridPopoverEditDropDown,
   GridPopoverMessage,
   GridUpdatingContextProvider,
@@ -82,9 +84,11 @@ const GridDemo = () => {
         headerName: "Id",
         export: false,
       }),
+      // This is the flex column that will expand to fit
       GridCell({
         field: "name",
         headerName: "Name",
+        flex: 1,
         cellRendererParams: {
           warning: ({ value }) => value === "Tester" && "Testers are testing",
           info: ({ value }) => value === "Developer" && "Developers are awesome",
@@ -116,10 +120,35 @@ const GridDemo = () => {
           },
         },
       ),
+      // If your flex column gets hidden this will become active
+      GridCellFiller(),
     ],
     [],
   );
 
+  const ContextMenu = ({ selectedRows, colDef, close }: GridContextMenuComponentProps<ITestRow>): ReactElement => {
+    const onClick = useCallback(() => {
+      selectedRows.forEach((row) => {
+        switch (colDef.field) {
+          case "name":
+            row.name = "";
+            break;
+          case "distance":
+            row.distance = null;
+            break;
+        }
+      });
+      close();
+    }, [close, colDef.field, selectedRows]);
+
+    return (
+      <>
+        <button onClick={onClick}>Button - Clear cell</button>
+        <MenuItem onClick={onClick}>Menu Item - Clear cell</MenuItem>
+      </>
+    );
+  };
+  
   const rowData: ITestRow[] = useMemo(
     () => [
       { id: 1000, name: "Tom", position: "Tester" },
@@ -155,6 +184,8 @@ const GridDemo = () => {
           <Grid selectable={true}
                 columnDefs={columnDefs}
                 rowData={rowData}
+                contextMenu={contextMenu}
+                contextMenuSelectRow={false}
                 onContentSize={({ width }) => setPanelSize(width)} />
         </GridWrapper>
       </GridContextProvider>
@@ -235,7 +266,7 @@ test("click Delete menu option removes row from the table", async () => {
   await screen.findByText("My component header");
   expect((await findRow(12345)).getAttribute("row-index")).toBe("1");
   await openAndClickMenuOption(12345, "actions", "Delete");
-  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined());
+  await waitFor(async () => expect((await queryRow(12345)).not.toBeDefined()));
 });
 ```
 
@@ -247,4 +278,3 @@ This will throw an exception if the row id is not found.
 ```tsx
 window.__stepAgGrid.grids[dataTestId].scrollRowIntoViewById("1000")
 ```
-

@@ -1,11 +1,10 @@
-import { ReactNode } from "react";
+import { PropsWithChildren } from "react";
 
 export interface GridWrapperProps {
-  children: ReactNode;
   maxHeight?: number | string;
 }
 
-export const GridWrapper = ({ children, maxHeight }: GridWrapperProps) => (
+export const GridWrapper = ({ children, maxHeight }: PropsWithChildren<GridWrapperProps>) => (
   <div className={"Grid-wrapper"} style={{ maxHeight }}>
     {children}
   </div>

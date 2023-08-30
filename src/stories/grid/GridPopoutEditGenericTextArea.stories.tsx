@@ -1,8 +1,11 @@
+import "../../styles/GridTheme.scss";
+import "../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { useCallback, useContext, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ActionButton,
@@ -23,8 +26,7 @@ import {
   isFloat,
   wait,
 } from "../..";
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
+import { waitForGridReady } from "../../utils/storybookTestUtil";
 import { IFormTestRow } from "./FormTest";
 
 export default {
@@ -172,7 +174,7 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
               {
                 label: "Delete",
                 action: async ({ selectedRows }) => {
-                  await wait(1500);
+                  await wait(1000);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
                 },
               },
@@ -224,4 +226,5 @@ const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridP
   );
 };
 
-export const EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
+export const _EditGenericTextArea = GridPopoutEditGenericTemplate.bind({});
+_EditGenericTextArea.play = waitForGridReady;

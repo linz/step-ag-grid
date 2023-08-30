@@ -31,7 +31,6 @@ export const ControlledMenuFr = (
     onItemClick,
     onClose,
     saveButtonRef,
-    closeMenuExclusionClassName,
     ...restProps
   }: ControlledMenuProps & { saveButtonRef?: MutableRefObject<HTMLButtonElement | null> },
   externalRef: ForwardedRef<HTMLUListElement>,
@@ -70,8 +69,10 @@ export const ControlledMenuFr = (
   const isWithinMenu = useCallback(
     (target: EventTarget | null) =>
       hasParentClass("szh-menu--state-open", target as Node) ||
-      (closeMenuExclusionClassName && hasParentClass(closeMenuExclusionClassName, target as Node)),
-    [closeMenuExclusionClassName],
+      // This is temporary, it will be removed when the overlay click is fixed
+      hasParentClass("LuiModalPrefab", target as Node) ||
+      hasParentClass("prefab-modal", target as Node),
+    [],
   );
 
   const handleScreenEventForSave = useCallback(

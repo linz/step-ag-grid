@@ -10,10 +10,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Use Node 16
+      - name: Use Node 18
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
@@ -43,7 +43,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
@@ -73,7 +73,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps

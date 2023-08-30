@@ -1,106 +1,144 @@
-@use "@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as lui;
+@use "@linzjs/lui/dist/scss/Core" as lui;
+@use "node_modules/ag-grid-community/styles" as ag;
 
-// These break if we use urls so ignore stylelint
-/* stylelint-disable-next-line */
-@import "ag-grid-community/src/styles/ag-grid";
-/* stylelint-disable-next-line */
-@import "ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
+// ag-grid likes to add 1px to this, so we subtract to compensate
+$grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
-.ag-theme-alpine {
-  // AG Grid themes can be customized using theme parameters, which are arguments that change its appearance. Refer to
-  // https://www.ag-grid.com/javascript-data-grid/themes-customising/#full-list-of-theme-parameters for a full list of
-  // the available theme parameters, which should be used whenever possible.
-  @include ag-theme-alpine(
-    (
-      alpine-active-color: lui.$sea,
-      foreground-color: lui.$charcoal,
-      data-color: lui.$charcoal,
-      // ag-grid-community >=28
-      selected-row-background-color: lui.$polar,
-      header-foreground-color: lui.$surfie,
-      background-color: lui.$white,
-      odd-row-background-color: lui.$white,
-      header-background-color: lui.$white,
-      border-color: lui.$lily,
-      secondary-border-color: lui.$lily,
-      cell-horizontal-border: solid ag-derived(secondary-border-color),
-      cell-horizontal-padding: 12,
-      row-hover-color: lui.$hint,
-      font-family: (
-        "Open Sans",
-        system-ui,
-        sans-serif,
+// GridTheme that support ag-grid v29 new SASS API
+@include ag.grid-styles(
+  (
+    themes: (
+      step-compact: (
+        extend-theme: alpine,
+        --ag-row-height: 36px,
+        --ag-header-height: 36px,
+        --ag-font-size: calc($grid-base-font-size - 2px),
       ),
-      font-size: 1rem !important,
-      borders: false,
-      borders-critical: true,
-      borders-secondary: false,
-    )
-  );
+      step-default: (
+        extend-theme: alpine,
+        --ag-row-height: 40px,
+        --ag-header-height: 40px,
+        --ag-font-size: calc($grid-base-font-size),
+      ),
+    ),
 
-  // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell[col-id="selection"] {
-    display: flex;
+    alpine-active-color: lui.$sea,
+    background-color: lui.$white,
+    border-color: lui.$dew,
+    borders: false,
+    borders-critical: true,
+    borders-secondary: false,
+    cell-horizontal-border: solid lui.$dew,
+    cell-horizontal-padding: lui.$unit-sm,
+    data-color: lui.$charcoal,
+    foreground-color: lui.$charcoal,
+    font-family: (
+      "Open Sans",
+      system-ui,
+      sans-serif,
+    ),
+    font-size: 1rem,
+    header-background-color: lui.$white,
+    header-foreground-color: lui.$surfie,
+    odd-row-background-color: lui.$white,
+    row-hover-color: lui.$hint,
+    secondary-border-color: lui.$dew,
+    selected-row-background-color: lui.$polar,
+  )
+);
+
+
+.ag-cell[col-id="selection"] {
+  display: flex;// Fix that when you click below checkbox it doesn't process a click
+}
+
+// fix alignment of cell content when grabber is present
+.ag-header-cell-comp-wrapper {
+  justify-content: end;
+}
+
+// Fix that when you click below checkbox it doesn't process a click
+.ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
+  height: auto;
+}
+
+.ag-row:last-of-type {
+  border-bottom: 1px solid lui.$dew;
+}
+
+.ag-header-cell {
+  font-size: 14px;
+  font-weight: 600;
+
+  // fix: Display descender line
+  padding: 0 11px;
+
+  .LuiIcon {
+    fill: lui.$surfie;
   }
+}
 
-  // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
-    height: auto;
-  }
+.ag-cell-label-container {
+  padding: 8px 0;
 
-  .ag-row:last-of-type {
-    border-bottom: 1px solid lui.$lily;
-  }
+  // Help ag-grid to calculate column height in react portal
+  height: fit-content;
+}
 
-  // ag-grid-community 27.x.x needs this vs 28 using the selected-row-background-color above
-  // You can set a background _color_ with theme parameters, but for something like a gradient, you need to override CSS.
-  .ag-row-selected {
-    background-color: lui.$polar;
-  }
+.ag-header .ag-header-cell[aria-colindex="1"] {
+  padding-left: 17px;
+  padding-right: 15px;
+}
 
-  .ag-header-cell {
-    font-weight: 600;
-    padding: 7px 11px;
+.ag-cell[role="gridcell"] {
+  border-right: none;
+  border-left: 1px var(--ag-cell-horizontal-border);
+}
 
-    .LuiIcon {
-      fill: lui.$surfie;
-    }
-  }
+.ag-cell[aria-colindex="1"] {
+  border-left: 1px solid transparent;
+  padding-left: lui.$unit-rg;
+}
 
-  .ag-cell {
-    padding-left: 11px;
-    padding-right: 11px;
-    display: flex;
-    align-items: center;
-  }
+.ag-cell {
+  padding-left: 11px;
+  padding-right: 11px;
+  display: flex;
+  align-items: center;
+}
 
-  .ag-cell-wrap-text {
-    word-break: break-word;
-  }
+.ag-cell-wrap-text {
+  word-break: break-word;
+}
 
-  .ag-cell.ag-cell-popup-editing,
-  .ag-cell.ag-selected-for-edit,
-  .ag-cell-inline-editing {
-    padding-left: 9px;
-    padding-right: 9px;
-    background: rgb(72 160 244 / 20%);
-    // These are important, it needs to override ag-grid to work
-    border: 3px solid #48a0f4 !important;
-    border-right: 3px solid #48a0f4 !important;
-  }
+.ag-cell.ag-cell-popup-editing,
+.ag-cell.ag-selected-for-edit,
+.ag-cell-inline-editing {
+  padding-left: 9px;
+  padding-right: 9px;
+  background: rgb(72 160 244 / 20%);
 
-  .ag-row .ag-cell-data-changed {
-    // ag-grid natively has !important on this style so we have to use it here :(
-    background-color: lightgoldenrodyellow !important;
-  }
+  // These are important, it needs to override ag-grid to work
+  border: 3px solid #48a0f4 !important;
+  border-right: 3px solid #48a0f4 !important;
+}
 
-  .ag-center-cols-clipper {
-    // when using domLayout={"autoHeight"}, ag grid has a default min-height set to 150px so the !important is necessary here
-    min-height: 40px !important;
-  }
+.ag-row .ag-cell-data-changed {
+  // ag-grid natively has !important on this style so we have to use it here :(
+  background-color: lightgoldenrodyellow;
+}
 
-  .ag-body-horizontal-scroll-viewport {
-    // It's set to scroll by default, but this causes issues with selecting the last row
-    overflow-x: auto;
-  }
+.ag-center-cols-clipper {
+  // when using domLayout={"autoHeight"}, ag grid has a default min-height
+  // set to 150px so the !important is necessary here
+  min-height: 40px !important;
+}
+
+.ag-body-horizontal-scroll-viewport {
+  // It's set to scroll by default, but this causes issues with selecting the last row
+  overflow-x: auto;
+}
+
+.Grid-container .ag-cell {
+  font-weight: 400;
 }

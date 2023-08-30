@@ -1,6 +1,6 @@
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
 import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { forwardRef, useContext } from "react";
+import { ReactElement, forwardRef, useContext } from "react";
 
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
@@ -18,7 +18,7 @@ import {
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
-  editor?: (editorProps: E) => JSX.Element;
+  editor?: (editorProps: E) => ReactElement;
   editorParams?: E;
 }
 
@@ -59,7 +59,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
 // This is so that typescript retains the row type to pass to the GridCells
 export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
   _?: RowType;
-  editor?: (editorProps: any) => JSX.Element;
+  editor?: (editorProps: any) => ReactElement;
 }
 
 export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
@@ -106,7 +106,7 @@ export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCo
   custom?: {
     multiEdit?: boolean;
     preventAutoEdit?: boolean;
-    editor?: (editorProps: Props) => JSX.Element;
+    editor?: (editorProps: Props) => ReactElement;
     editorParams?: Props;
   },
 ): ColDefT<RowType> => {
@@ -164,7 +164,7 @@ export interface CellEditorCommon {
   className?: string | undefined;
 }
 
-export const GenericCellEditorComponentWrapper = (editor?: (props: any) => JSX.Element) => {
+export const GenericCellEditorComponentWrapper = (editor?: (props: any) => ReactElement) => {
   const obj = { editor };
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
     const valueFormatted = cellEditorParams.formatValue

@@ -1,14 +1,17 @@
+import { PropsWithChildren, ReactElement } from "react";
+
 import { LuiMiniSpinner } from "@linzjs/lui";
 
 /**
  * If loading is true this returns a loading spinner, otherwise it returns its children.
  */
-export const ComponentLoadingWrapper = (props: {
-  loading?: boolean;
-  saving?: boolean;
-  children: JSX.Element | undefined;
-  className: string | undefined;
-}): JSX.Element => {
+export const ComponentLoadingWrapper = (
+  props: PropsWithChildren<{
+    loading?: boolean;
+    saving?: boolean;
+    className: string | undefined;
+  }>,
+): ReactElement => {
   return props.loading ? (
     <LuiMiniSpinner size={22} divProps={{ role: "status", ["aria-label"]: "Loading", style: { padding: 16 } }} />
   ) : (

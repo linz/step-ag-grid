@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 import { GridBaseRow } from "../components/Grid";
 import { isFloat, stringByteLengthIsInvalid } from "./util";
 
@@ -5,7 +7,7 @@ export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   required?: boolean;
   maxLength?: number;
   maxBytes?: number;
-  invalid?: (value: string, data: RowType, context: any) => JSX.Element | string | null;
+  invalid?: (value: string, data: RowType, context: any) => ReactElement | string | null;
   numberFormat?: {
     precision?: number;
     scale?: number;

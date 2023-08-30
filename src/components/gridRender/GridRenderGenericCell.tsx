@@ -5,6 +5,7 @@ import {
   ValueFormatterParams,
   ValueGetterParams,
 } from "ag-grid-community/dist/lib/entities/colDef";
+import { ReactElement } from "react";
 
 import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
@@ -40,7 +41,7 @@ export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDefT<
 
 export interface GenericCellRendererParams<RowType extends GridBaseRow> {
   singleClickEdit?: boolean;
-  rightHoverElement?: JSX.Element | undefined;
+  rightHoverElement?: ReactElement | undefined;
   editAction?: (selectedRows: RowType[]) => void;
   shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | void) | undefined>;
   warning?: (props: RowICellRendererParams<RowType>) => string | string[] | boolean | null | undefined;

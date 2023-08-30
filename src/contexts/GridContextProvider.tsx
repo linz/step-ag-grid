@@ -1,37 +1,40 @@
-import { ColDef, ColumnApi, GridApi, RowNode } from "ag-grid-community";
-import { CellPosition } from "ag-grid-community/dist/lib/entities/cellPosition";
+import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
 import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
 import debounce from "debounce-promise";
-import { compact, defer, delay, difference, isEmpty, last, remove, sortBy, sumBy } from "lodash-es";
-import { ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
+import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
+import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
+import { getColId, isFlexColumn } from "../components/gridUtil";
 import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
-
-interface GridContextProps {
-  children: ReactNode;
-}
 
 /**
  * Context for AgGrid operations.
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: GridContextProps): ReactElement => {
+export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
-  const [invisibleColumnIds, setInvisibleColumnIds] = useState<string[]>([]);
+  const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
+
+  /**
+   * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
+   */
+  const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
+    _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId));
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -125,6 +128,16 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
   }, [gridApi]);
 
   /**
+   * After a popup refocus the cell.
+   */
+  const postPopupOps = useCallback(() => {
+    if (!gridApi) return;
+    if (prePopupFocusedCell.current) {
+      gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+    }
+  }, [gridApi]);
+
+  /**
    * Get all row id's in grid.
    */
   const _getAllRowIds = useCallback(() => {
@@ -149,12 +162,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Find new row ids
    * Uses beforeUpdate ids to find new nodes.
    */
-  const _getNewNodes = useCallback((): RowNode[] => {
+  const _getNewNodes = useCallback((): IRowNode[] => {
     return gridApiOp(
       (gridApi) =>
-        difference(_getAllRowIds(), idsBeforeUpdate.current)
-          .map((rowId) => gridApi.getRowNode("" + rowId)) //
-          .filter((r) => r) as RowNode[],
+        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -166,16 +177,30 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * @param rowIds Row ids to get from grid.
    */
   const _rowIdsToNodes = useCallback(
-    (rowIds: number[]): RowNode[] => {
+    (rowIds: number[]): IRowNode[] => {
       return gridApiOp(
-        (gridApi) =>
-          rowIds
-            .map((rowId) => gridApi.getRowNode("" + rowId)) //
-            .filter((r) => r) as RowNode[],
+        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
         () => [] as RowNode[],
       );
     },
     [gridApiOp],
+  );
+
+  /**
+   * Get ColDefs, with flattened ColGroupDefs
+   */
+  const getColumns = useCallback(
+    (
+      filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
+    ): ColDefT<RowType>[] =>
+      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
+    [columnApi],
+  );
+
+  const getColumnIds = useCallback(
+    (filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true): string[] =>
+      compact(getColumns(filterDef).map(getColId)),
+    [getColumns],
   );
 
   /**
@@ -188,10 +213,19 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    */
   const _selectRowsWithOptionalFlash = useCallback(
     (
-      rowIds: number[] | undefined,
-      select: boolean,
-      flash: boolean,
-      retryCount = 15, // We retry for approximately 5x200ms=1s
+      {
+        rowIds,
+        select,
+        flash,
+        ifNoCellFocused = false,
+        retryCount = 15,
+      }: {
+        rowIds: number[] | undefined;
+        select: boolean;
+        flash: boolean;
+        ifNoCellFocused?: boolean;
+        retryCount?: number;
+      }, // We retry for approximately 5x200ms=1s
     ) => {
       return gridApiOp((gridApi) => {
         const rowNodes = rowIds ? _rowIdsToNodes(rowIds) : _getNewNodes();
@@ -200,7 +234,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const gridHasNotUpdated = gridRowIdsNotUpdatedYet || gridRowIdsNotChangedYet;
         // After retry count expires we give-up and deselect all rows, then select any subset of rows that have updated
         if (gridHasNotUpdated && retryCount > 0) {
-          delay(() => _selectRowsWithOptionalFlash(rowIds, select, flash, retryCount - 1), 250);
+          delay(
+            () =>
+              _selectRowsWithOptionalFlash({
+                rowIds,
+                select,
+                flash,
+                ifNoCellFocused,
+                retryCount: retryCount - 1,
+              }),
+            250,
+          );
           return;
         }
 
@@ -211,15 +255,21 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
           defer(() => gridApi.ensureNodeVisible(firstNode));
-          const colDefs = gridApi.getColumnDefs();
-          if (colDefs?.length) {
-            const col = colDefs[0] as ColDef; // We don't support ColGroupDef
+          const colDefs = getColumns();
+          if (!isEmpty(colDefs)) {
+            const col = colDefs[0];
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
               // We need to make sure we aren't currently editing a cell otherwise tests will fail
               // as they will start to edit the cell before this stuff has a chance to run
-              colId && defer(() => isEmpty(gridApi.getEditingCells()) && gridApi.setFocusedCell(rowIndex, colId));
+              colId &&
+                delay(() => {
+                  if (isEmpty(gridApi.getEditingCells()) && (!ifNoCellFocused || gridApi.getFocusedCell() == null)) {
+                    // ifNoCellFocused
+                    gridApi.setFocusedCell(rowIndex, colId);
+                  }
+                }, 100);
             }
           }
         }
@@ -244,21 +294,21 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
         }
       });
     },
-    [_getNewNodes, _rowIdsToNodes, gridApiOp],
+    [_getNewNodes, _rowIdsToNodes, getColumns, gridApiOp],
   );
 
   const selectRowsById = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, false),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: false }),
     [_selectRowsWithOptionalFlash],
   );
 
   const selectRowsByIdWithFlash = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, true, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
   const flashRows = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash(rowIds, false, true),
+    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: false, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -266,7 +316,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, false);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: false });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -275,7 +325,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, true, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: true, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
@@ -284,13 +334,14 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     async (fn: () => Promise<any>) => {
       beforeUpdate();
       await fn();
-      _selectRowsWithOptionalFlash(undefined, false, true);
+      _selectRowsWithOptionalFlash({ rowIds: undefined, select: false, flash: true });
     },
     [_selectRowsWithOptionalFlash, beforeUpdate],
   );
 
   const focusByRowById = useCallback(
-    (rowId: number) => _selectRowsWithOptionalFlash([rowId], false, false),
+    (rowId: number, ifNoCellFocused?: boolean) =>
+      _selectRowsWithOptionalFlash({ rowIds: [rowId], select: false, flash: false, ifNoCellFocused }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -343,15 +394,23 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Resize columns to fit container
    */
   const autoSizeColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!columnApi) return null;
-      const colIdsSet = colIds instanceof Set ? colIds : new Set<string>(colIds ?? []);
-      columnApi.getColumnState().forEach((col) => {
-        const colId = col.colId;
-        if ((isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId)) {
-          columnApi.autoSizeColumn(colId, skipHeader);
-        }
+      const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
+      const colsToResize = columnApi.getColumnState().filter((colState) => {
+        const colId = colState.colId;
+        return (
+          (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
+          !userSizedColIds?.has(colId) &&
+          (includeFlex || !colState.flex)
+        );
       });
+      if (!isEmpty(colsToResize)) {
+        columnApi.autoSizeColumns(
+          colsToResize.map((colState) => colState.colId),
+          skipHeader,
+        );
+      }
       return {
         width: sumBy(
           columnApi.getColumnState().filter((col) => !col.hide),
@@ -366,7 +425,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
    * Resize columns to fit container
    */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApi && gridApi.sizeColumnsToFit();
+    gridApi?.sizeColumnsToFit();
   }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
@@ -391,7 +450,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       }
 
       if (!rowNode.isSelected()) {
-        rowNode.setSelected(true, false);
+        rowNode.setSelected(true, true);
       }
 
       // Cell already being edited, so don't re-edit until finished
@@ -534,13 +593,17 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     [gridApiOp, modifyUpdating, selectNextEditableCell],
   );
 
-  const redrawRows = useCallback(
-    (rowNodes?: RowNode[]) => {
-      gridApiOp((gridApi) => {
-        gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
-      });
-    },
-    [gridApiOp],
+  const redrawRows = useMemo(
+    () =>
+      debounce((rowNodes?: IRowNode[]) => {
+        try {
+          gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
+        } catch (ex) {
+          // Hide errors in jest, but log them in browser
+          if (typeof jest === "undefined") console.error(ex);
+        }
+      }, 50),
+    [gridApi],
   );
 
   // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
@@ -574,33 +637,39 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
     onFilterChanged().then();
   };
 
-  const isExternalFilterPresent = (): boolean => externalFilters.current.length > 0;
+  const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
 
-  const doesExternalFilterPass = (node: RowNode): boolean => {
-    return externalFilters.current.every((filter) => filter(node.data, node));
-  };
+  const doesExternalFilterPass = (node: IRowNode): boolean =>
+    externalFilters.current.every((filter) => filter(node.data, node));
 
   const getColDef = useCallback(
     (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,
     [gridApi],
   );
 
-  const getColumns: () => ColDefT<RowType>[] = useCallback(() => gridApi?.getColumnDefs() ?? [], [gridApi]);
-
+  /**
+   * Apply column visibility
+   */
   useEffect(() => {
-    if (columnApi) {
-      // show all columns that aren't invisible
-      columnApi.setColumnsVisible(
-        compact(
-          getColumns()
-            .filter((col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId))
-            .map((col) => col.colId),
-        ),
-        true,
-      );
-      // hide all invisible columns
-      columnApi.setColumnsVisible(invisibleColumnIds, false);
+    if (!columnApi || !invisibleColumnIds) return;
+
+    // show all columns that aren't invisible
+    const newVisibleColumns = getColumns(
+      (col) => !col.lockVisible && col.colId && !invisibleColumnIds.includes(col.colId) && !isGridCellFiller(col),
+    );
+    // If there's no flex column showing add the filler column if defined
+    const visibleColumnsContainsAFlex = newVisibleColumns.some(isFlexColumn);
+    if (!visibleColumnsContainsAFlex) {
+      const fillerColumn = getColumns(isGridCellFiller)[0];
+      fillerColumn && newVisibleColumns.push(fillerColumn);
     }
+    columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
+
+    // Hide the filler column if there's already a flex column
+    const invisibleColumnIdsWithOptionalFiller = visibleColumnsContainsAFlex
+      ? [...invisibleColumnIds, GridCellFillerColId]
+      : invisibleColumnIds;
+    columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
   }, [invisibleColumnIds, columnApi, getColumns]);
 
   /**
@@ -614,7 +683,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
 
       const columnKeys = columnApi
         ?.getColumnState()
-        .filter((cs) => !cs.hide && gridApi.getColumnDef(cs.colId)?.headerComponentParams?.exportable !== false)
+        .filter((cs) => {
+          const colDef = gridApi.getColumnDef(cs.colId);
+          return !cs.hide && colDef && !isGridCellFiller(colDef) && colDef.headerComponentParams?.exportable !== false;
+        })
         .map((cs) => cs.colId);
       gridApi.exportDataAsCsv({
         columnKeys,
@@ -631,10 +703,12 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: GridCont
       value={{
         getColDef,
         getColumns,
+        getColumnIds,
         invisibleColumnIds,
         setInvisibleColumnIds,
         gridReady,
         prePopupOps,
+        postPopupOps,
         setApis,
         setQuickFilter,
         selectRowsById,

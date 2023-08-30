@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { ReactElement } from "react";
 
 import { LuiIcon } from "@linzjs/lui";
 import { IconName, IconSize } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
@@ -9,7 +10,7 @@ export const GridIcon = (props: {
   size?: IconSize;
   disabled?: boolean;
   className?: string;
-}): JSX.Element => (
+}): ReactElement => (
   <LuiIcon
     name={props.icon}
     title={props.title}

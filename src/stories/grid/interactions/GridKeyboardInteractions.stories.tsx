@@ -1,10 +1,13 @@
+import "../../../styles/GridTheme.scss";
+import "../../../styles/index.scss";
+import "@linzjs/lui/dist/scss/base.scss";
+
 import { expect, jest } from "@storybook/jest";
 import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
 import { userEvent, waitFor } from "@storybook/testing-library";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
-import "@linzjs/lui/dist/scss/base.scss";
 
 import {
   ColDefT,
@@ -21,8 +24,7 @@ import {
   MenuOption,
   wait,
 } from "../../../";
-import "../../../styles/GridTheme.scss";
-import "../../../styles/index.scss";
+import { waitForGridReady } from "../../../utils/storybookTestUtil";
 
 export default {
   title: "Components / Grids",
@@ -33,6 +35,14 @@ export default {
     quickFilterPlaceholder: "Quick filter...",
     selectable: false,
     rowSelection: "single",
+  },
+  // Storybook hangs otherwise
+  parameters: {
+    docs: {
+      source: {
+        type: "code",
+      },
+    },
   },
   decorators: [
     (Story) => (
@@ -216,6 +226,8 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   multiEditAction.mockReset();
   eAction.mockReset();
 
+  await waitForGridReady({ canvasElement });
+
   // Ensure first row/cell is selected on render
   await waitFor(async () => {
     const activeCell = canvasElement.ownerDocument.activeElement;
@@ -223,14 +235,14 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     expect(activeCell).toHaveAttribute("aria-colindex", "1");
     expect(activeCell?.parentElement).toHaveAttribute("row-index", "0");
   });
-  userEvent.keyboard("{arrowdown}{arrowdown}");
-  userEvent.keyboard("{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}");
+  await userEvent.keyboard("{arrowdown}{arrowdown}");
+  await userEvent.keyboard("{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}");
 
   // Test enter post focus
   const test = async (fn: () => any, colId: string, rowId: string) => {
-    userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{Enter}");
     await wait(1000);
-    userEvent.keyboard("{arrowdown}{arrowdown}");
+    await userEvent.keyboard("{arrowdown}{arrowdown}");
     fn();
     await waitFor(async () => {
       expect(multiEditAction).toHaveBeenCalled();
@@ -247,16 +259,16 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
 
   await test(() => userEvent.keyboard("{Enter}"), "8", "2");
   await test(() => userEvent.tab(), "9", "2");
-  userEvent.tab({ shift: true });
+  await userEvent.tab({ shift: true });
   await test(() => userEvent.tab({ shift: true }), "6", "2");
-  userEvent.keyboard("{Esc}");
-  userEvent.tab();
+  await userEvent.keyboard("{Esc}");
+  await userEvent.tab();
 
-  userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Enter}");
   await wait(250);
   expect(eAction).not.toHaveBeenCalled();
 
-  userEvent.keyboard("e");
+  await userEvent.keyboard("e");
   await waitFor(async () => {
     expect(eAction).toHaveBeenCalled();
   });

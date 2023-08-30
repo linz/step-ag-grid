@@ -1,6 +1,6 @@
 import { ICellEditorParams } from "ag-grid-community";
 import { sortBy } from "lodash-es";
-import { ReactNode, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { PropsWithChildren, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
 
 import { GridBaseRow } from "../components/Grid";
 import { GridContext } from "./GridContext";
@@ -8,10 +8,9 @@ import { GridPopoverContext } from "./GridPopoverContext";
 
 interface GridPopoverContextProps {
   props: ICellEditorParams;
-  children: ReactNode;
 }
 
-export const GridPopoverContextProvider = ({ props, children }: GridPopoverContextProps) => {
+export const GridPopoverContextProvider = ({ props, children }: PropsWithChildren<GridPopoverContextProps>) => {
   const { getFilteredSelectedRows, updatingCells } = useContext(GridContext);
   const anchorRef = useRef<Element>(props.eGridCell);
 

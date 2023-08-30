@@ -70,7 +70,15 @@ const quickSelector = <T extends HTMLElement>(
     els = els.filter(matcher);
   }
 
-  return { selector, els };
+  return {
+    selector: [
+      selector,
+      typeof lastIQueryQuick.text == "string" ? JSON.stringify(lastIQueryQuick.text) : lastIQueryQuick.text,
+    ]
+      .filter((r) => r)
+      .join(" "),
+    els,
+  };
 };
 
 /**
@@ -110,7 +118,7 @@ export const queryAllQuick = <T extends HTMLElement>(filter: IQueryQuick, contai
 export const getAllQuick = <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): T[] => {
   const els = queryAllQuick(filter, container);
   if (els.length == 0) {
-    throw Error(`getAllQuick not found, selector: ${quickSelector(filter)}`);
+    throw Error(`getAllQuick not found, selector: ${quickSelector(filter).selector}`);
   }
   return els as T[];
 };
@@ -131,14 +139,14 @@ export const getQuick = (filter: IQueryQuick, container?: HTMLElement): HTMLElem
 };
 
 /**
- * Find by filter.  Waits up to 4 seconds to find filter.
+ * Find by filter.  Waits up to 5 seconds to find filter.
  *
  * @param filter Filter
  * @param container Optional container to look in
  * @return HTMLElement.  Throws exception if not found.
  */
 export const findQuick = async <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): Promise<T> => {
-  const endTime = Date.now() + 4000;
+  const endTime = Date.now() + 5000;
   while (Date.now() < endTime) {
     const el = queryQuick<T>(filter, container);
     if (el) return el;
