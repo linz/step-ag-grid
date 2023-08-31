@@ -178,11 +178,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     }
   }
 
-  .GridFormMessage-container {
-    padding: 4px 8px;
-    max-width: 400px;
-  }
-
   .GridCell-readonly {
     color: lui.$fuscous;
   }
