@@ -60,7 +60,7 @@ export interface GridProps {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions["onColumnMoved"];
   rowDragText?: GridOptions["rowDragText"];
-  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => Promise<void> | void;
+  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => Promise<void>;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions["suppressColumnVirtualisation"];
   /**
