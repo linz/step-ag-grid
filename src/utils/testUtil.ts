@@ -28,15 +28,20 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
       { tagName: `.ag-center-cols-container div[row-id='${rowId}']:not(:empty)` },
       within,
     );
-    const leftCols = await findQuick<HTMLDivElement>(
+    let combineChildren = [...row.children];
+
+    const leftCols = queryQuick<HTMLDivElement>(
       { tagName: `.ag-pinned-left-cols-container div[row-id='${rowId}']` },
       within,
     );
-    const rightCols = await findQuick<HTMLDivElement>(
+    if (leftCols) combineChildren = [...leftCols.children, ...combineChildren];
+
+    const rightCols = queryQuick<HTMLDivElement>(
       { tagName: `.ag-pinned-right-cols-container div[row-id='${rowId}']` },
       within,
     );
-    const combineChildren = [...leftCols.children, ...row.children, ...rightCols.children];
+    if (rightCols) combineChildren = [...rightCols.children, ...combineChildren];
+
     row.replaceChildren(...combineChildren);
   });
   return row;
