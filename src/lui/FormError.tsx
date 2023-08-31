@@ -16,7 +16,7 @@ export const FormError = (props: FormErrorProps) => {
         </span>
       )}
 
-      {props.helpText && !props.error && <span className={"helpText"}>{props.helpText}</span>}
+      {props.helpText && !props.error && <span className={"FormError-helpText"}>{props.helpText}</span>}
     </>
   );
 };
