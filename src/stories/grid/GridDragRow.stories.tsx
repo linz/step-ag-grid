@@ -109,7 +109,7 @@ const GridDragRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
         columnDefs={columnDefs}
         defaultColDef={{ sortable: false }}
         rowData={rowData}
-        onRowDragEnd={(row, _, targetIndex) => {
+        onRowDragEnd={async (row, _, targetIndex) => {
           alert(`Row ${row.id} request to be moved to index ${targetIndex}.`);
         }}
         rowDragText={(params) => `${params.rowNode?.data.id} - ${params.rowNode?.data.position}`}
