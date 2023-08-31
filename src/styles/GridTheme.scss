@@ -8,13 +8,13 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 @include ag.grid-styles(
   (
     themes: (
-      step-compact: (
+      'step-compact.theme-specific': (
         extend-theme: alpine,
         --ag-row-height: 36px,
         --ag-header-height: 36px,
         --ag-font-size: calc($grid-base-font-size - 2px),
       ),
-      step-default: (
+      'step-default.theme-specific': (
         extend-theme: alpine,
         --ag-row-height: 40px,
         --ag-header-height: 40px,
@@ -47,8 +47,8 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-.ag-theme-step-default,
-.ag-theme-step-compact {
+.ag-theme-step-default.theme-specific,
+.ag-theme-step-compact.theme-specific {
   .ag-cell[col-id="selection"] {
     display: flex; // Fix that when you click below checkbox it doesn't process a click
   }

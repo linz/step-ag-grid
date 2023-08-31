@@ -644,6 +644,7 @@ export const Grid = ({
       className={clsx(
         "Grid-container",
         theme,
+        "theme-specific",
         staleGrid && "Grid-sortIsStale",
         gridReady && params.rowData && autoSized && "Grid-ready",
       )}
