@@ -47,155 +47,155 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-.Grid-container {
-  .ag-theme-step-default, .ag-theme-step-compact {
-    .ag-cell[col-id="selection"] {
-      display: flex; // Fix that when you click below checkbox it doesn't process a click
+.ag-theme-step-default,
+.ag-theme-step-compact {
+  .ag-cell[col-id="selection"] {
+    display: flex; // Fix that when you click below checkbox it doesn't process a click
+  }
+
+  // fix alignment of cell content when grabber is present
+  .ag-header-cell-comp-wrapper {
+    justify-content: end;
+  }
+
+  // Fix that when you click below checkbox it doesn't process a click
+  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
+    height: auto;
+  }
+
+  .ag-row:last-of-type {
+    border-bottom: 1px solid lui.$dew;
+  }
+
+  .ag-header-cell {
+    font-size: 14px;
+    font-weight: 600;
+
+    // fix: Display descender line
+    padding: 0 11px;
+
+    .LuiIcon {
+      fill: lui.$surfie;
     }
+  }
 
-    // fix alignment of cell content when grabber is present
-    .ag-header-cell-comp-wrapper {
-      justify-content: end;
+  .ag-cell-label-container {
+    padding: 8px 0;
+
+    // Help ag-grid to calculate column height in react portal
+    height: fit-content;
+  }
+
+  .ag-header .ag-header-cell[aria-colindex="1"] {
+    padding-left: 17px;
+    padding-right: 15px;
+  }
+
+  .ag-cell[role="gridcell"] {
+    border-right: none;
+    border-left: 1px var(--ag-cell-horizontal-border);
+  }
+
+  .ag-cell[aria-colindex="1"] {
+    border-left: 1px solid transparent;
+    padding-left: lui.$unit-rg;
+  }
+
+  .ag-cell {
+    padding-left: 11px;
+    padding-right: 11px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ag-cell-wrap-text {
+    word-break: break-word;
+  }
+
+  .ag-cell.ag-cell-popup-editing,
+  .ag-cell.ag-selected-for-edit,
+  .ag-cell-inline-editing {
+    padding-left: 9px;
+    padding-right: 9px;
+    background: rgb(72 160 244 / 20%);
+
+    // These are important, it needs to override ag-grid to work
+    border: 3px solid #48a0f4 !important;
+    border-right: 3px solid #48a0f4 !important;
+  }
+
+  .ag-row .ag-cell-data-changed {
+    // ag-grid natively has !important on this style so we have to use it here :(
+    background-color: lightgoldenrodyellow;
+  }
+
+  .ag-center-cols-clipper {
+    // when using domLayout={"autoHeight"}, ag grid has a default min-height
+    // set to 150px so the !important is necessary here
+    min-height: 40px !important;
+  }
+
+  .ag-body-horizontal-scroll-viewport {
+    // It's set to scroll by default, but this causes issues with selecting the last row
+    overflow-x: auto;
+  }
+
+  .ag-cell {
+    font-weight: 400;
+  }
+
+  .ag-cell-value {
+    display: flex;
+    align-items: center;
+  }
+
+  .ag-cell .GridCell-editableIcon {
+    fill: lui.$silver;
+    visibility: hidden;
+  }
+
+  .ag-cell:hover .GridCell-editableIcon,
+  .ag-cell.ag-cell-focus .GridCell-editableIcon {
+    visibility: visible;
+  }
+
+  .ag-drag-handle.ag-row-drag {
+    opacity: 0;
+
+    .ag-icon-grip {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%239999B3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2Zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2Zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z' /%3E%3C/svg%3E");
+      background-repeat: no-repeat no-repeat;
+      background-position: center center;
+      background-size: cover;
+      color: transparent;
     }
+  }
 
-    // Fix that when you click below checkbox it doesn't process a click
-    .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
-      height: auto;
-    }
-
-    .ag-row:last-of-type {
-      border-bottom: 1px solid lui.$dew;
-    }
-
-    .ag-header-cell {
-      font-size: 14px;
-      font-weight: 600;
-
-      // fix: Display descender line
-      padding: 0 11px;
-
-      .LuiIcon {
-        fill: lui.$surfie;
-      }
-    }
-
-    .ag-cell-label-container {
-      padding: 8px 0;
-
-      // Help ag-grid to calculate column height in react portal
-      height: fit-content;
-    }
-
-    .ag-header .ag-header-cell[aria-colindex="1"] {
-      padding-left: 17px;
-      padding-right: 15px;
-    }
-
-    .ag-cell[role="gridcell"] {
-      border-right: none;
-      border-left: 1px var(--ag-cell-horizontal-border);
-    }
-
-    .ag-cell[aria-colindex="1"] {
-      border-left: 1px solid transparent;
-      padding-left: lui.$unit-rg;
-    }
-
-    .ag-cell {
-      padding-left: 11px;
-      padding-right: 11px;
-      display: flex;
-      align-items: center;
-    }
-
-    .ag-cell-wrap-text {
-      word-break: break-word;
-    }
-
-    .ag-cell.ag-cell-popup-editing,
-    .ag-cell.ag-selected-for-edit,
-    .ag-cell-inline-editing {
-      padding-left: 9px;
-      padding-right: 9px;
-      background: rgb(72 160 244 / 20%);
-
-      // These are important, it needs to override ag-grid to work
-      border: 3px solid #48a0f4 !important;
-      border-right: 3px solid #48a0f4 !important;
-    }
-
-    .ag-row .ag-cell-data-changed {
-      // ag-grid natively has !important on this style so we have to use it here :(
-      background-color: lightgoldenrodyellow;
-    }
-
-    .ag-center-cols-clipper {
-      // when using domLayout={"autoHeight"}, ag grid has a default min-height
-      // set to 150px so the !important is necessary here
-      min-height: 40px !important;
-    }
-
-    .ag-body-horizontal-scroll-viewport {
-      // It's set to scroll by default, but this causes issues with selecting the last row
-      overflow-x: auto;
-    }
-
-    .ag-cell {
-      font-weight: 400;
-    }
-
-    .ag-cell-value {
-      display: flex;
-      align-items: center;
-    }
-
-    .ag-cell .GridCell-editableIcon {
-      fill: lui.$silver;
-      visibility: hidden;
-    }
-
-    .ag-cell:hover .GridCell-editableIcon, .ag-cell.ag-cell-focus .GridCell-editableIcon {
-      visibility: visible;
-    }
-
+  .ag-row:hover {
     .ag-drag-handle.ag-row-drag {
-      opacity: 0;
-
-      .ag-icon-grip {
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='%239999B3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2Zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2Zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z' /%3E%3C/svg%3E");
-        background-repeat: no-repeat no-repeat;
-        background-position: center center;
-        background-size: cover;
-        color: transparent;
-      }
+      opacity: 1;
+      transition: opacity 0.2s ease-in-out;
     }
+  }
 
-    .ag-row:hover {
-      .ag-drag-handle.ag-row-drag {
-        opacity: 1;
-        transition: opacity 0.2s ease-in-out;
-      }
-    }
+  .GridFormMessage-container {
+    padding: 4px 8px;
+    max-width: 400px;
+  }
 
-    .GridFormMessage-container {
-      padding: 4px 8px;
-      max-width: 400px;
-    }
+  .GridCell-readonly {
+    color: lui.$fuscous;
+  }
 
-    .GridCell-readonly {
-      color: lui.$fuscous;
-    }
+  .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
+    visibility: hidden;
+  }
 
-    .ag-cell:not(.ag-cell-focus) .Grid-displayWhenCellFocused {
-      visibility: hidden;
-    }
+  .ag-cell:hover .Grid-displayWhenCellFocused {
+    visibility: inherit;
+  }
 
-    .ag-cell:hover .Grid-displayWhenCellFocused {
-      visibility: inherit;
-    }
-
-    .ag-cell-wrapper {
-      width: 100%;
-    }
+  .ag-cell-wrapper {
+    width: 100%;
   }
 }
