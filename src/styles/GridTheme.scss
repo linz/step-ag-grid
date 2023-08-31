@@ -91,13 +91,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     padding-right: 15px;
   }
 
-  .ag-cell[role="gridcell"] {
-    border-right: none;
-    border-left: 1px var(--ag-cell-horizontal-border);
-  }
-
   .ag-cell[aria-colindex="1"] {
-    border-left: 1px solid transparent;
     padding-left: lui.$unit-rg;
   }
 
