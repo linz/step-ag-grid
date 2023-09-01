@@ -96,6 +96,11 @@ export interface GridProps {
    * Whether to select row on context menu.
    */
   contextMenuSelectRow?: boolean;
+
+  /**
+   * Defaults to false.
+   */
+  singleClickEdit?: boolean;
 }
 
 /**
@@ -109,6 +114,7 @@ export const Grid = ({
   sizeColumns = "auto",
   selectColumnPinned = null,
   contextMenuSelectRow = false,
+  singleClickEdit = false,
   rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
   ...params
 }: GridProps): ReactElement => {
@@ -469,11 +475,11 @@ export const Grid = ({
    */
   const onCellClicked = useCallback(
     (event: CellEvent) => {
-      if (event.colDef?.cellRendererParams?.singleClickEdit) {
+      if (event.colDef?.cellRendererParams?.singleClickEdit ?? singleClickEdit) {
         startCellEditing(event);
       }
     },
-    [startCellEditing],
+    [singleClickEdit, startCellEditing],
   );
 
   /**
