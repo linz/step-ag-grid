@@ -10,18 +10,21 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     themes: (
       'step-compact.theme-specific': (
         extend-theme: alpine,
-        --ag-row-height: 36px,
-        --ag-header-height: 36px,
-        --ag-font-size: calc($grid-base-font-size - 2px),
+        row-height: 36px,
+        header-height: 36px,
+        font-size: calc($grid-base-font-size - 2px),
       ),
       'step-default.theme-specific': (
         extend-theme: alpine,
-        --ag-row-height: 40px,
-        --ag-header-height: 40px,
-        --ag-font-size: calc($grid-base-font-size),
+        row-height: 40px,
+        header-height: 40px,
+        font-size: calc($grid-base-font-size),
       ),
     ),
 
+    input-focus-border-color: lui.$sea,
+    borders-input: 1px solid,
+    input-border-color: lui.$silver,
     alpine-active-color: lui.$sea,
     background-color: lui.$white,
     border-color: lui.$dew,
@@ -49,6 +52,10 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
+  .ag-text-area-input:focus {
+    border-color: lui.$sea;
+  }
+
   .ag-cell[col-id="selection"] {
     display: flex; // Fix that when you click below checkbox it doesn't process a click
   }
