@@ -194,4 +194,18 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-cell-wrapper {
     width: 100%;
   }
+
+  .ag-row-highlight-above::after, .ag-row-highlight-below::after {
+    content: '';
+    height: 2px;
+    background-color: transparent;
+  }
+  
+  .ag-row-highlight-above::after{
+    border-top: 2px dashed lui.$andrea;
+  
+  }
+  .ag-row-highlight-below::after {
+    border-bottom: 2px dashed lui.$andrea;
+  }
 }
