@@ -611,8 +611,19 @@ export const Grid = ({
   }, []);
 
   const onRowDragMove = useCallback((event: RowDragMoveEvent) => {
-    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-    clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+    if (event.overNode && event.node.rowIndex != null) {
+      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
+
+      //position 0 means highlight above, 1 means below
+      const position = clientSideRowModel.getHighlightPosition(event.y, event.overNode as RowNode<any>);
+
+      //we don't want to show the row highlight if it wouldn't result in the row moving
+      const targetIndex = event.overIndex + position - (event.node.rowIndex < event.overIndex ? 1 : 0);
+      //console.log(targetIndex)
+      if (event.node.rowIndex != targetIndex) {
+        clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+      }
+    }
   }, []);
 
   const onRowDragEnd = useCallback(
