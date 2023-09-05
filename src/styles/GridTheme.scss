@@ -202,12 +202,12 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
   
   .ag-row-highlight-above::after {
-    top:-3px; //moves the top highlight to the position of the bottom highlight
+    top:-3px; // moves the top highlight to the position of the bottom highlight
     border-top: 2px dashed lui.$andrea;
   }
 
   .ag-row-highlight-above:first-of-type:after {
-    top:0px; //the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
+    top:0px; // the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
   }
 
   .ag-row-highlight-below::after {
