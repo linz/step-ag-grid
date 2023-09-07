@@ -213,4 +213,39 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-row-highlight-below::after {
     border-bottom: 2px dashed lui.$andrea;
   }
+
+  // .ag-header .ag-pinned-left-header:after,
+  // .ag-body-viewport .ag-pinned-left-cols-container:after {
+  //   content: " ";
+  //   height: 100%;
+  //   position: absolute;
+  //   z-index: 1;
+  //   top: 0;
+  //   width: 15px;
+  //   box-shadow: -4px 0px 15px -4px rgba(0, 0, 0, 0.1);
+  //   right: -4px;
+  // }
+  
+  // div:after {
+  //   box-shadow: 15px 0 15px -15px inset;
+  //   right: -15px;
+  // }
+  .ag-pinned-left-header,
+  .ag-pinned-right-header,
+  .ag-pinned-right-cols-container,
+  .ag-pinned-left-cols-container {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+      clip-path: polygon(0% 0%, 120% 0%, 120% 100%, 0% 100%);
+  }
+
+  .ag-pinned-right-header,
+  .ag-pinned-right-cols-container {
+    clip-path: polygon(-20% 0%, 100% 0%, 100% 100%, -20% 100%);
+  }
 }
