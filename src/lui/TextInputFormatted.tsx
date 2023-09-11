@@ -19,7 +19,13 @@ export interface LuiTextInputProps extends DetailedHTMLProps<InputHTMLAttributes
 
 export const TextInputFormatted = (props: LuiTextInputProps): ReactElement => {
   return (
-    <div className={clsx("LuiTextInput Grid-popoverContainer", props.error && "hasError", props.className)}>
+    <div
+      className={clsx(
+        "LuiTextInput GridLuiTextInput Grid-popoverContainer",
+        props.error && "hasError",
+        props.className,
+      )}
+    >
       <span className="LuiTextInput-inputWrapper">
         {/* wrapper div used for error styling */}
         <input

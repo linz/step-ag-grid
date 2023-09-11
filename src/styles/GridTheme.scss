@@ -8,20 +8,23 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 @include ag.grid-styles(
   (
     themes: (
-      step-compact: (
+      'step-compact.theme-specific': (
         extend-theme: alpine,
-        --ag-row-height: 36px,
-        --ag-header-height: 36px,
-        --ag-font-size: calc($grid-base-font-size - 2px),
+        row-height: 36px,
+        header-height: 36px,
+        font-size: calc($grid-base-font-size - 2px),
       ),
-      step-default: (
+      'step-default.theme-specific': (
         extend-theme: alpine,
-        --ag-row-height: 40px,
-        --ag-header-height: 40px,
-        --ag-font-size: calc($grid-base-font-size),
+        row-height: 40px,
+        header-height: 40px,
+        font-size: calc($grid-base-font-size),
       ),
     ),
 
+    input-focus-border-color: lui.$sea,
+    borders-input: 1px solid,
+    input-border-color: lui.$silver,
     alpine-active-color: lui.$sea,
     background-color: lui.$white,
     border-color: lui.$dew,
@@ -47,8 +50,12 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-.ag-theme-step-default,
-.ag-theme-step-compact {
+.ag-theme-step-default.theme-specific,
+.ag-theme-step-compact.theme-specific {
+  .ag-text-area-input:focus {
+    border-color: lui.$sea;
+  }
+
   .ag-cell[col-id="selection"] {
     display: flex; // Fix that when you click below checkbox it doesn't process a click
   }
@@ -91,13 +98,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     padding-right: 15px;
   }
 
-  .ag-cell[role="gridcell"] {
-    border-right: none;
-    border-left: 1px var(--ag-cell-horizontal-border);
-  }
-
   .ag-cell[aria-colindex="1"] {
-    border-left: 1px solid transparent;
     padding-left: lui.$unit-rg;
   }
 
@@ -192,5 +193,59 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
   .ag-cell-wrapper {
     width: 100%;
+  }
+
+  .ag-row-highlight-above::after, .ag-row-highlight-below::after {
+    content: '';
+    height: 2px;
+    background-color: transparent;
+  }
+  
+  .ag-row-highlight-above::after {
+    top:-3px; // moves the top highlight to the position of the bottom highlight
+    border-top: 2px dashed lui.$andrea;
+  }
+
+  .ag-row-highlight-above:first-of-type:after {
+    top:0px; // the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
+  }
+
+  .ag-row-highlight-below::after {
+    border-bottom: 2px dashed lui.$andrea;
+  }
+
+  // .ag-header .ag-pinned-left-header:after,
+  // .ag-body-viewport .ag-pinned-left-cols-container:after {
+  //   content: " ";
+  //   height: 100%;
+  //   position: absolute;
+  //   z-index: 1;
+  //   top: 0;
+  //   width: 15px;
+  //   box-shadow: -4px 0px 15px -4px rgba(0, 0, 0, 0.1);
+  //   right: -4px;
+  // }
+  
+  // div:after {
+  //   box-shadow: 15px 0 15px -15px inset;
+  //   right: -15px;
+  // }
+  .ag-pinned-left-header,
+  .ag-pinned-right-header,
+  .ag-pinned-right-cols-container,
+  .ag-pinned-left-cols-container {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+      clip-path: polygon(0% 0%, 120% 0%, 120% 100%, 0% 100%);
+  }
+
+  .ag-pinned-right-header,
+  .ag-pinned-right-cols-container {
+    clip-path: polygon(-20% 0%, 100% 0%, 100% 100%, -20% 100%);
   }
 }
