@@ -658,7 +658,7 @@ export const Grid = ({
         theme,
         "theme-specific",
         staleGrid && "Grid-sortIsStale",
-        gridReady && rowData && autoSized && rowData != null && "Grid-ready",
+        gridReady && rowData && autoSized && "Grid-ready",
       )}
     >
       {gridContextMenu.component}
