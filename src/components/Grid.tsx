@@ -115,11 +115,13 @@ export const Grid = ({
   selectColumnPinned = null,
   contextMenuSelectRow = false,
   singleClickEdit = false,
+  rowData,
   rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
   ...params
 }: GridProps): ReactElement => {
   const {
     gridReady,
+    gridRenderState,
     setApis,
     ensureRowVisible,
     getFirstRowId,
@@ -153,36 +155,38 @@ export const Grid = ({
    */
   const hasSetContentSize = useRef(false);
   const hasSetContentSizeEmpty = useRef(false);
-  const needsAutoSize = useRef(false);
+  const needsAutoSize = useRef(true);
 
   const setInitialContentSize = useCallback(() => {
-    if (!gridDivRef.current?.clientWidth) {
+    if (!gridDivRef.current?.clientWidth || rowData == null) {
       // Don't resize grids if they are offscreen as it doesn't work.
       needsAutoSize.current = true;
       return;
     }
 
-    const headerCellCount = gridDivRef.current?.getElementsByClassName("ag-header-cell-label")?.length;
-    if (headerCellCount < 2) {
-      // Don't resize grids until all the columns are visible
-      // as `autoSizeColumns` will fail silently in this case
+    const gridRendered = gridRenderState();
+    if (gridRendered === null) {
+      // Don't resize until grid has rendered, or it has 0 rows.
       needsAutoSize.current = true;
       return;
     }
 
-    const skipHeader = sizeColumns === "auto-skip-headers" && !isEmpty(params.rowData);
+    const skipHeader = sizeColumns === "auto-skip-headers" && gridRendered === "rows-visible";
     if (sizeColumns === "auto" || skipHeader) {
       const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
-      if (isEmpty(params.rowData)) {
+      if (gridRendered === "empty") {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
           params.onContentSize && params.onContentSize(result);
         }
-      } else {
+      } else if (gridRendered === "rows-visible") {
         if (result && !hasSetContentSize.current) {
           hasSetContentSize.current = true;
           params.onContentSize && params.onContentSize(result);
         }
+      } else {
+        // It should be impossible to get here
+        console.error("Unknown value returned from hasGridRendered");
       }
     }
 
@@ -191,7 +195,7 @@ export const Grid = ({
     }
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, params, sizeColumns, sizeColumnsToFit]);
+  }, [autoSizeColumns, gridRenderState, params, rowData, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
 
@@ -213,25 +217,17 @@ export const Grid = ({
         setInitialContentSize();
       }
     },
-    timeoutMs: 1000,
+    timeoutMs: 200,
   });
-
-  const previousGridReady = useRef(gridReady);
-  useEffect(() => {
-    if (!previousGridReady.current && gridReady) {
-      previousGridReady.current = true;
-      setInitialContentSize();
-    }
-  }, [gridReady, setInitialContentSize]);
 
   /**
    * On data load select the first row of the grid if required.
    */
   const hasSelectedFirstItem = useRef(false);
   useEffect(() => {
-    if (!gridReady || hasSelectedFirstItem.current || !params.rowData || !externallySelectedItemsAreInSync) return;
+    if (!gridReady || hasSelectedFirstItem.current || !rowData || !externallySelectedItemsAreInSync) return;
     hasSelectedFirstItem.current = true;
-    if (isNotEmpty(params.rowData) && isEmpty(params.externalSelectedItems)) {
+    if (isNotEmpty(rowData) && isEmpty(params.externalSelectedItems)) {
       const firstRowId = getFirstRowId();
       if (params.autoSelectFirstRow) {
         selectRowsById([firstRowId]);
@@ -245,7 +241,7 @@ export const Grid = ({
     gridReady,
     params.externalSelectedItems,
     params.autoSelectFirstRow,
-    params.rowData,
+    rowData,
     selectRowsById,
     getFirstRowId,
   ]);
@@ -402,7 +398,7 @@ export const Grid = ({
   const previousRowDataLength = useRef(0);
 
   const onRowDataChanged = useCallback(() => {
-    const length = params.rowData?.length ?? 0;
+    const length = rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
       setInitialContentSize();
       previousRowDataLength.current = length;
@@ -417,7 +413,7 @@ export const Grid = ({
     const skipHeader = sizeColumns === "auto-skip-headers";
     autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
     colIdsEdited.current.clear();
-  }, [autoSizeColumns, params.rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
+  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
 
   /**
    * Show/hide no rows overlay when model changes.
@@ -619,7 +615,6 @@ export const Grid = ({
 
       //we don't want to show the row highlight if it wouldn't result in the row moving
       const targetIndex = event.overIndex + position - (event.node.rowIndex < event.overIndex ? 1 : 0);
-      //console.log(targetIndex)
       if (event.node.rowIndex != targetIndex) {
         clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
       }
@@ -663,7 +658,7 @@ export const Grid = ({
         theme,
         "theme-specific",
         staleGrid && "Grid-sortIsStale",
-        gridReady && params.rowData && autoSized && "Grid-ready",
+        gridReady && rowData && autoSized && "Grid-ready",
       )}
     >
       {gridContextMenu.component}
@@ -691,7 +686,7 @@ export const Grid = ({
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ["editable"]) }}
           columnDefs={columnDefsAdjusted}
-          rowData={params.rowData}
+          rowData={rowData}
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;
             event.api.forEachNode(() => rowCount++);

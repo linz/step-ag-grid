@@ -17,6 +17,7 @@ export type AutoSizeColumnsResult = { width: number } | null;
 
 export interface GridContextType<RowType extends GridBaseRow> {
   gridReady: boolean;
+  gridRenderState: () => null | "empty" | "rows-visible";
   getColDef: (colId?: string) => ColDef | undefined;
   getColumns: (
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
@@ -68,6 +69,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
 
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
+  gridRenderState: () => null,
   getColDef: () => {
     console.error("no context provider for getColDef");
     return undefined;
