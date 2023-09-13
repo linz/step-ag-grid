@@ -108,7 +108,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
    * Used to check if it's OK to autosize.
    */
   const gridRenderState = useCallback((): null | "empty" | "rows-visible" => {
-    if (!gridApi) return null;
+    // Even though getModel can't be null, sometimes it is
+    if (!gridApi || !gridApi.getModel()) return null;
     if (!gridApi.getModel().isRowsToRender()) return "empty";
     if (!isEmpty(gridApi.getRenderedNodes())) return "rows-visible";
     // If there are rows to render, but there are no rendered nodes then we should wait
