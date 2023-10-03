@@ -140,7 +140,7 @@
     "react-app-polyfill": "^3.0.0",
     "react-scripts": "^5.0.1",
     "rollup": "^3.28.0",
-    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-typescript2": "^0.35.0",
