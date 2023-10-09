@@ -2,7 +2,7 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
@@ -14,9 +14,9 @@ export default {
   title: "GridForm / Static Tests",
   component: GridFormMultiSelect,
   args: {},
-} as ComponentMeta<typeof GridFormMultiSelect>;
+} as Meta<typeof GridFormMultiSelect>;
 
-const Template: ComponentStory<typeof GridFormMultiSelect> = (props) => {
+const Template: StoryFn<typeof GridFormMultiSelect> = (props) => {
   const configs: [string, GridFormMultiSelectProps<GridBaseRow>, string?][] = [
     ["No options", { options: [] }],
     ["Custom no options", { options: [], noOptionsMessage: "Custom no options" }],

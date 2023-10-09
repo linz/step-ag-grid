@@ -2,7 +2,7 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
@@ -20,9 +20,9 @@ export default {
   title: "GridForm / Static Tests",
   component: GridFormPopoverMenu,
   args: {},
-} as ComponentMeta<typeof GridFormPopoverMenu>;
+} as Meta<typeof GridFormPopoverMenu>;
 
-const Template: ComponentStory<typeof GridFormPopoverMenu> = (props) => {
+const Template: StoryFn<typeof GridFormPopoverMenu> = (props) => {
   const configs: [string, GridFormPopoverMenuProps<GridBaseRow>][] = [
     ["No options", { options: async () => [] }],
     [

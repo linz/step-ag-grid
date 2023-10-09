@@ -3,7 +3,7 @@ import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect, jest } from "@storybook/jest";
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { userEvent, waitFor } from "@storybook/testing-library";
 import { useMemo, useState } from "react";
 
@@ -55,7 +55,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -71,7 +71,7 @@ const multiEditAction = jest.fn().mockImplementation(async () => {
 
 const eAction = jest.fn<boolean, []>().mockReturnValue(true);
 
-const GridKeyboardInteractionsTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [

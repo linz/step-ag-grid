@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { ColDef } from "ag-grid-community";
 import { GridPopoverEditDropDown } from "components/gridPopoverEdit/GridPopoverEditDropDown";
 import { GridPopoverTextArea } from "components/gridPopoverEdit/GridPopoverTextArea";
@@ -44,7 +44,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -53,7 +53,7 @@ interface ITestRow {
   desc: string;
 }
 
-const GridNonEditableRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [

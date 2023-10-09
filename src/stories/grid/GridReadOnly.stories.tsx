@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { ReactElement, useCallback, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -26,8 +26,7 @@ import {
   useGridFilter,
   wait,
 } from "../..";
-import { GridFilterColumnsToggle } from "../../components";
-import { GridFilterDownloadCsvButton } from "../../components";
+import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from "../../components";
 import { GridCellFiller } from "../../components/GridCellFiller";
 import { waitForGridReady } from "../../utils/storybookTestUtil";
 
@@ -60,7 +59,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -71,7 +70,7 @@ interface ITestRow {
   dd: string;
 }
 
-const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -211,14 +210,14 @@ const GridReadOnlyTemplate: ComponentStory<typeof Grid> = (props: GridProps) => 
     [],
   );
 
-  const [rowData] = useState([
+  const [rowData] = useState<ITestRow[]>([
     { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
     { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
     { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
-  ] as ITestRow[]);
+  ]);
 
   return (
-    <GridWrapper maxHeight={300}>
+    <GridWrapper maxHeight={400}>
       <GridFilters>
         <GridFilterQuick />
         <GridFilterLessThan text="Age <" field={"age"} />

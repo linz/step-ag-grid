@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { useCallback, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -48,7 +48,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -65,7 +65,7 @@ interface ICode {
   desc: string;
 }
 
-const GridEditDropDownTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {

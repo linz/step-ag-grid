@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -29,9 +29,9 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
-const GridPopoutEditGenericTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [

@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { ReactElement, useCallback, useContext, useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -41,7 +41,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 const ContextMenu = ({ clickedRow, colDef, close }: GridContextMenuComponentProps<IFormTestRow>): ReactElement => {
   const onClick = useCallback(() => {
@@ -64,7 +64,7 @@ const ContextMenu = ({ clickedRow, colDef, close }: GridContextMenuComponentProp
   );
 };
 
-const GridPopoutContextMenuTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridPopoutContextMenuTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const { selectRowsWithFlashDiff } = useContext(GridContext);
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const [rowData, setRowData] = useState([

@@ -1,6 +1,6 @@
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { useCallback } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -12,9 +12,9 @@ export default {
   title: "Components / ActionButton",
   component: ActionButton,
   args: {},
-} as ComponentMeta<typeof ActionButton>;
+} as Meta<typeof ActionButton>;
 
-const ActionButtonTemplate: ComponentStory<typeof ActionButton> = () => {
+const ActionButtonTemplate: StoryFn<typeof ActionButton> = () => {
   const performAction = useCallback(async () => {
     await wait(1000);
   }, []);

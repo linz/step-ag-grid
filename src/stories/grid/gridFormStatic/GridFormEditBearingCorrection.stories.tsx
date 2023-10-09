@@ -2,7 +2,7 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
@@ -19,9 +19,9 @@ export default {
   title: "GridForm / Static Tests",
   component: GridFormEditBearing,
   args: {},
-} as ComponentMeta<typeof GridFormEditBearing>;
+} as Meta<typeof GridFormEditBearing>;
 
-const Template: ComponentStory<typeof GridFormEditBearing> = (props: GridFormEditBearingProps<any>) => {
+const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearingProps<any>) => {
   const values: [string, GridFormEditBearingProps<any>, number | null][] = [
     ["Null value", {}, null],
     ["Custom placeholder", { placeHolder: "Custom placeholder" }, null],
