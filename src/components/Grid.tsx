@@ -52,7 +52,6 @@ export interface GridProps {
    * Whether select column is pinned.  Defaults to "left".
    */
   selectColumnPinned?: ColDef["pinned"];
-  loadingOverLayText?: string;
   noRowsOverlayText?: string;
   animateRows?: boolean;
   rowHeight?: number;
@@ -117,7 +116,7 @@ export const Grid = ({
   contextMenuSelectRow = false,
   singleClickEdit = false,
   rowData,
-  rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : undefined,
+  rowHeight = theme === "ag-theme-step-default" ? 40 : theme === "ag-theme-step-compact" ? 36 : 40,
   ...params
 }: GridProps): ReactElement => {
   const {
@@ -648,6 +647,8 @@ export const Grid = ({
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
+  const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
+
   return (
     <div
       data-testid={dataTestId}
@@ -692,8 +693,8 @@ export const Grid = ({
               <GridNoRowsOverlay
                 loading={!rowData}
                 rowCount={rowCount}
+                headerRowHeight={headerRowCount * rowHeight}
                 filteredRowCount={event.api.getDisplayedRowCount()}
-                loadingOverlayText={params.loadingOverLayText}
                 noRowsOverlayText={params.noRowsOverlayText}
               />
             );

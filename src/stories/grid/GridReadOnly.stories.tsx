@@ -223,7 +223,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   }, 5000);
 
   return (
-    <GridWrapper maxHeight={300}>
+    <GridWrapper maxHeight={400}>
       <GridFilters>
         <GridFilterQuick />
         <GridFilterLessThan text="Age <" field={"age"} />
