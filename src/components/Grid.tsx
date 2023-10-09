@@ -23,10 +23,10 @@ import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useInterval } from "usehooks-ts";
 
 import { GridContext } from "../contexts/GridContext";
 import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
-import { useIntervalHook } from "../lui/timeoutHook";
 import { fnOrVar, isNotEmpty } from "../utils/util";
 import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
@@ -52,6 +52,7 @@ export interface GridProps {
    * Whether select column is pinned.  Defaults to "left".
    */
   selectColumnPinned?: ColDef["pinned"];
+  loadingOverLayText?: string;
   noRowsOverlayText?: string;
   animateRows?: boolean;
   rowHeight?: number;
@@ -202,23 +203,20 @@ export const Grid = ({
   /**
    * Auto-size windows that had deferred auto-size
    */
-  useIntervalHook({
-    callback: () => {
-      // Check if window has been popped out and needs resize
-      const currentDocument = gridDivRef.current?.ownerDocument;
-      if (currentDocument !== lastOwnerDocumentRef.current) {
-        lastOwnerDocumentRef.current = currentDocument;
-        if (currentDocument) {
-          needsAutoSize.current = true;
-        }
+  useInterval(() => {
+    // Check if window has been popped out and needs resize
+    const currentDocument = gridDivRef.current?.ownerDocument;
+    if (currentDocument !== lastOwnerDocumentRef.current) {
+      lastOwnerDocumentRef.current = currentDocument;
+      if (currentDocument) {
+        needsAutoSize.current = true;
       }
-      if (needsAutoSize.current) {
-        needsAutoSize.current = false;
-        setInitialContentSize();
-      }
-    },
-    timeoutMs: 200,
-  });
+    }
+    if (needsAutoSize.current) {
+      needsAutoSize.current = false;
+      setInitialContentSize();
+    }
+  }, 200);
 
   /**
    * On data load select the first row of the grid if required.
@@ -611,12 +609,12 @@ export const Grid = ({
       const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
 
       //position 0 means highlight above, 1 means below
-      const position = clientSideRowModel.getHighlightPosition(event.y, event.overNode as RowNode<any>);
+      const position = clientSideRowModel.getHighlightPosition(event.y, event.overNode as RowNode);
 
       //we don't want to show the row highlight if it wouldn't result in the row moving
       const targetIndex = event.overIndex + position - (event.node.rowIndex < event.overIndex ? 1 : 0);
       if (event.node.rowIndex != targetIndex) {
-        clientSideRowModel.highlightRowAtPixel(event.node as RowNode<any>, event.y);
+        clientSideRowModel.highlightRowAtPixel(event.node as RowNode, event.y);
       }
     }
   }, []);
@@ -692,8 +690,10 @@ export const Grid = ({
             event.api.forEachNode(() => rowCount++);
             return (
               <GridNoRowsOverlay
+                loading={!rowData}
                 rowCount={rowCount}
                 filteredRowCount={event.api.getDisplayedRowCount()}
+                loadingOverlayText={params.loadingOverLayText}
                 noRowsOverlayText={params.noRowsOverlayText}
               />
             );

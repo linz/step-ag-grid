@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { countBy, mergeWith, pull, range, union } from "lodash-es";
 import { useMemo, useState } from "react";
 
@@ -32,7 +32,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -40,7 +40,7 @@ interface ITestRow {
   position2: string | null;
 }
 
-const GridEditMultiSelectGridTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(() => {

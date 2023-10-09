@@ -2,7 +2,7 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
@@ -14,9 +14,9 @@ export default {
   title: "GridForm / Static Tests",
   component: GridFormMessage,
   args: {},
-} as ComponentMeta<typeof GridFormMessage>;
+} as Meta<typeof GridFormMessage>;
 
-const Template: ComponentStory<typeof GridFormMessage> = (props: GridFormMessageProps<any>) => {
+const Template: StoryFn<typeof GridFormMessage> = (props: GridFormMessageProps<any>) => {
   const anchorRef1 = useRef<HTMLHeadingElement>(null);
 
   return (

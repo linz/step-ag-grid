@@ -1,7 +1,7 @@
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect } from "@storybook/jest";
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { within } from "@storybook/testing-library";
 
 import "@linzjs/lui/dist/fonts";
@@ -12,9 +12,9 @@ export default {
   title: "Components / Grids / GridNoRowsOverlay",
   component: GridNoRowsOverlay,
   args: {},
-} as ComponentMeta<typeof GridNoRowsOverlay>;
+} as Meta<typeof GridNoRowsOverlay>;
 
-const GridNoRowsOverlayTemplate: ComponentStory<typeof GridNoRowsOverlay> = (params: GridNoRowsOverlayProps) => {
+const GridNoRowsOverlayTemplate: StoryFn<typeof GridNoRowsOverlay> = (params: GridNoRowsOverlayProps) => {
   return <GridNoRowsOverlay {...params} />;
 };
 

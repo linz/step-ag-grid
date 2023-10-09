@@ -2,7 +2,7 @@ import "../../styles/GridTheme.scss";
 import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -47,7 +47,7 @@ export default {
       </div>
     ),
   ],
-} as ComponentMeta<typeof Grid>;
+} as Meta<typeof Grid>;
 
 interface ITestRow {
   id: number;
@@ -58,7 +58,7 @@ interface ITestRow {
   dd: string;
 }
 
-const GridDragRowTemplate: ComponentStory<typeof Grid> = (props: GridProps) => {
+const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({

@@ -3,7 +3,7 @@ import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect, jest } from "@storybook/jest";
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -24,7 +24,7 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormMultiSelect,
   args: {},
-} as ComponentMeta<typeof GridFormMultiSelect>;
+} as Meta<typeof GridFormMultiSelect>;
 
 const updateValue = jest
   .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
@@ -34,7 +34,7 @@ const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().
 const onSelectFilter = jest.fn();
 
 let options: MultiSelectOption[] = [];
-const Template: ComponentStory<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
+const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
   options = [
     { label: "Zero", value: 0 },
     { label: "One", value: 1 },

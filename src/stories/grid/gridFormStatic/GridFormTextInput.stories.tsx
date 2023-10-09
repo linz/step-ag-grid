@@ -2,7 +2,7 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
@@ -14,9 +14,9 @@ export default {
   title: "GridForm / Static Tests",
   component: GridFormTextInput,
   args: {},
-} as ComponentMeta<typeof GridFormTextInput>;
+} as Meta<typeof GridFormTextInput>;
 
-const Template: ComponentStory<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
+const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
   const configs: [string, GridFormTextInputProps<GridBaseRow>, string?][] = [
     ["Text input", {}],
     ["Text input with text", {}, "Some text"],

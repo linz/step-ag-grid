@@ -3,7 +3,7 @@ import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect, jest } from "@storybook/jest";
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -16,11 +16,11 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormTextInput,
   args: {},
-} as ComponentMeta<typeof GridFormTextInput>;
+} as Meta<typeof GridFormTextInput>;
 
 const updateValue = jest.fn();
 
-const Template: ComponentStory<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
+const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (

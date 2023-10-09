@@ -3,7 +3,7 @@ import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { expect, jest } from "@storybook/jest";
-import { ComponentMeta, ComponentStory } from "@storybook/react/dist/ts3.9/client/preview/types-6-3";
+import { Meta, StoryFn } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
 import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
 import { useRef } from "react";
@@ -25,7 +25,7 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormPopoverMenu,
   args: {},
-} as ComponentMeta<typeof GridFormPopoverMenu>;
+} as Meta<typeof GridFormPopoverMenu>;
 
 const updateValue = jest
   .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
@@ -41,7 +41,7 @@ const disabledAction = jest
   .fn<Promise<void>, [{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }]>()
   .mockResolvedValue(undefined);
 
-const Template: ComponentStory<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
+const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
