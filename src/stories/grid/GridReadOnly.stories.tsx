@@ -4,7 +4,6 @@ import "@linzjs/lui/dist/scss/base.scss";
 
 import { Meta, StoryFn } from "@storybook/react";
 import { ReactElement, useCallback, useMemo, useState } from "react";
-import { useTimeout } from "usehooks-ts";
 
 import "@linzjs/lui/dist/fonts";
 
@@ -27,8 +26,7 @@ import {
   useGridFilter,
   wait,
 } from "../..";
-import { GridFilterColumnsToggle } from "../../components";
-import { GridFilterDownloadCsvButton } from "../../components";
+import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from "../../components";
 import { GridCellFiller } from "../../components/GridCellFiller";
 import { waitForGridReady } from "../../utils/storybookTestUtil";
 
@@ -212,15 +210,11 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
     [],
   );
 
-  const [rowData, setRowData] = useState<ITestRow[]>();
-
-  useTimeout(() => {
-    setRowData([
-      { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
-      { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
-      { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
-    ]);
-  }, 5000);
+  const [rowData] = useState<ITestRow[]>([
+    { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
+    { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
+    { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
+  ]);
 
   return (
     <GridWrapper maxHeight={400}>
