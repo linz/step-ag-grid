@@ -659,6 +659,10 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     [gridApi],
   );
 
+  const showNoRowsOverlay = useCallback((): void => {
+    gridApi?.showNoRowsOverlay();
+  }, [gridApi]);
+
   /**
    * Apply column visibility
    */
@@ -755,6 +759,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
         doesExternalFilterPass,
         downloadCsv,
         setOnCellEditingComplete,
+        showNoRowsOverlay,
       }}
     >
       {props.children}

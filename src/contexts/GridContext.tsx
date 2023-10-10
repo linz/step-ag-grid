@@ -65,6 +65,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
   setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
+  showNoRowsOverlay: () => void;
 }
 
 export const GridContext = createContext<GridContextType<any>>({
@@ -200,6 +201,9 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   setOnCellEditingComplete: () => {
     console.error("no context provider for setOnCellEditingComplete");
+  },
+  showNoRowsOverlay: () => {
+    console.error("no context provider for showLoadingOverlay");
   },
 });
 

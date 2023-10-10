@@ -101,6 +101,8 @@ export interface GridProps {
    * Defaults to false.
    */
   singleClickEdit?: boolean;
+
+  loading?: boolean;
 }
 
 /**
@@ -136,9 +138,11 @@ export const Grid = ({
     doesExternalFilterPass,
     setOnCellEditingComplete,
     getColDef,
+    showNoRowsOverlay,
+    prePopupOps,
+    stopEditing,
   } = useContext(GridContext);
   const { checkUpdating, updatedDep, updatingCols } = useContext(GridUpdatingContext);
-  const { prePopupOps } = useContext(GridContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
@@ -323,7 +327,11 @@ export const Grid = ({
   const columnDefs = useMemo((): (ColDef | ColGroupDef)[] => {
     const adjustColDefs = params.columnDefs.map((colDef) => {
       const colDefEditable = colDef.editable;
-      const editable = combineEditables(params.readOnly !== true, params.defaultColDef?.editable, colDefEditable);
+      const editable = combineEditables(
+        params.loading !== true && params.readOnly !== true,
+        params.defaultColDef?.editable,
+        colDefEditable,
+      );
       return {
         ...colDef,
         editable,
@@ -369,6 +377,7 @@ export const Grid = ({
     params.columnDefs,
     params.selectable,
     params.onRowDragEnd,
+    params.loading,
     params.readOnly,
     params.defaultColDef?.editable,
     selectColumnPinned,
@@ -566,6 +575,16 @@ export const Grid = ({
     }
   }, [autoSizeColumns, getColDef, sizeColumns, updatedDep, updatingCols]);
 
+  const prevLoading = useRef(false);
+  useEffect(() => {
+    const newLoading = !rowData || params.loading === true;
+    if (newLoading && !prevLoading.current) {
+      stopEditing();
+      showNoRowsOverlay();
+    }
+    prevLoading.current = newLoading;
+  }, [params.loading, rowData, showNoRowsOverlay, stopEditing]);
+
   /**
    * Resize columns to fit if required on window/container resize
    */
@@ -691,7 +710,7 @@ export const Grid = ({
             event.api.forEachNode(() => rowCount++);
             return (
               <GridNoRowsOverlay
-                loading={!rowData}
+                loading={!rowData || params.loading === true}
                 rowCount={rowCount}
                 headerRowHeight={headerRowCount * rowHeight}
                 filteredRowCount={event.api.getDisplayedRowCount()}
