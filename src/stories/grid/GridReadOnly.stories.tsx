@@ -23,6 +23,7 @@ import {
   GridProps,
   GridUpdatingContextProvider,
   GridWrapper,
+  MenuItem,
   useGridFilter,
   wait,
 } from "../..";
@@ -170,6 +171,10 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
                     alert(`Multi-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
                     await wait(1500);
                   },
+                },
+                {
+                  label: "Sub menu...",
+                  subMenu: () => <MenuItem>Find...</MenuItem>,
                 },
                 {
                   label: "Disabled item",

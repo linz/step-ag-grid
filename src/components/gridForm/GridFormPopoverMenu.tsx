@@ -3,7 +3,7 @@ import { Fragment, ReactElement, useCallback, useEffect, useRef, useState } from
 
 import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
 import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { FocusableItem, MenuDivider, MenuItem } from "../../react-menu3";
+import { FocusableItem, MenuDivider, MenuItem, SubMenu } from "../../react-menu3";
 import { ClickEvent } from "../../react-menu3/types";
 import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
 import { GridBaseRow } from "../Grid";
@@ -29,6 +29,7 @@ export interface SelectedMenuOptionResult<RowType extends GridBaseRow> extends M
 
 export interface MenuOption<RowType extends GridBaseRow> {
   label: ReactElement | string | MenuSeparatorType;
+  subMenu?: () => ReactElement;
   action?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
@@ -135,14 +136,25 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
             ) : (
               !item.hidden && (
                 <Fragment key={`${item.label}`}>
-                  <MenuItem
-                    key={`${item.label}`}
-                    onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
-                    disabled={!!item.disabled}
-                    title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
-                  >
-                    {item.label as ReactElement | string}
-                  </MenuItem>
+                  {item.subMenu ? (
+                    <SubMenu
+                      key={`${item.label}`}
+                      disabled={!!item.disabled}
+                      label={item.label as string}
+                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                    >
+                      <item.subMenu />
+                    </SubMenu>
+                  ) : (
+                    <MenuItem
+                      key={`${item.label}`}
+                      onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
+                      disabled={!!item.disabled}
+                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                    >
+                      {item.label as ReactElement | string}
+                    </MenuItem>
+                  )}
                   {item.subComponent && subComponentSelected === item && (
                     <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
                       {() => (
