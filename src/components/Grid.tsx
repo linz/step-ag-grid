@@ -103,6 +103,7 @@ export interface GridProps {
   singleClickEdit?: boolean;
 
   loading?: boolean;
+  suppressCellFocus?: boolean;
 }
 
 /**
@@ -734,6 +735,7 @@ export const Grid = ({
           onRowDragMove={onRowDragMove}
           onRowDragEnd={onRowDragEnd}
           onRowDragLeave={onRowDragLeave}
+          suppressCellFocus={params.suppressCellFocus}
         />
       </div>
     </div>
