@@ -20,6 +20,12 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
         header-height: 40px,
         font-size: calc($grid-base-font-size),
       ),
+      'step-view-list-default.theme-specific': (
+        extend-theme: alpine,
+        row-height: 60px,
+        header-height: 40px,
+        font-size: calc($grid-base-font-size),
+      ),
     ),
 
     input-focus-border-color: lui.$sea,
@@ -247,5 +253,49 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-pinned-right-header,
   .ag-pinned-right-cols-container {
     clip-path: polygon(-20% 0%, 100% 0%, 100% 100%, -20% 100%);
+  }
+}
+
+.ag-theme-step-view-list-default.theme-specific {
+
+  // fix alignment of cell content when grabber is present
+  .ag-header-cell-comp-wrapper {
+    justify-content: end;
+  }
+
+  .ag-header-cell {
+    font-size: 14px;
+    font-weight: 600;
+
+    // fix: Display descender line
+    padding: 0 11px;
+
+    .LuiIcon {
+      fill: lui.$surfie;
+    }
+  }
+
+  .ag-header .ag-header-cell[aria-colindex="1"] {
+    padding-left: 17px;
+    padding-right: 15px;
+  }
+
+
+  .ag-header {
+    background: lui.$iceberg;
+  }
+
+  .ag-header-group-cell {
+    font-weight: normal;
+    font-size: 22px;
+  }
+
+  .ag-header-cell {
+    font-size: 14px;
+  }
+
+  .ag-cell {
+    border: none !important;
+    outline: none;
   }
 }
