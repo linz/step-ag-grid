@@ -56,28 +56,11 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-.ag-theme-step-default.theme-specific,
-.ag-theme-step-compact.theme-specific {
-  .ag-text-area-input:focus {
-    border-color: lui.$sea;
-  }
-
-  .ag-cell[col-id="selection"] {
-    display: flex; // Fix that when you click below checkbox it doesn't process a click
-  }
+%ag-header-common {
 
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
     justify-content: end;
-  }
-
-  // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
-    height: auto;
-  }
-
-  .ag-row:last-of-type {
-    border-bottom: 1px solid lui.$dew;
   }
 
   .ag-header-cell {
@@ -92,6 +75,34 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     }
   }
 
+  .ag-header .ag-header-cell[aria-colindex="1"] {
+    padding-left: 17px;
+    padding-right: 15px;
+  }
+}
+
+.ag-theme-step-default.theme-specific,
+.ag-theme-step-compact.theme-specific {
+
+  @extend %ag-header-common;
+
+  .ag-text-area-input:focus {
+    border-color: lui.$sea;
+  }
+
+  .ag-cell[col-id="selection"] {
+    display: flex; // Fix that when you click below checkbox it doesn't process a click
+  }
+
+  // Fix that when you click below checkbox it doesn't process a click
+  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
+    height: auto;
+  }
+
+  .ag-row:last-of-type {
+    border-bottom: 1px solid lui.$dew;
+  }
+
   .ag-cell-label-container {
     padding: 8px 0;
 
@@ -99,10 +110,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     height: fit-content;
   }
 
-  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 17px;
-    padding-right: 15px;
-  }
 
   .ag-cell[aria-colindex="1"] {
     padding-left: lui.$unit-rg;
@@ -206,14 +213,14 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     height: 2px;
     background-color: transparent;
   }
-  
+
   .ag-row-highlight-above::after {
     top:-3px; // moves the top highlight to the position of the bottom highlight
     border-top: 2px dashed lui.$andrea;
   }
 
   .ag-row-highlight-above:first-of-type::after {
-    top:0px; // the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
+    top:0; // the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
   }
 
   .ag-row-highlight-below::after {
@@ -231,7 +238,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   //   box-shadow: -4px 0px 15px -4px rgba(0, 0, 0, 0.1);
   //   right: -4px;
   // }
-  
+
   // div:after {
   //   box-shadow: 15px 0 15px -15px inset;
   //   right: -15px;
@@ -258,28 +265,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 .ag-theme-step-view-list-default.theme-specific {
 
-  // fix alignment of cell content when grabber is present
-  .ag-header-cell-comp-wrapper {
-    justify-content: end;
-  }
-
-  .ag-header-cell {
-    font-size: 14px;
-    font-weight: 600;
-
-    // fix: Display descender line
-    padding: 0 11px;
-
-    .LuiIcon {
-      fill: lui.$surfie;
-    }
-  }
-
-  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 17px;
-    padding-right: 15px;
-  }
-
+  @extend %ag-header-common;
 
   .ag-header {
     background: lui.$iceberg;
