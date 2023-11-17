@@ -116,6 +116,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         sizeColumns={"fit"}
         theme={"ag-theme-step-view-list-default"}
         contextMenuSelectRow={false}
+        suppressCellFocus={true}
       />
     </GridWrapper>
   );
