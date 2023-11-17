@@ -20,7 +20,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
         header-height: 40px,
         font-size: calc($grid-base-font-size),
       ),
-      'step-view-list-default.theme-specific': (
+      'step-default-v2.theme-specific': (
         extend-theme: alpine,
         row-height: 60px,
         header-height: 40px,
@@ -260,7 +260,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
 }
 
-.ag-theme-step-view-list-default.theme-specific {
+.ag-theme-step-default-v2.theme-specific {
 
   .ag-header-cell {
     font-size: 14px;
