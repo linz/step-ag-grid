@@ -56,7 +56,8 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-%ag-header-common {
+.ag-theme-step-default.theme-specific,
+.ag-theme-step-compact.theme-specific {
 
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
@@ -79,12 +80,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     padding-left: 17px;
     padding-right: 15px;
   }
-}
-
-.ag-theme-step-default.theme-specific,
-.ag-theme-step-compact.theme-specific {
-
-  @extend %ag-header-common;
 
   .ag-text-area-input:focus {
     border-color: lui.$sea;
@@ -265,7 +260,22 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 .ag-theme-step-view-list-default.theme-specific {
 
-  @extend %ag-header-common;
+  .ag-header-cell {
+    font-size: 14px;
+    font-weight: 600;
+
+    // fix: Display descender line
+    padding: 0 12px;
+
+    .LuiIcon {
+      fill: lui.$surfie;
+    }
+  }
+
+  .ag-header .ag-header-cell[aria-colindex="1"] {
+    padding-left: 32px;
+    padding-right: 12px;
+  }
 
   .ag-header {
     background: lui.$iceberg;
@@ -283,5 +293,9 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-cell {
     border: none !important;
     outline: none;
+  }
+
+  .ag-row .ag-cell[aria-colindex="1"] {
+    padding-left: 32px;
   }
 }
