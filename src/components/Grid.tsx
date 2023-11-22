@@ -53,6 +53,7 @@ export interface GridProps {
    */
   selectColumnPinned?: ColDef["pinned"];
   noRowsOverlayText?: string;
+  noRowsMatchingOverlayText?: string;
   animateRows?: boolean;
   rowHeight?: number;
   rowClassRules?: GridOptions["rowClassRules"];
@@ -716,6 +717,7 @@ export const Grid = ({
                 headerRowHeight={headerRowCount * rowHeight}
                 filteredRowCount={event.api.getDisplayedRowCount()}
                 noRowsOverlayText={params.noRowsOverlayText}
+                noRowsMatchingOverlayText={params.noRowsMatchingOverlayText}
               />
             );
           }}

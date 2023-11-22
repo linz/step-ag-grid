@@ -288,7 +288,11 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-size: 14px;
   }
 
-  .ag-row .ag-cell[aria-colindex="1"] {
+  .ag-row .ag-cell:first-of-type {
     padding-left: 32px;
+  }
+
+  .ag-row .ag-cell:last-of-type {
+    padding-right: 32px;
   }
 }
