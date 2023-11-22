@@ -24,12 +24,14 @@ export interface GridNoRowsOverlayProps {
   rowCount: number | undefined | null;
   filteredRowCount: number;
   noRowsOverlayText: string | undefined;
+  noRowsMatchingOverlayText: string | undefined;
   headerRowHeight: number;
 }
 
 export const GridNoRowsOverlay = (props: GridNoRowsOverlayProps) => {
   if (props.loading) return <GridLoadingOverlayComponent headerRowHeight={props.headerRowHeight} />;
   if (props.rowCount === 0) return <div>{props.noRowsOverlayText ?? "There are currently no rows"}</div>;
-  if (props.filteredRowCount === 0) return <div>All rows have been filtered</div>;
+  if (props.filteredRowCount === 0)
+    return <div>{props.noRowsMatchingOverlayText ?? "All rows have been filtered"}</div>;
   return <span />;
 };
