@@ -35,11 +35,12 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@linzjs/lui": "^21.15.1",
+    "@linzjs/lui": ">=21",
     "ag-grid-community": ">=29",
     "ag-grid-react": ">=29",
     "clsx": "^2.0.0",
     "debounce-promise": "^3.1.2",
+    "esbuild": "^0.19.9",
     "lodash-es": ">=4",
     "matcher": "^5.0.0",
     "react": ">=18",
