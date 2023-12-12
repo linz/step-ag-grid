@@ -50,7 +50,6 @@
   },
   "scripts": {
     "build": "run-s clean stylelint lint css bundle",
-    "build-ci": "NODE_ENV=test run-s clean stylelint lint css bundle",
     "yalc": "run-s clean css bundle && yalc publish",
     "clean": "rimraf dist && mkdirp ./dist",
     "bundle": "rollup -c",
@@ -60,9 +59,8 @@
     "eject": "react-scripts eject",
     "lint": "eslint ./src --ext .js,.ts,.tsx --fix --cache --ignore-path .gitignore",
     "storybook": "storybook dev -p 6006",
-    "build-storybook-ci": "NODE_ENV=test storybook build",
+    "build-storybook-ci": "NODE_ENV=development storybook build",
     "build-storybook": "storybook build",
-    "deploy-storybook-ci": "NODE_ENV=test npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",
     "deploy-storybook": "npx --yes -p @storybook/storybook-deployer storybook-to-ghpages",
     "chromatic": "chromatic --exit-zero-on-changes",
     "semantic-release": "semantic-release"
