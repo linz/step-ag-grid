@@ -81,6 +81,6 @@ jobs:
       - name: Build
         run: npm run build-ci
 
-      - run: npm run deploy-storybook -- --ci
+      - run: npm run deploy-storybook-ci -- --ci
         env:
           GH_TOKEN: github-actions:${{secrets.GITHUB_TOKEN}}
