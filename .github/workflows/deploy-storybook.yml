@@ -79,8 +79,8 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Build
-        run: npm run build-storybook-ci
+        run: npm run build
 
-      - run: npm run deploy-storybook-ci -- --ci
+      - run: npm run deploy-storybook -- --ci
         env:
           GH_TOKEN: github-actions:${{secrets.GITHUB_TOKEN}}
