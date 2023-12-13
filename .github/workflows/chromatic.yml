@@ -1,6 +1,7 @@
 name: 'Chromatic'
 on: push
-
+env:
+  NODE_ENV: test
 jobs:
   chromatic-deployment:
     runs-on: ubuntu-latest
