@@ -17,6 +17,7 @@ jobs:
         env:
           STORYBOOK_BUILD_TIMEOUT: 1200000
           NODE_ENV: test
+          CI: true
       - name: Publish Chromatic and auto accept changes for master and beta
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
         uses: chromaui/action@v1
@@ -27,3 +28,4 @@ jobs:
         env:
           STORYBOOK_BUILD_TIMEOUT: 1200000
           NODE_ENV: test
+          CI: true
