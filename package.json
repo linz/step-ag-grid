@@ -28,16 +28,14 @@
   },
   "peerDependencies": {
     "@linzjs/lui": ">=21",
-    "ag-grid-community": ">=29",
-    "ag-grid-react": ">=29",
+    "ag-grid-react": "~29",
     "lodash-es": ">=4",
     "react": ">=18",
     "react-dom": ">=18"
   },
   "dependencies": {
     "@linzjs/lui": ">=21",
-    "ag-grid-community": ">=29",
-    "ag-grid-react": ">=29",
+    "ag-grid-react": "~29",
     "clsx": "^2.0.0",
     "debounce-promise": "^3.1.2",
     "lodash-es": ">=4",
