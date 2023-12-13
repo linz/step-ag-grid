@@ -278,3 +278,5 @@ This will throw an exception if the row id is not found.
 ```tsx
 window.__stepAgGrid.grids[dataTestId].scrollRowIntoViewById("1000")
 ```
+
+## Will chromatic deployment work correctly
