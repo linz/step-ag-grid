@@ -19,3 +19,37 @@ export * from "./react-menu3/types";
 export * from "./utils/bearing";
 export * from "./utils/util";
 export * from "./utils/deferredPromise";
+export {
+  clickActionButton,
+  clickMenuOption,
+  clickMultiSelectOption,
+  closeMenu,
+  closePopover,
+  countRows,
+  deselectRow,
+  editCell,
+  findActionButton,
+  findCell,
+  findCellContains,
+  findMenuOption,
+  findMultiSelectOption,
+  findOpenPopover,
+  findRow,
+  getMultiSelectOptions,
+  isCellReadOnly,
+  openAndClickMenuOption,
+  openAndFindMenuOption,
+  queryMenuOption,
+  queryRow,
+  selectCell,
+  selectRow,
+  setUpUserEvent,
+  typeInputByLabel,
+  typeInputByPlaceholder,
+  typeOnlyInput,
+  typeOtherInput,
+  typeOtherTextArea,
+  validateMenuOptions,
+  waitForGridReady,
+  waitForGridRows
+} from "./utils/testUtil";
