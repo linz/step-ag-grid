@@ -23,6 +23,7 @@ import {
 export default {
   title: "GridForm / Interactions",
   component: GridFormMultiSelect,
+  decorators: [(storyFn) => <div style={{ width: 600, height: 400 }}>{storyFn()}</div>],
   args: {},
 } as Meta<typeof GridFormMultiSelect>;
 
@@ -57,37 +58,35 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <div>
-          <h6 ref={anchorRef}>Interaction test</h6>
-          <GridPopoverContext.Provider
-            value={
-              {
-                anchorRef: anchorRef,
-                updateValue,
-                data: { value: "" },
-                value: "",
-                field: "value",
-                selectedRows: [],
-              } as any as GridPopoverContextType<any>
-            }
-          >
-            <GridFormMultiSelect {...props} {...config} />
-          </GridPopoverContext.Provider>
-        </div>
-      </GridContextProvider>
-    </div>
+    <GridContextProvider>
+      <div>
+        <h6 ref={anchorRef}>Interaction test</h6>
+        <GridPopoverContext.Provider
+          value={
+            {
+              anchorRef: anchorRef,
+              updateValue,
+              data: { value: "" },
+              value: "",
+              field: "value",
+              selectedRows: [],
+            } as any as GridPopoverContextType<any>
+          }
+        >
+          <GridFormMultiSelect {...props} {...config} />
+        </GridPopoverContext.Provider>
+      </div>
+    </GridContextProvider>
   );
 };
 
 export const GridFormMultiSelectInteractions_ = Template.bind({});
-GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
+GridFormMultiSelectInteractions_.play = async () => {
+  const canvas = within(document.body);
+
   updateValue.mockClear();
   onSave.mockClear();
   onSelectFilter.mockClear();
-
-  const canvas = within(canvasElement);
 
   const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
 

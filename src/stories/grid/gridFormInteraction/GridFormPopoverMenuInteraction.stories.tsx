@@ -24,6 +24,7 @@ import {
 export default {
   title: "GridForm / Interactions",
   component: GridFormPopoverMenu,
+  decorators: [(storyFn) => <div style={{ width: 600, height: 400 }}>{storyFn()}</div>],
   args: {},
 } as Meta<typeof GridFormPopoverMenu>;
 
@@ -45,50 +46,48 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <h6 ref={anchorRef}>Interaction Test</h6>
-        <GridPopoverContext.Provider
-          value={
+    <GridContextProvider>
+      <h6 ref={anchorRef}>Interaction Test</h6>
+      <GridPopoverContext.Provider
+        value={
+          {
+            anchorRef,
+            value: null,
+            updateValue,
+          } as any as GridPopoverContextType<any>
+        }
+      >
+        <GridFormPopoverMenu
+          {...props}
+          options={async () => [
+            { label: "Enabled", value: 1, action: enabledAction },
+            PopoutMenuSeparator,
+            { label: "Disabled", value: 0, disabled: true, action: disabledAction },
             {
-              anchorRef,
-              value: null,
-              updateValue,
-            } as any as GridPopoverContextType<any>
-          }
-        >
-          <GridFormPopoverMenu
-            {...props}
-            options={async () => [
-              { label: "Enabled", value: 1, action: enabledAction },
-              PopoutMenuSeparator,
-              { label: "Disabled", value: 0, disabled: true, action: disabledAction },
-              {
-                label: "Sub text input",
-                value: 0,
-                subComponent: () => (
-                  <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
-                ),
-              },
-              {
-                label: "Sub text area",
-                value: 0,
-                subComponent: () => (
-                  <GridFormSubComponentTextArea placeholder={"Text area"} maxLength={5} required defaultValue={""} />
-                ),
-              },
-              { label: "ERROR! this should be hidden", value: 3, hidden: true },
-            ]}
-          />
-        </GridPopoverContext.Provider>
-      </GridContextProvider>
-    </div>
+              label: "Sub text input",
+              value: 0,
+              subComponent: () => (
+                <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+              ),
+            },
+            {
+              label: "Sub text area",
+              value: 0,
+              subComponent: () => (
+                <GridFormSubComponentTextArea placeholder={"Text area"} maxLength={5} required defaultValue={""} />
+              ),
+            },
+            { label: "ERROR! this should be hidden", value: 3, hidden: true },
+          ]}
+        />
+      </GridPopoverContext.Provider>
+    </GridContextProvider>
   );
 };
 
 export const GridFormPopoverMenuInteractions_ = Template.bind({});
-GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
+GridFormPopoverMenuInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   const getOption = (name: string) => canvas.findByRole("menuitem", { name });
 

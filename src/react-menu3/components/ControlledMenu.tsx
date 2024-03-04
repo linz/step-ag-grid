@@ -1,4 +1,5 @@
-import { FocusEvent, ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import { delay } from "lodash-es";
+import React, { ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { hasParentClass } from "../../utils/util";
@@ -9,6 +10,8 @@ import { useBEM } from "../hooks";
 import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
 import { CloseReason, Keys, getTransition, isMenuOpen, menuContainerClass, mergeProps, safeCall } from "../utils";
 import { MenuList } from "./MenuList";
+
+const reactMenuOverlayTestId = "ReactMenu-overlay";
 
 export const ControlledMenuFr = (
   {
@@ -66,52 +69,43 @@ export const ControlledMenuFr = (
     ],
   );
 
-  const isWithinMenu = useCallback(
-    (target: EventTarget | null) =>
-      hasParentClass("szh-menu--state-open", target as Node) ||
-      // This is temporary, it will be removed when the overlay click is fixed
-      hasParentClass("LuiModalPrefab", target as Node) ||
-      hasParentClass("prefab-modal", target as Node),
-    [],
-  );
+  const handleSaveOnOverlayClick = useCallback(() => {
+    // Note: There's an issue in React17
+    // the cell doesn't refresh during update if save is invoked from a native event
+    // This doesn't happen in React18
+    // To work around it, I invoke the save by clicking on a passed in invisible button ref
+    if (saveButtonRef?.current) {
+      saveButtonRef.current.setAttribute("data-reason", CloseReason.BLUR);
+      saveButtonRef.current.click();
+    } else safeCall(onClose, { reason: CloseReason.BLUR });
 
-  const handleScreenEventForSave = useCallback(
-    (ev: MouseEvent) => {
-      if (!isWithinMenu(ev.target)) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        // Note: There's an issue in React17
-        // the cell doesn't refresh during update if save is invoked from a native event
-        // This doesn't happen in React18
-        // To work around it, I invoke the save by clicking on a passed in invisible button ref
-        if (saveButtonRef?.current) {
-          saveButtonRef.current.setAttribute("data-reason", CloseReason.BLUR);
-          saveButtonRef.current.click();
-        } else safeCall(onClose, { reason: CloseReason.BLUR });
+    // If a user clicks on the menu button when a menu is open, we need to close the menu.
+    // However, a blur event will be fired prior to the click event on menu button,
+    // which makes the menu first close and then open again.
+    // If this happens, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
+    // and makes it difficult to determine whether onBlur is fired because of clicking on menu button.
+    // This is a workaround approach which sets a flag to skip a following click event.
+    if (skipOpen) {
+      skipOpen.current = true;
+      setTimeout(() => (skipOpen.current = false), 300);
+    }
+  }, [onClose, saveButtonRef, skipOpen]);
 
-        // If a user clicks on the menu button when a menu is open, we need to close the menu.
-        // However, a blur event will be fired prior to the click event on menu button,
-        // which makes the menu first close and then open again.
-        // If this happens, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
-        // and makes it difficult to determine whether onBlur is fired because of clicking on menu button.
-        // This is a workaround approach which sets a flag to skip a following click event.
-        if (skipOpen) {
-          skipOpen.current = true;
-          setTimeout(() => (skipOpen.current = false), 300);
-        }
-      }
+  const handleContextMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const replayEvent = new MouseEvent(e.type, e.nativeEvent);
+      const ownerDocument = (e.target as Node).ownerDocument;
+      e.preventDefault();
+      e.stopPropagation();
+      safeCall(onClose, { reason: CloseReason.CANCEL });
+
+      ownerDocument &&
+        delay(() => {
+          const el = ownerDocument.elementFromPoint(e.clientX, e.clientY);
+          el?.dispatchEvent(replayEvent);
+        }, 150);
     },
-    [isWithinMenu, onClose, saveButtonRef, skipOpen],
-  );
-
-  const handleScreenEventForCancel = useCallback(
-    (ev: MouseEvent) => {
-      if (!isWithinMenu(ev.target)) {
-        ev.preventDefault();
-        ev.stopPropagation();
-      }
-    },
-    [isWithinMenu],
+    [onClose],
   );
 
   const lastTabDownEl = useRef<Element>();
@@ -121,11 +115,23 @@ export const ControlledMenuFr = (
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
       const activeElement = thisDocument.activeElement;
       if (!anchorRef?.current || !activeElement) return;
-      if (ev.key !== "Tab" && ev.key !== "Enter") return;
+      if (ev.key !== "Tab" && ev.key !== "Enter" && ev.key !== "Escape") return;
 
       if (ev.repeat) {
         ev.preventDefault();
         ev.stopPropagation();
+        return;
+      }
+
+      if (ev.key === "Escape") {
+        if (document.elementFromPoint(0, 0)?.getAttribute("data-testid") === reactMenuOverlayTestId) {
+          if (isDown) {
+            ev.preventDefault();
+            ev.stopPropagation();
+          } else {
+            safeCall(onClose, { reason: CloseReason.CANCEL });
+          }
+        }
         return;
       }
 
@@ -187,7 +193,7 @@ export const ControlledMenuFr = (
           break;
       }
     },
-    [anchorRef, saveButtonRef],
+    [anchorRef, onClose, saveButtonRef],
   );
 
   const handleKeydownTabAndEnter = useMemo(() => handleKeyboardTabAndEnter(true), [handleKeyboardTabAndEnter]);
@@ -197,29 +203,16 @@ export const ControlledMenuFr = (
     if (isMenuOpen(state)) {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
       thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
+      // also escape, on escape scan screen
+      // if escape document.elementFromPoint(screen center), if not element or overlay then don't close
       thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
-      thisDocument.addEventListener("mousedown", handleScreenEventForSave, true);
-      thisDocument.addEventListener("mouseup", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("click", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
       return () => {
         thisDocument.removeEventListener("keydown", handleKeydownTabAndEnter, true);
         thisDocument.removeEventListener("keyup", handleKeyupTabAndEnter, true);
-        thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
-        thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("dblclick", handleScreenEventForCancel, true);
       };
     }
     return () => {};
-  }, [
-    handleScreenEventForSave,
-    handleScreenEventForCancel,
-    state,
-    anchorRef,
-    handleKeydownTabAndEnter,
-    handleKeyupTabAndEnter,
-  ]);
+  }, [state, anchorRef, handleKeydownTabAndEnter, handleKeyupTabAndEnter]);
 
   const itemSettings = useMemo(
     () => ({
@@ -264,65 +257,56 @@ export const ControlledMenuFr = (
     [onItemClick, onClose],
   );
 
-  const onKeyDown = ({ key }: KeyboardEvent) => {
+  // escape is handled by global handler
+  const onKeyDown = () => {};
+  /*const onKeyDown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case Keys.ESC:
         safeCall(onClose, { key, reason: CloseReason.CANCEL });
         break;
     }
-  };
-
-  const onBlur = (e: FocusEvent) => {
-    if (
-      isMenuOpen(state) &&
-      !e.currentTarget.contains(e.relatedTarget || document.activeElement) &&
-      !isWithinMenu(e.relatedTarget)
-    ) {
-      safeCall(onClose, { reason: CloseReason.BLUR });
-
-      // If a user clicks on the menu button when a menu is open, we need to close the menu.
-      // However, a blur event will be fired prior to the click event on menu button,
-      // which makes the menu first close and then open again.
-      // If this happens, e.relatedTarget is incorrectly set to null instead of the button in Safari and Firefox,
-      // and makes it difficult to determine whether onBlur is fired because of clicking on menu button.
-      // This is a workaround approach which sets a flag to skip a following click event.
-      if (skipOpen) {
-        skipOpen.current = true;
-        setTimeout(() => (skipOpen.current = false), 300);
-      }
-    }
-  };
+  };*/
 
   const itemTransition = getTransition(transition, "item");
   const modifiers = useMemo(() => ({ theme: theming, itemTransition }), [theming, itemTransition]);
 
   const menuList = (
-    <div
-      {...mergeProps({ onKeyDown, onBlur }, containerProps)}
-      className={useBEM({
-        block: menuContainerClass,
-        modifiers,
-        className,
-      })}
-      style={{ ...containerProps?.style, position: "relative" }}
-      ref={containerRef}
-    >
-      {state && (
-        <SettingsContext.Provider value={settings}>
-          <ItemSettingsContext.Provider value={itemSettings}>
-            <EventHandlersContext.Provider value={eventHandlers}>
-              <MenuList
-                {...restProps}
-                ariaLabel={ariaLabel || "Menu"}
-                externalRef={externalRef}
-                containerRef={containerRef}
-                onClose={onClose}
-              />
-            </EventHandlersContext.Provider>
-          </ItemSettingsContext.Provider>
-        </SettingsContext.Provider>
+    <>
+      {isMenuOpen(state) && (
+        <div
+          data-testid={reactMenuOverlayTestId}
+          className={"ReactMenu-overlay"}
+          onClick={handleSaveOnOverlayClick}
+          onContextMenu={(e) => handleContextMenuClick(e)}
+        />
       )}
-    </div>
+      <div
+        {...mergeProps({ onKeyDown }, containerProps)}
+        className={useBEM({
+          block: menuContainerClass,
+          modifiers,
+          className,
+        })}
+        style={{ ...containerProps?.style, position: "relative" }}
+        ref={containerRef}
+      >
+        {state && (
+          <SettingsContext.Provider value={settings}>
+            <ItemSettingsContext.Provider value={itemSettings}>
+              <EventHandlersContext.Provider value={eventHandlers}>
+                <MenuList
+                  {...restProps}
+                  ariaLabel={ariaLabel || "Menu"}
+                  externalRef={externalRef}
+                  containerRef={containerRef}
+                  onClose={onClose}
+                />
+              </EventHandlersContext.Provider>
+            </ItemSettingsContext.Provider>
+          </SettingsContext.Provider>
+        )}
+      </div>
+    </>
   );
 
   if (portal === true && anchorRef?.current != null) {

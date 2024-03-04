@@ -4,7 +4,7 @@ import { expect, jest } from "@storybook/jest";
 import { Meta, StoryFn } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
 
-import { Grid } from "../../components/Grid";
+import { Grid } from "../../components";
 import { Menu, MenuButton, MenuDivider, MenuItem, SubMenu } from "../../react-menu3";
 import { wait } from "../../utils/util";
 
@@ -57,9 +57,15 @@ ReactMenuControlled.play = async ({ canvasElement }) => {
     expect(await canvas.findByRole("menuitem", { name: "New File" })).toBeInTheDocument();
   };
 
-  // Check menu closes on click outside
   await openMenu();
+
+  const overlay = await canvas.findByTestId("ReactMenu-overlay");
+
+  // Check menu closes on click outside
+  await userEvent.click(overlay);
+
   await userEvent.click(menuButton.parentElement as Element);
+
   expect(canvas.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
 
   // Test arrow down/up

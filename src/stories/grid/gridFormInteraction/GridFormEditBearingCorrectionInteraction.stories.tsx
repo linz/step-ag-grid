@@ -20,6 +20,7 @@ import {
 export default {
   title: "GridForm / Interactions",
   component: GridFormEditBearing,
+  decorators: [(storyFn) => <div style={{ width: 600, height: 400 }}>{storyFn()}</div>],
   args: {},
 } as Meta<typeof GridFormEditBearing>;
 
@@ -29,28 +30,26 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <h6 ref={anchorRef}>Interaction Test</h6>
-        <GridPopoverContext.Provider
-          value={
-            {
-              anchorRef,
-              value: null,
-              updateValue,
-            } as any as GridPopoverContextType<any>
-          }
-        >
-          <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} />
-        </GridPopoverContext.Provider>
-      </GridContextProvider>
-    </div>
+    <GridContextProvider>
+      <h6 ref={anchorRef}>Interaction Test</h6>
+      <GridPopoverContext.Provider
+        value={
+          {
+            anchorRef,
+            value: null,
+            updateValue,
+          } as any as GridPopoverContextType<any>
+        }
+      >
+        <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} />
+      </GridPopoverContext.Provider>
+    </GridContextProvider>
   );
 };
 
 export const GridFormEditBearingCorrectionInteractions_ = Template.bind({});
-GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
-  const canvas = within(canvasElement);
+GridFormEditBearingCorrectionInteractions_.play = async () => {
+  const canvas = within(document.body);
 
   expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
 

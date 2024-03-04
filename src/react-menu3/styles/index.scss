@@ -1,6 +1,15 @@
 @use "var";
 @use "core";
 
+.ReactMenu-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
 .szh-menu {
   user-select: none;
   color: var.$color;
@@ -72,6 +81,10 @@
   }
 }
 
-.react-menu-inline-test .szh-menu-container, .react-menu-inline-test .szh-menu {
+.react-menu-inline-test .szh-menu-container {
+  z-index: 3;
+}
+
+.react-menu-inline-test .szh-menu {
   position: static !important;
 }
