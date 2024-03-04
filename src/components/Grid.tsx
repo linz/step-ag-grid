@@ -105,6 +105,8 @@ export interface GridProps {
 
   loading?: boolean;
   suppressCellFocus?: boolean;
+  pinnedTopRowData?: GridOptions["pinnedTopRowData"];
+  pinnedBottomRowData?: GridOptions["pinnedBottomRowData"];
 }
 
 /**
@@ -738,6 +740,8 @@ export const Grid = ({
           onRowDragEnd={onRowDragEnd}
           onRowDragLeave={onRowDragLeave}
           suppressCellFocus={params.suppressCellFocus}
+          pinnedTopRowData={params.pinnedTopRowData}
+          pinnedBottomRowData={params.pinnedBottomRowData}
         />
       </div>
     </div>
