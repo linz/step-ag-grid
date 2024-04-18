@@ -264,10 +264,12 @@ export const ControlledMenuFr = (
     [onItemClick, onClose],
   );
 
-  const onKeyDown = ({ key }: KeyboardEvent) => {
-    switch (key) {
+  const onKeyUp = (e: KeyboardEvent) => {
+    switch (e.key) {
       case Keys.ESC:
-        safeCall(onClose, { key, reason: CloseReason.CANCEL });
+        e.preventDefault();
+        e.stopPropagation();
+        safeCall(onClose, { key: e.key, reason: CloseReason.CANCEL });
         break;
     }
   };
@@ -298,7 +300,7 @@ export const ControlledMenuFr = (
 
   const menuList = (
     <div
-      {...mergeProps({ onKeyDown, onBlur }, containerProps)}
+      {...mergeProps({ onKeyUp, onBlur }, containerProps)}
       className={useBEM({
         block: menuContainerClass,
         modifiers,
