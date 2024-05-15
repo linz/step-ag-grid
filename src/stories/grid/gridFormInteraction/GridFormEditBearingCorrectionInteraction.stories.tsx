@@ -11,7 +11,6 @@ import "@linzjs/lui/dist/fonts";
 
 import {
   GridContext,
-  GridContextProvider,
   GridFormEditBearing,
   GridFormEditBearingProps,
   GridPopoverEditBearingCorrectionEditorParams,

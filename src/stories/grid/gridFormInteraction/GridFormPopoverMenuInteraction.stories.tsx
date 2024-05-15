@@ -13,7 +13,6 @@ import "@linzjs/lui/dist/fonts";
 import {
   GridBaseRow,
   GridContext,
-  GridContextProvider,
   GridFormPopoverMenu,
   GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
@@ -45,7 +44,14 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContext.Provider value={{ stopEditing: () => {}, cancelEdit: () => {} } as any}>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
           value={{
