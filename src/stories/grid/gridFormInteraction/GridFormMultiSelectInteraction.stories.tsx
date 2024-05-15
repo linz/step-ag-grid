@@ -2,19 +2,17 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
+import { StoryFn } from "@storybook/react";
+import { expect, fn, userEvent, within } from "@storybook/test";
+import { GridPopoverContext } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
 import {
-  GridContextProvider,
+  GridContext,
   GridFormMultiSelect,
   GridFormMultiSelectProps,
-  GridFormMultiSelectSaveProps,
   GridFormSubComponentTextInput,
   MultiSelectOption,
   wait,
@@ -24,14 +22,12 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormMultiSelect,
   args: {},
-} as Meta<typeof GridFormMultiSelect>;
+};
 
-const updateValue = jest
-  .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
-  .mockImplementation((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
+const updateValue = fn((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
 
-const onSave = jest.fn<Promise<boolean>, [GridFormMultiSelectSaveProps<any>]>().mockImplementation(async () => true);
-const onSelectFilter = jest.fn();
+const onSave = fn();
+const onSelectFilter = fn();
 
 let options: MultiSelectOption[] = [];
 const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
@@ -58,30 +54,36 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <div>
-          <h6 ref={anchorRef}>Interaction test</h6>
-          <GridPopoverContext.Provider
-            value={
-              {
-                anchorRef: anchorRef,
-                updateValue,
-                data: { value: "" },
-                value: "",
-                field: "value",
-                selectedRows: [],
-              } as any as GridPopoverContextType<any>
-            }
-          >
-            <GridFormMultiSelect {...props} {...config} />
-          </GridPopoverContext.Provider>
-        </div>
-      </GridContextProvider>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
+        <h6 ref={anchorRef}>Interaction test</h6>
+        <GridPopoverContext.Provider
+          value={{
+            anchorRef,
+            updateValue,
+            data: { value: "" },
+            value: "",
+            field: "value",
+            selectedRows: [],
+            saving: false,
+            setSaving: () => {},
+            formatValue: (value) => value,
+          }}
+        >
+          <GridFormMultiSelect {...props} {...config} />
+        </GridPopoverContext.Provider>
+      </GridContext.Provider>
     </div>
   );
 };
 
-export const GridFormMultiSelectInteractions_ = Template.bind({});
+export const GridFormMultiSelectInteractions_: typeof Template = Template.bind({});
 GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   updateValue.mockClear();
   onSave.mockClear();

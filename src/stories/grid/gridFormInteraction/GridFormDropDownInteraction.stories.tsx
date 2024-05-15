@@ -2,35 +2,26 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
+import { StoryFn } from "@storybook/react";
+import { expect, fn, userEvent, within } from "@storybook/test";
+import { GridPopoverContext } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import {
-  GridContextProvider,
-  GridFormDropDown,
-  GridFormDropDownProps,
-  GridFormSubComponentTextInput,
-  GridPopoutEditDropDownSelectedItem,
-} from "../../..";
+import { GridContext, GridFormDropDown, GridFormDropDownProps, GridFormSubComponentTextInput } from "../../..";
 
 export default {
   title: "GridForm / Interactions",
   component: GridFormDropDown,
   args: {},
-} as Meta<typeof GridFormDropDown>;
+};
 
-const updateValue = jest
-  .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
-  .mockImplementation((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
+const updateValue = fn(async (saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) =>
+  saveFn([]),
+);
 
-const onSelectedItem = jest
-  .fn<Promise<void>, [GridPopoutEditDropDownSelectedItem<any>]>()
-  .mockImplementation(async () => undefined);
+const onSelectedItem = fn(async () => {});
 
 const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
   const config: GridFormDropDownProps<any> = {
@@ -52,30 +43,37 @@ const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
-        <div>
-          <h6 ref={anchorRef}>Interaction test</h6>
-          <GridPopoverContext.Provider
-            value={
-              {
-                anchorRef: anchorRef,
-                updateValue,
-                data: { value: "" },
-                value: "",
-                field: "value",
-                selectedRows: [],
-              } as any as GridPopoverContextType<any>
-            }
-          >
-            <GridFormDropDown {...props} {...config} />
-          </GridPopoverContext.Provider>
-        </div>
-      </GridContextProvider>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
+        <h6 ref={anchorRef}>Interaction test</h6>
+        <GridPopoverContext.Provider
+          value={{
+            anchorRef,
+            updateValue,
+            data: { value: "" },
+            value: "",
+            field: "value",
+            selectedRows: [],
+            formatValue: () => "",
+            saving: false,
+            setSaving: () => {},
+          }}
+        >
+          <GridFormDropDown {...props} {...config} />
+        </GridPopoverContext.Provider>
+      </GridContext.Provider>
     </div>
   );
 };
 
-export const GridFormDropDownInteractions_ = Template.bind({});
+//console.log({ extendedExpect });
+export const GridFormDropDownInteractions_: typeof Template = Template.bind({});
 GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
@@ -114,7 +112,7 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   // Test tab to save
   updateValue.mockClear();
   await userEvent.tab();
-  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = Tab
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 1); // 1 = tab
 
   // Test shift+tab to save
   updateValue.mockClear();

@@ -2,9 +2,10 @@ import "../../../styles/GridTheme.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
 import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, waitFor } from "@storybook/testing-library";
+import { expect } from "@storybook/test";
+import * as test from "@storybook/test";
+import { userEvent, waitFor } from "@storybook/test";
 import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
@@ -65,11 +66,11 @@ interface ITestRow {
   dd: string;
 }
 
-const multiEditAction = jest.fn().mockImplementation(async () => {
+const multiEditAction = test.fn().mockImplementation(async () => {
   await wait(500);
 });
 
-const eAction = jest.fn<boolean, []>().mockReturnValue(true);
+const eAction = test.fn<[], boolean>().mockReturnValue(true);
 
 const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
@@ -221,7 +222,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
   );
 };
 
-export const GridKeyboardInteractions = GridKeyboardInteractionsTemplate.bind({});
+export const GridKeyboardInteractions: StoryFn<typeof Grid> = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
   multiEditAction.mockReset();
   eAction.mockReset();

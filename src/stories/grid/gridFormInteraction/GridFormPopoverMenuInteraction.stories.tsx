@@ -2,17 +2,17 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
+import { StoryFn } from "@storybook/react";
+import * as test from "@storybook/test";
+import { expect, userEvent, within } from "@storybook/test";
+import { GridPopoverContext } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
 import {
   GridBaseRow,
-  GridContextProvider,
+  GridContext,
   GridFormPopoverMenu,
   GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
@@ -25,20 +25,18 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormPopoverMenu,
   args: {},
-} as Meta<typeof GridFormPopoverMenu>;
+};
 
-const updateValue = jest
-  .fn<void, [saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1]>()
-  .mockImplementation(async (saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => {
-    await saveFn([]);
-  });
+const updateValue = test.fn((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) =>
+  saveFn([]),
+);
 
-const enabledAction = jest
-  .fn<Promise<void>, [{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }]>()
+const enabledAction = test
+  .fn<[{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }], Promise<void>>()
   .mockResolvedValue(undefined);
 
-const disabledAction = jest
-  .fn<Promise<void>, [{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }]>()
+const disabledAction = test
+  .fn<[{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }], Promise<void>>()
   .mockResolvedValue(undefined);
 
 const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
@@ -46,16 +44,27 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
-          value={
-            {
-              anchorRef,
-              value: null,
-              updateValue,
-            } as any as GridPopoverContextType<any>
-          }
+          value={{
+            anchorRef,
+            value: null,
+            updateValue,
+            data: { value: "" },
+            field: "value",
+            selectedRows: [],
+            saving: false,
+            setSaving: () => {},
+            formatValue: (value) => value,
+          }}
         >
           <GridFormPopoverMenu
             {...props}
@@ -81,12 +90,12 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
             ]}
           />
         </GridPopoverContext.Provider>
-      </GridContextProvider>
+      </GridContext.Provider>
     </div>
   );
 };
 
-export const GridFormPopoverMenuInteractions_ = Template.bind({});
+export const GridFormPopoverMenuInteractions_: typeof Template = Template.bind({});
 GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 

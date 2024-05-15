@@ -92,7 +92,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
       <div className={"GridFilterColumnsToggle-container"}>
         {getColumns("headerName").map((col) => (
           <MenuItem
-            key={col.colId}
+            key={col.colId ?? "no_col_id"}
             disabled={isNonManageableColumn(col)}
             onClick={(e: ClickEvent) => {
               // Global react-menu MenuItem handler handles tabs
