@@ -1,8 +1,9 @@
 import "../../react-menu3/styles/index.scss";
 
-import { expect, jest } from "@storybook/jest";
 import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
+import { expect } from "@storybook/test";
+import * as test from "@storybook/test";
+import { userEvent, within } from "@storybook/test";
 
 import { Grid } from "../../components/Grid";
 import { Menu, MenuButton, MenuDivider, MenuItem, SubMenu } from "../../react-menu3";
@@ -17,8 +18,8 @@ export default {
   },
 } as Meta<typeof Grid>;
 
-const menuItemClickAction = jest.fn();
-const newFileAction = jest.fn();
+const menuItemClickAction = test.fn();
+const newFileAction = test.fn();
 
 const ReactMenuTemplate: StoryFn<typeof Grid> = () => {
   return (

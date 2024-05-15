@@ -145,8 +145,8 @@ export const GridFormMultiSelectGrid = <RowType extends GridBaseRow>(
                     value={`${o.value}`}
                     label={
                       <>
-                        {o.warning && <GridIcon icon={"ic_warning_outline"} title={o.warning} />}
-                        <span className={"GridMultiSelectGrid-Label"}>
+                        {o.warning && <GridIcon key={"$$icon$$"} icon={"ic_warning_outline"} title={o.warning} />}
+                        <span key={"$$label$$"} className={"GridMultiSelectGrid-Label"}>
                           {o.label ?? (o.value == null ? `<${o.value}>` : `${o.value}`)}
                         </span>
                       </>

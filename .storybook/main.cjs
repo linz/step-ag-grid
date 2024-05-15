@@ -2,12 +2,13 @@ const path = require("path");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 module.exports = {
   // Specifying the location of the stories and file formats of what stories can be
-  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
 
   // Specifying the add-ons for Storybook if requiring specific addons to make a story work then add them here
   addons: [
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
+    "@chromatic-com/storybook"
   ],
 
   webpackFinal: async (config) => {
@@ -65,7 +66,9 @@ module.exports = {
     options: {}
   },
 
-  docs: {
-    autodocs: false
+  docs: {},
+
+  typescript: {
+    reactDocgen: "react-docgen-typescript"
   }
 };

@@ -2,48 +2,58 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
+import { StoryFn } from "@storybook/react";
+import { expect, fn, userEvent, within } from "@storybook/test";
+import { GridPopoverContext } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { GridContextProvider, GridFormTextArea, GridFormTextAreaProps } from "../../..";
+import { GridContext, GridFormTextArea, GridFormTextAreaProps } from "../../..";
 
 export default {
   title: "GridForm / Interactions",
   component: GridFormTextArea,
   args: {},
-} as Meta<typeof GridFormTextArea>;
+};
 
-const updateValue = jest.fn();
+const updateValue = fn();
 
 const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
-          value={
-            {
-              anchorRef,
-              value: null,
-              updateValue,
-            } as any as GridPopoverContextType<any>
-          }
+          value={{
+            anchorRef,
+            value: null,
+            updateValue,
+            data: { value: null },
+            field: "value",
+            selectedRows: [],
+            saving: false,
+            setSaving: () => {},
+            formatValue: (value) => value,
+          }}
         >
           <GridFormTextArea {...props} required={true} />
         </GridPopoverContext.Provider>
-      </GridContextProvider>
+      </GridContext.Provider>
     </div>
   );
 };
 
-export const GridFormTextAreaInteractions_ = Template.bind({});
+export const GridFormTextAreaInteractions_: typeof Template = Template.bind({});
 GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 

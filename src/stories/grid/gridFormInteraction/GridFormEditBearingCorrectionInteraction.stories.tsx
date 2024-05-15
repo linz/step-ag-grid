@@ -2,15 +2,15 @@ import "../../../react-menu3/styles/index.scss";
 import "../../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
-import { expect, jest } from "@storybook/jest";
-import { Meta, StoryFn } from "@storybook/react";
-import { userEvent, within } from "@storybook/testing-library";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
+import { StoryFn } from "@storybook/react";
+import { expect, fn, userEvent, within } from "@storybook/test";
+import { GridPopoverContext } from "contexts/GridPopoverContext";
 import { useRef } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
 import {
+  GridContext,
   GridContextProvider,
   GridFormEditBearing,
   GridFormEditBearingProps,
@@ -21,34 +21,45 @@ export default {
   title: "GridForm / Interactions",
   component: GridFormEditBearing,
   args: {},
-} as Meta<typeof GridFormEditBearing>;
+};
 
-const updateValue = jest.fn();
+const updateValue = fn();
 
 const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearingProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
     <div className={"react-menu-inline-test"}>
-      <GridContextProvider>
+      <GridContext.Provider
+        value={
+          {
+            stopEditing: () => {},
+            cancelEdit: () => {},
+          } as any
+        }
+      >
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
-          value={
-            {
-              anchorRef,
-              value: null,
-              updateValue,
-            } as any as GridPopoverContextType<any>
-          }
+          value={{
+            anchorRef,
+            value: null,
+            updateValue,
+            formatValue: (value) => value,
+            setSaving: () => {},
+            saving: false,
+            selectedRows: [],
+            data: { value: "" },
+            field: "value",
+          }}
         >
           <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} />
         </GridPopoverContext.Provider>
-      </GridContextProvider>
+      </GridContext.Provider>
     </div>
   );
 };
 
-export const GridFormEditBearingCorrectionInteractions_ = Template.bind({});
+export const GridFormEditBearingCorrectionInteractions_: typeof Template = Template.bind({});
 GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
