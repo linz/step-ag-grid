@@ -4,7 +4,7 @@ import "@linzjs/lui/dist/scss/base.scss";
 
 import { Meta, StoryFn } from "@storybook/react";
 import { expect } from "@storybook/test";
-import * as test from "@storybook/test";
+import { fn } from "@storybook/test";
 import { userEvent, waitFor } from "@storybook/test";
 import { useMemo, useState } from "react";
 
@@ -66,11 +66,13 @@ interface ITestRow {
   dd: string;
 }
 
-const multiEditAction = test.fn().mockImplementation(async () => {
+const multiEditAction = fn(async () => {
   await wait(500);
 });
 
-const eAction = test.fn<[], boolean>().mockReturnValue(true);
+const eAction = fn(() => {
+  return true;
+});
 
 const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);

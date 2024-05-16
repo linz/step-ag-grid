@@ -65,7 +65,7 @@ export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
 export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
   const exec = shortcutKeys[e.event.key];
-  if (!e.editing && !e.event.repeat && e.event.type === "keypress" && exec) {
+  if (exec && !e.editing && !e.event.repeat && e.event.type === "keydown") {
     const editable = fnOrVar(e.colDef?.editable, e);
     return editable ? exec(e) ?? true : true;
   }
