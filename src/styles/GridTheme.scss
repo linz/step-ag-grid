@@ -61,6 +61,10 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
 
+  div.ag-header-cell-comp-wrapper {
+    align-items: end;
+  }
+
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
     justify-content: end;
