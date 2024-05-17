@@ -60,7 +60,11 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
-
+  div.ag-center-cols-viewport {
+    // when using domLayout={"autoHeight"}, ag grid has a default min-height
+    // set to 150px so the !important is necessary here
+    min-height: 40px !important;
+  }
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
     justify-content: end;
@@ -140,15 +144,23 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     background-color: lightgoldenrodyellow;
   }
 
-  .ag-center-cols-clipper {
-    // when using domLayout={"autoHeight"}, ag grid has a default min-height
-    // set to 150px so the !important is necessary here
-    min-height: 40px !important;
-  }
-
   .ag-body-horizontal-scroll-viewport {
     // It's set to scroll by default, but this causes issues with selecting the last row
     overflow-x: auto;
+  }
+
+  .ag-header-group-cell {
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-top: 12px;
+    height: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    justify-content: center;
+
+    &.ag-header-group-cell-with-group {
+      background-color: lui.$iceberg;
+    }
   }
 
   .ag-cell {
@@ -224,22 +236,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     border-bottom: 2px dashed lui.$andrea;
   }
 
-  // .ag-header .ag-pinned-left-header:after,
-  // .ag-body-viewport .ag-pinned-left-cols-container:after {
-  //   content: " ";
-  //   height: 100%;
-  //   position: absolute;
-  //   z-index: 1;
-  //   top: 0;
-  //   width: 15px;
-  //   box-shadow: -4px 0px 15px -4px rgba(0, 0, 0, 0.1);
-  //   right: -4px;
-  // }
-
-  // div:after {
-  //   box-shadow: 15px 0 15px -15px inset;
-  //   right: -15px;
-  // }
   .ag-pinned-left-header,
   .ag-pinned-right-header,
   .ag-pinned-right-cols-container,
