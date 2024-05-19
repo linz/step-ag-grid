@@ -66,12 +66,12 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: "Id",
         lockVisible: true,
       }),
-      GridCell({
+      GridCell<ITestRow, "position">({
         field: "position",
         headerName: "Position",
         cellRendererParams: {
-          warning: (props) => props.value === "Tester" && "Testers are testing",
-          info: (props) => props.value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridCell({

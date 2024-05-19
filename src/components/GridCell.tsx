@@ -1,5 +1,11 @@
 import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
-import { SuppressKeyboardEventParams, ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
+import {
+  SuppressKeyboardEventParams,
+  ValueFormatterFunc,
+  ValueFormatterParams,
+  ValueGetterFunc,
+  ValueGetterParams,
+} from "ag-grid-community/dist/lib/entities/colDef";
 import { ReactElement, forwardRef, useContext } from "react";
 
 import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
@@ -9,12 +15,7 @@ import { GridBaseRow } from "./Grid";
 import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
 import { GridIcon } from "./GridIcon";
 import { GridLoadableCell } from "./GridLoadableCell";
-import {
-  GenericCellColDef,
-  GenericCellRendererParams,
-  RowValueFormatterParams,
-  RowValueGetterParams,
-} from "./gridRender";
+import { GenericCellColDef, GenericCellRendererParams } from "./gridRender";
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -57,8 +58,20 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
 };
 
 // This is so that typescript retains the row type to pass to the GridCells
-export interface ColDefT<RowType extends GridBaseRow> extends ColDef {
+export interface ColDefT<RowType extends GridBaseRow, Field extends keyof RowType = any, ValueType = RowType[Field]>
+  extends ColDef<RowType, ValueType> {
   _?: RowType;
+  cellRenderer?: (props: ICellRendererParams<RowType, ValueType>) => ReactElement | string | false | null | undefined;
+  cellRendererParams?: {
+    singleClickEdit?: boolean;
+    rightHoverElement?: ReactElement;
+    originalCellRenderer?: any;
+    editAction?: (selectedRows: RowType[]) => void;
+    shortcutKeys?: Record<string, () => void>;
+    warning?: (props: ICellRendererParams<RowType, ValueType>) => ReactElement | string | false | null | undefined;
+    error?: (props: ICellRendererParams<RowType, ValueType>) => ReactElement | string | false | null | undefined;
+    info?: (props: ICellRendererParams<RowType, ValueType>) => ReactElement | string | false | null | undefined;
+  };
   editor?: (editorProps: any) => ReactElement;
 }
 
@@ -76,16 +89,16 @@ export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   );
 };
 
-export const generateFilterGetter = <RowType extends GridBaseRow>(
+export const generateFilterGetter = <RowType extends GridBaseRow, ValueType>(
   field: string | undefined,
-  filterValueGetter: string | ((params: RowValueGetterParams<RowType>) => string) | undefined,
-  valueFormatter: string | ((params: RowValueFormatterParams<RowType>) => string) | undefined,
-) => {
+  filterValueGetter: string | ValueGetterFunc<RowType, ValueType> | undefined,
+  valueFormatter: string | ValueFormatterFunc<RowType, ValueType> | undefined,
+): string | ValueGetterFunc<RowType, ValueType> | undefined => {
   if (filterValueGetter) return filterValueGetter;
   // aggrid will default to valueGetter
   if (typeof valueFormatter !== "function" || !field) return undefined;
 
-  return (params: RowValueGetterParams<RowType>) => {
+  return (params: ValueGetterParams<RowType, ValueType>): any => {
     const value = params.getValue(field);
     let formattedValue = valueFormatter({ ...params, value });
     // Search for null values using standard dash
@@ -101,15 +114,20 @@ export const generateFilterGetter = <RowType extends GridBaseRow>(
 /*
  * All cells should use this.
  */
-export const GridCell = <RowType extends GridBaseRow, Props extends CellEditorCommon>(
-  props: GenericCellColDef<RowType>,
+export const GridCell = <
+  RowType extends GridBaseRow,
+  Field extends keyof RowType,
+  Props extends CellEditorCommon = CellEditorCommon,
+>(
+  props: GenericCellColDef<RowType, Field>,
   custom?: {
     multiEdit?: boolean;
     preventAutoEdit?: boolean;
     editor?: (editorProps: Props) => ReactElement;
     editorParams?: Props;
   },
-): ColDefT<RowType> => {
+): ColDefT<RowType, Field> => {
+  // props.field = ;
   // Generate a default filter value getter which uses the formatted value plus
   // the editable value if it's a string and different from the formatted value.
   // This is so that e.g. bearings can be searched for by DMS or raw number.

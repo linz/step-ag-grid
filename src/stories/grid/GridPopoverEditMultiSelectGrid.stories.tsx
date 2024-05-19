@@ -49,7 +49,7 @@ const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid> = (props: GridProps)
         field: "id",
         headerName: "Id",
       }),
-      GridPopoutEditMultiSelectGrid(
+      GridPopoutEditMultiSelectGrid<ITestRow, "position">(
         {
           field: "position",
           headerName: "Position",
@@ -62,7 +62,7 @@ const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid> = (props: GridProps)
           multiEdit: true,
           editorParams: {
             className: "GridMultiSelect-containerUnlimited",
-            options: (selectedRows) => {
+            options: (selectedRows: ITestRow[]) => {
               const counts: Record<number, number> = mergeWith(
                 {},
                 ...selectedRows.map((row) => countBy(row.position)),

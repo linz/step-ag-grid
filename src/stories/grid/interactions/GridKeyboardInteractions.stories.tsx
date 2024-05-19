@@ -82,12 +82,12 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
         field: "id",
         headerName: "Id",
       }),
-      GridCell({
+      GridCell<ITestRow, "position">({
         field: "position",
         headerName: "Position",
         cellRendererParams: {
-          warning: (props) => props.value === "Tester" && "Testers are testing",
-          info: (props) => props.value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridCell({

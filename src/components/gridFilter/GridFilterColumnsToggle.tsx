@@ -6,9 +6,8 @@ import { LuiCheckboxInput, LuiIcon } from "@linzjs/lui";
 import { GridContext } from "../../contexts/GridContext";
 import { Menu, MenuDivider, MenuItem } from "../../react-menu3";
 import { ClickEvent } from "../../react-menu3/types";
-import { GridBaseRow } from "../Grid";
-import { ColDefT } from "../GridCell";
 import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
+import { ColDef } from "ag-grid-community";
 
 export interface GridFilterColumnsToggleProps {
   saveState?: boolean;
@@ -78,9 +77,7 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
   );
 
   const numericRegExp = /^\d+$/;
-  const isNonManageableColumn = (col: ColDefT<GridBaseRow>) => {
-    return col.lockVisible || col.colId == null || numericRegExp.test(col.colId);
-  };
+  const isNonManageableColumn = (col: ColDef) => col.lockVisible || col.colId == null || numericRegExp.test(col.colId);
 
   return (
     <Menu

@@ -11,7 +11,7 @@ export interface GridFormMessageProps<RowType extends GridBaseRow> extends CellE
   message: (selectedRows: RowType[]) => Promise<string | ReactElement> | string | ReactElement;
 }
 
-export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormMessageProps<RowType>) => {
+export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormMessageProps<RowType>): ReactElement => {
   const { selectedRows } = useGridPopoverContext<RowType>();
 
   const [message, setMessage] = useState<string | ReactElement | null>(null);

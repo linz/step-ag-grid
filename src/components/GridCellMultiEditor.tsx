@@ -23,11 +23,11 @@ export interface RowCellEditorParams<RowType extends GridBaseRow> extends ICellE
 /**
  * Used to choose between cell editors based in data.
  */
-export const GridCellMultiEditor = <RowType extends GridBaseRow>(
-  props: GenericCellColDef<RowType>,
+export const GridCellMultiEditor = <RowType extends GridBaseRow, Field extends keyof RowType>(
+  props: GenericCellColDef<RowType, Field>,
   cellEditorSelector: (params: RowCellEditorParams<RowType>) => CellEditorSelectorResult,
-): ColDefT<RowType> =>
-  GridCell({
+): ColDefT<RowType, Field> =>
+  GridCell<RowType, Field>({
     cellClassRules: GridCellMultiSelectClassRules,
     cellEditorSelector,
     editable: props.editable ?? true,

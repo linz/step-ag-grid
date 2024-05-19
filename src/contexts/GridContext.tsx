@@ -21,7 +21,7 @@ export interface GridContextType<RowType extends GridBaseRow> {
   getColDef: (colId?: string) => ColDef | undefined;
   getColumns: (
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
-  ) => ColDefT<RowType>[];
+  ) => ColDefT<RowType, any>[];
   getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;

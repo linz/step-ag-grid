@@ -7,11 +7,11 @@ import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell
 /**
  * Popout burger menu
  */
-export const GridPopoverMenu = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
+export const GridPopoverMenu = <RowType extends GridBaseRow, Field extends keyof RowType>(
+  colDef: GenericCellColDef<RowType, Field>,
   custom: GenericCellEditorProps<GridFormPopoverMenuProps<RowType>>,
-): ColDefT<RowType> =>
-  GridCell<RowType, GridFormPopoverMenuProps<RowType>>(
+): ColDefT<RowType, Field> =>
+  GridCell<RowType, Field, GridFormPopoverMenuProps<RowType>>(
     {
       minWidth: 48,
       maxWidth: 48,

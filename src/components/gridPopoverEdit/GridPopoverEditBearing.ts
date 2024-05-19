@@ -11,13 +11,13 @@ import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
-const GridPopoverEditBearingLike = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
+const GridPopoverEditBearingLike = <RowType extends GridBaseRow, Field extends keyof RowType>(
+  colDef: GenericCellColDef<RowType, Field>,
   props: GenericCellEditorProps<GridFormEditBearingProps<RowType>> & {
     editorParams: { formatValue: (value: any) => any };
   },
-): ColDefT<RowType> =>
-  GridCell(
+): ColDefT<RowType, Field> =>
+  GridCell<RowType, Field, GridFormEditBearingProps<RowType>>(
     {
       valueFormatter: (params: ValueFormatterParams) => props.editorParams?.formatValue(params.value) ?? "",
       ...colDef,
@@ -34,11 +34,11 @@ export const GridPopoverEditBearingEditorParams = {
   range: bearingRangeValidator,
 };
 
-export const GridPopoverEditBearing = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
+export const GridPopoverEditBearing = <RowType extends GridBaseRow, Field extends keyof RowType>(
+  colDef: GenericCellColDef<RowType, Field>,
   props: GenericCellEditorProps<GridFormEditBearingProps<RowType>>,
-): ColDefT<RowType> =>
-  GridPopoverEditBearingLike(colDef, {
+): ColDefT<RowType, Field> =>
+  GridPopoverEditBearingLike<RowType, Field>(colDef, {
     multiEdit: !!props.multiEdit,
     editorParams: {
       ...GridPopoverEditBearingEditorParams,
@@ -52,11 +52,11 @@ export const GridPopoverEditBearingCorrectionEditorParams = {
   range: bearingCorrectionRangeValidator,
 };
 
-export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
+export const GridPopoverEditBearingCorrection = <RowType extends GridBaseRow, Field extends keyof RowType>(
+  colDef: GenericCellColDef<RowType, Field>,
   props: GenericCellEditorProps<GridFormEditBearingProps<RowType>>,
-): ColDefT<RowType> =>
-  GridPopoverEditBearingLike(colDef, {
+): ColDefT<RowType, Field> =>
+  GridPopoverEditBearingLike<RowType, Field>(colDef, {
     multiEdit: !!props.multiEdit,
     editorParams: {
       ...GridPopoverEditBearingCorrectionEditorParams,
