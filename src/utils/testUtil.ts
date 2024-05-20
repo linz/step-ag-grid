@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { isEqual } from "lodash-es";
 
 import { IQueryQuick, findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
-import { wait } from "./util";
 
 let user = userEvent;
 /**
