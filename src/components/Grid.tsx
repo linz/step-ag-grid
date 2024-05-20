@@ -687,7 +687,7 @@ export const Grid = ({
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
           rowHeight={rowHeight}
-          animateRows={params.animateRows}
+          animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}
