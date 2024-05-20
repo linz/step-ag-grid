@@ -65,8 +65,8 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
           field: "bearingCorrection",
           headerName: "Bearing correction",
           cellRendererParams: {
-            warning: ({ data }) => data.id == 1002 && "Testers are testing",
-            info: ({ data }) => data.id == 1001 && "Developers are developing",
+            warning: ({ data }) => data?.id == 1002 && "Testers are testing",
+            info: ({ data }) => data?.id == 1001 && "Developers are developing",
           },
         },
         {

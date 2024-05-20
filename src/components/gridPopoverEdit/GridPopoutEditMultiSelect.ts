@@ -3,15 +3,15 @@ import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormMultiSelect, GridFormMultiSelectProps } from "../gridForm/GridFormMultiSelect";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
-export const GridPopoutEditMultiSelect = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
-  props: GenericCellEditorProps<GridFormMultiSelectProps<RowType>>,
-): ColDefT<RowType> =>
-  GridCell(colDef, {
+export const GridPopoutEditMultiSelect = <TData extends GridBaseRow, TValue = any>(
+  colDef: GenericCellColDef<TData, TValue>,
+  props: GenericCellEditorProps<GridFormMultiSelectProps<TData>>,
+): ColDefT<TData, TValue> =>
+  GridCell<TData, TValue, GridFormMultiSelectProps<TData>>(colDef, {
     editor: GridFormMultiSelect,
     ...props,
     editorParams: {
       className: "GridMultiSelect-containerMedium",
-      ...(props.editorParams as GridFormMultiSelectProps<RowType>),
+      ...(props.editorParams as GridFormMultiSelectProps<TData>),
     },
   });

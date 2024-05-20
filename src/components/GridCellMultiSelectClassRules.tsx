@@ -1,5 +1,5 @@
-import { CellClassParams, CellClassRules } from "ag-grid-community/dist/lib/entities/colDef";
-import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
+import { CellClassParams, CellClassRules } from "ag-grid-community";
+import { ICellEditorParams } from "ag-grid-community";
 
 export const GridCellMultiSelectClassRules: CellClassRules = {
   "ag-selected-for-edit": (params: CellClassParams) => {
@@ -12,8 +12,8 @@ export const GridCellMultiSelectClassRules: CellClassRules = {
       cep?.multiEdit &&
       api
         .getSelectedNodes()
-        .map((row) => row.id)
-        .includes(node.id) &&
+        ?.map((row) => row.id)
+        ?.includes(node.id) &&
       api.getEditingCells().some((cell) => cell.column.getColDef() === colDef)
     );
   },

@@ -3,11 +3,11 @@ import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormTextInput, GridFormTextInputProps } from "../gridForm/GridFormTextInput";
 import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
 
-export const GridPopoverTextInput = <RowType extends GridBaseRow>(
-  colDef: GenericCellColDef<RowType>,
-  params: GenericCellEditorProps<GridFormTextInputProps<RowType>>,
-): ColDefT<RowType> =>
-  GridCell(colDef, {
+export const GridPopoverTextInput = <TData extends GridBaseRow, TValue = any>(
+  colDef: GenericCellColDef<TData, TValue>,
+  params: GenericCellEditorProps<GridFormTextInputProps<TData>>,
+): ColDefT<TData, TValue> =>
+  GridCell<TData, TValue, GridFormTextInputProps<TData>>(colDef, {
     editor: GridFormTextInput,
     ...params,
   });

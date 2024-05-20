@@ -80,23 +80,23 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: "Id",
         lockVisible: true,
       }),
-      GridCell({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         cellRendererParams: {
-          warning: (props) => props.value === "Tester" && "Testers are testing",
-          info: (props) => props.value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       {
         headerName: "Metrics",
         marryChildren: true,
         children: [
-          GridCell({
+          GridCell<ITestRow, ITestRow["age"]>({
             field: "age",
             headerName: "Age",
           }),
-          GridCell({
+          GridCell<ITestRow, ITestRow["height"]>({
             field: "height",
             headerName: "Height",
           }),
@@ -134,7 +134,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           rightHoverElement: (
             <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
           ),
-          editAction: (selectedRows) => {
+          editAction: (selectedRows: ITestRow[]) => {
             alert(`Custom edit ${selectedRows.map((r) => r.id)} rowId(s) selected`);
           },
           shortcutKeys: {

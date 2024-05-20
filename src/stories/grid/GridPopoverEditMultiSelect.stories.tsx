@@ -68,7 +68,7 @@ const GridEditMultiSelectTemplate: StoryFn<typeof Grid> = (props: GridProps) => 
         field: "id",
         headerName: "Id",
       }),
-      GridPopoutEditMultiSelect(
+      GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>(
         {
           field: "position",
           headerName: "Position",
@@ -112,7 +112,7 @@ const GridEditMultiSelectTemplate: StoryFn<typeof Grid> = (props: GridProps) => 
           },
         },
       ),
-      GridPopoutEditMultiSelect(
+      GridPopoutEditMultiSelect<ITestRow, ITestRow["position"]>(
         {
           field: "position",
           headerName: "Parcel picker",

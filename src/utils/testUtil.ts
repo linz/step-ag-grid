@@ -17,6 +17,43 @@ export const countRows = async (within?: HTMLElement): Promise<number> => {
   return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
 };
 
+export const findRowByIndex = async (rowIndex: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
+  await waitFor(async () => {
+    expect(getAllQuick({ classes: ".ag-row" }).length > 0).toBe(true);
+  });
+  //if this is not wrapped in an act console errors are logged during testing
+  let row!: HTMLDivElement;
+  await act(async () => {
+    row = await findQuick<HTMLDivElement>(
+      { tagName: `.ag-center-cols-container div[row-index='${rowIndex}']:not(:empty)` },
+      within,
+    );
+    // @ts-ignore
+    let combineChildren = [...Array.from(row.children)];
+
+    const leftCols = queryQuick<HTMLDivElement>(
+      { tagName: `.ag-pinned-left-cols-container div[row-index='${rowIndex}']` },
+      within,
+    );
+    if (leftCols) {
+      // @ts-ignore
+      combineChildren = [...Array.from(leftCols.children), ...combineChildren];
+    }
+
+    const rightCols = queryQuick<HTMLDivElement>(
+      { tagName: `.ag-pinned-right-cols-container div[row-index='${rowIndex}']` },
+      within,
+    );
+    if (rightCols) {
+      // @ts-ignore
+      combineChildren = [...Array.from(rightCols.children), ...combineChildren];
+    }
+
+    row.replaceChildren(...combineChildren);
+  });
+  return row;
+};
+
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
   await waitFor(async () => {
     expect(getAllQuick({ classes: ".ag-row" }).length > 0).toBe(true);
@@ -29,7 +66,7 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
       within,
     );
     // @ts-ignore
-    let combineChildren = [...row.children];
+    let combineChildren = [...Array.from(row.children)];
 
     const leftCols = queryQuick<HTMLDivElement>(
       { tagName: `.ag-pinned-left-cols-container div[row-id='${rowId}']` },
@@ -37,7 +74,7 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
     );
     if (leftCols) {
       // @ts-ignore
-      combineChildren = [...leftCols.children, ...combineChildren];
+      combineChildren = [...Array.from(leftCols.children), ...combineChildren];
     }
 
     const rightCols = queryQuick<HTMLDivElement>(
@@ -46,7 +83,7 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
     );
     if (rightCols) {
       // @ts-ignore
-      combineChildren = [...rightCols.children, ...combineChildren];
+      combineChildren = [...Array.from(rightCols.children), ...combineChildren];
     }
 
     row.replaceChildren(...combineChildren);
@@ -108,9 +145,14 @@ export const selectCell = async (rowId: string | number, colId: string, within?:
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
-  const cell = await findCell(rowId, colId, within);
-  await user.dblClick(cell);
-  await waitFor(findOpenPopover);
+  await waitFor(
+    async () => {
+      const cell = await findCell(rowId, colId, within);
+      await user.dblClick(cell);
+      await waitFor(findOpenPopover, { timeout: 1000 });
+    },
+    { timeout: 10000 },
+  );
 };
 
 export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
@@ -118,7 +160,7 @@ export const isCellReadOnly = async (rowId: number | string, colId: string, with
   return cell.className.includes("GridCell-readonly");
 };
 
-export const findOpenPopover = async (): Promise<HTMLElement> => findQuick({ classes: ".szh-menu--state-open" });
+export const findOpenPopover = () => findQuick({ classes: ".szh-menu--state-open" });
 
 export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement | null> => {
   const openMenu = await findOpenPopover();

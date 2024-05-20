@@ -1,6 +1,6 @@
 import { IRowNode } from "ag-grid-community";
-import { ColumnState } from "ag-grid-community/dist/lib/columns/columnModel";
-import { PostSortRowsParams } from "ag-grid-community/dist/lib/interfaces/iCallbackParams";
+import { ColumnState } from "ag-grid-community";
+import { PostSortRowsParams } from "ag-grid-community";
 import { isEmpty } from "lodash-es";
 import { useCallback, useContext, useRef } from "react";
 

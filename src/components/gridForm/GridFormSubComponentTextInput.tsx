@@ -6,8 +6,8 @@ import { TextInputValidator, TextInputValidatorProps } from "../../utils/textVal
 import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 
-export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
-  extends TextInputValidatorProps<RowType>,
+export interface GridFormSubComponentTextInputProps<TData extends GridBaseRow>
+  extends TextInputValidatorProps<TData>,
     CellEditorCommon {
   placeholder?: string;
   width?: string | number;
@@ -15,8 +15,8 @@ export interface GridFormSubComponentTextInputProps<RowType extends GridBaseRow>
   helpText?: string;
 }
 
-export const GridFormSubComponentTextInput = <RowType extends GridBaseRow>(
-  props: GridFormSubComponentTextInputProps<RowType>,
+export const GridFormSubComponentTextInput = <TData extends GridBaseRow>(
+  props: GridFormSubComponentTextInputProps<TData>,
 ): ReactElement => {
   const { value, setValue, setValid, data, context } = useContext(GridSubComponentContext);
 

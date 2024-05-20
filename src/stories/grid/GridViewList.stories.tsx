@@ -54,24 +54,22 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
-      GridCell({
+      GridCell<ITestRow, ITestRow["id"]>({
         field: "id",
         headerName: "Id",
         lockVisible: true,
         resizable: false,
         lockPosition: "left",
-        cellRenderer: (props) => {
-          return <a href={"#"}>{props.value}</a>;
-        },
+        cellRenderer: ({ value }) => <a href={"#"}>{value}</a>,
       }),
-      GridCell({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         resizable: false,
         lockPosition: "left",
         cellRendererParams: {
-          warning: (props) => props.value === "Tester" && "Testers are testing",
-          info: (props) => props.value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === "Tester" && "Testers are testing",
+          info: ({ value }) => value === "Developer" && "Developers are awesome",
         },
       }),
       GridCell({

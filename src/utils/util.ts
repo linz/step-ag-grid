@@ -44,7 +44,7 @@ export const hasParentClass = function (className: string, child: Node) {
 export const stringByteLengthIsInvalid = (str: string, maxBytes: number) =>
   new TextEncoder().encode(str).length > maxBytes;
 
-export const fnOrVar = (fn: any, param: any) => (typeof fn === "function" ? fn(param) : fn);
+export const fnOrVar = (fn: any, param?: any) => (typeof fn === "function" ? fn(param) : fn);
 
 export const sanitiseFileName = (filename: string): string => {
   const valid = filename

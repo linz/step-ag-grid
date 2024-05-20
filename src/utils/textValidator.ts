@@ -3,11 +3,11 @@ import { ReactElement } from "react";
 import { GridBaseRow } from "../components/Grid";
 import { isFloat, stringByteLengthIsInvalid } from "./util";
 
-export interface TextInputValidatorProps<RowType extends GridBaseRow> {
+export interface TextInputValidatorProps<TData extends GridBaseRow> {
   required?: boolean;
   maxLength?: number;
   maxBytes?: number;
-  invalid?: (value: string, data: RowType, context: any) => ReactElement | string | null;
+  invalid?: (value: string, data: TData, context: any) => ReactElement | string | null;
   numberFormat?: {
     precision?: number;
     scale?: number;
@@ -19,10 +19,10 @@ export interface TextInputValidatorProps<RowType extends GridBaseRow> {
   };
 }
 
-export const TextInputValidator = <RowType extends GridBaseRow>(
-  props: TextInputValidatorProps<RowType>,
+export const TextInputValidator = <TData extends GridBaseRow>(
+  props: TextInputValidatorProps<TData>,
   value: string | null,
-  data: RowType,
+  data: TData,
   context: any,
 ) => {
   if (value == null) return null;

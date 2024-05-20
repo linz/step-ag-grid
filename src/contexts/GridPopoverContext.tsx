@@ -2,14 +2,14 @@ import { RefObject, createContext, useContext } from "react";
 
 import { GridBaseRow } from "../components/Grid";
 
-export interface GridPopoverContextType<RowType extends GridBaseRow> {
+export interface GridPopoverContextType<TData extends GridBaseRow> {
   anchorRef: RefObject<Element>;
   saving: boolean;
   setSaving: (saving: boolean) => void;
-  field: keyof RowType;
+  field: keyof TData;
   value: any;
-  data: RowType;
-  selectedRows: RowType[];
+  data: TData;
+  selectedRows: TData[];
   updateValue: (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1) => Promise<boolean>;
   formatValue: (value: any) => any;
 }
@@ -26,5 +26,5 @@ export const GridPopoverContext = createContext<GridPopoverContextType<any>>({
   formatValue: () => "! No gridPopoverContextProvider !",
 });
 
-export const useGridPopoverContext = <RowType extends GridBaseRow>() =>
-  useContext<GridPopoverContextType<RowType>>(GridPopoverContext);
+export const useGridPopoverContext = <TData extends GridBaseRow>() =>
+  useContext<GridPopoverContextType<TData>>(GridPopoverContext);

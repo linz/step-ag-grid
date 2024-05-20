@@ -1,4 +1,4 @@
-import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
+import { CsvExportParams } from "ag-grid-community";
 import { delay } from "lodash-es";
 import { useContext } from "react";
 

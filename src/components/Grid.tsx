@@ -8,8 +8,8 @@ import {
   RowHighlightPosition,
   RowNode,
 } from "ag-grid-community";
-import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { GridOptions } from "ag-grid-community/dist/lib/entities/gridOptions";
+import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community";
+import { GridOptions } from "ag-grid-community";
 import {
   AgGridEvent,
   CellEvent,
@@ -18,7 +18,7 @@ import {
   RowDragEndEvent,
   RowDragMoveEvent,
   SelectionChangedEvent,
-} from "ag-grid-community/dist/lib/events";
+} from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";
 import { defer, difference, isEmpty, last, omit, xorBy } from "lodash-es";
@@ -687,7 +687,7 @@ export const Grid = ({
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
           rowHeight={rowHeight}
-          animateRows={params.animateRows}
+          animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
           suppressRowClickSelection={true}

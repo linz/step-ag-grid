@@ -8,23 +8,23 @@ import { GridFilterExternal } from "../../contexts/GridContext";
 import { GridBaseRow } from "../Grid";
 import { useGridFilter } from "./useGridFilter";
 
-export interface GridFilterButtonsOption<RowType extends GridBaseRow> {
+export interface GridFilterButtonsOption<TData extends GridBaseRow> {
   defaultSelected?: boolean;
-  filter?: GridFilterExternal<RowType>;
+  filter?: GridFilterExternal<TData>;
   label: string;
 }
 
-export type GridFilterButtonsProps<RowType extends GridBaseRow> = {
+export type GridFilterButtonsProps<TData extends GridBaseRow> = {
   className?: ClassValue;
   luiButtonProps?: Partial<LuiButtonProps>;
-  options: GridFilterButtonsOption<RowType>[];
+  options: GridFilterButtonsOption<TData>[];
 };
 
-export const GridFilterButtons = <RowType extends GridBaseRow>({
+export const GridFilterButtons = <TData extends GridBaseRow>({
   className,
   luiButtonProps,
   options,
-}: GridFilterButtonsProps<RowType>): ReactElement => {
+}: GridFilterButtonsProps<TData>): ReactElement => {
   // Select defaultSelected option, otherwise first option.  If no options select none.
   const [selectedOption, setSelectedOption] = useState(options.find((option) => option.defaultSelected) ?? options[0]);
 

@@ -1,49 +1,19 @@
 import { ICellRendererParams } from "ag-grid-community";
-import {
-  EditableCallbackParams,
-  SuppressKeyboardEventParams,
-  ValueFormatterParams,
-  ValueGetterParams,
-} from "ag-grid-community/dist/lib/entities/colDef";
+import { SuppressKeyboardEventParams } from "ag-grid-community";
 import { ReactElement } from "react";
 
 import { GridBaseRow } from "../Grid";
 import { ColDefT } from "../GridCell";
 
-export interface RowICellRendererParams<RowType extends GridBaseRow> extends ICellRendererParams {
-  data: RowType;
-}
-
-export interface RowEditableCallbackParams<RowType extends GridBaseRow> extends EditableCallbackParams {
-  data: RowType;
-}
-
-export interface RowValueFormatterParams<RowType extends GridBaseRow> extends ValueFormatterParams {
-  data: RowType;
-}
-export interface RowValueGetterParams<RowType extends GridBaseRow> extends ValueGetterParams {
-  data: RowType;
-}
-
-export interface RowValueGetterParams<RowType extends GridBaseRow> extends ValueGetterParams {
-  data: RowType;
-}
-
-export interface GenericCellColDef<RowType extends GridBaseRow> extends ColDefT<RowType> {
-  cellRenderer?: (params: RowICellRendererParams<RowType>) => any;
-  cellRendererParams?: GenericCellRendererParams<RowType>;
-  valueGetter?: string | ((params: RowValueGetterParams<RowType>) => any);
-  valueFormatter?: string | ((params: RowValueFormatterParams<RowType>) => string);
-  filterValueGetter?: string | ((params: RowValueGetterParams<RowType>) => string);
-  editable?: boolean | ((params: RowEditableCallbackParams<RowType>) => boolean);
+export interface GenericCellColDef<TData extends GridBaseRow, TValue = any> extends ColDefT<TData, TValue> {
   exportable?: boolean;
 }
 
-export interface GenericCellRendererParams<RowType extends GridBaseRow> {
+export interface GenericCellRendererParams<TData extends GridBaseRow> {
   singleClickEdit?: boolean;
   rightHoverElement?: ReactElement | undefined;
-  editAction?: (selectedRows: RowType[]) => void;
+  editAction?: (selectedRows: TData[]) => void;
   shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | void) | undefined>;
-  warning?: (props: RowICellRendererParams<RowType>) => string | string[] | boolean | null | undefined;
-  info?: (props: RowICellRendererParams<RowType>) => string | string[] | boolean | null | undefined;
+  warning?: (props: ICellRendererParams<TData>) => string | string[] | boolean | null | undefined;
+  info?: (props: ICellRendererParams<TData>) => string | string[] | boolean | null | undefined;
 }

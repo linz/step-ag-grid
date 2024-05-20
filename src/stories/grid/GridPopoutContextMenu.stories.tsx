@@ -85,8 +85,8 @@ const GridPopoutContextMenuTemplate: StoryFn<typeof Grid> = (props: GridProps) =
       GridCell({
         field: "distance",
         headerName: "Number input",
-        valueFormatter: (params) => {
-          const v = params.data.distance;
+        valueFormatter: ({ data }) => {
+          const v = data?.distance;
           return v != null ? `${v}m` : "–";
         },
       }),

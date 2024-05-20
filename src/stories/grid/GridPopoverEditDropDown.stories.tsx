@@ -99,7 +99,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         field: "id",
         headerName: "Id",
       }),
-      GridPopoverEditDropDown(
+      GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>(
         {
           field: "position2",
           headerName: "Multi-edit",
@@ -173,7 +173,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {
           field: "position4",
           headerName: "Filtered (object)",
-          valueGetter: (params) => params.data.position4?.desc,
+          valueGetter: ({ data }) => data?.position4?.desc,
         },
         {
           multiEdit: true,
@@ -217,7 +217,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {
           field: "sub",
           headerName: "Subcomponent",
-          valueGetter: (params) => params.data.sub,
+          valueGetter: ({ data }) => data?.sub,
         },
         {
           multiEdit: true,

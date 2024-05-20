@@ -91,7 +91,7 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
           field: "distance",
           headerName: "Number input",
           valueFormatter: (params) => {
-            const v = params.data.distance;
+            const v = params.data?.distance;
             return v != null ? `${v}${params.colDef.cellEditorParams.units}` : "–";
           },
         },
