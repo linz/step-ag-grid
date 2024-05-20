@@ -1,10 +1,10 @@
 import { ColDef, ColumnApi, GridApi, IRowNode } from "ag-grid-community";
-import { CsvExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
+import { CsvExportParams } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
 import { ColDefT, GridBaseRow } from "../components";
 
-export type GridFilterExternal<RowType extends GridBaseRow> = (data: RowType, rowNode: IRowNode) => boolean;
+export type GridFilterExternal<TData extends GridBaseRow> = (data: TData, rowNode: IRowNode) => boolean;
 
 export interface AutoSizeColumnsProps {
   skipHeader?: boolean;
@@ -15,13 +15,13 @@ export interface AutoSizeColumnsProps {
 
 export type AutoSizeColumnsResult = { width: number } | null;
 
-export interface GridContextType<RowType extends GridBaseRow> {
+export interface GridContextType<TData extends GridBaseRow> {
   gridReady: boolean;
   gridRenderState: () => null | "empty" | "rows-visible";
   getColDef: (colId?: string) => ColDef | undefined;
   getColumns: (
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
-  ) => ColDefT<RowType, any>[];
+  ) => ColDefT<TData, any>[];
   getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
   setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
@@ -57,8 +57,8 @@ export interface GridContextType<RowType extends GridBaseRow> {
   externallySelectedItemsAreInSync: boolean;
   setExternallySelectedItemsAreInSync: (inSync: boolean) => void;
   waitForExternallySelectedItemsToBeInSync: () => Promise<void>;
-  addExternalFilter: (filter: GridFilterExternal<RowType>) => void;
-  removeExternalFilter: (filter: GridFilterExternal<RowType>) => void;
+  addExternalFilter: (filter: GridFilterExternal<TData>) => void;
+  removeExternalFilter: (filter: GridFilterExternal<TData>) => void;
   isExternalFilterPresent: () => boolean;
   doesExternalFilterPass: (node: IRowNode) => boolean;
   invisibleColumnIds: string[] | undefined;
@@ -207,4 +207,4 @@ export const GridContext = createContext<GridContextType<any>>({
   },
 });
 
-export const useGridContext = <RowType extends GridBaseRow>() => useContext<GridContextType<RowType>>(GridContext);
+export const useGridContext = <TData extends GridBaseRow>() => useContext<GridContextType<TData>>(GridContext);

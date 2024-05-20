@@ -54,7 +54,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
-      GridCell<ITestRow, "id">({
+      GridCell<ITestRow, ITestRow["id"]>({
         field: "id",
         headerName: "Id",
         lockVisible: true,
@@ -62,7 +62,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         lockPosition: "left",
         cellRenderer: ({ value }) => <a href={"#"}>{value}</a>,
       }),
-      GridCell<ITestRow, "position">({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         resizable: false,

@@ -7,15 +7,15 @@ import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
-export interface GridFormEditBearingProps<RowType extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormEditBearingProps<TData extends GridBaseRow> extends CellEditorCommon {
   formatValue?: (value: any) => string;
   placeHolder?: string;
   range?: (value: number | null) => string | null;
-  onSave?: (props: { selectedRows: RowType[]; value: number | null }) => Promise<boolean>;
+  onSave?: (props: { selectedRows: TData[]; value: number | null }) => Promise<boolean>;
 }
 
-export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridFormEditBearingProps<RowType>) => {
-  const { field, value: initialValue } = useGridPopoverContext<RowType>();
+export const GridFormEditBearing = <TData extends GridBaseRow>(props: GridFormEditBearingProps<TData>) => {
+  const { field, value: initialValue } = useGridPopoverContext<TData>();
 
   // This clears out any scientific precision
   const defaultValue = useMemo(
@@ -28,7 +28,7 @@ export const GridFormEditBearing = <RowType extends GridBaseRow>(props: GridForm
   const invalid = useCallback(() => bearingStringValidator(value, props.range), [props.range, value]);
 
   const save = useCallback(
-    async (selectedRows: RowType[]): Promise<boolean> => {
+    async (selectedRows: TData[]): Promise<boolean> => {
       const parsedValue = bearingNumberParser(value);
       // Value didn't change so don't save just cancel
       if (parsedValue === bearingNumberParser(defaultValue)) {

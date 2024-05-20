@@ -49,7 +49,7 @@ const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid> = (props: GridProps)
         field: "id",
         headerName: "Id",
       }),
-      GridPopoutEditMultiSelectGrid<ITestRow, "position">(
+      GridPopoutEditMultiSelectGrid<ITestRow, ITestRow["position"]>(
         {
           field: "position",
           headerName: "Position",

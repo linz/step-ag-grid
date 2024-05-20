@@ -1,6 +1,5 @@
-import { ValueGetterParams } from "ag-grid-community";
 import { GridBaseRow } from "./Grid";
-import { generateFilterGetter } from "./GridCell";
+import { generateFilterGetter, SAValueGetterParams } from "./GridCell";
 
 describe("GridCell", () => {
   test("generateFilterGetter returns passed filterValueGetter", () => {
@@ -25,7 +24,9 @@ describe("GridCell", () => {
       const filterGetter = generateFilterGetter(field, undefined, valueFormatter);
       expect(typeof filterGetter).toBe("function");
       if (typeof filterGetter !== "function") return;
-      expect(filterGetter({ getValue: () => test.value } as any as ValueGetterParams<GridBaseRow>)).toBe(test.expected);
+      expect(filterGetter({ getValue: () => test.value } as any as SAValueGetterParams<GridBaseRow>)).toBe(
+        test.expected,
+      );
     });
   });
 });

@@ -1,5 +1,5 @@
-import { CellClassParams, CellClassRules } from "ag-grid-community/dist/lib/entities/colDef";
-import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
+import { CellClassParams, CellClassRules } from "ag-grid-community";
+import { ICellEditorParams } from "ag-grid-community";
 
 export const GridCellMultiSelectClassRules: CellClassRules = {
   "ag-selected-for-edit": (params: CellClassParams) => {

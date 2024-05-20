@@ -7,12 +7,12 @@ import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
-export interface GridFormMessageProps<RowType extends GridBaseRow> extends CellEditorCommon {
-  message: (selectedRows: RowType[]) => Promise<string | ReactElement> | string | ReactElement;
+export interface GridFormMessageProps<TData extends GridBaseRow> extends CellEditorCommon {
+  message: (selectedRows: TData[]) => Promise<string | ReactElement> | string | ReactElement;
 }
 
-export const GridFormMessage = <RowType extends GridBaseRow>(props: GridFormMessageProps<RowType>): ReactElement => {
-  const { selectedRows } = useGridPopoverContext<RowType>();
+export const GridFormMessage = <TData extends GridBaseRow>(props: GridFormMessageProps<TData>): ReactElement => {
+  const { selectedRows } = useGridPopoverContext<TData>();
 
   const [message, setMessage] = useState<string | ReactElement | null>(null);
   const { popoverWrapper } = useGridPopoverHook({ className: props.className });

@@ -99,7 +99,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         field: "id",
         headerName: "Id",
       }),
-      GridPopoverEditDropDown<ITestRow, "position2">(
+      GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>(
         {
           field: "position2",
           headerName: "Multi-edit",

@@ -1,28 +1,28 @@
 import { ColDef } from "ag-grid-community";
-import { CellContextMenuEvent } from "ag-grid-community/dist/lib/events";
+import { CellContextMenuEvent } from "ag-grid-community";
 import { ReactElement, useCallback, useContext, useRef, useState } from "react";
 
 import { GridContext } from "../../contexts/GridContext";
 import { ControlledMenu } from "../../react-menu3";
 import { GridBaseRow } from "../Grid";
 
-export interface GridContextMenuComponentProps<RowType extends GridBaseRow> {
-  selectedRows: RowType[];
-  clickedRow: RowType;
+export interface GridContextMenuComponentProps<TData extends GridBaseRow> {
+  selectedRows: TData[];
+  clickedRow: TData;
   colDef: ColDef;
   close: () => void;
 }
 
-export type GridContextMenuComponent<RowType extends GridBaseRow> = (
-  props: GridContextMenuComponentProps<RowType>,
+export type GridContextMenuComponent<TData extends GridBaseRow> = (
+  props: GridContextMenuComponentProps<TData>,
 ) => ReactElement | null;
 
-export const useGridContextMenu = <RowType extends GridBaseRow>({
+export const useGridContextMenu = <TData extends GridBaseRow>({
   contextMenuSelectRow,
   contextMenu: ContextMenu,
 }: {
   contextMenuSelectRow: boolean;
-  contextMenu?: GridContextMenuComponent<RowType>;
+  contextMenu?: GridContextMenuComponent<TData>;
 }) => {
   const { redrawRows, prePopupOps, postPopupOps, getSelectedRows } = useContext(GridContext);
 

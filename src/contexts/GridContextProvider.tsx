@@ -1,6 +1,6 @@
 import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
-import { ValueFormatterParams } from "ag-grid-community/dist/lib/entities/colDef";
-import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community/dist/lib/interfaces/exportParams";
+import { ValueFormatterParams } from "ag-grid-community";
+import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community";
 import debounce from "debounce-promise";
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
 import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -8,7 +8,7 @@ import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, us
 import { ColDefT, GridBaseRow } from "../components";
 import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
 import { getColId, isFlexColumn } from "../components/gridUtil";
-import { isNotEmpty, sanitiseFileName, wait } from "../utils/util";
+import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from "../utils/util";
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
 import { GridUpdatingContext } from "./GridUpdatingContext";
 
@@ -17,7 +17,7 @@ import { GridUpdatingContext } from "./GridUpdatingContext";
  * Make sure you wrap AgGrid in this.
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
-export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
+export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
@@ -28,7 +28,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
-  const externalFilters = useRef<GridFilterExternal<RowType>[]>([]);
+  const externalFilters = useRef<GridFilterExternal<TData>[]>([]);
 
   /**
    * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
@@ -204,8 +204,8 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
   const getColumns = useCallback(
     (
       filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
-    ): ColDefT<RowType>[] =>
-      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<RowType>[],
+    ): ColDefT<TData>[] =>
+      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<TData>[],
     [columnApi],
   );
 
@@ -639,12 +639,12 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     [gridApi],
   );
 
-  const addExternalFilter = (filter: GridFilterExternal<RowType>) => {
+  const addExternalFilter = (filter: GridFilterExternal<TData>) => {
     externalFilters.current.push(filter);
     onFilterChanged().then();
   };
 
-  const removeExternalFilter = (filter: GridFilterExternal<RowType>) => {
+  const removeExternalFilter = (filter: GridFilterExternal<TData>) => {
     remove(externalFilters.current, (v) => v === filter);
     onFilterChanged().then();
   };
@@ -695,7 +695,7 @@ export const GridContextProvider = <RowType extends GridBaseRow>(props: PropsWit
     (csvExportParams?: CsvExportParams) => {
       if (!gridApi || !columnApi) return;
 
-      const fileName = csvExportParams?.fileName && sanitiseFileName(csvExportParams.fileName);
+      const fileName = csvExportParams?.fileName && sanitiseFileName(fnOrVar(csvExportParams.fileName));
 
       const columnKeys = columnApi
         ?.getColumnState()

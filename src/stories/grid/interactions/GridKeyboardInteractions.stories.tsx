@@ -82,7 +82,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
         field: "id",
         headerName: "Id",
       }),
-      GridCell<ITestRow, "position">({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         cellRendererParams: {

@@ -7,28 +7,28 @@ import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
-export interface GridFormTextInputProps<RowType extends GridBaseRow>
-  extends TextInputValidatorProps<RowType>,
+export interface GridFormTextInputProps<TData extends GridBaseRow>
+  extends TextInputValidatorProps<TData>,
     CellEditorCommon {
   placeholder?: string;
   units?: string;
   width?: string | number;
-  onSave?: (props: { selectedRows: RowType[]; value: string }) => Promise<boolean>;
+  onSave?: (props: { selectedRows: TData[]; value: string }) => Promise<boolean>;
   helpText?: string;
 }
 
-export const GridFormTextInput = <RowType extends GridBaseRow>(props: GridFormTextInputProps<RowType>) => {
-  const { field, value: initialVale, data } = useGridPopoverContext<RowType>();
+export const GridFormTextInput = <TData extends GridBaseRow>(props: GridFormTextInputProps<TData>) => {
+  const { field, value: initialVale, data } = useGridPopoverContext<TData>();
 
   const helpText = props.helpText ?? "Press enter or tab to save";
 
   const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);
   const [value, setValue] = useState(initValue);
 
-  const invalid = useCallback(() => TextInputValidator<RowType>(props, value, data, {}), [data, props, value]);
+  const invalid = useCallback(() => TextInputValidator<TData>(props, value, data, {}), [data, props, value]);
 
   const save = useCallback(
-    async (selectedRows: RowType[]): Promise<boolean> => {
+    async (selectedRows: TData[]): Promise<boolean> => {
       if (invalid()) return false;
 
       const trimmedValue = value.trim();

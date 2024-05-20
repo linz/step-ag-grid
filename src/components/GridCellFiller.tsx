@@ -5,7 +5,7 @@ export const GridCellFillerColId = "gridCellFiller";
 
 export const isGridCellFiller = (col: ColDef) => col.colId === GridCellFillerColId;
 
-export const GridCellFiller = <RowType extends GridBaseRow>(): ColDef<RowType, any> => ({
+export const GridCellFiller = <TData extends GridBaseRow>(): ColDef<TData, any> => ({
   colId: GridCellFillerColId,
   headerName: "",
   flex: 1,

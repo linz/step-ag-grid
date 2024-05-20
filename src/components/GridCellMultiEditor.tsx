@@ -1,5 +1,5 @@
-import { CellEditorSelectorResult } from "ag-grid-community/dist/lib/entities/colDef";
-import { ICellEditorParams } from "ag-grid-community/dist/lib/interfaces/iCellEditor";
+import { CellEditorSelectorResult } from "ag-grid-community";
+import { ICellEditorParams } from "ag-grid-community";
 import { ComponentProps, ReactElement } from "react";
 
 import { GridBaseRow } from "./Grid";
@@ -16,18 +16,18 @@ export const Editor = <FN extends (param: any) => ReactElement>(props: {
   params: { ...props.editorParams, multiEdit: props.multiEdit },
 });
 
-export interface RowCellEditorParams<RowType extends GridBaseRow> extends ICellEditorParams {
-  data: RowType;
+export interface RowCellEditorParams<TData extends GridBaseRow> extends ICellEditorParams {
+  data: TData;
 }
 
 /**
  * Used to choose between cell editors based in data.
  */
-export const GridCellMultiEditor = <RowType extends GridBaseRow, Field extends keyof RowType>(
-  props: GenericCellColDef<RowType, Field>,
-  cellEditorSelector: (params: RowCellEditorParams<RowType>) => CellEditorSelectorResult,
-): ColDefT<RowType, Field> =>
-  GridCell<RowType, Field>({
+export const GridCellMultiEditor = <TData extends GridBaseRow, TValue = any>(
+  props: GenericCellColDef<TData, TValue>,
+  cellEditorSelector: (params: RowCellEditorParams<TData>) => CellEditorSelectorResult,
+): ColDefT<TData, TValue> =>
+  GridCell<TData, TValue>({
     cellClassRules: GridCellMultiSelectClassRules,
     cellEditorSelector,
     editable: props.editable ?? true,

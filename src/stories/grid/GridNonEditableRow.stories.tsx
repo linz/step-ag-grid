@@ -3,7 +3,6 @@ import "../../styles/index.scss";
 import "@linzjs/lui/dist/scss/base.scss";
 
 import { Meta, StoryFn } from "@storybook/react";
-import { ColDef } from "ag-grid-community";
 import { GridPopoverEditDropDown } from "components/gridPopoverEdit/GridPopoverEditDropDown";
 import { GridPopoverTextArea } from "components/gridPopoverEdit/GridPopoverTextArea";
 import { useMemo, useState } from "react";
@@ -155,9 +154,9 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
     { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
   ]);
 
-  const defaultColDef: ColDef = useMemo(
+  const defaultColDef: ColDefT<ITestRow> = useMemo(
     () => ({
-      editable: (params) => (params.data as ITestRow).position !== "Manager",
+      editable: ({ data }) => data?.position !== "Manager",
     }),
     [],
   );

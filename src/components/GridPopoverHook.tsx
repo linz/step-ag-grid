@@ -7,7 +7,7 @@ import { MenuCloseEvent } from "../react-menu3/types";
 import { CloseReason } from "../react-menu3/utils";
 import { GridBaseRow } from "./Grid";
 
-export interface GridPopoverHookProps<RowType> {
+export interface GridPopoverHookProps<TData> {
   className: string | undefined;
   invalid?: () =>
     | Promise<ReactElement | boolean | string | null | undefined>
@@ -16,13 +16,13 @@ export interface GridPopoverHookProps<RowType> {
     | string
     | null
     | undefined;
-  save?: (selectedRows: RowType[]) => Promise<boolean>;
+  save?: (selectedRows: TData[]) => Promise<boolean>;
   dontSaveOnExternalClick?: boolean;
 }
 
-export const useGridPopoverHook = <RowType extends GridBaseRow>(props: GridPopoverHookProps<RowType>) => {
+export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
   const { stopEditing, cancelEdit } = useContext(GridContext);
-  const { anchorRef, saving, updateValue } = useGridPopoverContext<RowType>();
+  const { anchorRef, saving, updateValue } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 

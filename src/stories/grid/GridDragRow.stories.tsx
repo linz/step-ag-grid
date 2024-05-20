@@ -66,7 +66,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: "Id",
         lockVisible: true,
       }),
-      GridCell<ITestRow, "position">({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         cellRendererParams: {
@@ -112,7 +112,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         onRowDragEnd={async (row, _, targetIndex) => {
           alert(`Row ${row.id} request to be moved to index ${targetIndex}.`);
         }}
-        rowDragText={(params) => `${params.rowNode?.data.id} - ${params.rowNode?.data.position}`}
+        rowDragText={({ rowNode }) => `${rowNode?.data.id} - ${rowNode?.data.position}`}
       />
     </GridWrapper>
   );

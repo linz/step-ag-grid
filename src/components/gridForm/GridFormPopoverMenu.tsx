@@ -10,9 +10,9 @@ import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
-export interface GridFormPopoverMenuProps<RowType extends GridBaseRow> extends CellEditorCommon {
-  options: (selectedRows: RowType[]) => Promise<MenuOption<RowType>[]>;
-  defaultAction?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
+export interface GridFormPopoverMenuProps<TData extends GridBaseRow> extends CellEditorCommon {
+  options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]>;
+  defaultAction?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => Promise<void>;
 }
 
 /** Menu configuration types **/
@@ -23,14 +23,14 @@ interface MenuSeparatorType {
   __isMenuSeparator__: boolean;
 }
 
-export interface SelectedMenuOptionResult<RowType extends GridBaseRow> extends MenuOption<RowType> {
+export interface SelectedMenuOptionResult<TData extends GridBaseRow> extends MenuOption<TData> {
   subValue: any;
 }
 
-export interface MenuOption<RowType extends GridBaseRow> {
+export interface MenuOption<TData extends GridBaseRow> {
   label: ReactElement | string | MenuSeparatorType;
   subMenu?: () => ReactElement;
-  action?: (props: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => Promise<void>;
+  action?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => Promise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
   subComponent?: (props: any) => ReactElement;
@@ -40,18 +40,18 @@ export interface MenuOption<RowType extends GridBaseRow> {
  * NOTE: If the popout menu doesn't appear on single click when also selecting row it's because
  * you need a useMemo around your columnDefs
  */
-export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridFormPopoverMenuProps<RowType>) => {
-  const { selectedRows, updateValue, data } = useGridPopoverContext<RowType>();
+export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPopoverMenuProps<TData>) => {
+  const { selectedRows, updateValue, data } = useGridPopoverContext<TData>();
 
   const optionsInitialising = useRef(false);
-  const [options, setOptions] = useState<MenuOption<RowType>[]>();
+  const [options, setOptions] = useState<MenuOption<TData>[]>();
 
-  const [subComponentSelected, setSubComponentSelected] = useState<MenuOption<RowType> | null>(null);
+  const [subComponentSelected, setSubComponentSelected] = useState<MenuOption<TData> | null>(null);
   const subComponentIsValid = useRef(false);
   const [subSelectedValue, setSubSelectedValue] = useState<any>();
 
   const defaultAction = useCallback(
-    async (params: { selectedRows: RowType[]; menuOption: SelectedMenuOptionResult<RowType> }) => {
+    async (params: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => {
       if (props.defaultAction) await props.defaultAction(params);
       else console.error(`No action specified for ${params.menuOption.label} menu options`);
     },
@@ -80,7 +80,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   }, [options, props.defaultAction, props.options, selectedRows]);
 
   const actionClick = useCallback(
-    async (menuOption: MenuOption<RowType>) => {
+    async (menuOption: MenuOption<TData>) => {
       await (menuOption.action ?? defaultAction)({
         selectedRows,
         menuOption: { ...menuOption, subValue: subSelectedValue },
@@ -91,7 +91,7 @@ export const GridFormPopoverMenu = <RowType extends GridBaseRow>(props: GridForm
   );
 
   const onMenuItemClick = useCallback(
-    async (e: ClickEvent, item: MenuOption<RowType>) => {
+    async (e: ClickEvent, item: MenuOption<TData>) => {
       if (item.subComponent) {
         subComponentIsValid.current = false;
         setSubSelectedValue(null);

@@ -80,7 +80,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: "Id",
         lockVisible: true,
       }),
-      GridCell<ITestRow, "position">({
+      GridCell<ITestRow, ITestRow["position"]>({
         field: "position",
         headerName: "Position",
         cellRendererParams: {
@@ -92,11 +92,11 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: "Metrics",
         marryChildren: true,
         children: [
-          GridCell<ITestRow, "age", any>({
+          GridCell<ITestRow, ITestRow["age"]>({
             field: "age",
             headerName: "Age",
           }),
-          GridCell<ITestRow, "height", any>({
+          GridCell<ITestRow, ITestRow["height"]>({
             field: "height",
             headerName: "Height",
           }),

@@ -45,12 +45,12 @@ export interface GridFormMultiSelectGroup {
   filter?: string;
 }
 
-export interface GridFormMultiSelectSaveProps<RowType extends GridBaseRow> {
-  selectedRows: RowType[];
+export interface GridFormMultiSelectSaveProps<TData extends GridBaseRow> {
+  selectedRows: TData[];
   selectedOptions: MultiSelectOption[];
 }
 
-export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormMultiSelectProps<TData extends GridBaseRow> extends CellEditorCommon {
   className?:
     | "GridMultiSelect-containerSmall"
     | "GridMultiSelect-containerMedium"
@@ -63,14 +63,14 @@ export interface GridFormMultiSelectProps<RowType extends GridBaseRow> extends C
   filterHelpText?: string | ((filter: string, options: MultiSelectOption[]) => string | undefined);
   noOptionsMessage?: string;
   onSelectFilter?: (props: { filter: string; options: MultiSelectOption[] }) => void;
-  onSave?: (props: GridFormMultiSelectSaveProps<RowType>) => Promise<boolean>;
+  onSave?: (props: GridFormMultiSelectSaveProps<TData>) => Promise<boolean>;
   headers?: GridFormMultiSelectGroup[];
-  options: MultiSelectOption[] | ((selectedRows: RowType[]) => Promise<MultiSelectOption[]> | MultiSelectOption[]);
-  invalid?: (selectedRows: RowType[], selectedOptions: MultiSelectOption[]) => boolean;
+  options: MultiSelectOption[] | ((selectedRows: TData[]) => Promise<MultiSelectOption[]> | MultiSelectOption[]);
+  invalid?: (selectedRows: TData[], selectedOptions: MultiSelectOption[]) => boolean;
 }
 
-export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridFormMultiSelectProps<RowType>) => {
-  const { selectedRows, data } = useGridPopoverContext<RowType>();
+export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMultiSelectProps<TData>) => {
+  const { selectedRows, data } = useGridPopoverContext<TData>();
 
   const subComponentIsValidRef = useRef<Record<string, boolean>>({});
   const optionsInitialising = useRef(false);
@@ -95,7 +95,7 @@ export const GridFormMultiSelect = <RowType extends GridBaseRow>(props: GridForm
   }, [options, props, selectedRows]);
 
   const save = useCallback(
-    async (selectedRows: RowType[]): Promise<boolean> => {
+    async (selectedRows: TData[]): Promise<boolean> => {
       if (!options || !props.onSave) return true;
 
       // Any changes to save?
