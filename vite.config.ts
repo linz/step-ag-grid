@@ -1,4 +1,3 @@
-// vite.config.ts
 import { defineConfig, UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { createHtmlPlugin } from "vite-plugin-html";
@@ -13,12 +12,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       chunkSizeWarningLimit: 7500,
       outDir: "./build",
       target: "esnext",
-    },
-    resolve: {
-      alias: {
-        //...stdLibBrowser,
-        //"ag-grid-react": path.resolve(__dirname, "./node_modules/ag-grid-react/bundles/ag-grid-react.min.js"),
-      },
     },
     base: "/",
   };
