@@ -12,8 +12,8 @@ export const GridCellMultiSelectClassRules: CellClassRules = {
       cep?.multiEdit &&
       api
         .getSelectedNodes()
-        .map((row) => row.id)
-        .includes(node.id) &&
+        ?.map((row) => row.id)
+        ?.includes(node.id) &&
       api.getEditingCells().some((cell) => cell.column.getColDef() === colDef)
     );
   },
