@@ -657,7 +657,7 @@ export const Grid = ({
 
         const moved = event.node.data;
         const target = event.overNode?.data;
-        moved.id != target.id && //moved over a different row
+        moved.id !== target?.id && //moved over a different row
           event.node.rowIndex != targetIndex && //moved to a different index
           params.onRowDragEnd &&
           (await params.onRowDragEnd(moved, target, targetIndex));
@@ -686,6 +686,7 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          reactiveCustomComponents={true}
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
