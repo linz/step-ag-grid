@@ -1,5 +1,4 @@
-import { CellPosition, ColDef, ColumnApi, GridApi, IRowNode, RowNode } from "ag-grid-community";
-import { ValueFormatterParams } from "ag-grid-community";
+import { CellPosition, ColDef, GridApi, IRowNode, RowNode } from "ag-grid-community";
 import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community";
 import debounce from "debounce-promise";
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
@@ -20,7 +19,6 @@ import { GridUpdatingContext } from "./GridUpdatingContext";
 export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
-  const [columnApi, setColumnApi] = useState<ColumnApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, setQuickFilter] = useState("");
   const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
@@ -40,7 +38,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Set quick filter directly on grid, based on previously save quickFilter state.
    */
   useEffect(() => {
-    gridApi?.setQuickFilter(quickFilter);
+    gridApi?.setGridOption("quickFilterText", quickFilter);
   }, [gridApi, quickFilter]);
 
   /**
@@ -94,11 +92,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Set the grid api when the grid is ready.
    */
   const setApis = useCallback(
-    (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => {
+    (gridApi: GridApi | undefined, dataTestId?: string) => {
       testId.current = dataTestId;
       setGridApi(gridApi);
-      setColumnApi(columnApi);
-      gridApi?.setQuickFilter(quickFilter);
+      gridApi?.setGridOption("quickFilterText", quickFilter);
       setGridReady(!!gridApi);
     },
     [quickFilter],
@@ -108,9 +105,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Used to check if it's OK to autosize.
    */
   const gridRenderState = useCallback((): null | "empty" | "rows-visible" => {
-    // Even though getModel can't be null, sometimes it is
-    if (!gridApi || !gridApi.getModel()) return null;
-    if (!gridApi.getModel().isRowsToRender()) return "empty";
+    if (!gridApi) return null;
+    if (!gridApi.getDisplayedRowCount()) return "empty";
     if (!isEmpty(gridApi.getRenderedNodes())) return "rows-visible";
     // If there are rows to render, but there are no rendered nodes then we should wait
     return null;
@@ -205,8 +201,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     (
       filterDef: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string) = () => true,
     ): ColDefT<TData>[] =>
-      filter(columnApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<TData>[],
-    [columnApi],
+      filter(gridApi?.getColumns()?.map((col) => col.getColDef()) ?? [], filterDef) as ColDefT<TData>[],
+    [gridApi],
   );
 
   const getColumnIds = useCallback(
@@ -407,9 +403,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    */
   const autoSizeColumns = useCallback(
     ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
-      if (!columnApi) return null;
+      if (!gridApi) return null;
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
-      const colsToResize = columnApi.getColumnState().filter((colState) => {
+      const colsToResize = gridApi.getColumnState().filter((colState) => {
         const colId = colState.colId;
         return (
           (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
@@ -418,19 +414,19 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         );
       });
       if (!isEmpty(colsToResize)) {
-        columnApi.autoSizeColumns(
+        gridApi.autoSizeColumns(
           colsToResize.map((colState) => colState.colId),
           skipHeader,
         );
       }
       return {
         width: sumBy(
-          columnApi.getColumnState().filter((col) => !col.hide),
+          gridApi.getColumnState().filter((col) => !col.hide),
           "width",
         ),
       };
     },
-    [columnApi],
+    [gridApi],
   );
 
   /**
@@ -489,7 +485,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    */
   const cancelEdit = useCallback((): void => {
     stopEditing();
-    cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+    cellEditingCompleteCallbackRef.current?.();
   }, [stopEditing]);
 
   const cellEditingCompleteCallbackRef = useRef<() => void>();
@@ -583,7 +579,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           gridApi.refreshClientSideRowModel();
         } else {
           // Don't set saving if ok as the form has already closed
-          setSaving && setSaving(false);
+          setSaving?.(false);
         }
 
         // Only focus next cell if user hasn't already manually changed focus
@@ -667,7 +663,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Apply column visibility
    */
   useEffect(() => {
-    if (!columnApi || !invisibleColumnIds) return;
+    if (!gridApi || !invisibleColumnIds) return;
 
     // show all columns that aren't invisible
     const newVisibleColumns = getColumns(
@@ -679,26 +675,26 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       const fillerColumn = getColumns(isGridCellFiller)[0];
       fillerColumn && newVisibleColumns.push(fillerColumn);
     }
-    columnApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
+    gridApi.setColumnsVisible(compact(newVisibleColumns.map(getColId)), true);
 
     // Hide the filler column if there's already a flex column
     const invisibleColumnIdsWithOptionalFiller = visibleColumnsContainsAFlex
       ? [...invisibleColumnIds, GridCellFillerColId]
       : invisibleColumnIds;
-    columnApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
-  }, [invisibleColumnIds, columnApi, getColumns]);
+    gridApi.setColumnsVisible(invisibleColumnIdsWithOptionalFiller, false);
+  }, [invisibleColumnIds, getColumns, gridApi]);
 
   /**
    * Download visible columns as a CSV
    */
   const downloadCsv = useCallback(
     (csvExportParams?: CsvExportParams) => {
-      if (!gridApi || !columnApi) return;
+      if (!gridApi) return;
 
       const fileName = csvExportParams?.fileName && sanitiseFileName(fnOrVar(csvExportParams.fileName));
 
-      const columnKeys = columnApi
-        ?.getColumnState()
+      const columnKeys = gridApi
+        .getColumnState()
         .filter((cs) => {
           const colDef = gridApi.getColumnDef(cs.colId);
           return !cs.hide && colDef && !isGridCellFiller(colDef) && colDef.headerComponentParams?.exportable !== false;
@@ -711,7 +707,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         fileName,
       });
     },
-    [columnApi, gridApi],
+    [gridApi],
   );
 
   return (
@@ -807,7 +803,7 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
     return encodeToString(params.value);
   }
 
-  const result = valueFormatter({ ...params, data: params.node?.data, colDef } as ValueFormatterParams);
+  const result = valueFormatter({ ...params, data: params.node?.data, colDef, node: null });
   // type may not be string due to casting, leave the type check in
   if (params.value != null && typeof result !== "string") {
     console.error(`downloadCsv: valueFormatter is returning non string values, colDef:", colId: ${colDef.colId}`);

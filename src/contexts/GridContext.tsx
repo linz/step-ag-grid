@@ -1,4 +1,4 @@
-import { ColDef, ColumnApi, GridApi, IRowNode } from "ag-grid-community";
+import { ColDef, GridApi, IRowNode } from "ag-grid-community";
 import { CsvExportParams } from "ag-grid-community";
 import { createContext, useContext } from "react";
 
@@ -23,7 +23,7 @@ export interface GridContextType<TData extends GridBaseRow> {
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
   ) => ColDefT<TData, any>[];
   getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
-  setApis: (gridApi: GridApi | undefined, columnApi: ColumnApi | undefined, dataTestId?: string) => void;
+  setApis: (gridApi: GridApi | undefined, dataTestId?: string) => void;
   prePopupOps: () => void;
   postPopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;

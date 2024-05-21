@@ -38,9 +38,9 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
   const previousQuickFilter = useRef("");
 
   return useCallback(
-    ({ api, columnApi, nodes }: PostSortRowsParams) => {
+    ({ api, nodes }: PostSortRowsParams) => {
       // Grid is destroyed
-      if (!api || !columnApi) return;
+      if (!api) return;
 
       const previousRowSortIndex = previousRowSortIndexRef.current;
 
@@ -49,7 +49,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
       };
 
       const copyCurrentSortSettings = (): ColumnState[] =>
-        columnApi.getColumnState().map((row) => ({ colId: row.colId, sort: row.sort, sortIndex: row.sortIndex }));
+        api.getColumnState().map((row) => ({ colId: row.colId, sort: row.sort, sortIndex: row.sortIndex }));
 
       const backupSortOrder = () => {
         for (const x in previousRowSortIndex) delete previousRowSortIndex[x];
@@ -62,7 +62,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
       const isSameColumnAndDifferentSort = (col1: ColumnState | undefined, col2: ColumnState | undefined) =>
         col1 && col2 && col1.colId === col2.colId && col1.sort != col2.sort;
 
-      const restorePreviousSortColumnState = () => columnApi.applyColumnState({ state: previousColSort.current });
+      const restorePreviousSortColumnState = () => api.applyColumnState({ state: previousColSort.current });
 
       const sortNodesByPreviousSort = () => {
         nodes.sort(
@@ -149,7 +149,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
           previousRowSortIndex[`${lastNewNode?.data.id}`] = { index: newIndex, hash: hashNode(lastNewNode) };
           wasStale = true;
         } else if (changedRowCount === 2 && newRowCount === 0) {
-          // This must be a swap rows
+          // This must be a swap rows (sometimes it's not, needs further attention)
           backupSortOrder();
           wasStale = false;
         } else if (changedRowCount > 1 && newRowCount === 1) {

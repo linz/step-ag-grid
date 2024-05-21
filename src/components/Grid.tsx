@@ -185,12 +185,12 @@ export const Grid = ({
       if (gridRendered === "empty") {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
-          params.onContentSize && params.onContentSize(result);
+          params.onContentSize?.(result);
         }
       } else if (gridRendered === "rows-visible") {
         if (result && !hasSetContentSize.current) {
           hasSetContentSize.current = true;
-          params.onContentSize && params.onContentSize(result);
+          params.onContentSize?.(result);
         }
       } else {
         // It should be impossible to get here
@@ -219,7 +219,7 @@ export const Grid = ({
         needsAutoSize.current = true;
       }
     }
-    if (needsAutoSize.current) {
+    if (needsAutoSize.current || (!hasSetContentSize.current && sizeColumns === "auto")) {
       needsAutoSize.current = false;
       setInitialContentSize();
     }
@@ -394,7 +394,7 @@ export const Grid = ({
    */
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setApis(event.api, event.columnApi, dataTestId);
+      setApis(event.api, dataTestId);
       event.api.showNoRowsOverlay();
       synchroniseExternallySelectedItemsToGrid();
     },
@@ -657,7 +657,7 @@ export const Grid = ({
 
         const moved = event.node.data;
         const target = event.overNode?.data;
-        moved.id != target.id && //moved over a different row
+        moved.id !== target?.id && //moved over a different row
           event.node.rowIndex != targetIndex && //moved to a different index
           params.onRowDragEnd &&
           (await params.onRowDragEnd(moved, target, targetIndex));
@@ -686,6 +686,7 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          reactiveCustomComponents={true}
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}

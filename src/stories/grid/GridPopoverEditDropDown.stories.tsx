@@ -290,6 +290,15 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       code: "O2",
       sub: "one",
     },
+    {
+      id: 1002,
+      position: "Scrum Master",
+      position2: "2",
+      position3: "Architect",
+      position4: { code: "O2", desc: "Object Two" },
+      code: "O2",
+      sub: "one",
+    },
   ] as ITestRow[]);
 
   return (
