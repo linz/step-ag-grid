@@ -182,6 +182,10 @@ export const Grid = ({
     const skipHeader = sizeColumns === "auto-skip-headers" && gridRendered === "rows-visible";
     if (sizeColumns === "auto" || skipHeader) {
       const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
+      if (!result) {
+        needsAutoSize.current = true;
+        return;
+      }
       if (gridRendered === "empty") {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
