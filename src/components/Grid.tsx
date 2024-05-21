@@ -394,7 +394,7 @@ export const Grid = ({
    */
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setApis(event.api, event.columnApi, dataTestId);
+      setApis(event.api, dataTestId);
       event.api.showNoRowsOverlay();
       synchroniseExternallySelectedItemsToGrid();
     },

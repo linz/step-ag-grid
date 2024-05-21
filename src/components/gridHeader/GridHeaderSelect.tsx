@@ -29,7 +29,7 @@ export const GridHeaderSelect = ({ api }: IHeaderParams) => {
     }
   };
 
-  const totalNodeCount = api.getModel().getRowCount();
+  const totalNodeCount = api.getDisplayedRowCount();
   const partialSelect = selectedNodeCount != 0 && selectedNodeCount != totalNodeCount;
   const allSelected = selectedNodeCount != 0 && selectedNodeCount == totalNodeCount;
 
