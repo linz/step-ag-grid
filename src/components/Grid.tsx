@@ -185,12 +185,12 @@ export const Grid = ({
       if (gridRendered === "empty") {
         if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
-          params.onContentSize && params.onContentSize(result);
+          params.onContentSize?.(result);
         }
       } else if (gridRendered === "rows-visible") {
         if (result && !hasSetContentSize.current) {
           hasSetContentSize.current = true;
-          params.onContentSize && params.onContentSize(result);
+          params.onContentSize?.(result);
         }
       } else {
         // It should be impossible to get here
@@ -219,7 +219,7 @@ export const Grid = ({
         needsAutoSize.current = true;
       }
     }
-    if (needsAutoSize.current) {
+    if (needsAutoSize.current || (!hasSetContentSize.current && sizeColumns === "auto")) {
       needsAutoSize.current = false;
       setInitialContentSize();
     }

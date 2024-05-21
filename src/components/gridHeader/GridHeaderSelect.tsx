@@ -1,6 +1,6 @@
 import { IHeaderParams } from "ag-grid-community";
 import clsx from "clsx";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * AgGrid's existing select header doesn't work the way we want.
@@ -12,14 +12,16 @@ export const GridHeaderSelect = ({ api }: IHeaderParams) => {
   const [updateCounter, setUpdateCounter] = useState(0);
   const selectedNodeCount = api.getSelectedRows().length;
 
-  const clickHandler = useCallback(() => {
-    setUpdateCounter(updateCounter + 1);
-  }, [updateCounter]);
-
   useEffect(() => {
+    const clickHandler = () => {
+      setUpdateCounter(updateCounter + 1);
+    };
+
     api.addEventListener("selectionChanged", clickHandler);
-    return () => api.removeEventListener("selectionChanged", clickHandler);
-  }, [api, clickHandler]);
+    return () => {
+      !api.isDestroyed() && api.removeEventListener("selectionChanged", clickHandler);
+    };
+  }, [api, updateCounter]);
 
   const handleMultiSelect = () => {
     if (selectedNodeCount == 0) {
