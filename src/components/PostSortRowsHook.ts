@@ -149,8 +149,8 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
           previousRowSortIndex[`${lastNewNode?.data.id}`] = { index: newIndex, hash: hashNode(lastNewNode) };
           wasStale = true;
         } else if (changedRowCount === 2 && newRowCount === 0) {
-          // This must be a swap rows
-          // backupSortOrder();
+          // This must be a swap rows (sometimes it's not, needs further attention)
+          backupSortOrder();
           wasStale = false;
         } else if (changedRowCount > 1 && newRowCount === 1) {
           // This must be a insert so, insert new row near the row that changed
