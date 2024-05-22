@@ -133,7 +133,7 @@ export const findCellContains = async (
   return await waitFor(
     async () => {
       const row = await findRow(rowId, within);
-      return await findQuick({ tagName: `[col-id='${colId}']`, text }, row);
+      return getQuick({ tagName: `[col-id='${colId}']`, text }, row);
     },
     { timeout: 10000 },
   );
