@@ -187,12 +187,12 @@ export const Grid = ({
         return;
       }
       if (gridRendered === "empty") {
-        if (!hasSetContentSizeEmpty.current && result && !hasSetContentSize.current) {
+        if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
           params.onContentSize?.(result);
         }
       } else if (gridRendered === "rows-visible") {
-        if (result && !hasSetContentSize.current) {
+        if (!hasSetContentSize.current) {
           hasSetContentSize.current = true;
           params.onContentSize?.(result);
         }
@@ -425,7 +425,9 @@ export const Grid = ({
     if (!isEmpty(updatingCols())) return;
 
     const skipHeader = sizeColumns === "auto-skip-headers";
-    autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
+    if (hasSetContentSize.current) {
+      autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
+    }
     colIdsEdited.current.clear();
   }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
 
@@ -563,13 +565,15 @@ export const Grid = ({
       if (!isEmpty(colIdsEdited.current)) {
         const skipHeader = sizeColumns === "auto-skip-headers";
         if (sizeColumns === "auto" || skipHeader) {
-          defer(() =>
-            autoSizeColumns({
-              skipHeader,
-              userSizedColIds: userSizedColIds.current,
-              colIds: colIdsEdited.current,
-            }),
-          );
+          defer(() => {
+            if (hasSetContentSize.current) {
+              autoSizeColumns({
+                skipHeader,
+                userSizedColIds: userSizedColIds.current,
+                colIds: colIdsEdited.current,
+              });
+            }
+          });
         }
         colIdsEdited.current.clear();
       }
