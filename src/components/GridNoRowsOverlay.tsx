@@ -1,7 +1,12 @@
 import { LuiStatusSpinner } from "@linzjs/lui";
+import { ForwardedRef, forwardRef } from "react";
 
-const GridLoadingOverlayComponent = (props: { headerRowHeight: number }) => (
+const GridLoadingOverlayComponentFr = (
+  props: { headerRowHeight: number },
+  externalRef: ForwardedRef<HTMLDivElement>,
+) => (
   <div
+    ref={externalRef}
     style={{
       left: 0,
       top: 0,
@@ -19,6 +24,8 @@ const GridLoadingOverlayComponent = (props: { headerRowHeight: number }) => (
   </div>
 );
 
+const GridLoadingOverlayComponent = forwardRef(GridLoadingOverlayComponentFr);
+
 export interface GridNoRowsOverlayProps {
   loading: boolean;
   rowCount: number | undefined | null;
@@ -28,10 +35,17 @@ export interface GridNoRowsOverlayProps {
   headerRowHeight: number;
 }
 
-export const GridNoRowsOverlay = (props: GridNoRowsOverlayProps) => {
-  if (props.loading) return <GridLoadingOverlayComponent headerRowHeight={props.headerRowHeight} />;
-  if (props.rowCount === 0) return <div>{props.noRowsOverlayText ?? "There are currently no rows"}</div>;
-  if (props.filteredRowCount === 0)
-    return <div>{props.noRowsMatchingOverlayText ?? "All rows have been filtered"}</div>;
-  return <span />;
+export const GridNoRowsOverlayFr = (props: GridNoRowsOverlayProps, externalRef: ForwardedRef<HTMLDivElement>) => {
+  if (props.loading) {
+    return <GridLoadingOverlayComponent ref={externalRef} headerRowHeight={props.headerRowHeight} />;
+  }
+  if (props.rowCount === 0) {
+    return <div ref={externalRef}>{props.noRowsOverlayText ?? "There are currently no rows"}</div>;
+  }
+  if (props.filteredRowCount === 0) {
+    return <div ref={externalRef}>{props.noRowsMatchingOverlayText ?? "All rows have been filtered"}</div>;
+  }
+  return <div ref={externalRef} />;
 };
+
+export const GridNoRowsOverlay = forwardRef(GridNoRowsOverlayFr);
