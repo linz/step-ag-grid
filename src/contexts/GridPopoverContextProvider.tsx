@@ -26,7 +26,9 @@ export const GridPopoverContextProvider = ({ props, children }: PropsWithChildre
       multiEdit ? sortBy(getFilteredSelectedRows(), (row) => row.id !== props.data.id) : [props.data as GridBaseRow],
     [getFilteredSelectedRows, multiEdit, props.data],
   );
+
   const field = props.colDef?.field ?? "";
+  const colId = props.colDef?.colId ?? field ?? "";
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {
@@ -44,6 +46,7 @@ export const GridPopoverContextProvider = ({ props, children }: PropsWithChildre
         saving,
         setSaving,
         selectedRows,
+        colId,
         field,
         data: props.data,
         value: props.value,

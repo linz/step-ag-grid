@@ -6,6 +6,7 @@ export interface GridPopoverContextType<TData extends GridBaseRow> {
   anchorRef: RefObject<Element>;
   saving: boolean;
   setSaving: (saving: boolean) => void;
+  colId: string;
   field: keyof TData;
   value: any;
   data: TData;
@@ -18,6 +19,7 @@ export const GridPopoverContext = createContext<GridPopoverContextType<any>>({
   anchorRef: { current: null },
   saving: false,
   setSaving: () => {},
+  colId: "",
   field: "",
   value: null,
   data: {} as GridBaseRow,
