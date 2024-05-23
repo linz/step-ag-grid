@@ -165,6 +165,8 @@ export const Grid = ({
   const hasSetContentSizeEmpty = useRef(false);
   const needsAutoSize = useRef(true);
 
+  const lastFullResize = useRef<number>();
+
   const setInitialContentSize = useCallback(() => {
     if (!gridDivRef.current?.clientWidth || rowData == null) {
       // Don't resize grids if they are offscreen as it doesn't work.
@@ -193,8 +195,13 @@ export const Grid = ({
         }
       } else if (gridRendered === "rows-visible") {
         if (!hasSetContentSize.current) {
-          hasSetContentSize.current = true;
-          params.onContentSize?.(result);
+          if (lastFullResize.current === result.width) {
+            hasSetContentSize.current = true;
+            params.onContentSize?.(result);
+          } else {
+            needsAutoSize.current = true;
+          }
+          lastFullResize.current = result.width;
         }
       } else {
         // It should be impossible to get here
