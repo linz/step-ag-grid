@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormMultiSelect, GridFormMultiSelectProps } from "../gridForm/GridFormMultiSelect";
@@ -11,7 +12,7 @@ export const GridPopoutEditMultiSelect = <TData extends GridBaseRow, TValue = an
     editor: GridFormMultiSelect,
     ...props,
     editorParams: {
-      className: "GridMultiSelect-containerMedium",
       ...(props.editorParams as GridFormMultiSelectProps<TData>),
+      className: clsx("GridMultiSelect-containerMedium", props.editorParams?.className),
     },
   });
