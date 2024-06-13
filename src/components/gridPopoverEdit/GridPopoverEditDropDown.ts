@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { GridBaseRow } from "../Grid";
 import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
 import { GridFormDropDown, GridFormDropDownProps } from "../gridForm/GridFormDropDown";
@@ -11,8 +12,7 @@ export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any>
     editor: GridFormDropDown,
     ...props,
     editorParams: {
-      // Defaults to large size container
-      className: "GridPopoverEditDropDown-containerLarge",
       ...(props.editorParams as GridFormDropDownProps<TData>),
+      className: clsx("GridPopoverEditDropDown-containerLarge", props.editorParams?.className),
     },
   });
