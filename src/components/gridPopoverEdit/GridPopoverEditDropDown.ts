@@ -12,7 +12,7 @@ export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any>
     ...props,
     editorParams: {
       // Defaults to large size container
-      className: "GridPopoverEditDropDown-containerLarge",
       ...(props.editorParams as GridFormDropDownProps<TData>),
+      className: `GridPopoverEditDropDown-containerLarge ${props.editorParams?.className ?? ""}`,
     },
   });
