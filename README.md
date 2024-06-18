@@ -40,7 +40,7 @@ yarn add @linzjs/step-ag-grid
 npm run storybook
 ```
 
-Storybook demo deployed at: https://linz.github.io/step-ag-grid/
+Storybook demo deployed at: https://master--633cd0dc2fe91d7df3ed32e4.chromatic.com/
 
 ## Usage
 
@@ -85,7 +85,7 @@ const GridDemo = () => {
         export: false,
       }),
       // This is the flex column that will expand to fit
-      GridCell({
+      GridCell<ITestRow, string>({
         field: "name",
         headerName: "Name",
         flex: 1,
