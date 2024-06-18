@@ -85,7 +85,7 @@ const GridDemo = () => {
         export: false,
       }),
       // This is the flex column that will expand to fit
-      GridCell({
+      GridCell<ITestRow, string>({
         field: "name",
         headerName: "Name",
         flex: 1,
