@@ -72,6 +72,7 @@
   font-family: "Open Sans", system-ui, sans-serif;
 
   &::placeholder {
+    color: colors.$fuscous;
     font-style: italic;
   }
 }
