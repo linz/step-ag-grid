@@ -29,7 +29,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const externalFilters = useRef<GridFilterExternal<TData>[]>([]);
 
   const setQuickFilter = useCallback(
-    (filter: "") => {
+    (filter: string) => {
       // If we don't clear the focused cell focus switches back to grid when typing in the quick filter input
       gridApi?.clearFocusedCell();
       _setQuickFilter(filter);
