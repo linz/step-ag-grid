@@ -639,7 +639,24 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const onFilterChanged = useMemo(
     () =>
       debounce(() => {
-        gridApi && gridApi.onFilterChanged();
+        // This is terrible, but there's no other way for me to check whether a filter has changed the grid
+        const getDisplayedRowsHash = () => {
+          let hash = "";
+          gridApi?.forEachNodeAfterFilter((rowNode) => {
+            hash += String(rowNode.id);
+          });
+          return hash;
+        };
+
+        if (gridApi) {
+          const hasFocusedCell = gridApi.getFocusedCell();
+          const preHash = hasFocusedCell && getDisplayedRowsHash();
+          gridApi.onFilterChanged();
+          const postHash = hasFocusedCell && getDisplayedRowsHash();
+          // Ag-grid has a bug where if a focused cell comes into view after a filter the filter loses focus
+          // So the focus is cleared to prevent this
+          preHash !== postHash && gridApi.clearFocusedCell();
+        }
       }, 200),
     [gridApi],
   );

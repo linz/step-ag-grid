@@ -255,7 +255,14 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   );
 };
 
-const GridFilterLessThan = (props: { field: keyof ITestRow; text: string }): ReactElement => {
+type KeysOfType<TObject, TValue> = {
+  [K in keyof TObject]: TObject[K] extends TValue ? K : never;
+}[keyof TObject];
+
+const GridFilterLessThan = (props: {
+  field: KeysOfType<ITestRow, number | null | undefined>;
+  text: string;
+}): ReactElement => {
   const [value, setValue] = useState<number>();
 
   const filter = useCallback(
