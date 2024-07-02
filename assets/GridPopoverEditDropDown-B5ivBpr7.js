@@ -1,0 +1,1 @@
+import{c as a}from"./util-BMTC4KOK.js";import{G as i,k as e}from"./GridWrapper-DJOqlb4b.js";const d=(o,r)=>i(o,{editor:e,...r,editorParams:{...r.editorParams,className:a("GridPopoverEditDropDown-containerLarge",r.editorParams?.className)}});export{d as G};

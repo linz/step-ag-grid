@@ -1,0 +1,1 @@
+import{G as t,o as l}from"./GridWrapper-DJOqlb4b.js";import{G as i}from"./GridFormPopoverMenu-ZxOdRx-U.js";const a=(e,r)=>t({minWidth:48,maxWidth:48,width:40,sortable:!1,editable:e.editable!=null?e.editable:!0,exportable:!1,cellStyle:{flex:1,justifyContent:"center"},cellRenderer:l,...e,cellRendererParams:{singleClickEdit:!0}},{editor:i,preventAutoEdit:!0,...r});export{a as G};
