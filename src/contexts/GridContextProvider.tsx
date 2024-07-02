@@ -641,11 +641,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       debounce(() => {
         // This is terrible, but there's no other way for me to check whether a filter has changed the grid
         const getDisplayedRowsHash = () => {
-          let hash = "";
+          const arr: any[] = [];
           gridApi?.forEachNodeAfterFilter((rowNode) => {
-            hash += String(rowNode.id);
+            arr.push(rowNode.id);
           });
-          return hash;
+          return arr.join("|");
         };
 
         if (gridApi) {
