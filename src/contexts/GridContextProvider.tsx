@@ -20,13 +20,22 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
-  const [quickFilter, setQuickFilter] = useState("");
+  const [quickFilter, _setQuickFilter] = useState("");
   const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<TData>[]>([]);
+
+  const setQuickFilter = useCallback(
+    (filter: "") => {
+      // If we don't clear the focused cell focus switches back to grid when typing in the quick filter input
+      gridApi?.clearFocusedCell();
+      _setQuickFilter(filter);
+    },
+    [gridApi],
+  );
 
   /**
    * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
