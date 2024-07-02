@@ -54,15 +54,27 @@
   flex: 1;
 }
 
+.GridFilterQuick-icon {
+  position: absolute;
+  margin: 8px;
+  pointer-events: none;
+  fill: colors.$fuscous;
+}
+
 .GridFilterQuick-input {
   width: 100%;
   height: 40px;
   min-height: 40px;
   border: 0.06rem solid colors.$silver;
   border-radius: 3px;
-  padding-left: 0.75rem;
+  padding-left: 36px;
   padding-right: 0.75rem;
   font-family: "Open Sans", system-ui, sans-serif;
+
+  &::placeholder {
+    color: colors.$fuscous;
+    font-style: italic;
+  }
 }
 
 .Grid-popoverContainer {
