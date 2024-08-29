@@ -32,6 +32,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   getFilteredSelectedRows: <T extends GridBaseRow>() => T[];
   getSelectedRowIds: () => number[];
   getFilteredSelectedRowIds: () => number[];
+  resetColumnSortState: () => void;
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsById: (rowIds?: number[]) => void;
@@ -118,6 +119,9 @@ export const GridContext = createContext<GridContextType<any>>({
   getFilteredSelectedRowIds: () => {
     console.error("no context provider for getFilteredSelectedRowIds");
     return [];
+  },
+  resetColumnSortState: () => {
+    console.error("no context provider for resetColumnSortState");
   },
   selectRowsDiff: async () => {
     console.error("no context provider for selectRowsDiff");

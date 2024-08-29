@@ -329,6 +329,12 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [_selectRowsWithOptionalFlash],
   );
 
+  const resetColumnSortState = useCallback(() => {
+    gridApi?.applyColumnState({
+      defaultState: { sort: null },
+    });
+  }, [gridApi]);
+
   const selectRowsDiff = useCallback(
     async (fn: () => Promise<any>) => {
       beforeUpdate();
@@ -748,6 +754,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         gridReady,
         prePopupOps,
         postPopupOps,
+        resetColumnSortState,
         setApis,
         setQuickFilter,
         selectRowsById,

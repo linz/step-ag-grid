@@ -131,6 +131,7 @@ export const Grid = ({
     setApis,
     ensureRowVisible,
     getFirstRowId,
+    resetColumnSortState,
     selectRowsById,
     focusByRowById,
     ensureSelectedRowIsVisible,
@@ -425,6 +426,8 @@ export const Grid = ({
       previousRowDataLength.current = length;
     }
 
+    defer(resetColumnSortState);
+
     if (lastUpdatedDep.current === updatedDep || isEmpty(colIdsEdited.current)) return;
     lastUpdatedDep.current = updatedDep;
 
@@ -436,7 +439,15 @@ export const Grid = ({
       autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
     }
     colIdsEdited.current.clear();
-  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
+  }, [
+    autoSizeColumns,
+    resetColumnSortState,
+    rowData?.length,
+    setInitialContentSize,
+    sizeColumns,
+    updatedDep,
+    updatingCols,
+  ]);
 
   /**
    * Show/hide no rows overlay when model changes.
