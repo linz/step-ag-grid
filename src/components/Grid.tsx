@@ -39,6 +39,7 @@ export interface GridBaseRow {
 
 export interface GridProps {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
+  defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
   selectable?: boolean;
   theme?: string; // should have prefix ag-theme-
   ["data-testid"]?: string;
@@ -114,6 +115,7 @@ export interface GridProps {
  */
 export const Grid = ({
   "data-testid": dataTestId,
+  defaultPostSort = true,
   rowSelection = "multiple",
   suppressColumnVirtualization = true,
   theme = "ag-theme-step-default",
@@ -742,7 +744,7 @@ export const Grid = ({
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.onRowDragEnd ? undefined : postSortRows}
+          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
