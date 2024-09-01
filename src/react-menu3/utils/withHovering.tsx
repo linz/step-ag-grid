@@ -8,17 +8,24 @@ export interface withHoveringResultProps {
   menuItemRef?: MutableRefObject<HTMLLIElement>;
 }
 
-export const withHovering = <T,>(name: string, WrappedComponent: (props: T) => ReactElement) => {
+export const withHovering = <X extends Record<string, any>, T extends PropsWithRef<X>>(
+  name: string,
+  WrappedComponent: (props: T) => ReactElement,
+) => {
   const Component = memo(WrappedComponent);
-  const WithHovering = forwardRef((props: PropsWithRef<T>, ref) => {
+  const WithHovering = forwardRef<any, T>((props, ref) => {
     const menuItemRef = useRef<any>(null);
+
     return (
-      <Component
-        {...props}
-        menuItemRef={menuItemRef}
-        externalRef={ref}
-        isHovering={useContext(HoverItemContext) === menuItemRef.current}
-      />
+      <>
+        {/* @ts-ignore Can't work out what the ref issue is here */}
+        <Component
+          {...props}
+          menuItemRef={menuItemRef}
+          externalRef={ref}
+          isHovering={useContext(HoverItemContext) === menuItemRef.current}
+        />
+      </>
     );
   });
 
