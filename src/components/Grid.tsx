@@ -1,10 +1,13 @@
 import {
   CellClickedEvent,
+  CellDoubleClickedEvent,
+  CellEditingStartedEvent,
   ColDef,
   ColGroupDef,
   ColumnResizedEvent,
   IClientSideRowModel,
   ModelUpdatedEvent,
+  RowDragLeaveEvent,
   RowHighlightPosition,
   RowNode,
 } from "ag-grid-community";
@@ -12,7 +15,6 @@ import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-gr
 import { GridOptions } from "ag-grid-community";
 import {
   AgGridEvent,
-  CellEvent,
   CellKeyDownEvent,
   GridReadyEvent,
   RowDragEndEvent,
@@ -372,6 +374,7 @@ export const Grid = ({
               exportable: false,
             },
             checkboxSelection: params.selectable,
+            headerClass: params.onRowDragEnd ? "ag-header-select-draggable" : undefined,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
               if (!params.selectable) return false;
@@ -450,7 +453,7 @@ export const Grid = ({
   /**
    * Force-refresh all selected rows to re-run class function, to update selection highlighting
    */
-  const refreshSelectedRows = useCallback((event: CellEvent): void => {
+  const refreshSelectedRows = useCallback((event: CellEditingStartedEvent): void => {
     event.api.refreshCells({
       force: true,
       rowNodes: event.api.getSelectedNodes(),
@@ -461,7 +464,7 @@ export const Grid = ({
    * Make sure node is selected for editing and start edit
    */
   const startCellEditing = useCallback(
-    (event: CellEvent) => {
+    (event: CellKeyDownEvent | CellClickedEvent | CellDoubleClickedEvent) => {
       prePopupOps();
       if (!event.node.isSelected()) {
         event.node.setSelected(true, true);
@@ -485,7 +488,7 @@ export const Grid = ({
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
-    (event: CellEvent) => {
+    (event: CellDoubleClickedEvent) => {
       if (!invokeEditAction(event)) startCellEditing(event);
     },
     [startCellEditing],
@@ -495,7 +498,7 @@ export const Grid = ({
    * Handle single click edits
    */
   const onCellClicked = useCallback(
-    (event: CellEvent) => {
+    (event: CellClickedEvent) => {
       if (event.colDef?.cellRendererParams?.singleClickEdit ?? singleClickEdit) {
         startCellEditing(event);
       }
@@ -506,7 +509,7 @@ export const Grid = ({
   /**
    * If cell has an edit action invoke it (if editable)
    */
-  const invokeEditAction = (e: CellEvent): boolean => {
+  const invokeEditAction = (e: CellDoubleClickedEvent | CellKeyDownEvent): boolean => {
     const editAction = e.colDef?.cellRendererParams?.editAction;
     if (!editAction) return false;
 
@@ -638,7 +641,7 @@ export const Grid = ({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
-  const onRowDragLeave = useCallback((event: RowDragMoveEvent) => {
+  const onRowDragLeave = useCallback((event: RowDragLeaveEvent) => {
     const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
     clientSideRowModel.highlightRowAtPixel(null);
   }, []);
@@ -703,7 +706,6 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
-          reactiveCustomComponents={true}
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}

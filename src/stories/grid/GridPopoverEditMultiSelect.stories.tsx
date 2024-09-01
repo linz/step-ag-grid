@@ -84,21 +84,24 @@ const GridEditMultiSelectTemplate: StoryFn<typeof Grid> = (props: GridProps) => 
             filterPlaceholder: "Filter position",
             className: "GridMultiSelect-containerUnlimited",
             headers: [{ header: "Header item" }],
-            options: [
-              { value: "lot1", label: "Lot 1" },
-              { value: "lot2", label: "Lot 2" },
-              { value: "lot3", label: "Lot 3" },
-              { value: "lot11", label: "Lot 11" },
-              { value: "lot4", label: "Lot A 482392" },
-              { value: "appA", label: "A" },
-              { value: "appB", label: "B" },
-              MenuSeparator,
-              {
-                value: "other",
-                label: "Other",
-                subComponent: () => <GridFormSubComponentTextArea required={true} maxLength={5} defaultValue={""} />,
-              },
-            ],
+            options: (selectedRows) => {
+              const firstRow = selectedRows[0];
+              return [
+                { value: "lot1", label: "Lot 1" },
+                { value: "lot2", label: "Lot 2" },
+                { value: "lot3", label: "Lot 3" },
+                { value: "lot11", label: "Lot 11" },
+                { value: "lot4", label: "Lot A 482392" },
+                { value: "appA", label: "A" },
+                { value: "appB", label: "B" },
+                MenuSeparator,
+                {
+                  value: "other",
+                  label: "Other",
+                  subComponent: () => <GridFormSubComponentTextArea required={true} maxLength={5} defaultValue={""} />,
+                },
+              ].map((r) => ({ ...r, checked: firstRow.position?.includes(r.value) }));
+            },
             onSave: async ({ selectedRows, selectedOptions }) => {
               // eslint-disable-next-line no-console
               console.log("multiSelect result", { selectedRows, selectedOptions });

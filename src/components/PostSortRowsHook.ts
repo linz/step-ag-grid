@@ -81,9 +81,9 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
       const newSortOrder = JSON.stringify(copyCurrentSortSettings());
       let sortOrderChanged = newSortOrder != lastSortOrderHash.current;
 
-      const quickFilter = (api as any).filterManager.quickFilter;
+      const quickFilter = api.getQuickFilter();
       if (previousQuickFilter.current != quickFilter) {
-        previousQuickFilter.current = quickFilter;
+        previousQuickFilter.current = quickFilter ?? "";
         sortOrderChanged = true;
       }
 
