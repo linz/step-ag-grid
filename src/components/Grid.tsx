@@ -374,6 +374,7 @@ export const Grid = ({
               exportable: false,
             },
             checkboxSelection: params.selectable,
+            headerClass: params.onRowDragEnd ? "ag-header-select-draggable" : undefined,
             headerComponent: rowSelection === "multiple" ? GridHeaderSelect : null,
             suppressHeaderKeyboardEvent: (e) => {
               if (!params.selectable) return false;
