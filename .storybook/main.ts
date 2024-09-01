@@ -17,9 +17,7 @@ const config: StorybookConfig = {
     "@storybook/addon-interactions",
   ],
 
-  docs: {
-    autodocs: false,
-  },
+  docs: {},
 
   async viteFinal(config) {
     const { config: userConfig } = (await loadConfigFromFile({
