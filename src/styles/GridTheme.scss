@@ -67,7 +67,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
-    justify-content: end;
+    justify-content: center;
   }
 
   .ag-header-cell {
