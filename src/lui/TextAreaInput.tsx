@@ -1,14 +1,8 @@
 import clsx from "clsx";
 import { omit } from "lodash-es";
-import { InputHTMLAttributes, ReactElement, useState } from "react";
-import { v4 as uuidVersion4 } from "uuid";
+import { InputHTMLAttributes, ReactElement, useId } from "react";
 
 import { FormError } from "./FormError";
-
-export const useGenerateOrDefaultId = (idFromProps?: string) => {
-  const [id] = useState(idFromProps ? idFromProps : uuidVersion4());
-  return id;
-};
 
 export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaElement> {
   // overrides value in base class to be string type only
@@ -23,7 +17,8 @@ export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaE
 }
 
 export const TextAreaInput = (props: LuiTextAreaInputProps) => {
-  const id = useGenerateOrDefaultId(props?.id);
+  const reactId = useId();
+  const id = props?.id ?? reactId;
 
   return (
     <div
