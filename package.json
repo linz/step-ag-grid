@@ -145,7 +145,7 @@
     "rollup-plugin-typescript2": "^0.36.0",
     "sass": "^1.77.8",
     "sass-loader": "^14.2.1",
-    "semantic-release": "^22.0.12",
+    "semantic-release": "^24.1.0",
     "storybook": "^8.2.9",
     "storybook-css-modules-preset": "^1.1.1",
     "style-loader": "^4.0.0",
