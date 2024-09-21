@@ -9,7 +9,7 @@ jobs:
         run: npm i --legacy-peer-deps && npm run build-storybook
       - name: Publish to non-master non-beta to Chromatic
         if: github.ref != 'refs/heads/master' && github.ref != 'refs/heads/beta'
-        uses: chromaui/action@v1
+        uses: chromaui/action@v11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
@@ -19,7 +19,7 @@ jobs:
           CI: true
       - name: Publish Chromatic and auto accept changes for master and beta
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
-        uses: chromaui/action@v1
+        uses: chromaui/action@v11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
