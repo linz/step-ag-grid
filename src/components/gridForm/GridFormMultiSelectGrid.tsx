@@ -140,7 +140,7 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
                   }}
                 >
                   <LuiCheckboxInput
-                    isChecked={!!o.checked ?? false}
+                    isChecked={!!o.checked}
                     isIndeterminate={o.checked === "partial"}
                     value={`${o.value}`}
                     label={

@@ -1,24 +1,24 @@
 import {
+  AgGridEvent,
+  CellClassParams,
   CellClickedEvent,
   CellDoubleClickedEvent,
   CellEditingStartedEvent,
+  CellKeyDownEvent,
   ColDef,
   ColGroupDef,
   ColumnResizedEvent,
+  EditableCallback,
+  EditableCallbackParams,
+  GridOptions,
+  GridReadyEvent,
   IClientSideRowModel,
   ModelUpdatedEvent,
+  RowDragEndEvent,
   RowDragLeaveEvent,
+  RowDragMoveEvent,
   RowHighlightPosition,
   RowNode,
-} from "ag-grid-community";
-import { CellClassParams, EditableCallback, EditableCallbackParams } from "ag-grid-community";
-import { GridOptions } from "ag-grid-community";
-import {
-  AgGridEvent,
-  CellKeyDownEvent,
-  GridReadyEvent,
-  RowDragEndEvent,
-  RowDragMoveEvent,
   SelectionChangedEvent,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -34,6 +34,7 @@ import { GridNoRowsOverlay } from "./GridNoRowsOverlay";
 import { usePostSortRowsHook } from "./PostSortRowsHook";
 import { GridHeaderSelect } from "./gridHeader";
 import { GridContextMenuComponent, useGridContextMenu } from "./gridHook";
+import { clickInputWhenContainingCellClicked } from "./clickInputWhenContainingCellClicked";
 
 export interface GridBaseRow {
   id: string | number;
@@ -267,16 +268,6 @@ export const Grid = ({
   ]);
 
   /**
-   * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
-   * This passes the event to the checkbox when you click anywhere in the cell.
-   */
-  const clickSelectorCheckboxWhenContainingCellClicked = useCallback(({ event }: CellClickedEvent) => {
-    if (!event) return;
-    const input = (event.target as Element).querySelector("input");
-    input?.dispatchEvent(event);
-  }, []);
-
-  /**
    * Ensure external selected items list is in sync with panel.
    */
   const synchroniseExternalStateToGridSelection = useCallback(
@@ -388,7 +379,7 @@ export const Grid = ({
               }
               return false;
             },
-            onCellClicked: clickSelectorCheckboxWhenContainingCellClicked,
+            onCellClicked: clickInputWhenContainingCellClicked,
           },
           ...adjustColDefs,
         ]
@@ -402,7 +393,6 @@ export const Grid = ({
     params.defaultColDef?.editable,
     selectColumnPinned,
     rowSelection,
-    clickSelectorCheckboxWhenContainingCellClicked,
   ]);
 
   /**
@@ -528,11 +518,16 @@ export const Grid = ({
    */
   const onCellKeyPress = useCallback(
     (e: CellKeyDownEvent) => {
-      if ((e.event as KeyboardEvent).key === "Enter") {
+      const kbe = e.event as KeyboardEvent;
+      if (kbe.key === "Enter") {
         if (!invokeEditAction(e)) startCellEditing(e);
       }
+      if (kbe.key === "Tab") {
+        // eslint-disable-next-line
+        prePopupOps();
+      }
     },
-    [startCellEditing],
+    [prePopupOps, startCellEditing],
   );
 
   /**

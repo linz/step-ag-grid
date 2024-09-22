@@ -20,3 +20,8 @@
 .GridPopoverEditDropDown-noOptions {
   justify-content: center;
 }
+
+.GridPopoverEditDropDown-containerAutoWidth .szh-menu {
+  width: auto;
+  max-width: 274px;
+}

@@ -98,7 +98,9 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
   editable?: boolean | SAEditableCallback<TData, ValueType>;
   valueGetter?: string | SAValueGetterFunc<TData, ValueType>;
   valueFormatter?: string | SAValueFormatterFunc<TData, ValueType>;
-  cellRenderer?: (props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
+  cellRenderer?:
+    | ((props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
+    | string;
   cellRendererParams?: {
     singleClickEdit?: boolean;
     rightHoverElement?: ReactElement;
@@ -116,7 +118,7 @@ export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   const exec = shortcutKeys[e.event.key];
   if (exec && !e.editing && !e.event.repeat && e.event.type === "keydown") {
     const editable = fnOrVar(e.colDef?.editable, e);
-    return editable ? exec(e) ?? true : true;
+    return editable ? (exec(e) ?? true) : true;
   }
   // It's important that aggrid doesn't trigger edit on enter
   // as the incorrect selected rows will be returned
@@ -200,7 +202,7 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
       else return JSON.stringify(params.value);
     },
     ...props,
-    cellRenderer: GridCellRenderer,
+    cellRenderer: typeof props.cellRenderer === "string" ? props.cellRenderer : GridCellRenderer,
     cellRendererParams: {
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,

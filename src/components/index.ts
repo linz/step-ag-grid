@@ -16,3 +16,4 @@ export * from "./GridPopoverHook";
 export * from "./gridRender";
 export * from "./GridWrapper";
 export * from "./PostSortRowsHook";
+export * from "./clickInputWhenContainingCellClicked";

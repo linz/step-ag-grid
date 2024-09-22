@@ -45,6 +45,7 @@ export interface GridFormDropDownProps<TData extends GridBaseRow> extends CellEd
     | "GridPopoverEditDropDown-containerMedium"
     | "GridPopoverEditDropDown-containerLarge"
     | "GridPopoverEditDropDown-containerUnlimited"
+    | "GridPopoverEditDropDown-containerAutoWidth"
     | string
     | undefined;
   // local means the use the local filter, otherwise it's expected options will be passed a function that takes a filter

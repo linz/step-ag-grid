@@ -13,6 +13,7 @@ export interface IFormTestRow {
   numba: string;
   plan: string;
   distance: number | null;
+  bold: boolean;
 }
 
 export const FormTest = (props: CellEditorCommon): ReactElement => {
