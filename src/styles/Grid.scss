@@ -2,6 +2,18 @@
 @use "./react-menu-customisations";
 @use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
 
+
+.LabelPreferencesPanelGridCellAlignCenter .ag-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.LabelPreferencesPanelGridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
+  display: flex;
+  justify-content: center;
+}
+
+
 .Grid-container {
   flex: 1;
   width: 100%;
@@ -106,4 +118,25 @@
   background-color: colors.$hint;
 }
 
+.GridHeaderAlignCenter .ag-header-cell-text {
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.GridCellAlignCenter .GridCell-container {
+  display: flex;
+}
+
+.GridCellAlignCenter .ag-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.GridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
+  display: flex;
+  justify-content: center;
+}
+
+div.ag-ltr div.ag-header-cell-resize {
+  right: -4px;
+}

@@ -533,6 +533,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           // implying it was start/end of grid
           break;
         }
+
         if (focusedCellIsEditable()) {
           const focusedCell = gridApi?.getFocusedCell();
           if (focusedCell) {

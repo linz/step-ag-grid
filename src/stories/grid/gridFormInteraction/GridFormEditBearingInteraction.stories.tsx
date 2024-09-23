@@ -41,6 +41,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
         <GridPopoverContext.Provider
           value={{
             anchorRef,
+            colId: "",
             value: null,
             updateValue,
             formatValue: (value) => value,

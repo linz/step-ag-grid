@@ -59,6 +59,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
             value: null,
             updateValue,
             data: { value: "" },
+            colId: "",
             field: "value",
             selectedRows: [],
             saving: false,

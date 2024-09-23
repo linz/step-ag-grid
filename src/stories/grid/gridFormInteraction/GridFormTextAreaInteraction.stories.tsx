@@ -39,6 +39,7 @@ const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps
             value: null,
             updateValue,
             data: { value: null },
+            colId: "",
             field: "value",
             selectedRows: [],
             saving: false,

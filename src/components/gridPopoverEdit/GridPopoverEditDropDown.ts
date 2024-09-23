@@ -13,6 +13,13 @@ export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any>
     ...props,
     editorParams: {
       ...(props.editorParams as GridFormDropDownProps<TData>),
-      className: clsx("GridPopoverEditDropDown-containerLarge", props.editorParams?.className),
+      className: clsx(
+        {
+          "GridPopoverEditDropDown-containerLarge": !props.editorParams?.className?.includes(
+            "GridPopoverEditDropDown-container",
+          ),
+        },
+        props.editorParams?.className,
+      ),
     },
   });

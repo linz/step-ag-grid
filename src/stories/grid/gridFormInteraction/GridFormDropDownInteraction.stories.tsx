@@ -57,6 +57,7 @@ const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps
             anchorRef,
             updateValue,
             data: { value: "" },
+            colId: "",
             value: "",
             field: "value",
             selectedRows: [],

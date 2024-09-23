@@ -54,6 +54,7 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
           value={{
             anchorRef: anchorRef,
             updateValue,
+            colId: "",
             value: "",
             selectedRows: [],
             formatValue: (value) => value,
