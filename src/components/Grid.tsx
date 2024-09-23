@@ -20,6 +20,7 @@ import {
   RowHighlightPosition,
   RowNode,
   SelectionChangedEvent,
+  SelectionOptions,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import clsx from "clsx";

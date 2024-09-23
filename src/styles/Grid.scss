@@ -118,4 +118,21 @@
   background-color: colors.$hint;
 }
 
+.GridHeaderAlignCenter .ag-header-cell-text {
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.GridCellAlignCenter .GridCell-container {
+  display: flex;
+}
+
+.GridCellAlignCenter .ag-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.GridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
+  display: flex;
+  justify-content: center;
+}

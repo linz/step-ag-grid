@@ -72,8 +72,8 @@ export const GridEditBoolean = <TData extends GridBaseRow>(
     singleClickEdit: true,
     resizable: false,
     editable: true,
-    cellClass: "LabelPreferencesPanelGridCellAlignCenter",
-    headerClass: "LabelPreferencesPanelGridHeaderAlignCenter",
+    cellClass: "GridCellAlignCenter",
+    headerClass: "GridHeaderAlignCenter",
     ...colDef,
   });
 };
