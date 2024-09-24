@@ -7,7 +7,15 @@ import { useMemo, useState } from "react";
 
 import "@linzjs/lui/dist/fonts";
 
-import { ColDefT, Grid, GridCell, GridContextProvider, GridEditBoolean, GridUpdatingContextProvider } from "../..";
+import {
+  ColDefT,
+  Grid,
+  GridButton,
+  GridCell,
+  GridContextProvider,
+  GridEditBoolean,
+  GridUpdatingContextProvider,
+} from "../..";
 import { waitForGridReady } from "../../utils/storybookTestUtil";
 import { IFormTestRow } from "./FormTest";
 
@@ -39,6 +47,18 @@ const GridPopoutEditBooleanTemplate: StoryFn<typeof Grid> = () => {
         field: "id",
         headerName: "Id",
       }),
+      GridButton(
+        {
+          colId: "button",
+          headerName: "Button",
+        },
+        {
+          visible: ({ data }) => !!(data.id & 1),
+          onClick: ({ selectedRowIds }) => {
+            alert("click " + selectedRowIds);
+          },
+        },
+      ),
       GridEditBoolean(
         {
           field: "bold",
