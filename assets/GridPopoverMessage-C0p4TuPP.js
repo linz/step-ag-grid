@@ -1,0 +1,1 @@
+import{G as s}from"./GridWrapper-y58xtKL0.js";import{G as a}from"./GridFormMessage-B0-Z9GkP.js";const l=(e,r)=>s({resizable:!0,...e,cellRendererParams:{singleClickEdit:!0,...e.cellRendererParams}},{editor:a,...r});export{l as G};
