@@ -24,12 +24,19 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
     };
   }, [api, column, node.rowIndex]);
 
+  const isDisabled = !fnOrVar(colDef?.editable, props);
+
   return (
-    <div className={clsx("ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper", { "ag-checked": props.value })}>
+    <div
+      className={clsx("ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper", {
+        "ag-checked": props.value,
+        "ag-disabled": isDisabled,
+      })}
+    >
       <input
         type="checkbox"
         className="ag-input-field-input ag-checkbox-input"
-        disabled={!fnOrVar(colDef?.editable, props)}
+        disabled={isDisabled}
         ref={inputRef}
         checked={value}
         onChange={() => {}}
