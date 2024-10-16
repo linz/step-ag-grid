@@ -79,7 +79,7 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@chromatic-com/storybook": "^2.0.2",
     "@linzjs/lui": "^21.46.0",
-    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.4",
     "@semantic-release/changelog": "^6.0.3",
