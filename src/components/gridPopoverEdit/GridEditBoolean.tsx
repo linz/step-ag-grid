@@ -47,7 +47,15 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
           if (!onValueChange) return;
           const params = props?.colDef?.cellEditorParams as GridEditBooleanEditorProps<any> | undefined;
           if (!params) return;
-          const selectedRows = [data];
+          // The data cannot be relied upon if grid changed whilst editing, data will be stale
+          // So I get the data from the node itself which will be up to date.
+          const selectedRows: { id: string | number }[] = [];
+          api.forEachNode((n) => {
+            if (n.data.id === data.id) {
+              selectedRows.push(n.data);
+            }
+          });
+
           const checked = !value;
           onValueChange(checked);
           params.onClick({ selectedRows, selectedRowIds: selectedRows.map((r) => r.id), checked }).then();
