@@ -5,7 +5,7 @@ import { GridBaseRow } from "../Grid";
 import { LuiButton, LuiIcon } from "@linzjs/lui";
 import { useEffect, useRef } from "react";
 
-const ButtonCellRenderer = (props: SAICellRendererParams) => {
+const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererParams<TData>) => {
   const { data, node, column, colDef, api } = props;
   const inputRef = useRef<HTMLButtonElement>(null);
 
@@ -39,9 +39,9 @@ const ButtonCellRenderer = (props: SAICellRendererParams) => {
   );
 };
 
-export interface GridButtonProps<TData> {
+export interface GridButtonProps<TData extends GridBaseRow> {
   visible?: (cellEditorParams: ICellEditorParams) => boolean;
-  onClick?: (props: { selectedRows: TData[]; selectedRowIds: (string | number)[] }) => void;
+  onClick?: (props: { selectedRows: TData[]; selectedRowIds: TData["id"][] }) => void;
 }
 
 export const GridButton = <TData extends GridBaseRow>(
