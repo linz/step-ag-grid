@@ -65,12 +65,8 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
   );
 };
 
-export interface GridEditBooleanEditorProps<TData> extends CellEditorCommon {
-  onClick: (props: {
-    selectedRows: TData[];
-    selectedRowIds: (string | number)[];
-    checked: boolean;
-  }) => Promise<boolean>;
+export interface GridEditBooleanEditorProps<TData extends GridBaseRow> extends CellEditorCommon {
+  onClick: (props: { selectedRows: TData[]; selectedRowIds: TData["id"][]; checked: boolean }) => Promise<boolean>;
 }
 
 export const GridEditBoolean = <TData extends GridBaseRow>(

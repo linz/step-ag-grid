@@ -14,10 +14,11 @@ import { GridBaseRow } from "../Grid";
 import { CellEditorCommon } from "../GridCell";
 import { useGridPopoverHook } from "../GridPopoverHook";
 
-export interface GridPopoutEditDropDownSelectedItem<TData> {
+export interface GridPopoutEditDropDownSelectedItem<TData extends GridBaseRow, TValue> {
   // Note the row that was clicked on will be first
   selectedRows: TData[];
-  value: any;
+  selectedRowIds: TData["id"][];
+  value: TValue;
   subComponentValue?: any;
 }
 
@@ -38,7 +39,7 @@ export const MenuHeaderItem = (title: string) => {
 
 export type SelectOption = null | string | FinalSelectOption;
 
-export interface GridFormDropDownProps<TData extends GridBaseRow> extends CellEditorCommon {
+export interface GridFormDropDownProps<TData extends GridBaseRow, TValue> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options
   className?:
     | "GridPopoverEditDropDown-containerSmall"
@@ -54,8 +55,8 @@ export interface GridFormDropDownProps<TData extends GridBaseRow> extends CellEd
   filterPlaceholder?: string;
   filterHelpText?: string;
   noOptionsMessage?: string;
-  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<TData>) => Promise<void>;
-  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<TData>) => Promise<void>;
+  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void>;
+  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void>;
   options:
     | SelectOption[]
     | ((selectedRows: TData[], filter?: string) => Promise<SelectOption[] | undefined> | SelectOption[] | undefined)
@@ -66,7 +67,7 @@ const fieldToString = (field: any) => {
   return typeof field == "symbol" ? field.toString() : `${field}`;
 };
 
-export const GridFormDropDown = <TData extends GridBaseRow>(props: GridFormDropDownProps<TData>) => {
+export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridFormDropDownProps<TData, TValue>) => {
   const { selectedRows, field, data } = useGridPopoverContext<TData>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
@@ -86,7 +87,12 @@ export const GridFormDropDown = <TData extends GridBaseRow>(props: GridFormDropD
         (subComponentValue !== undefined && subComponentInitialValue.current !== JSON.stringify(subComponentValue));
       if (hasChanged) {
         if (props.onSelectedItem) {
-          await props.onSelectedItem({ selectedRows, value, subComponentValue });
+          await props.onSelectedItem({
+            selectedRows,
+            selectedRowIds: selectedRows.map((row) => row.id),
+            value,
+            subComponentValue,
+          });
         } else {
           selectedRows.forEach((row) => (row[field] = value as any));
         }
@@ -167,7 +173,7 @@ export const GridFormDropDown = <TData extends GridBaseRow>(props: GridFormDropD
     if (selectedItem === null) {
       if (props.onSelectFilter) {
         const { onSelectFilter } = props;
-        await onSelectFilter({ selectedRows, value: filter });
+        await onSelectFilter({ selectedRows, selectedRowIds: selectedRows.map((row) => row.id), value: filter as any });
         return true;
       } else {
         if (filteredValues && filteredValues.length === 1) {
