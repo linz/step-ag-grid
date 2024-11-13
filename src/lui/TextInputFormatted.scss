@@ -1,3 +1,5 @@
+@use "@linzjs/lui/dist/scss/Core" as lui;
+
 .LuiTextInput.GridLuiTextInput {
   margin-bottom: 0;
 }
@@ -7,5 +9,5 @@
   right: 14px;
   top: 0;
   line-height: 48px;
-  color: #beb9b4;
+  color: lui.$fuscous;
 }
