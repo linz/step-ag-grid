@@ -1,5 +1,5 @@
 @use "@linzjs/lui/dist/scss/Core" as lui;
-@use "node_modules/ag-grid-community/styles" as ag;
+@use "ag-grid-community/styles" as ag;
 
 // ag-grid likes to add 1px to this, so we subtract to compensate
 $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
