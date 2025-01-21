@@ -9,15 +9,20 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const config: StorybookConfig = {
   // Required
   framework: '@storybook/react-vite',
+
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+
   // Optional
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
+    "@chromatic-com/storybook"
   ],
 
-  docs: {},
+  docs: {
+    autodocs: true
+  },
 
   async viteFinal(config) {
     const { config: userConfig } = (await loadConfigFromFile({
@@ -34,6 +39,10 @@ const config: StorybookConfig = {
       ],
     });
   },
+
+  typescript: {
+    reactDocgen: "react-docgen-typescript"
+  }
 };
 
 export default config;
