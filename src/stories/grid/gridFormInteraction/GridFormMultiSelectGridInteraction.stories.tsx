@@ -22,6 +22,7 @@ const updateValue = fn((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabD
 const onSave = fn(async () => true);
 const onSelectFilter = fn();
 
+const five = <div>Five</div>;
 let options: MultiSelectGridOption[] = [];
 const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiSelectGridProps<any>) => {
   options = [
@@ -30,7 +31,7 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
     { label: "Two", value: 2 },
     { label: "Three", value: 3 },
     { label: "Four", value: 4 },
-    { label: <div>Five</div>, value: 5 },
+    { label: five, value: 5 },
   ];
   const config: GridFormMultiSelectGridProps<any> = {
     onSave,

@@ -5,6 +5,10 @@
   align-items: center;
 }
 
+.ActionButton-inProgress .LuiIcon {
+  visibility: hidden;
+}
+
 .ActionButton-minimal.lui-button-lg.lui-button-icon-right {
   padding-right: 38px;
 }
@@ -41,14 +45,9 @@
   cursor: progress;
   color: #007198;
   background-color: colors.$polar;
-
-  svg * {
-    fill: transparent;
-  }
 }
 
 .ActionButton-fill {
   width: 100%;
   justify-content: center;
 }
-
