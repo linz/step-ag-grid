@@ -90,25 +90,26 @@ export const ActionButton = ({
       disabled={localInProgress || disabled}
     >
       {iconPosition === "right" && buttonText}
-      {localInProgress ? (
-        <LuiMiniSpinner
-          size={16}
-          divProps={{
-            "data-testid": "loading-spinner",
-            style: {
-              margin: 0,
-              paddingRight: 5,
-              paddingLeft: 3,
-              paddingBottom: 0,
-              paddingTop: 0,
-            },
-            role: "status",
-            "aria-label": "Loading",
-          }}
-        />
-      ) : (
-        <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
+      {localInProgress && (
+        <div style={{ position: "relative" }}>
+          <LuiMiniSpinner
+            size={14}
+            divProps={{
+              "data-testid": "loading-spinner",
+              style: {
+                position: "absolute",
+                left: 4,
+                top: -10,
+                bottom: 10,
+                right: -4,
+              },
+              role: "status",
+              "aria-label": "Loading",
+            }}
+          />
+        </div>
       )}
+      <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
       {iconPosition === "left" && buttonText}
     </LuiButton>
   );
