@@ -67,7 +67,7 @@ export const ActionButton = ({
       type={"button"}
       level={level}
       title={title ?? ariaLabel ?? name}
-      aria-label={ariaLabel ?? name}
+      buttonProps={{ "aria-label": ariaLabel ?? name }}
       className={clsx(
         "lui-button-icon-right",
         "ActionButton",
