@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 export type GridUpdatingContextType = {
   checkUpdating: (fields: string | string[], id: number | string) => boolean;
@@ -13,15 +13,16 @@ export type GridUpdatingContextType = {
 
 export const GridUpdatingContext = createContext<GridUpdatingContextType>({
   checkUpdating: () => {
-    console.error("Missing GridUpdatingContext");
+    console.error('Missing GridUpdatingContext');
     return false;
   },
   updatingCols: () => {
-    console.error("Missing GridUpdatingContext");
+    console.error('Missing GridUpdatingContext');
     return [];
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   modifyUpdating: async () => {
-    console.error("Missing GridUpdatingContext");
+    console.error('Missing GridUpdatingContext');
   },
   updatedDep: 0,
 });

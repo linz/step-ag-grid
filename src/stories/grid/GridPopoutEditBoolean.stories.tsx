@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -15,12 +14,12 @@ import {
   GridContextProvider,
   GridEditBoolean,
   GridUpdatingContextProvider,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
-import { IFormTestRow } from "./FormTest";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { IFormTestRow } from './FormTest';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   decorators: [
     (Story) => (
@@ -37,37 +36,37 @@ export default {
 
 const GridPopoutEditBooleanTemplate: StoryFn<typeof Grid> = () => {
   const [rowData, setRowData] = useState([
-    { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345", bold: true },
-    { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523", bold: false },
+    { id: 1000, name: 'IS IS DP12345', nameType: 'IS', numba: 'IX', plan: 'DP 12345', bold: true },
+    { id: 1001, name: 'PEG V SD523', nameType: 'PEG', numba: 'V', plan: 'SD 523', bold: false },
   ] as IFormTestRow[]);
 
   const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
       GridButton(
         {
-          colId: "button",
-          headerName: "Button",
+          colId: 'button',
+          headerName: 'Button',
         },
         {
           visible: ({ data }) => !!(data.id & 1),
           onClick: ({ selectedRowIds }) => {
-            alert("click " + selectedRowIds);
+            alert('click ' + String(selectedRowIds));
           },
         },
       ),
       GridEditBoolean(
         {
-          field: "bold",
+          field: 'bold',
         },
         {
-          onClick: async ({ selectedRowIds, checked }) => {
+          onClick: ({ selectedRowIds, checked }) => {
             setRowData((rowData) => {
               // eslint-disable-next-line no-console
-              console.log("onchange", selectedRowIds, checked);
+              console.log('onchange', selectedRowIds, checked);
               return rowData.map((row) => (selectedRowIds.includes(row.id) ? { ...row, bold: checked } : row));
             });
             return true;
@@ -85,7 +84,7 @@ const GridPopoutEditBooleanTemplate: StoryFn<typeof Grid> = () => {
       selectable={false}
       singleClickEdit={true}
       rowSelection="single"
-      domLayout={"autoHeight"}
+      domLayout={'autoHeight'}
     />
   );
 };

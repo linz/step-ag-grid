@@ -1,29 +1,29 @@
 //
 // base types
 // ----------------------------------------------------------------------
-import { ForwardedRef, MutableRefObject } from "react";
+import { ForwardedRef, MutableRefObject } from 'react';
 
-export type MenuState = "opening" | "open" | "closing" | "closed";
-export type MenuAlign = "start" | "center" | "end";
-export type MenuDirection = "left" | "right" | "top" | "bottom";
-export type MenuPosition = "auto" | "anchor" | "initial";
-export type MenuOverflow = "auto" | "visible" | "hidden";
-export type MenuReposition = "auto" | "initial";
-export type MenuViewScroll = "auto" | "close" | "initial";
-export type MenuItemTypeProp = "checkbox" | "radio";
-export type CloseReason = "click" | "cancel" | "blur" | "scroll";
+export type MenuState = 'opening' | 'open' | 'closing' | 'closed';
+export type MenuAlign = 'start' | 'center' | 'end';
+export type MenuDirection = 'left' | 'right' | 'top' | 'bottom';
+export type MenuPosition = 'auto' | 'anchor' | 'initial';
+export type MenuOverflow = 'auto' | 'visible' | 'hidden';
+export type MenuReposition = 'auto' | 'initial';
+export type MenuViewScroll = 'auto' | 'close' | 'initial';
+export type MenuItemTypeProp = 'checkbox' | 'radio';
+export type CloseReason = 'click' | 'cancel' | 'blur' | 'scroll';
 /**
  * - `'first'` focus the first item in the menu.
  * - `'last'` focus the last item in the menu.
  * - `number` focus item at the specific position (zero-based).
  */
-export type FocusPosition = "first" | "last" | number;
+export type FocusPosition = 'first' | 'last' | number;
 
 export type ClassNameProp<M = undefined> = string | ((modifiers: M) => string);
 
 export type RenderProp<M, R = React.ReactNode> = R | ((modifiers: M) => R);
 
-export interface BaseProps<M = undefined> extends Omit<React.HTMLAttributes<HTMLElement>, "className" | "children"> {
+export interface BaseProps<M = undefined> extends Omit<React.HTMLAttributes<HTMLElement>, 'className' | 'children'> {
   ref?: React.Ref<any>;
   /**
    * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
@@ -31,7 +31,7 @@ export interface BaseProps<M = undefined> extends Omit<React.HTMLAttributes<HTML
   className?: ClassNameProp<M>;
 }
 
-export interface BasePropsWithChildren<M = undefined> extends Omit<React.HTMLAttributes<HTMLElement>, "className"> {
+export interface BasePropsWithChildren<M = undefined> extends Omit<React.HTMLAttributes<HTMLElement>, 'className'> {
   ref?: React.Ref<any>;
   /**
    * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
@@ -157,7 +157,7 @@ export interface Hoverable {
 /**
  * Common props for `Menu`, `SubMenu` and `ControlledMenu`
  */
-interface BaseMenuProps extends Omit<BaseProps, "style"> {
+interface BaseMenuProps extends Omit<BaseProps, 'style'> {
   /**
    * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
    */
@@ -310,7 +310,7 @@ export interface RootMenuProps extends BaseMenuProps, MenuStateOptions {
   /**
    * Properties of this object are spread to the root DOM element containing the menu.
    */
-  containerProps?: Omit<React.HTMLAttributes<HTMLElement>, "className">;
+  containerProps?: Omit<React.HTMLAttributes<HTMLElement>, 'className'>;
   /**
    * A ref object attached to a DOM element within which menu will be positioned.
    * If not provided, the nearest ancestor which has CSS `overflow` set to a value

@@ -1,11 +1,11 @@
-import clsx from "clsx";
-import { ReactElement, useCallback, useContext, useEffect } from "react";
+import clsx from 'clsx';
+import { ReactElement, useCallback, useContext, useEffect } from 'react';
 
-import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { TextAreaInput } from "../../lui/TextAreaInput";
-import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
+import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
+import { TextAreaInput } from '../../lui/TextAreaInput';
+import { TextInputValidator, TextInputValidatorProps } from '../../utils/textValidator';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
 
 export interface GridSubComponentTextAreaProps<TData extends GridBaseRow>
   extends TextInputValidatorProps<TData>,
@@ -22,7 +22,7 @@ export const GridFormSubComponentTextArea = <TData extends GridBaseRow>(
 ): ReactElement => {
   const { value, data, setValue, setValid, context } = useContext(GridSubComponentContext);
 
-  const helpText = props.helpText ?? "Press tab to save";
+  const helpText = props.helpText ?? 'Press tab to save';
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
@@ -36,9 +36,9 @@ export const GridFormSubComponentTextArea = <TData extends GridBaseRow>(
   }, [setValid, invalid, value]);
 
   return (
-    <div className={clsx("FreeTextInput", props.className)}>
+    <div className={clsx('FreeTextInput', props.className)}>
       <TextAreaInput
-        className={"free-text-input"}
+        className={'free-text-input'}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}

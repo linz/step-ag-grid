@@ -1,6 +1,6 @@
-import { MutableRefObject, createContext } from "react";
+import { createContext, MutableRefObject } from 'react';
 
-import { MenuDirection, MenuOverflow } from "../types";
+import { MenuDirection, MenuOverflow } from '../types';
 
 export const MenuListContext = createContext<{
   overflow?: MenuOverflow;

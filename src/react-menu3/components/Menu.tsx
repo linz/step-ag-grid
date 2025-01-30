@@ -1,18 +1,18 @@
 import {
+  cloneElement,
   ForwardedRef,
+  forwardRef,
   Fragment,
   ReactElement,
-  cloneElement,
-  forwardRef,
   useCallback,
   useImperativeHandle,
   useRef,
-} from "react";
+} from 'react';
 
-import { useCombinedRef, useMenuChange, useMenuStateAndFocus } from "../hooks";
-import { MenuButtonModifiers, MenuCloseEvent, RenderProp, RootMenuProps, UncontrolledMenuProps } from "../types";
-import { FocusPositions, Keys, getName, isMenuOpen, mergeProps, safeCall } from "../utils";
-import { ControlledMenu } from "./ControlledMenu";
+import { useCombinedRef, useMenuChange, useMenuStateAndFocus } from '../hooks';
+import { MenuButtonModifiers, MenuCloseEvent, RenderProp, RootMenuProps, UncontrolledMenuProps } from '../types';
+import { FocusPositions, getName, isMenuOpen, Keys, mergeProps, safeCall } from '../utils';
+import { ControlledMenu } from './ControlledMenu';
 
 //
 // Menu
@@ -31,7 +31,7 @@ export interface MenuProps extends RootMenuProps, UncontrolledMenuProps {
 }
 
 export function MenuFr(
-  { "aria-label": ariaLabel, menuButton, instanceRef, onMenuChange, ...restProps }: MenuProps,
+  { 'aria-label': ariaLabel, menuButton, instanceRef, onMenuChange, ...restProps }: MenuProps,
   externalRef: ForwardedRef<ReactElement>,
 ) {
   const [stateProps, toggleMenu, openMenu] = useMenuStateAndFocus(restProps);
@@ -72,14 +72,14 @@ export function MenuFr(
 
   // Too many mixed types here to figure out what to pick for button.  Bad code.
   const button: any = safeCall(menuButton, { open: isOpen });
-  if (!button || !button.type) throw new Error("Menu requires a menuButton prop.");
+  if (!button || !button.type) throw new Error('Menu requires a menuButton prop.');
 
   const buttonProps = {
     ref: useCombinedRef(button.ref, buttonRef),
     ...mergeProps({ onClick, onKeyDown }, button.props),
     isOpen: false,
   };
-  if (getName(button.type) === "MenuButton") {
+  if (getName(button.type) === 'MenuButton') {
     buttonProps.isOpen = isOpen;
   }
   const renderButton = cloneElement(button, buttonProps);
@@ -97,7 +97,7 @@ export function MenuFr(
       <ControlledMenu
         {...restProps}
         {...stateProps}
-        aria-label={ariaLabel || (typeof button.props.children === "string" ? button.props.children : "Menu")}
+        aria-label={ariaLabel || (typeof button.props.children === 'string' ? button.props.children : 'Menu')}
         anchorRef={buttonRef}
         ref={externalRef}
         onClose={handleClose}

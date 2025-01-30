@@ -1,6 +1,6 @@
-import { IHeaderParams } from "ag-grid-community";
-import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { IHeaderParams } from 'ag-grid-community';
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 
 /**
  * AgGrid's existing select header doesn't work the way we want.
@@ -17,9 +17,9 @@ export const GridHeaderSelect = ({ api }: IHeaderParams) => {
       setUpdateCounter(updateCounter + 1);
     };
 
-    api.addEventListener("selectionChanged", clickHandler);
+    api.addEventListener('selectionChanged', clickHandler);
     return () => {
-      !api.isDestroyed() && api.removeEventListener("selectionChanged", clickHandler);
+      !api.isDestroyed() && api.removeEventListener('selectionChanged', clickHandler);
     };
   }, [api, updateCounter]);
 
@@ -38,15 +38,15 @@ export const GridHeaderSelect = ({ api }: IHeaderParams) => {
   return (
     <div
       className={clsx(
-        "ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper",
-        partialSelect && "ag-indeterminate",
-        allSelected && "ag-checked",
+        'ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper',
+        partialSelect && 'ag-indeterminate',
+        allSelected && 'ag-checked',
       )}
       onClick={handleMultiSelect}
     >
       <input
         type="checkbox"
-        className={"ag-checkbox-input-wrapper"}
+        className={'ag-checkbox-input-wrapper'}
         onChange={() => {
           /* do nothing */
         }}

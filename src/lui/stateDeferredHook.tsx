@@ -1,13 +1,11 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from 'react';
 
-import { useTimeoutHook } from "./timeoutHook";
+import { useTimeoutHook } from './timeoutHook';
 
 /**
  * Defers state change up to a minimum time since last state change.
  */
-export const useStateDeferred = <T extends unknown>(
-  initialValue: T,
-): [T, (v: T) => void, (v: T, w: number) => void] => {
+export const useStateDeferred = <T,>(initialValue: T): [T, (v: T) => void, (v: T, w: number) => void] => {
   const startTime = useRef<number>(0);
   const timeoutHook = useTimeoutHook();
 

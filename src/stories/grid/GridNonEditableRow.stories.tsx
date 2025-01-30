@@ -1,13 +1,12 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { GridPopoverEditDropDown } from "components/gridPopoverEdit/GridPopoverEditDropDown";
-import { GridPopoverTextArea } from "components/gridPopoverEdit/GridPopoverTextArea";
-import { useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { GridPopoverEditDropDown } from 'components/gridPopoverEdit/GridPopoverEditDropDown';
+import { GridPopoverTextArea } from 'components/gridPopoverEdit/GridPopoverTextArea';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -21,15 +20,15 @@ import {
   GridUpdatingContextProvider,
   MenuOption,
   wait,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
     selectable: true,
-    rowSelection: "single",
+    rowSelection: 'single',
     autoSelectFirstRow: true,
   },
   decorators: [
@@ -57,31 +56,31 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
       GridPopoverEditDropDown(
         {
-          field: "position",
-          headerName: "Position",
+          field: 'position',
+          headerName: 'Position',
         },
         {
           multiEdit: true,
           editorParams: {
-            filtered: "local",
-            filterPlaceholder: "Filter",
-            options: ["Architect", "Developer", "Product Owner", "Scrum Master", "Tester"],
+            filtered: 'local',
+            filterPlaceholder: 'Filter',
+            options: ['Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
           },
         },
       ),
       GridCell({
-        field: "age",
-        headerName: "Age",
+        field: 'age',
+        headerName: 'Age',
       }),
       GridPopoverTextArea(
         {
-          field: "desc",
-          headerName: "Description",
+          field: 'desc',
+          headerName: 'Description',
         },
         {},
       ),
@@ -95,48 +94,48 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
               await wait(500);
               return [
                 {
-                  label: "Single edit only",
+                  label: 'Single edit only',
                   action: async ({ selectedRows }) => {
-                    alert(`Single-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
+                    alert(`Single-edit: ${selectedRows.map((r) => r.id).join()} rowId(s) selected`);
                     await wait(1500);
                   },
                   disabled: selectedItems.length > 1,
                 },
                 {
-                  label: "Multi-edit",
+                  label: 'Multi-edit',
                   action: async ({ selectedRows }) => {
-                    alert(`Multi-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
+                    alert(`Multi-edit: ${selectedRows.map((r) => r.id).join()} rowId(s) selected`);
                     await wait(1500);
                   },
                 },
                 {
-                  label: "Disabled item",
-                  disabled: "Disabled for test",
+                  label: 'Disabled item',
+                  disabled: 'Disabled for test',
                 },
                 {
-                  label: "Developer Only",
-                  hidden: selectedItems.some((x) => x.position != "Developer"),
+                  label: 'Developer Only',
+                  hidden: selectedItems.some((x) => x.position != 'Developer'),
                 },
                 {
-                  label: "Other (TextInput)",
+                  label: 'Other (TextInput)',
                   action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextInput placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
                 {
-                  label: "Other (TextArea)",
+                  label: 'Other (TextArea)',
                   action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextArea placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
               ] as MenuOption<ITestRow>[];
@@ -149,14 +148,14 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
-    { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
+    { id: 1000, position: 'Tester', age: 30, desc: 'Tests application', dd: '1' },
+    { id: 1001, position: 'Developer', age: 12, desc: 'Develops application', dd: '2' },
+    { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
   ]);
 
   const defaultColDef: ColDefT<ITestRow> = useMemo(
     () => ({
-      editable: ({ data }) => data?.position !== "Manager",
+      editable: ({ data }) => data?.position !== 'Manager',
     }),
     [],
   );
@@ -169,7 +168,7 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       defaultColDef={defaultColDef}
       columnDefs={columnDefs}
       rowData={rowData}
-      domLayout={"autoHeight"}
+      domLayout={'autoHeight'}
     />
   );
 };

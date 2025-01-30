@@ -5,9 +5,9 @@
  * @param container Optional container
  * @return HTMLElement array
  */
-import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
+import { IconName } from '@linzjs/lui/dist/components/LuiIcon/LuiIcon';
 
-import { wait } from "./util";
+import { wait } from './util';
 
 const queryAllBySelector = <T extends HTMLElement>(selector: string, container: HTMLElement = document.body): T[] =>
   Array.from(container.querySelectorAll<T>(selector));
@@ -17,7 +17,8 @@ const queryAllBySelector = <T extends HTMLElement>(selector: string, container: 
  */
 export interface IQueryQuick {
   testId?: string;
-  tagName?: "button" | "span" | "div" | "input" | "textarea" | any;
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  tagName?: 'button' | 'span' | 'div' | 'input' | 'textarea' | any;
   text?: string | RegExp;
   icon?: IconName;
   ariaLabel?: string;
@@ -26,11 +27,11 @@ export interface IQueryQuick {
   child?: IQueryQuick;
 }
 
-const escapeSelectorParam = (param: string): string => param.replace(/["\\]/g, "\\$&");
+const escapeSelectorParam = (param: string): string => param.replace(/["\\]/g, '\\$&');
 
 export const getMatcher = (matcherText: string | RegExp) => {
   const textMatcher =
-    typeof matcherText === "string"
+    typeof matcherText === 'string'
       ? (text?: string) => text != null && text.toLowerCase() === matcherText.toLowerCase()
       : (text?: string) => text != null && matcherText.test(text);
   return (e: HTMLElement) => textMatcher(e.innerHTML?.trim()) || textMatcher(e.innerText?.trim());
@@ -46,7 +47,7 @@ const quickSelector = <T extends HTMLElement>(
   props: IQueryQuick,
   container?: HTMLElement,
 ): { selector: string; els: T[] } => {
-  let selector = "";
+  let selector = '';
   let lastIQueryQuick = props;
   for (let loop: IQueryQuick | undefined = props; loop; loop = loop.child) {
     lastIQueryQuick = loop;
@@ -56,11 +57,11 @@ const quickSelector = <T extends HTMLElement>(
     loop.testId && (selector += `[data-testid="${escapeSelectorParam(loop.testId)}"]`);
     loop.icon && (selector += `[data-icon='${loop.icon}']`);
     loop.classes && (selector += loop.classes);
-    selector += " ";
+    selector += ' ';
   }
 
-  if (selector.trim() == "") {
-    throw "get/query/findQuick needs at least one defined parameter";
+  if (selector.trim() == '') {
+    throw 'get/query/findQuick needs at least one defined parameter';
   }
 
   let els = queryAllBySelector<T>(selector, container);
@@ -73,10 +74,10 @@ const quickSelector = <T extends HTMLElement>(
   return {
     selector: [
       selector,
-      typeof lastIQueryQuick.text == "string" ? JSON.stringify(lastIQueryQuick.text) : lastIQueryQuick.text,
+      typeof lastIQueryQuick.text === 'string' ? JSON.stringify(lastIQueryQuick.text) : lastIQueryQuick.text,
     ]
       .filter((r) => r)
-      .join(" "),
+      .join(' '),
     els,
   };
 };
@@ -91,9 +92,9 @@ const quickSelector = <T extends HTMLElement>(
 export const queryQuick = <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): T | null => {
   const { els, selector } = quickSelector<T>(filter, container);
   if (els.length > 1) {
-    throw `Found multiple(${els.length}) elements by selector ${selector}\n${els.map(
-      (el, index) => `${index}: ${el.parentElement?.innerHTML}\n\n`,
-    )}`;
+    throw `Found multiple(${els.length}) elements by selector ${selector}\n${els
+      .map((el, index) => `${index}: ${el.parentElement?.innerHTML}\n\n`)
+      .join()}`;
   }
   return els[0] ?? null;
 };

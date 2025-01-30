@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { EventHandler, MenuChangeEvent } from "../types";
-import { safeCall } from "../utils";
+import { EventHandler, MenuChangeEvent } from '../types';
+import { safeCall } from '../utils';
 
 export const useMenuChange = (onMenuChange?: EventHandler<MenuChangeEvent>, isOpen?: boolean) => {
   const prevOpen = useRef(isOpen);

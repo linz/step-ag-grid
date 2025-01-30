@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useCallback, useContext, useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 
 import {
   ActionButton,
@@ -25,15 +24,15 @@ import {
   GridUpdatingContextProvider,
   isFloat,
   wait,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
-import { IFormTestRow } from "./FormTest";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { IFormTestRow } from './FormTest';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
-    quickFilterValue: "",
+    quickFilterValue: '',
     selectable: true,
   },
   decorators: [
@@ -53,34 +52,34 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
   const { selectRowsWithFlashDiff } = useContext(GridContext);
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const [rowData, setRowData] = useState([
-    { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345", distance: 10 },
-    { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523", distance: null },
+    { id: 1000, name: 'IS IS DP12345', nameType: 'IS', numba: 'IX', plan: 'DP 12345', distance: 10 },
+    { id: 1001, name: 'PEG V SD523', nameType: 'PEG', numba: 'V', plan: 'SD 523', distance: null },
   ] as IFormTestRow[]);
 
   const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
       GridPopoverTextInput(
         {
-          field: "name",
-          headerName: "Text input",
+          field: 'name',
+          headerName: 'Text input',
         },
         {
           multiEdit: true,
           editorParams: {
             required: true,
             maxLength: 12,
-            placeholder: "Enter some text...",
+            placeholder: 'Enter some text...',
             invalid: (value: string) => {
-              if (value === "never") return "The value 'never' is not allowed";
+              if (value === 'never') return "The value 'never' is not allowed";
               return null;
             },
             onSave: async ({ selectedRows, value }) => {
               await wait(1000);
-              selectedRows.forEach((selectedRow) => (selectedRow["name"] = value));
+              selectedRows.forEach((selectedRow) => (selectedRow['name'] = value));
               return true;
             },
           },
@@ -88,27 +87,27 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
       ),
       GridPopoverTextInput(
         {
-          field: "distance",
-          headerName: "Number input",
+          field: 'distance',
+          headerName: 'Number input',
           valueFormatter: (params) => {
             const v = params.data?.distance;
-            return v != null ? `${v}${params.colDef.cellEditorParams.units}` : "–";
+            return v != null ? `${v}${params.colDef.cellEditorParams.units}` : '–';
           },
         },
         {
           multiEdit: false,
           editorParams: {
             maxLength: 12,
-            placeholder: "Enter distance...",
-            units: "m",
+            placeholder: 'Enter distance...',
+            units: 'm',
             invalid: (value: string) => {
-              if (value.length && !isFloat(value)) return "Value must be a number";
+              if (value.length && !isFloat(value)) return 'Value must be a number';
               return null;
             },
             onSave: async ({ selectedRows, value }) => {
               await wait(1000);
               selectedRows.forEach(
-                (selectedRow) => (selectedRow["distance"] = value.length ? parseFloat(value) : null),
+                (selectedRow) => (selectedRow['distance'] = value.length ? parseFloat(value) : null),
               );
               return true;
             },
@@ -117,22 +116,22 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
       ),
       GridPopoverTextArea(
         {
-          field: "plan",
-          headerName: "Text area",
+          field: 'plan',
+          headerName: 'Text area',
         },
         {
           multiEdit: true,
           editorParams: {
             required: true,
             maxLength: 32,
-            placeholder: "Enter some text...",
+            placeholder: 'Enter some text...',
             invalid: (value: string) => {
-              if (value === "never") return "The value 'never' is not allowed";
+              if (value === 'never') return "The value 'never' is not allowed";
               return null;
             },
             onSave: async ({ selectedRows, value }) => {
               await wait(1000);
-              selectedRows.forEach((selectedRow) => (selectedRow["plan"] = value));
+              selectedRows.forEach((selectedRow) => (selectedRow['plan'] = value));
               return true;
             },
           },
@@ -140,9 +139,9 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
       ),
       GridCellMultiEditor(
         {
-          colId: "plan2",
-          field: "plan",
-          headerName: "Multi-editor",
+          colId: 'plan2',
+          field: 'plan',
+          headerName: 'Multi-editor',
         },
         (_params) =>
           _params.rowIndex == 0
@@ -152,27 +151,27 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
                 editorParams: {
                   required: true,
                   maxLength: 32,
-                  placeholder: "Enter some text...",
+                  placeholder: 'Enter some text...',
                 },
               })
             : Editor({
                 multiEdit: false,
                 editor: GridFormDropDown,
                 editorParams: {
-                  options: [{ label: "One", value: 1 }],
+                  options: [{ label: 'One', value: 1 }],
                 },
               }),
       ),
       GridPopoverMenu(
         {
-          headerName: "",
+          headerName: '',
         },
         {
           multiEdit: true,
           editorParams: {
-            options: async (_) => [
+            options: () => [
               {
-                label: "Delete",
+                label: 'Delete',
                 action: async ({ selectedRows }) => {
                   await wait(1000);
                   setRowData(rowData.filter((data) => !selectedRows.some((row) => row.id == data.id)));
@@ -190,16 +189,18 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
     await wait(1000);
 
     const lastRow = rowData[rowData.length - 1];
+    // eslint-disable-next-line @typescript-eslint/require-await
     await selectRowsWithFlashDiff(async () => {
       setRowData([
         ...rowData,
         {
           id: (lastRow?.id ?? 0) + 1,
-          name: "?",
-          nameType: "?",
-          numba: "?",
-          plan: "",
+          name: '?',
+          nameType: '?',
+          numba: '?',
+          plan: '',
           distance: null,
+          bold: false,
         },
       ]);
     });
@@ -213,15 +214,15 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        domLayout={"autoHeight"}
+        domLayout={'autoHeight'}
         defaultColDef={{ minWidth: 70 }}
-        sizeColumns={"auto"}
+        sizeColumns={'auto'}
         onCellEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log("Cell editing complete");
+          console.log('Cell editing complete');
         }}
       />
-      <ActionButton icon={"ic_add"} name={"Add new row"} inProgressName={"Adding..."} onClick={addRowAction} />
+      <ActionButton icon={'ic_add'} name={'Add new row'} inProgressName={'Adding...'} onClick={addRowAction} />
     </>
   );
 };

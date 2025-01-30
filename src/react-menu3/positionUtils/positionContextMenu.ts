@@ -1,5 +1,5 @@
-import { MenuDirection } from "../types";
-import { getPositionHelpers } from "./getPositionHelpers";
+import { MenuDirection } from '../types';
+import { getPositionHelpers } from './getPositionHelpers';
 
 export const positionContextMenu = ({
   positionHelpers,
@@ -45,14 +45,14 @@ export const positionContextMenu = ({
   }
 
   // Similar logic to the left and right side above.
-  let computedDirection: MenuDirection = "bottom";
+  let computedDirection: MenuDirection = 'bottom';
   const bottomOverflow = getBottomOverflow(y);
   if (bottomOverflow > 0) {
     const adjustedY = y - menuRect.height;
     const topOverflow = getTopOverflow(adjustedY);
     if (topOverflow >= 0 || -topOverflow < bottomOverflow) {
       y = adjustedY;
-      computedDirection = "top";
+      computedDirection = 'top';
     }
     y = confineVertically(y);
   }

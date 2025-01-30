@@ -1,7 +1,7 @@
-import { useTransition } from "react-transition-state";
+import { useTransition } from 'react-transition-state';
 
-import { MenuState, MenuStateOptions } from "../types";
-import { MenuStateMap, getTransition } from "../utils";
+import { MenuState, MenuStateOptions } from '../types';
+import { getTransition, MenuStateMap } from '../utils';
 
 /**
  * A custom Hook which helps manage the states of `ControlledMenu`.
@@ -35,8 +35,8 @@ export const useMenuState = (
     mountOnEnter: !initialMounted,
     unmountOnExit: unmountOnClose,
     timeout: transitionTimeout ?? 500,
-    enter: getTransition(transition, "open"),
-    exit: getTransition(transition, "close"),
+    enter: getTransition(transition, 'open'),
+    exit: getTransition(transition, 'close'),
   });
 
   return [{ state: MenuStateMap[state.status], endTransition }, toggleMenu];

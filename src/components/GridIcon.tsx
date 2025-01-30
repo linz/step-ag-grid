@@ -1,8 +1,7 @@
-import clsx from "clsx";
-import { ReactElement } from "react";
-
-import { LuiIcon } from "@linzjs/lui";
-import { IconName, IconSize } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
+import { LuiIcon } from '@linzjs/lui';
+import { IconName, IconSize } from '@linzjs/lui/dist/components/LuiIcon/LuiIcon';
+import clsx from 'clsx';
+import { ReactElement } from 'react';
 
 export const GridIcon = (props: {
   icon: IconName;
@@ -15,11 +14,11 @@ export const GridIcon = (props: {
     name={props.icon}
     title={props.title}
     alt={props.title}
-    size={props.size ?? "md"}
+    size={props.size ?? 'md'}
     className={clsx(
       `AgGridGenericCellRenderer-${props.icon}Icon`,
       props.className,
-      props.disabled && "GridIcon-disabled",
+      props.disabled && 'GridIcon-disabled',
     )}
   />
 );

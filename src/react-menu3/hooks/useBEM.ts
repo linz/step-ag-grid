@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { ClassNameProp } from "../types";
+import { ClassNameProp } from '../types';
 
 type useBemModifiers = Record<string, boolean | string | undefined>;
 
@@ -24,8 +24,8 @@ export const useBEM = ({ block, element, modifiers, className }: useBemProps) =>
         if (value) classString += ` ${blockElement}--${value === true ? name : `${name}-${value}`}`;
       });
 
-    let expandedClassName = typeof className === "function" ? className(modifiers) : className;
-    if (typeof expandedClassName === "string") {
+    let expandedClassName = typeof className === 'function' ? className(modifiers) : className;
+    if (typeof expandedClassName === 'string') {
       expandedClassName = expandedClassName.trim();
       if (expandedClassName) classString += ` ${expandedClassName}`;
     }

@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useCallback, useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -27,14 +26,14 @@ import {
   MenuSeparator,
   MenuSeparatorString,
   wait,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
-    quickFilterValue: "",
+    quickFilterValue: '',
     selectable: true,
   },
   decorators: [
@@ -70,25 +69,25 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
     // eslint-disable-next-line no-console
-    console.log("optionsFn selected rows", selectedRows, filter);
+    console.log('optionsFn selected rows', selectedRows, filter);
     filter = filter?.toLowerCase();
     await wait(1000);
     return [
       null,
-      "Architect",
-      "Developer",
-      "Product Owner",
-      "Scrum Master",
-      "Tester",
+      'Architect',
+      'Developer',
+      'Product Owner',
+      'Scrum Master',
+      'Tester',
       MenuSeparatorString,
-      "Custom",
+      'Custom',
     ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
   }, []);
 
   const optionsObjects = useMemo(
     () => [
-      { code: "O1", desc: "Object One" },
-      { code: "O2", desc: "Object Two" },
+      { code: 'O1', desc: 'Object One' },
+      { code: 'O2', desc: 'Object Two' },
     ],
     [],
   );
@@ -96,40 +95,40 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
-      GridPopoverEditDropDown<ITestRow, ITestRow["position2"]>(
+      GridPopoverEditDropDown<ITestRow, ITestRow['position2']>(
         {
-          field: "position2",
-          headerName: "Multi-edit",
+          field: 'position2',
+          headerName: 'Multi-edit',
         },
         {
           multiEdit: true,
           editorParams: {
             options: [
-              MenuHeaderItem("Header"),
+              MenuHeaderItem('Header'),
               {
-                value: "1",
-                label: "One",
-                disabled: "Disabled for test",
+                value: '1',
+                label: 'One',
+                disabled: 'Disabled for test',
               },
-              { value: "2", label: "Two" },
+              { value: '2', label: 'Two' },
               MenuSeparator,
-              { value: "3", label: "Three" },
+              { value: '3', label: 'Three' },
             ],
           },
         },
       ),
       GridPopoverEditDropDown(
         {
-          field: "position3",
-          headerName: "Custom callback",
+          field: 'position3',
+          headerName: 'Custom callback',
         },
         {
           multiEdit: true,
           editorParams: {
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester"],
+            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
             onSelectedItem: async (selected) => {
               await wait(2000);
               selected.selectedRows.forEach((row) => {
@@ -141,45 +140,45 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       ),
       GridPopoverEditDropDown(
         {
-          field: "position",
-          headerName: "Options Fn",
+          field: 'position',
+          headerName: 'Options Fn',
         },
         {
           multiEdit: false,
           editorParams: {
-            filtered: "reload",
-            filterPlaceholder: "Search me...",
+            filtered: 'reload',
+            filterPlaceholder: 'Search me...',
             options: optionsFn,
           },
         },
       ),
       GridPopoverEditDropDown(
         {
-          colId: "position3filtered",
-          field: "position3",
-          headerName: "Filtered",
+          colId: 'position3filtered',
+          field: 'position3',
+          headerName: 'Filtered',
           editable: false,
         },
         {
           multiEdit: true,
           editorParams: {
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            options: [null, "Architect", "Developer", "Product Owner", "Scrum Master", "Tester"],
+            filtered: 'local',
+            filterPlaceholder: 'Filter this',
+            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
           },
         },
       ),
       GridPopoverEditDropDown(
         {
-          colId: "position4",
-          headerName: "Filtered (object)",
+          colId: 'position4',
+          headerName: 'Filtered (object)',
           valueGetter: ({ data }) => data?.position4?.desc,
         },
         {
           multiEdit: true,
           editorParams: {
-            filtered: "local",
-            filterPlaceholder: "Filter this",
+            filtered: 'local',
+            filterPlaceholder: 'Filter this',
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
@@ -188,26 +187,26 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       ),
       GridPopoverEditDropDown(
         {
-          field: "code",
-          headerName: "Filter Selectable",
+          field: 'code',
+          headerName: 'Filter Selectable',
         },
         {
           multiEdit: true,
           editorParams: {
-            filtered: "local",
-            filterPlaceholder: "Filter this",
-            filterHelpText: "Press enter to save custom value",
+            filtered: 'local',
+            filterPlaceholder: 'Filter this',
+            filterHelpText: 'Press enter to save custom value',
             options: optionsObjects.map((o) => {
               return { value: o, label: o.desc, disabled: false };
             }),
-            onSelectedItem: async (selected) => {
+            onSelectedItem: (selected) => {
               // eslint-disable-next-line no-console
-              console.log("onSelectedItem selected", selected);
+              console.log('onSelectedItem selected', selected);
               selected.selectedRows.forEach((row) => (row.code = selected.value.code));
             },
-            onSelectFilter: async (selected) => {
+            onSelectFilter: (selected) => {
               // eslint-disable-next-line no-console
-              console.log("onSelectFilter selected", selected);
+              console.log('onSelectFilter selected', selected);
               selected.selectedRows.forEach((row) => (row.code = selected.value));
             },
           },
@@ -215,44 +214,44 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       ),
       GridPopoverEditDropDown(
         {
-          field: "sub",
-          headerName: "Subcomponent",
+          field: 'sub',
+          headerName: 'Subcomponent',
           valueGetter: ({ data }) => data?.sub,
         },
         {
           multiEdit: true,
           editorParams: {
-            filtered: "local",
-            filterPlaceholder: "Filter this",
+            filtered: 'local',
+            filterPlaceholder: 'Filter this',
             options: () => {
               return [
                 {
-                  value: "one",
-                  label: "One",
+                  value: 'one',
+                  label: 'One',
                 },
                 {
-                  value: "two",
-                  label: "Two",
+                  value: 'two',
+                  label: 'Two',
                 },
                 {
-                  value: "oth",
-                  label: "Other text input",
+                  value: 'oth',
+                  label: 'Other text input',
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other..."} defaultValue={"a"} required={true} />
+                    <GridFormSubComponentTextInput placeholder={'Other...'} defaultValue={'a'} required={true} />
                   ),
                 },
                 {
-                  value: "oth",
-                  label: "Other text area",
+                  value: 'oth',
+                  label: 'Other text area',
                   subComponent: () => (
-                    <GridFormSubComponentTextArea placeholder={"Other..."} defaultValue={"b"} required={true} />
+                    <GridFormSubComponentTextArea placeholder={'Other...'} defaultValue={'b'} required={true} />
                   ),
                 },
               ];
             },
             onSelectedItem: async (selected) => {
               // eslint-disable-next-line no-console
-              console.log("onSelectedItem", selected);
+              console.log('onSelectedItem', selected);
               await wait(500);
               selected.selectedRows.forEach((row) => (row.sub = selected.subComponentValue ?? selected.value));
             },
@@ -263,7 +262,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {},
         {
           editorParams: {
-            options: async () => [{ label: "Hello", action: async () => {} }],
+            options: () => [{ label: 'Hello', action: async () => {} }],
           },
         },
       ),
@@ -274,30 +273,30 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [rowData] = useState([
     {
       id: 1000,
-      position: "Tester",
-      position2: "1",
-      position3: "Tester",
-      position4: { code: "O1", desc: "Object One" },
-      code: "O1",
-      sub: "two",
+      position: 'Tester',
+      position2: '1',
+      position3: 'Tester',
+      position4: { code: 'O1', desc: 'Object One' },
+      code: 'O1',
+      sub: 'two',
     },
     {
       id: 1001,
-      position: "Developer",
-      position2: "2",
-      position3: "Developer",
-      position4: { code: "O2", desc: "Object Two" },
-      code: "O2",
-      sub: "one",
+      position: 'Developer',
+      position2: '2',
+      position3: 'Developer',
+      position4: { code: 'O2', desc: 'Object Two' },
+      code: 'O2',
+      sub: 'one',
     },
     {
       id: 1002,
-      position: "Scrum Master",
-      position2: "2",
-      position3: "Architect",
-      position4: { code: "O2", desc: "Object Two" },
-      code: "O2",
-      sub: "one",
+      position: 'Scrum Master',
+      position2: '2',
+      position3: 'Architect',
+      position4: { code: 'O2', desc: 'Object Two' },
+      code: 'O2',
+      sub: 'one',
     },
   ] as ITestRow[]);
 
@@ -306,7 +305,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       <GridFilters>
         <GridFilterQuick />
         <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+        <GridFilterDownloadCsvButton fileName={'customFilename'} />
       </GridFilters>
       <Grid
         {...props}
@@ -314,10 +313,10 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        domLayout={"autoHeight"}
+        domLayout={'autoHeight'}
         onCellEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log("Cell editing complete");
+          console.log('Cell editing complete');
         }}
       />
     </GridWrapper>

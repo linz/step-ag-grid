@@ -1,10 +1,10 @@
-import { ReactElement, useCallback, useContext, useEffect } from "react";
+import { ReactElement, useCallback, useContext, useEffect } from 'react';
 
-import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
+import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
+import { TextInputFormatted } from '../../lui/TextInputFormatted';
+import { TextInputValidator, TextInputValidatorProps } from '../../utils/textValidator';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
 
 export interface GridFormSubComponentTextInputProps<TData extends GridBaseRow>
   extends TextInputValidatorProps<TData>,
@@ -20,7 +20,7 @@ export const GridFormSubComponentTextInput = <TData extends GridBaseRow>(
 ): ReactElement => {
   const { value, setValue, setValid, data, context } = useContext(GridSubComponentContext);
 
-  const helpText = props.helpText ?? "Press enter or tab to save";
+  const helpText = props.helpText ?? 'Press enter or tab to save';
 
   // If is not initialised yet as it's just been created then set the default value
   useEffect(() => {
@@ -40,7 +40,7 @@ export const GridFormSubComponentTextInput = <TData extends GridBaseRow>(
       onChange={(e) => setValue(e.target.value)}
       helpText={helpText}
       placeholder={props.placeholder}
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
       allowTabToSave={true}
     />
   );

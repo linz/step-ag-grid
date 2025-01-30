@@ -1,7 +1,7 @@
-import "./FormError.scss";
+import './FormError.scss';
 
-import { ReactElement } from "react";
-import { LuiIcon } from "@linzjs/lui";
+import { LuiIcon } from '@linzjs/lui';
+import { ReactElement } from 'react';
 
 export interface FormErrorProps {
   helpText?: string;
@@ -18,7 +18,7 @@ export const FormError = (props: FormErrorProps) => {
         </div>
       )}
 
-      {props.helpText && !props.error && <span className={"FormError-helpText"}>{props.helpText}</span>}
+      {props.helpText && !props.error && <span className={'FormError-helpText'}>{props.helpText}</span>}
     </>
   );
 };

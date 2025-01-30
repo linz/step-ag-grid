@@ -1,7 +1,7 @@
-import { LuiIcon } from "@linzjs/lui";
-import { useContext, useEffect, useState } from "react";
+import { LuiIcon } from '@linzjs/lui';
+import { useContext, useEffect, useState } from 'react';
 
-import { GridContext } from "../../contexts/GridContext";
+import { GridContext } from '../../contexts/GridContext';
 
 export interface GridFilterQuickProps {
   quickFilterPlaceholder?: string;
@@ -10,7 +10,7 @@ export interface GridFilterQuickProps {
 
 export const GridFilterQuick = ({ quickFilterPlaceholder, defaultValue }: GridFilterQuickProps) => {
   const { setQuickFilter } = useContext(GridContext);
-  const [quickFilterValue, setQuickFilterValue] = useState(defaultValue ?? "");
+  const [quickFilterValue, setQuickFilterValue] = useState(defaultValue ?? '');
 
   useEffect(() => {
     setQuickFilter(quickFilterValue);
@@ -19,13 +19,13 @@ export const GridFilterQuick = ({ quickFilterPlaceholder, defaultValue }: GridFi
   return (
     <div className="GridFilterQuick-container">
       <div className="GridFilterQuick-icon">
-        <LuiIcon name={"ic_search"} alt={"Search"} size={"md"} />
+        <LuiIcon name={'ic_search'} alt={'Search'} size={'md'} />
       </div>
       <input
         aria-label="Search"
         className="GridFilterQuick-input"
         type="text"
-        placeholder={quickFilterPlaceholder ?? "Search"}
+        placeholder={quickFilterPlaceholder ?? 'Search'}
         value={quickFilterValue}
         onChange={(event) => {
           setQuickFilterValue(event.target.value);

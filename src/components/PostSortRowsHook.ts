@@ -1,10 +1,10 @@
-import { IRowNode } from "ag-grid-community";
-import { ColumnState } from "ag-grid-community";
-import { PostSortRowsParams } from "ag-grid-community";
-import { isEmpty } from "lodash-es";
-import { useCallback, useContext, useRef } from "react";
+import { IRowNode } from 'ag-grid-community';
+import { ColumnState } from 'ag-grid-community';
+import { PostSortRowsParams } from 'ag-grid-community';
+import { isEmpty } from 'lodash-es';
+import { useCallback, useContext, useRef } from 'react';
 
-import { GridContext } from "../contexts/GridContext";
+import { GridContext } from '../contexts/GridContext';
 
 interface PostSortRowsHookProps {
   setStaleGrid: (stale: boolean) => void;
@@ -22,7 +22,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
   const initialised = useRef(false);
 
   // Used to detect sort order has changed since last run
-  const lastSortOrderHash = useRef<string>("");
+  const lastSortOrderHash = useRef<string>('');
 
   // Used to detect if sort order was the same, has the direction changed
   const previousRowSortIndexRef = useRef<Record<string, { index: number; hash: string } | undefined>>({});
@@ -35,7 +35,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
   // As a sort on a stale row should just resort, not change sort direction
   const previousColSort = useRef<ColumnState[]>([]);
 
-  const previousQuickFilter = useRef("");
+  const previousQuickFilter = useRef('');
 
   return useCallback(
     ({ api, nodes }: PostSortRowsParams) => {
@@ -45,7 +45,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
       const previousRowSortIndex = previousRowSortIndexRef.current;
 
       const hashNode = (node: IRowNode | undefined) => {
-        return node ? JSON.stringify(node.data) : "";
+        return node ? JSON.stringify(node.data) : '';
       };
 
       const copyCurrentSortSettings = (): ColumnState[] =>
@@ -83,7 +83,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
 
       const quickFilter = api.getQuickFilter();
       if (previousQuickFilter.current != quickFilter) {
-        previousQuickFilter.current = quickFilter ?? "";
+        previousQuickFilter.current = quickFilter ?? '';
         sortOrderChanged = true;
       }
 
@@ -110,7 +110,7 @@ export const usePostSortRowsHook = ({ setStaleGrid }: PostSortRowsHookProps) => 
           setStaleGrid(false);
 
           // trigger a recapture of sort order
-          lastSortOrderHash.current = "";
+          lastSortOrderHash.current = '';
           restorePreviousSortColumnState();
         } else {
           // Sort was on a different column so clear sort and sort like normal

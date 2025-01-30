@@ -1,32 +1,32 @@
-import { debounce } from "lodash-es";
-import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { flushSync } from "react-dom";
+import { debounce } from 'lodash-es';
+import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
-import { findParentWithClass } from "../../utils/util";
-import { HoverItemContext } from "../contexts/HoverItemContext";
-import { MenuListContext } from "../contexts/MenuListContext";
-import { MenuListItemContext } from "../contexts/MenuListItemContext";
-import { SettingsContext } from "../contexts/SettingsContext";
-import { useBEM, useCombinedRef, useItems, useLayoutEffect } from "../hooks";
-import { getPositionHelpers, positionContextMenu, positionMenu } from "../positionUtils";
-import { ControlledMenuProps, MenuDirection } from "../types";
+import { findParentWithClass } from '../../utils/util';
+import { HoverItemContext } from '../contexts/HoverItemContext';
+import { MenuListContext } from '../contexts/MenuListContext';
+import { MenuListItemContext } from '../contexts/MenuListItemContext';
+import { SettingsContext } from '../contexts/SettingsContext';
+import { useBEM, useCombinedRef, useItems, useLayoutEffect } from '../hooks';
+import { getPositionHelpers, positionContextMenu, positionMenu } from '../positionUtils';
+import { ControlledMenuProps, MenuDirection } from '../types';
 import {
-  CloseReason,
-  FocusPositions,
-  HoverActionTypes,
-  Keys,
   batchedUpdates,
+  CloseReason,
   commonProps,
   floatEqual,
   focusFirstInput,
+  FocusPositions,
   getScrollAncestor,
   getTransition,
+  HoverActionTypes,
   isMenuOpen,
+  Keys,
   menuArrowClass,
   menuClass,
   mergeProps,
   safeCall,
-} from "../utils";
+} from '../utils';
 
 export const MenuList = ({
   ariaLabel,
@@ -40,10 +40,10 @@ export const MenuList = ({
   externalRef,
   parentScrollingRef,
   arrow,
-  align = "start",
-  direction = "bottom",
-  position = "auto",
-  overflow = "visible",
+  align = 'start',
+  direction = 'bottom',
+  position = 'auto',
+  overflow = 'visible',
   setDownOverflow,
   repositionFlag,
   captureFocus = true,
@@ -85,8 +85,8 @@ export const MenuList = ({
   const { hoverItem, dispatch, updateItems } = useItems(menuRef, focusRef);
 
   const isOpen = isMenuOpen(state);
-  const openTransition = getTransition(transition, "open");
-  const closeTransition = getTransition(transition, "close");
+  const openTransition = getTransition(transition, 'open');
+  const closeTransition = getTransition(transition, 'close');
   const scrollNodes = scrollNodesRef.current;
 
   /**
@@ -97,8 +97,8 @@ export const MenuList = ({
     if (!menuItemEl) return false;
 
     let [best, worst]: { i: number; d: number }[] = [];
-    findParentWithClass("szh-menu", menuItemEl)
-      ?.querySelectorAll<HTMLLIElement>(".szh-menu__item")
+    findParentWithClass('szh-menu', menuItemEl)
+      ?.querySelectorAll<HTMLLIElement>('.szh-menu__item')
       ?.forEach((item, i) => {
         // Must be at same height as currently focused menu-item
         if (item.offsetTop === menuItemEl.offsetTop) {
@@ -111,16 +111,16 @@ export const MenuList = ({
     const r = best ?? worst;
     if (!r) return false;
 
-    dispatch(HoverActionTypes.SET_INDEX, undefined, r["i"]);
+    dispatch(HoverActionTypes.SET_INDEX, undefined, r['i']);
     return true;
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    const elementTarget = e.target instanceof HTMLElement ? (e.target as HTMLElement) : null;
+    const elementTarget = e.target instanceof HTMLElement ? e.target : null;
     const isTextInputTarget =
       elementTarget &&
-      (elementTarget.nodeName === "TEXTAREA" ||
-        (elementTarget.nodeName === "INPUT" && elementTarget.getAttribute("type") === "text"));
+      (elementTarget.nodeName === 'TEXTAREA' ||
+        (elementTarget.nodeName === 'INPUT' && elementTarget.getAttribute('type') === 'text'));
     switch (e.key) {
       case Keys.HOME:
         // Don't eat home/end events on inputs
@@ -171,7 +171,7 @@ export const MenuList = ({
   };
 
   const onAnimationEnd = () => {
-    if (state === "closing") {
+    if (state === 'closing') {
       setOverflowData(undefined); // reset overflowData after closing
     }
 
@@ -181,7 +181,7 @@ export const MenuList = ({
   const handlePosition = useCallback(
     (noOverflowCheck?: boolean) => {
       if (!containerRef?.current) {
-        if (process.env.NODE_ENV !== "production") {
+        if (process.env.NODE_ENV !== 'production') {
           console.error(
             '[React-Menu] Menu cannot be positioned properly as container ref is null. If you need to initialise `state` prop to "open" for ControlledMenu, please see this solution: https://codesandbox.io/s/initial-open-sp10wn',
           );
@@ -199,7 +199,7 @@ export const MenuList = ({
       const positionHelpers = getPositionHelpers(containerRef, menuRef, scrollNodes.menu, boundingBoxPadding);
       const { menuRect } = positionHelpers;
       let results: { computedDirection: MenuDirection; arrowX?: number; arrowY?: number; x: number; y: number } = {
-        computedDirection: "bottom",
+        computedDirection: 'bottom',
         x: 0,
         y: 0,
       };
@@ -222,7 +222,7 @@ export const MenuList = ({
       const { x, arrowX, arrowY, computedDirection } = results;
       let menuHeight = menuRect.height;
 
-      if (!noOverflowCheck && overflow !== "visible") {
+      if (!noOverflowCheck && overflow !== 'visible') {
         const { getTopOverflow, getBottomOverflow } = positionHelpers;
 
         let height: number | undefined, overflowAmt: number | undefined;
@@ -307,20 +307,20 @@ export const MenuList = ({
     }
 
     let scroll = viewScroll;
-    if (scrollNodes.anchors.length && scroll === "initial") scroll = "auto";
-    if (scroll === "initial") return;
+    if (scrollNodes.anchors.length && scroll === 'initial') scroll = 'auto';
+    if (scroll === 'initial') return;
 
     const handleScroll = () => {
-      if (scroll === "auto") {
+      if (scroll === 'auto') {
         batchedUpdates(() => handlePosition(true));
       } else {
         safeCall(onClose, { reason: CloseReason.SCROLL });
       }
     };
 
-    const scrollObservers = scrollNodes.anchors.concat(viewScroll !== "initial" ? menuScroll : []);
-    scrollObservers.forEach((o: any) => o.addEventListener("scroll", handleScroll));
-    return () => scrollObservers.forEach((o) => o.removeEventListener("scroll", handleScroll));
+    const scrollObservers = scrollNodes.anchors.concat(viewScroll !== 'initial' ? menuScroll : []);
+    scrollObservers.forEach((o: any) => o.addEventListener('scroll', handleScroll));
+    return () => scrollObservers.forEach((o) => o.removeEventListener('scroll', handleScroll));
   }, [rootAnchorRef, scrollNodes, isOpen, onClose, viewScroll, handlePosition]);
 
   const hasOverflow = !!overflowData && overflowData.overflowAmt != null && overflowData.overflowAmt > 0;
@@ -329,12 +329,12 @@ export const MenuList = ({
 
     const handleScroll = () => batchedUpdates(handlePosition);
     const parentScroll = parentScrollingRef.current;
-    parentScroll.addEventListener("scroll", handleScroll);
-    return () => parentScroll.removeEventListener("scroll", handleScroll);
+    parentScroll.addEventListener('scroll', handleScroll);
+    return () => parentScroll.removeEventListener('scroll', handleScroll);
   }, [isOpen, hasOverflow, parentScrollingRef, handlePosition]);
 
   useEffect(() => {
-    if (typeof ResizeObserver !== "function" || reposition === "initial") return;
+    if (typeof ResizeObserver !== 'function' || reposition === 'initial') return;
 
     const resizeObserver = new ResizeObserver(([entry]) => {
       const { borderBoxSize, target } = entry;
@@ -359,13 +359,13 @@ export const MenuList = ({
     });
 
     const observeTarget = menuRef.current;
-    resizeObserver.observe(observeTarget, { box: "border-box" });
+    resizeObserver.observe(observeTarget, { box: 'border-box' });
     return () => resizeObserver.unobserve(observeTarget);
   }, [reposition]);
 
   // Matt added window resize observer
   useEffect(() => {
-    if (typeof ResizeObserver !== "function" || reposition === "initial") return;
+    if (typeof ResizeObserver !== 'function' || reposition === 'initial') return;
 
     const callback = debounce(() => {
       const { width, height } = menuRef.current.ownerDocument.body.getBoundingClientRect();
@@ -386,7 +386,7 @@ export const MenuList = ({
     const resizeObserver = new ResizeObserver(callback);
 
     const observeTarget = menuRef.current.ownerDocument.body;
-    resizeObserver.observe(observeTarget, { box: "border-box" });
+    resizeObserver.observe(observeTarget, { box: 'border-box' });
     return () => {
       callback.cancel();
       resizeObserver.unobserve(observeTarget);
@@ -406,7 +406,7 @@ export const MenuList = ({
         dispatch(HoverActionTypes.FIRST, undefined, 0);
       } else if (position === FocusPositions.LAST) {
         dispatch(HoverActionTypes.LAST, undefined, 0);
-      } else if (typeof position === "number" && position >= -1) {
+      } else if (typeof position === 'number' && position >= -1) {
         dispatch(HoverActionTypes.SET_INDEX, undefined, position);
       }
     };
@@ -488,10 +488,10 @@ export const MenuList = ({
 
   const dontShrinkOps = useMemo(
     () =>
-      expandedDirection === "top" && dontShrinkIfDirectionIsTop
+      expandedDirection === 'top' && dontShrinkIfDirectionIsTop
         ? {
-            overflowY: isSubmenuOpen ? "" : "auto",
-            minHeight: (isSubmenuOpen ? 0 : minHeight.current) + "px",
+            overflowY: isSubmenuOpen ? '' : 'auto',
+            minHeight: (isSubmenuOpen ? 0 : minHeight.current) + 'px',
           }
         : undefined,
     [dontShrinkIfDirectionIsTop, expandedDirection, isSubmenuOpen],
@@ -510,8 +510,8 @@ export const MenuList = ({
         ...overflowStyle,
         ...dontShrinkOps,
         margin: 0,
-        display: state === "closed" ? "none" : undefined,
-        position: "absolute",
+        display: state === 'closed' ? 'none' : undefined,
+        position: 'absolute',
         left: menuPosition.x,
         top: menuPosition.y,
       }}
@@ -519,16 +519,16 @@ export const MenuList = ({
       <div
         ref={focusRef}
         tabIndex={-1}
-        style={{ position: "absolute", left: 0, top: 0 }}
+        style={{ position: 'absolute', left: 0, top: 0 }}
         onKeyDown={(event) => {
-          if (event.key == "Tab") {
+          if (event.key == 'Tab') {
             event.preventDefault();
             event.stopPropagation();
             safeCall(onClose, {
               key: event.key,
               shiftKey: event.shiftKey,
               reason:
-                event.key === "Tab"
+                event.key === 'Tab'
                   ? event.shiftKey
                     ? CloseReason.TAB_BACKWARD
                     : CloseReason.TAB_FORWARD
@@ -542,7 +542,7 @@ export const MenuList = ({
           className={_arrowClass}
           style={{
             ...arrowStyle,
-            position: "absolute",
+            position: 'absolute',
             left: arrowPosition.x,
             top: arrowPosition.y,
           }}

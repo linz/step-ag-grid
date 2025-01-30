@@ -1,17 +1,19 @@
-import { ICellEditorParams } from "ag-grid-community";
-import { sortBy } from "lodash-es";
-import { PropsWithChildren, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { ICellEditorParams } from 'ag-grid-community';
+import { sortBy } from 'lodash-es';
+import { PropsWithChildren, RefObject, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import { GridBaseRow } from "../components/Grid";
-import { GridContext } from "./GridContext";
-import { GridPopoverContext } from "./GridPopoverContext";
+import { GridBaseRow } from '../components/Grid';
+import { GridContext } from './GridContext';
+import { GridPopoverContext } from './GridPopoverContext';
 
 interface GridPopoverContextProps {
-  props: ICellEditorParams;
+  props: ICellEditorParams<any, any, any>;
 }
 
-export const GridPopoverContextProvider = ({ props, children }: PropsWithChildren<GridPopoverContextProps>) => {
+export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopoverContextProps>) => {
   const { getFilteredSelectedRows, updatingCells } = useContext(GridContext);
+  const children = props2.children;
+  const props = props2.props;
   const anchorRef = useRef<Element>(props.eGridCell);
 
   const hasSaved = useRef(false);
@@ -27,8 +29,8 @@ export const GridPopoverContextProvider = ({ props, children }: PropsWithChildre
     [getFilteredSelectedRows, multiEdit, props.data],
   );
 
-  const field = props.colDef?.field ?? "";
-  const colId = props.colDef?.colId ?? field ?? "";
+  const field = props.colDef?.field ?? '';
+  const colId = props.colDef?.colId ?? field ?? '';
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {

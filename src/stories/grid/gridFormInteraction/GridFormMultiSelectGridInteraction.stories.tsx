@@ -1,24 +1,24 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import { expect, fn, userEvent, waitFor, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { StoryFn } from '@storybook/react';
+import { expect, fn, userEvent, waitFor, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridContext, GridFormMultiSelectGrid, GridFormMultiSelectGridProps, MultiSelectGridOption } from "../../..";
+import { GridContext, GridFormMultiSelectGrid, GridFormMultiSelectGridProps, MultiSelectGridOption } from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormMultiSelectGrid,
   args: {},
 };
 
 const updateValue = fn((saveFn: (selectedRows: any[]) => Promise<boolean>, _tabDirection: 1 | 0 | -1) => saveFn([]));
 
+// eslint-disable-next-line @typescript-eslint/require-await
 const onSave = fn(async () => true);
 const onSelectFilter = fn();
 
@@ -26,11 +26,11 @@ const five = <div>Five</div>;
 let options: MultiSelectGridOption[] = [];
 const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiSelectGridProps<any>) => {
   options = [
-    { label: "Zero", value: 0 },
-    { label: "One", value: 1 },
-    { label: "Two", value: 2 },
-    { label: "Three", value: 3 },
-    { label: "Four", value: 4 },
+    { label: 'Zero', value: 0 },
+    { label: 'One', value: 1 },
+    { label: 'Two', value: 2 },
+    { label: 'Three', value: 3 },
+    { label: 'Four', value: 4 },
     { label: five, value: 5 },
   ];
   const config: GridFormMultiSelectGridProps<any> = {
@@ -41,7 +41,7 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -55,14 +55,14 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
           value={{
             anchorRef: anchorRef,
             updateValue,
-            colId: "",
-            value: "",
+            colId: '',
+            value: '',
             selectedRows: [],
             formatValue: (value) => value,
             setSaving: () => {},
             saving: false,
-            data: { value: "" },
-            field: "value",
+            data: { value: '' },
+            field: 'value',
           }}
         >
           <GridFormMultiSelectGrid {...props} {...config} />
@@ -80,14 +80,14 @@ GridFormMultiSelectGridInteractions_.play = async ({ canvasElement }) => {
 
   const canvas = within(canvasElement);
 
-  const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
+  const getOption = (name: RegExp | string) => canvas.findByRole('menuitem', { name });
 
   // Check enabled menu handles click
   const zeroMenuOption = await getOption(/Zero/);
   expect(zeroMenuOption).toBeInTheDocument();
 
   await userEvent.click(zeroMenuOption);
-  await userEvent.keyboard("{Tab}");
+  await userEvent.keyboard('{Tab}');
   expect(updateValue).toHaveBeenCalled();
   await waitFor(() => expect(onSave).toHaveBeenCalledWith({ selectedRows: [], addValues: [0], removeValues: [] }));
 
@@ -97,14 +97,14 @@ GridFormMultiSelectGridInteractions_.play = async ({ canvasElement }) => {
   };
 
   // Test left/right arrow
-  await userEvent.keyboard("{ArrowRight}");
-  check("Three");
-  await userEvent.keyboard("{ArrowRight}");
-  check("Zero");
-  await userEvent.keyboard("{ArrowLeft}");
-  check("Three");
-  await userEvent.keyboard("{ArrowLeft}");
-  check("Zero");
+  await userEvent.keyboard('{ArrowRight}');
+  check('Three');
+  await userEvent.keyboard('{ArrowRight}');
+  check('Zero');
+  await userEvent.keyboard('{ArrowLeft}');
+  check('Three');
+  await userEvent.keyboard('{ArrowLeft}');
+  check('Zero');
 
   // Test tab to save
   updateValue.mockClear();

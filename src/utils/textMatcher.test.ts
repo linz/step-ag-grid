@@ -1,4 +1,4 @@
-import { textMatch } from "./textMatcher";
+import { textMatch } from './textMatcher';
 
 /**
  * "L" => L*
@@ -11,18 +11,18 @@ import { textMatch } from "./textMatcher";
  * "=!A" => all values must not match exactly A
  * Returns true if there's a text match.
  */
-describe("textMatch", () => {
-  test("textMatch", () => {
+describe('textMatch', () => {
+  test('textMatch', () => {
     const validate = [
       {
-        value: "",
-        matched: [""],
-        unmatched: ["a", "a*", "*a*"],
+        value: '',
+        matched: [''],
+        unmatched: ['a', 'a*', '*a*'],
       },
       {
-        value: "two words",
-        matched: ["", "*wo", "*or*", "tw", "two", "tw wo", "tw, rr", "=!tw"],
-        unmatched: ["ds", "o", "=tw", "tw rr", "!two", "!tw*"],
+        value: 'two words',
+        matched: ['', '*wo', '*or*', 'tw', 'two', 'tw wo', 'tw, rr', '=!tw'],
+        unmatched: ['ds', 'o', '=tw', 'tw rr', '!two', '!tw*'],
       },
     ];
 

@@ -1,8 +1,8 @@
-import { ColDef, GridApi, IRowNode } from "ag-grid-community";
-import { CsvExportParams } from "ag-grid-community";
-import { createContext, useContext } from "react";
+import { ColDef, GridApi, IRowNode } from 'ag-grid-community';
+import { CsvExportParams } from 'ag-grid-community';
+import { createContext, useContext } from 'react';
 
-import { ColDefT, GridBaseRow } from "../components";
+import { ColDefT, GridBaseRow } from '../components';
 
 export type GridFilterExternal<TData extends GridBaseRow> = (data: TData, rowNode: IRowNode) => boolean;
 
@@ -17,7 +17,7 @@ export type AutoSizeColumnsResult = { width: number } | null;
 
 export interface GridContextType<TData extends GridBaseRow> {
   gridReady: boolean;
-  gridRenderState: () => null | "empty" | "rows-visible";
+  gridRenderState: () => null | 'empty' | 'rows-visible';
   getColDef: (colId?: string) => ColDef | undefined;
   getColumns: (
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
@@ -72,138 +72,144 @@ export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
   gridRenderState: () => null,
   getColDef: () => {
-    console.error("no context provider for getColDef");
+    console.error('no context provider for getColDef');
     return undefined;
   },
   getColumns: () => {
-    console.error("no context provider for getColumns");
+    console.error('no context provider for getColumns');
     return [];
   },
   getColumnIds: () => {
-    console.error("no context provider for getColumnIds");
+    console.error('no context provider for getColumnIds');
     return [];
   },
   invisibleColumnIds: undefined,
   setInvisibleColumnIds: () => {
-    console.error("no context provider for setInvisibleColumnIds");
+    console.error('no context provider for setInvisibleColumnIds');
   },
   prePopupOps: () => {
-    console.error("no context provider for prePopupOps");
+    console.error('no context provider for prePopupOps');
   },
   postPopupOps: () => {
-    console.error("no context provider for prePopupOps");
+    console.error('no context provider for prePopupOps');
   },
   externallySelectedItemsAreInSync: false,
   setApis: () => {
-    console.error("no context provider for setApis");
+    console.error('no context provider for setApis');
   },
   setQuickFilter: () => {
-    console.error("no context provider for setQuickFilter");
+    console.error('no context provider for setQuickFilter');
   },
   selectRowsById: () => {
-    console.error("no context provider for selectRows");
+    console.error('no context provider for selectRows');
   },
-  getSelectedRows: <T extends unknown>(): T[] => {
-    console.error("no context provider for getSelectedRows");
+  getSelectedRows: <T,>(): T[] => {
+    console.error('no context provider for getSelectedRows');
     return [];
   },
-  getFilteredSelectedRows: <T extends unknown>(): T[] => {
-    console.error("no context provider for getFilteredSelectedRows");
+  getFilteredSelectedRows: <T,>(): T[] => {
+    console.error('no context provider for getFilteredSelectedRows');
     return [];
   },
   getSelectedRowIds: () => {
-    console.error("no context provider for getSelectedRowIds");
+    console.error('no context provider for getSelectedRowIds');
     return [];
   },
   getFilteredSelectedRowIds: () => {
-    console.error("no context provider for getFilteredSelectedRowIds");
+    console.error('no context provider for getFilteredSelectedRowIds');
     return [];
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   selectRowsDiff: async () => {
-    console.error("no context provider for selectRowsDiff");
+    console.error('no context provider for selectRowsDiff');
   },
   selectRowsByIdWithFlash: () => {
-    console.error("no context provider for selectRowsWithFlash");
+    console.error('no context provider for selectRowsWithFlash');
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   selectRowsWithFlashDiff: async () => {
-    console.error("no context provider for selectRowsWithFlashDiff");
+    console.error('no context provider for selectRowsWithFlashDiff');
   },
   flashRows: () => {
-    console.error("no context provider for flashRows");
+    console.error('no context provider for flashRows');
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   flashRowsDiff: async () => {
-    console.error("no context provider for flashRows");
+    console.error('no context provider for flashRows');
   },
+  // eslint-disable-next-line @typescript-eslint/require-await,@typescript-eslint/no-misused-promises
   focusByRowById: async () => {
-    console.error("no context provider for focusByRowById");
+    console.error('no context provider for focusByRowById');
   },
   ensureRowVisible: () => {
-    console.error("no context provider for ensureRowVisible");
+    console.error('no context provider for ensureRowVisible');
     return true;
   },
   ensureSelectedRowIsVisible: () => {
-    console.error("no context provider for ensureSelectedRowIsVisible");
+    console.error('no context provider for ensureSelectedRowIsVisible');
   },
   getFirstRowId: () => {
-    console.error("no context provider for getFirstRowId");
+    console.error('no context provider for getFirstRowId');
     return -1;
   },
   autoSizeColumns: () => {
-    console.error("no context provider for autoSizeColumns");
+    console.error('no context provider for autoSizeColumns');
     return null;
   },
   sizeColumnsToFit: () => {
-    console.error("no context provider for autoSizeAllColumns");
+    console.error('no context provider for autoSizeAllColumns');
     return null;
   },
   editingCells: () => {
-    console.error("no context provider for editingCells");
+    console.error('no context provider for editingCells');
     return false;
   },
   cancelEdit: () => {
-    console.error("no context provider for cancelEdit");
+    console.error('no context provider for cancelEdit');
   },
   startCellEditing: () => {
-    console.error("no context provider for startCellEditing");
+    console.error('no context provider for startCellEditing');
   },
   stopEditing: () => {
-    console.error("no context provider for stopEditing");
+    console.error('no context provider for stopEditing');
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   updatingCells: async () => {
-    console.error("no context provider for modifyUpdating");
+    console.error('no context provider for modifyUpdating');
     return false;
   },
   redrawRows: () => {
-    console.error("no context provider for redrawRows");
+    console.error('no context provider for redrawRows');
   },
   setExternallySelectedItemsAreInSync: () => {
-    console.error("no context provider for setExternallySelectedItemsAreInSync");
+    console.error('no context provider for setExternallySelectedItemsAreInSync');
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   waitForExternallySelectedItemsToBeInSync: async () => {
-    console.error("no context provider for waitForExternallySelectedItemsToBeInSync");
+    console.error('no context provider for waitForExternallySelectedItemsToBeInSync');
   },
   addExternalFilter: () => {
-    console.error("no context provider for addExternalFilter");
+    console.error('no context provider for addExternalFilter');
   },
   removeExternalFilter: () => {
-    console.error("no context provider for removeExternalFilter");
+    console.error('no context provider for removeExternalFilter');
   },
   isExternalFilterPresent: () => {
-    console.error("no context provider for isExternalFilterPresent");
+    console.error('no context provider for isExternalFilterPresent');
     return false;
   },
   doesExternalFilterPass: () => {
-    console.error("no context provider for doesExternalFilterPass");
+    console.error('no context provider for doesExternalFilterPass');
     return true;
   },
   downloadCsv: () => {
-    console.error("no context provider for downloadCsv");
+    console.error('no context provider for downloadCsv');
   },
   setOnCellEditingComplete: () => {
-    console.error("no context provider for setOnCellEditingComplete");
+    console.error('no context provider for setOnCellEditingComplete');
   },
   showNoRowsOverlay: () => {
-    console.error("no context provider for showLoadingOverlay");
+    console.error('no context provider for showLoadingOverlay');
   },
 });
 

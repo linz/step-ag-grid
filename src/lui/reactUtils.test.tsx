@@ -1,9 +1,9 @@
-import { screen } from "@testing-library/dom";
-import { render } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { ReactElement, useEffect, useState } from "react";
+import { screen } from '@testing-library/dom';
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ReactElement, useEffect, useState } from 'react';
 
-import { usePrevious } from "./reactUtils";
+import { usePrevious } from './reactUtils';
 
 interface WrapperProps {
   value: boolean;
@@ -33,10 +33,10 @@ const TestComponent = (): ReactElement => {
   );
 };
 
-describe("usePrevious", () => {
-  test("usePrevious", async () => {
+describe('usePrevious', () => {
+  test('usePrevious', async () => {
     render(<TestComponent />);
-    const button = await screen.findByText("Change value");
+    const button = await screen.findByText('Change value');
 
     expect(extPrevious).toBeUndefined();
 

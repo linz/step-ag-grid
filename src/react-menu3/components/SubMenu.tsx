@@ -7,14 +7,14 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
-} from "react";
-import { createPortal } from "react-dom";
+} from 'react';
+import { createPortal } from 'react-dom';
 
-import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
-import { MenuListContext } from "../contexts/MenuListContext";
-import { MenuListItemContext } from "../contexts/MenuListItemContext";
-import { SettingsContext } from "../contexts/SettingsContext";
-import { useBEM, useCombinedRef, useItemEffect, useMenuChange, useMenuStateAndFocus } from "../hooks";
+import { ItemSettingsContext } from '../contexts/ItemSettingsContext';
+import { MenuListContext } from '../contexts/MenuListContext';
+import { MenuListItemContext } from '../contexts/MenuListItemContext';
+import { SettingsContext } from '../contexts/SettingsContext';
+import { useBEM, useCombinedRef, useItemEffect, useMenuChange, useMenuStateAndFocus } from '../hooks';
 import {
   BaseProps,
   ClassNameProp,
@@ -27,23 +27,23 @@ import {
   MenuPosition,
   RenderProp,
   UncontrolledMenuProps,
-} from "../types";
+} from '../types';
 import {
-  FocusPositions,
-  HoverActionTypes,
-  Keys,
   batchedUpdates,
   commonProps,
+  FocusPositions,
+  HoverActionTypes,
   isMenuOpen,
+  Keys,
   menuClass,
   menuItemClass,
   mergeProps,
   safeCall,
   subMenuClass,
   withHovering,
-} from "../utils";
-import { withHoveringResultProps } from "../utils/withHovering";
-import { MenuList } from "./MenuList";
+} from '../utils';
+import { withHoveringResultProps } from '../utils/withHovering';
+import { MenuList } from './MenuList';
 
 //
 // SubMenu
@@ -66,7 +66,7 @@ export type SubMenuItemModifiers = Readonly<{
 /**
  * Common props for `Menu`, `SubMenu` and `ControlledMenu`
  */
-interface BaseMenuProps extends Omit<BaseProps, "style"> {
+interface BaseMenuProps extends Omit<BaseProps, 'style'> {
   /**
    * Can be a string or a function which receives a modifier object and returns a CSS `class` string.
    */
@@ -152,11 +152,11 @@ export interface SubMenuProps extends BaseMenuProps, Hoverable, UncontrolledMenu
    * - 'none' submenu doesn't open with mouse or keyboard events;
    * you can call the `openMenu` function on `instanceRef` to open submenu programmatically.
    */
-  openTrigger?: "none" | "clickOnly";
+  openTrigger?: 'none' | 'clickOnly';
 }
 
 export const SubMenuFr = ({
-  "aria-label": ariaLabel,
+  'aria-label': ariaLabel,
   className,
   disabled,
   direction,
@@ -174,7 +174,7 @@ export const SubMenuFr = ({
   const { submenuOpenDelay, submenuCloseDelay } = useContext(ItemSettingsContext);
   const { parentMenuRef, parentDir, overflow: parentOverflow } = useContext(MenuListContext);
   const { isParentOpen, isSubmenuOpen, setOpenSubmenuCount, dispatch, updateItems } = useContext(MenuListItemContext);
-  const isPortal = parentOverflow !== "visible";
+  const isPortal = parentOverflow !== 'visible';
 
   const [stateProps, toggleMenu, _openMenu] = useMenuStateAndFocus(settings);
 
@@ -251,7 +251,7 @@ export const SubMenuFr = ({
       case Keys.ENTER:
       case Keys.SPACE:
       case Keys.RIGHT:
-        openTrigger !== "none" && openMenu(FocusPositions.FIRST);
+        openTrigger !== 'none' && openMenu(FocusPositions.FIRST);
         break;
     }
   };
@@ -303,7 +303,7 @@ export const SubMenuFr = ({
       onPointerMove: handlePointerMove,
       onPointerLeave: handlePointerLeave,
       onKeyDown: handleItemKeyDown,
-      onClick: () => openTrigger !== "none" && openMenu(),
+      onClick: () => openTrigger !== 'none' && openMenu(),
     },
     restItemProps,
   );
@@ -313,10 +313,10 @@ export const SubMenuFr = ({
       <MenuList
         {...restProps}
         {...stateProps}
-        ariaLabel={ariaLabel || (typeof label === "string" ? label : "Submenu")}
+        ariaLabel={ariaLabel || (typeof label === 'string' ? label : 'Submenu')}
         anchorRef={menuItemRef}
         containerRef={isPortal ? rootMenuRef : containerRef}
-        direction={direction || (parentDir === "right" || parentDir === "left" ? parentDir : "right")}
+        direction={direction || (parentDir === 'right' || parentDir === 'left' ? parentDir : 'right')}
         parentScrollingRef={isPortal && parentMenuRef}
         isDisabled={isDisabled}
       />
@@ -328,7 +328,7 @@ export const SubMenuFr = ({
   return (
     <li
       className={useBEM({ block: menuClass, element: subMenuClass, className })}
-      style={{ position: "relative" }}
+      style={{ position: 'relative' }}
       role="presentation"
       ref={containerRef}
       onKeyDown={handleKeyDown}
@@ -355,4 +355,4 @@ export const SubMenuFr = ({
   );
 };
 
-export const SubMenu = withHovering("SubMenu", SubMenuFr);
+export const SubMenu = withHovering('SubMenu', SubMenuFr);

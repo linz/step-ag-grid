@@ -1,13 +1,12 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import { expect, fn, userEvent, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { StoryFn } from '@storybook/react';
+import { expect, fn, userEvent, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
 import {
   GridContext,
@@ -16,10 +15,10 @@ import {
   GridFormSubComponentTextInput,
   MultiSelectOption,
   wait,
-} from "../../..";
+} from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormMultiSelect,
   args: {},
 };
@@ -32,28 +31,28 @@ const onSelectFilter = fn();
 let options: MultiSelectOption[] = [];
 const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelectProps<any>) => {
   options = [
-    { label: "Zero", value: 0 },
-    { label: "One", value: 1 },
+    { label: 'Zero', value: 0 },
+    { label: 'One', value: 1 },
     {
-      label: "Sub component",
+      label: 'Sub component',
       value: 2,
       subComponent: () => (
-        <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+        <GridFormSubComponentTextInput placeholder={'Text input'} maxLength={5} required defaultValue={''} />
       ),
     },
-    { label: "Other", value: 3 },
+    { label: 'Other', value: 3 },
   ];
   const config: GridFormMultiSelectProps<any> = {
     filtered: true,
     onSelectFilter,
-    filterHelpText: "Press enter to add free-text",
+    filterHelpText: 'Press enter to add free-text',
     onSave,
     options,
   };
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -67,10 +66,10 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
           value={{
             anchorRef,
             updateValue,
-            data: { value: "" },
-            colId: "",
-            value: "",
-            field: "value",
+            data: { value: '' },
+            colId: '',
+            value: '',
+            field: 'value',
             selectedRows: [],
             saving: false,
             setSaving: () => {},
@@ -92,14 +91,14 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
 
   const canvas = within(canvasElement);
 
-  const getOption = (name: RegExp | string) => canvas.findByRole("menuitem", { name });
+  const getOption = (name: RegExp | string) => canvas.findByRole('menuitem', { name });
 
   // Check enabled menu handles click
   const zeroMenuOption = await getOption(/Zero/);
   expect(zeroMenuOption).toBeInTheDocument();
 
   await userEvent.click(zeroMenuOption);
-  await userEvent.keyboard("{Tab}");
+  await userEvent.keyboard('{Tab}');
   expect(updateValue).toHaveBeenCalled();
   expect(onSave).toHaveBeenCalledWith({ selectedOptions: [options[0]], selectedRows: [] });
 
@@ -107,16 +106,16 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   const subTextInput = await getOption(/Sub component/);
   expect(subTextInput).toBeInTheDocument();
 
-  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text input')).not.toBeInTheDocument();
 
   await userEvent.click(subTextInput);
-  const textInput = await canvas.findByPlaceholderText("Text input");
+  const textInput = await canvas.findByPlaceholderText('Text input');
   expect(textInput).toBeInTheDocument();
-  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+  expect(await canvas.findByText('Must not be empty')).toBeInTheDocument();
 
   // textInput should be autofocus
-  await userEvent.type(textInput, "Hello");
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  await userEvent.type(textInput, 'Hello');
+  expect(await canvas.findByText('Press enter or tab to save')).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -126,8 +125,8 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   expect(onSave).toHaveBeenCalledWith({
     selectedRows: [],
     selectedOptions: [
-      { label: "Zero", value: 0, checked: true },
-      { label: "Sub component", value: 2, checked: true, subValue: "Hello", subComponent: expect.anything() },
+      { label: 'Zero', value: 0, checked: true },
+      { label: 'Sub component', value: 2, checked: true, subValue: 'Hello', subComponent: expect.anything() },
     ],
   });
 
@@ -141,7 +140,7 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   // Test escape to not save
   updateValue.mockClear();
   onSave.mockClear();
-  await userEvent.type(textInput, "{Escape}");
+  await userEvent.type(textInput, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSave).not.toHaveBeenCalled();
 
@@ -149,30 +148,30 @@ GridFormMultiSelectInteractions_.play = async ({ canvasElement }) => {
   updateValue.mockClear();
   onSave.mockClear();
   await userEvent.clear(textInput);
-  await userEvent.type(textInput, "{Enter}");
+  await userEvent.type(textInput, '{Enter}');
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSave).not.toHaveBeenCalled();
 
   // Test filter
-  const filterText = await canvas.findByPlaceholderText("Filter...");
-  await userEvent.type(filterText, "o");
+  const filterText = await canvas.findByPlaceholderText('Filter...');
+  await userEvent.type(filterText, 'o');
   await wait(500);
-  expect(canvas.queryByText("One")).toBeInTheDocument();
-  expect(canvas.queryByText("Other")).toBeInTheDocument();
-  await userEvent.type(filterText, "n");
-  expect(canvas.queryByText("One")).toBeInTheDocument();
-  expect(canvas.queryByText("Zero")).not.toBeInTheDocument();
-  expect(canvas.queryByText("Sub component")).not.toBeInTheDocument();
-  expect(canvas.queryByText("Other")).not.toBeInTheDocument();
+  expect(canvas.queryByText('One')).toBeInTheDocument();
+  expect(canvas.queryByText('Other')).toBeInTheDocument();
+  await userEvent.type(filterText, 'n');
+  expect(canvas.queryByText('One')).toBeInTheDocument();
+  expect(canvas.queryByText('Zero')).not.toBeInTheDocument();
+  expect(canvas.queryByText('Sub component')).not.toBeInTheDocument();
+  expect(canvas.queryByText('Other')).not.toBeInTheDocument();
 
-  await userEvent.type(filterText, "x");
-  expect(canvas.queryByText("One")).not.toBeInTheDocument();
-  expect(canvas.queryByText("No Options")).toBeInTheDocument();
+  await userEvent.type(filterText, 'x');
+  expect(canvas.queryByText('One')).not.toBeInTheDocument();
+  expect(canvas.queryByText('No Options')).toBeInTheDocument();
 
   // Check enter works to add custom free-text
-  await userEvent.type(filterText, "{Enter}");
+  await userEvent.type(filterText, '{Enter}');
   expect(onSelectFilter).toHaveBeenCalledWith({
-    filter: "onx",
+    filter: 'onx',
     options: [
       {
         ...options[0],

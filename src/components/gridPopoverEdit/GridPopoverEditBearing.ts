@@ -1,15 +1,15 @@
-import { ValueFormatterParams } from "ag-grid-community";
+import { ValueFormatterParams } from 'ag-grid-community';
 
 import {
   bearingCorrectionRangeValidator,
   bearingCorrectionValueFormatter,
   bearingRangeValidator,
   bearingValueFormatter,
-} from "../../utils/bearing";
-import { GridBaseRow } from "../Grid";
-import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
-import { GridFormEditBearing, GridFormEditBearingProps } from "../gridForm/GridFormEditBearing";
-import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
+} from '../../utils/bearing';
+import { GridBaseRow } from '../Grid';
+import { ColDefT, GenericCellEditorProps, GridCell } from '../GridCell';
+import { GridFormEditBearing, GridFormEditBearingProps } from '../gridForm/GridFormEditBearing';
+import { GenericCellColDef } from '../gridRender/GridRenderGenericCell';
 
 const GridPopoverEditBearingLike = <TData extends GridBaseRow, TValue = any>(
   colDef: GenericCellColDef<TData, TValue>,
@@ -19,7 +19,7 @@ const GridPopoverEditBearingLike = <TData extends GridBaseRow, TValue = any>(
 ): ColDefT<TData, TValue> =>
   GridCell<TData, TValue, GridFormEditBearingProps<TData>>(
     {
-      valueFormatter: (params: ValueFormatterParams) => props.editorParams?.formatValue(params.value) ?? "",
+      valueFormatter: (params: ValueFormatterParams) => props.editorParams?.formatValue(params.value) ?? '',
       ...colDef,
     },
     {
@@ -29,7 +29,7 @@ const GridPopoverEditBearingLike = <TData extends GridBaseRow, TValue = any>(
   );
 
 export const GridPopoverEditBearingEditorParams = {
-  placeHolder: "Enter bearing",
+  placeHolder: 'Enter bearing',
   formatValue: bearingValueFormatter,
   range: bearingRangeValidator,
 };
@@ -47,7 +47,7 @@ export const GridPopoverEditBearing = <TData extends GridBaseRow, TValue = any>(
   });
 
 export const GridPopoverEditBearingCorrectionEditorParams = {
-  placeHolder: "Enter bearing correction",
+  placeHolder: 'Enter bearing correction',
   formatValue: bearingCorrectionValueFormatter,
   range: bearingCorrectionRangeValidator,
 };

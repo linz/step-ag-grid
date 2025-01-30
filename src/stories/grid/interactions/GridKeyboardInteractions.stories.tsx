@@ -1,14 +1,13 @@
-import "../../../styles/GridTheme.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../styles/GridTheme.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { expect } from "@storybook/test";
-import { fn } from "@storybook/test";
-import { userEvent, waitFor } from "@storybook/test";
-import { useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { expect } from '@storybook/test';
+import { fn } from '@storybook/test';
+import { userEvent, waitFor } from '@storybook/test';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -24,24 +23,24 @@ import {
   GridUpdatingContextProvider,
   MenuOption,
   wait,
-} from "../../../";
-import { waitForGridReady } from "../../../utils/storybookTestUtil";
+} from '../../../';
+import { waitForGridReady } from '../../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
     quickFilter: true,
-    quickFilterValue: "",
-    quickFilterPlaceholder: "Quick filter...",
+    quickFilterValue: '',
+    quickFilterPlaceholder: 'Quick filter...',
     selectable: false,
-    rowSelection: "single",
+    rowSelection: 'single',
   },
   // Storybook hangs otherwise
   parameters: {
     docs: {
       source: {
-        type: "code",
+        type: 'code',
       },
     },
   },
@@ -79,28 +78,28 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
-      GridCell<ITestRow, ITestRow["position"]>({
-        field: "position",
-        headerName: "Position",
+      GridCell<ITestRow, ITestRow['position']>({
+        field: 'position',
+        headerName: 'Position',
         cellRendererParams: {
-          warning: ({ value }) => value === "Tester" && "Testers are testing",
-          info: ({ value }) => value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === 'Tester' && 'Testers are testing',
+          info: ({ value }) => value === 'Developer' && 'Developers are awesome',
         },
       }),
       GridCell({
-        field: "age",
-        headerName: "Age",
+        field: 'age',
+        headerName: 'Age',
       }),
       GridCell({
-        field: "desc",
-        headerName: "Description",
+        field: 'desc',
+        headerName: 'Description',
       }),
       GridPopoverMessage(
         {
-          headerName: "Popout message",
+          headerName: 'Popout message',
           maxWidth: 150,
           cellRenderer: () => <>Single Click me!</>,
         },
@@ -115,13 +114,13 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
         },
       ),
       GridCell({
-        headerName: "Custom edit",
+        headerName: 'Custom edit',
         maxWidth: 100,
         editable: true,
-        valueFormatter: () => "Press E",
+        valueFormatter: () => 'Press E',
         cellRendererParams: {
           rightHoverElement: (
-            <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
+            <GridIcon icon={'ic_launch_modal'} title={'Title text'} className={'GridCell-editableIcon'} />
           ),
           editAction: () => {
             //
@@ -136,51 +135,51 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
         {
           multiEdit: true,
           editorParams: {
-            defaultAction: async ({ menuOption }) => {
+            defaultAction: ({ menuOption }) => {
               // eslint-disable-next-line no-console
-              console.log("clicked", { menuOption });
+              console.log('clicked', { menuOption });
             },
             options: async (selectedItems) => {
               // Just doing a timeout here to demonstrate deferred loading
               await wait(500);
               return [
                 {
-                  label: "Single edit only",
+                  label: 'Single edit only',
                   action: async () => {
                     //
                   },
                   disabled: selectedItems.length > 1,
                 },
                 {
-                  label: "Multi-edit",
+                  label: 'Multi-edit',
                   action: multiEditAction,
                 },
                 {
-                  label: "Disabled item",
-                  disabled: "Disabled for test",
+                  label: 'Disabled item',
+                  disabled: 'Disabled for test',
                 },
                 {
-                  label: "Developer Only",
-                  hidden: selectedItems.some((x) => x.position != "Developer"),
+                  label: 'Developer Only',
+                  hidden: selectedItems.some((x) => x.position != 'Developer'),
                 },
                 {
-                  label: "Other (TextInput)",
+                  label: 'Other (TextInput)',
                   action: async () => {
                     //
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextInput placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
                 {
-                  label: "Other (TextArea)",
+                  label: 'Other (TextArea)',
                   action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextArea placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
               ] as MenuOption<ITestRow>[];
@@ -194,9 +193,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
         },
         {
           editorParams: {
-            options: async () => {
-              return [];
-            },
+            options: () => [],
           },
         },
       ),
@@ -205,9 +202,9 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
   );
 
   const [rowData] = useState([
-    { id: 1000, position: "Tester", age: 30, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, desc: "Develops application", dd: "2" },
-    { id: 1002, position: "Manager", age: 65, desc: "Manages", dd: "3" },
+    { id: 1000, position: 'Tester', age: 30, desc: 'Tests application', dd: '1' },
+    { id: 1001, position: 'Developer', age: 12, desc: 'Develops application', dd: '2' },
+    { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
   ]);
 
   return (
@@ -218,7 +215,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
-      domLayout={"autoHeight"}
+      domLayout={'autoHeight'}
       autoSelectFirstRow={true}
     />
   );
@@ -232,47 +229,47 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   await waitForGridReady({ canvasElement });
 
   // Ensure first row/cell is selected on render
-  await waitFor(async () => {
+  await waitFor(() => {
     const activeCell = canvasElement.ownerDocument.activeElement;
-    expect(activeCell).toHaveClass("ag-cell-focus");
-    expect(activeCell).toHaveAttribute("aria-colindex", "1");
-    expect(activeCell?.parentElement).toHaveAttribute("row-index", "0");
+    expect(activeCell).toHaveClass('ag-cell-focus');
+    expect(activeCell).toHaveAttribute('aria-colindex', '1');
+    expect(activeCell?.parentElement).toHaveAttribute('row-index', '0');
   });
-  await userEvent.keyboard("{arrowdown}{arrowdown}");
-  await userEvent.keyboard("{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}");
+  await userEvent.keyboard('{arrowdown}{arrowdown}');
+  await userEvent.keyboard('{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}');
 
   // Test enter post focus
   const test = async (fn: () => any, colId: string, rowId: string) => {
-    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard('{Enter}');
     await wait(1000);
-    await userEvent.keyboard("{arrowdown}{arrowdown}");
+    await userEvent.keyboard('{arrowdown}{arrowdown}');
     fn();
-    await waitFor(async () => {
+    await waitFor(() => {
       expect(multiEditAction).toHaveBeenCalled();
     });
 
-    await waitFor(async () => {
+    await waitFor(() => {
       const activeCell = canvasElement.ownerDocument.activeElement;
-      expect(activeCell).toHaveClass("ag-cell-focus");
-      expect(activeCell).toHaveAttribute("aria-colindex", colId);
-      expect(activeCell?.parentElement).toHaveAttribute("row-index", rowId);
+      expect(activeCell).toHaveClass('ag-cell-focus');
+      expect(activeCell).toHaveAttribute('aria-colindex', colId);
+      expect(activeCell?.parentElement).toHaveAttribute('row-index', rowId);
     });
     await wait(1000);
   };
 
-  await test(() => userEvent.keyboard("{Enter}"), "8", "2");
-  await test(() => userEvent.tab(), "9", "2");
+  await test(() => userEvent.keyboard('{Enter}'), '8', '2');
+  await test(() => userEvent.tab(), '9', '2');
   await userEvent.tab({ shift: true });
-  await test(() => userEvent.tab({ shift: true }), "6", "2");
-  await userEvent.keyboard("{Esc}");
+  await test(() => userEvent.tab({ shift: true }), '6', '2');
+  await userEvent.keyboard('{Esc}');
   await userEvent.tab();
 
-  await userEvent.keyboard("{Enter}");
+  await userEvent.keyboard('{Enter}');
   await wait(250);
   expect(eAction).not.toHaveBeenCalled();
 
-  await userEvent.keyboard("e");
-  await waitFor(async () => {
+  await userEvent.keyboard('e');
+  await waitFor(() => {
     expect(eAction).toHaveBeenCalled();
   });
 };

@@ -1,8 +1,8 @@
-import { GridBaseRow } from "../Grid";
-import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
-import { GridFormPopoverMenu, GridFormPopoverMenuProps } from "../gridForm/GridFormPopoverMenu";
-import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
-import { GridRenderPopoutMenuCell } from "../gridRender/GridRenderPopoutMenuCell";
+import { GridBaseRow } from '../Grid';
+import { ColDefT, GenericCellEditorProps, GridCell } from '../GridCell';
+import { GridFormPopoverMenu, GridFormPopoverMenuProps } from '../gridForm/GridFormPopoverMenu';
+import { GenericCellColDef } from '../gridRender/GridRenderGenericCell';
+import { GridRenderPopoutMenuCell } from '../gridRender/GridRenderPopoutMenuCell';
 
 /**
  * Popout burger menu
@@ -19,7 +19,7 @@ export const GridPopoverMenu = <TData extends GridBaseRow>(
       sortable: false,
       editable: colDef.editable != null ? colDef.editable : true,
       exportable: false,
-      cellStyle: { flex: 1, justifyContent: "center" },
+      cellStyle: { flex: 1, justifyContent: 'center' },
       cellRenderer: GridRenderPopoutMenuCell,
       ...colDef,
       cellRendererParams: {

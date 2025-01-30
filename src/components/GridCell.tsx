@@ -1,22 +1,22 @@
-import { ColDef, ICellEditorParams, ICellRendererParams } from "ag-grid-community";
+import { ColDef, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import {
+  EditableCallbackParams,
   SuppressKeyboardEventParams,
   ValueFormatterFunc,
   ValueFormatterParams,
   ValueGetterFunc,
   ValueGetterParams,
-  EditableCallbackParams,
-} from "ag-grid-community";
-import { forwardRef, ReactElement, useContext } from "react";
+} from 'ag-grid-community';
+import { forwardRef, ReactElement, useContext } from 'react';
 
-import { GridPopoverContextProvider } from "../contexts/GridPopoverContextProvider";
-import { GridUpdatingContext } from "../contexts/GridUpdatingContext";
-import { fnOrVar } from "../utils/util";
-import { GridBaseRow } from "./Grid";
-import { GridCellMultiSelectClassRules } from "./GridCellMultiSelectClassRules";
-import { GridIcon } from "./GridIcon";
-import { GridLoadableCell } from "./GridLoadableCell";
-import { GenericCellColDef, GenericCellRendererParams } from "./gridRender";
+import { GridPopoverContextProvider } from '../contexts/GridPopoverContextProvider';
+import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
+import { fnOrVar } from '../utils/util';
+import { GridBaseRow } from './Grid';
+import { GridCellMultiSelectClassRules } from './GridCellMultiSelectClassRules';
+import { GridIcon } from './GridIcon';
+import { GridLoadableCell } from './GridLoadableCell';
+import { GenericCellColDef, GenericCellRendererParams } from './gridRender';
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -25,7 +25,7 @@ export interface GenericCellEditorProps<E> {
 }
 
 export interface SAICellRendererParams<TData = any, TValue = any, TContext = any>
-  extends Omit<ICellRendererParams<TData, TValue, TContext>, "data"> {
+  extends Omit<ICellRendererParams<TData, TValue, TContext>, 'data'> {
   data: TData;
 }
 
@@ -38,18 +38,18 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   let warningText = props.data !== undefined && warningFn ? warningFn(props) : undefined;
   const infoFn = rendererParams?.info;
   let infoText = props.data !== undefined && infoFn ? infoFn(props) : undefined;
-  if (Array.isArray(warningText)) warningText = warningText.join("\n");
-  if (Array.isArray(infoText)) infoText = infoText.join("\n");
+  if (Array.isArray(warningText)) warningText = warningText.join('\n');
+  if (Array.isArray(infoText)) infoText = infoText.join('\n');
 
-  return checkUpdating(colDef.field ?? colDef.colId ?? "", props.data.id) ? (
+  return checkUpdating(colDef.field ?? colDef.colId ?? '', props.data.id) ? (
     <GridLoadableCell />
   ) : (
     <>
       {!!warningText && (
-        <GridIcon icon={"ic_warning_outline"} title={typeof warningText === "string" ? warningText : "Warning"} />
+        <GridIcon icon={'ic_warning_outline'} title={typeof warningText === 'string' ? warningText : 'Warning'} />
       )}
-      {!!infoText && <GridIcon icon={"ic_info_outline"} title={typeof infoText === "string" ? infoText : "Info"} />}
-      <div className={"GridCell-container"}>
+      {!!infoText && <GridIcon icon={'ic_info_outline'} title={typeof infoText === 'string' ? infoText : 'Info'} />}
+      <div className={'GridCell-container'}>
         {colDef.cellRendererParams?.originalCellRenderer ? (
           <colDef.cellRendererParams.originalCellRenderer {...props} />
         ) : (
@@ -57,13 +57,13 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         )}
       </div>
       {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
-        <div className={"GridCell-hoverRight"}>{rendererParams?.rightHoverElement}</div>
+        <div className={'GridCell-hoverRight'}>{rendererParams?.rightHoverElement}</div>
       )}
     </>
   );
 };
 
-export interface SAValueGetterParams<TData = any, TValue = any> extends Omit<ValueGetterParams<TData, TValue>, "data"> {
+export interface SAValueGetterParams<TData = any, TValue = any> extends Omit<ValueGetterParams<TData, TValue>, 'data'> {
   data: TData;
   getValue: (field: string) => any;
 }
@@ -73,7 +73,7 @@ export interface SAValueGetterFunc<TData = any, TValue = any> {
 }
 
 export interface SAEditableCallbackParams<TData = any, TValue = any>
-  extends Omit<EditableCallbackParams<TData, TValue>, "data"> {
+  extends Omit<EditableCallbackParams<TData, TValue>, 'data'> {
   data: TData;
 }
 
@@ -82,7 +82,7 @@ export interface SAEditableCallback<TData = any, TValue = any> {
 }
 
 export interface SAValueFormatterParams<TData = any, TValue = any>
-  extends Omit<ValueFormatterParams<TData, TValue>, "data" | "value"> {
+  extends Omit<ValueFormatterParams<TData, TValue>, 'data' | 'value'> {
   data: TData;
   value: TValue;
 }
@@ -92,7 +92,7 @@ export interface SAValueFormatterFunc<TData = any, TValue = any> {
 }
 
 // This is so that typescript retains the row type to pass to the GridCells
-// @ts-ignore
+// @ts-expect-error types
 export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends ColDef<TData, ValueType> {
   _?: TData;
   editable?: boolean | SAEditableCallback<TData, ValueType>;
@@ -116,13 +116,13 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
 export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};
   const exec = shortcutKeys[e.event.key];
-  if (exec && !e.editing && !e.event.repeat && e.event.type === "keydown") {
+  if (exec && !e.editing && !e.event.repeat && e.event.type === 'keydown') {
     const editable = fnOrVar(e.colDef?.editable, e);
     return editable ? (exec(e) ?? true) : true;
   }
   // It's important that aggrid doesn't trigger edit on enter
   // as the incorrect selected rows will be returned
-  return !["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Tab", " ", "Home", "End", "PageUp", "PageDown"].includes(
+  return !['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Tab', ' ', 'Home', 'End', 'PageUp', 'PageDown'].includes(
     e.event.key,
   );
 };
@@ -134,17 +134,17 @@ export const generateFilterGetter = <TData extends GridBaseRow, ValueType>(
 ): string | SAValueGetterFunc<TData, ValueType> | undefined => {
   if (filterValueGetter) return filterValueGetter;
   // aggrid will default to valueGetter
-  if (typeof valueFormatter !== "function" || !field) return undefined;
+  if (typeof valueFormatter !== 'function' || !field) return undefined;
 
   return (params: ValueGetterParams<TData, ValueType>): any => {
     const value = params.getValue(field);
     let formattedValue = valueFormatter({ ...params, value });
     // Search for null values using standard dash
-    if (formattedValue === "–") formattedValue += " -";
+    if (formattedValue === '–') formattedValue += ' -';
     // Search by raw value as well as formatted
-    const gotValue = ["string", "number"].includes(typeof value) ? value : undefined;
-    return (formattedValue + (gotValue != null && formattedValue != gotValue ? " " + gotValue : "")) //
-      .replace(/\s+/g, " ")
+    const gotValue = ['string', 'number'].includes(typeof value) ? value : undefined;
+    return (formattedValue + (gotValue != null && formattedValue != gotValue ? ' ' + gotValue : '')) //
+      .replace(/\s+/g, ' ')
       .trim();
   };
 };
@@ -196,13 +196,13 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
     filterValueGetter: filterValueGetter as any,
     // Default value formatter, otherwise react freaks out on objects
     valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value == null) return "–";
-      const types = ["number", "boolean", "string"];
+      if (params.value == null) return '–';
+      const types = ['number', 'boolean', 'string'];
       if (types.includes(typeof params.value)) return `${params.value}`;
       else return JSON.stringify(params.value);
     },
     ...props,
-    cellRenderer: typeof props.cellRenderer === "string" ? props.cellRenderer : GridCellRenderer,
+    cellRenderer: typeof props.cellRenderer === 'string' ? props.cellRenderer : GridCellRenderer,
     cellRendererParams: {
       originalCellRenderer: props.cellRenderer,
       ...props.cellRendererParams,
@@ -223,17 +223,19 @@ export const GenericCellEditorComponentWrapper = (editor?: (props: any) => React
   return forwardRef(function GenericCellEditorComponentFr(cellEditorParams: ICellEditorParams, _) {
     const valueFormatted = cellEditorParams.formatValue
       ? cellEditorParams.formatValue(cellEditorParams.value)
-      : "Missing formatter";
+      : 'Missing formatter';
     return (
       <GridPopoverContextProvider props={cellEditorParams}>
-        {
-          <cellEditorParams.colDef.cellRenderer
-            {...cellEditorParams}
-            valueFormatted={valueFormatted}
-            {...cellEditorParams.colDef.cellRendererParams}
-          />
-        }
-        {obj.editor && <obj.editor {...cellEditorParams} />}
+        <>
+          {
+            <cellEditorParams.colDef.cellRenderer
+              {...cellEditorParams}
+              valueFormatted={valueFormatted}
+              {...cellEditorParams.colDef.cellRendererParams}
+            />
+          }
+          {obj.editor && <obj.editor {...cellEditorParams} />}
+        </>
       </GridPopoverContextProvider>
     );
   });

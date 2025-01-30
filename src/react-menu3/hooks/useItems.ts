@@ -1,8 +1,8 @@
-import { defer } from "lodash-es";
-import { MutableRefObject, useCallback, useRef, useState } from "react";
+import { defer } from 'lodash-es';
+import { MutableRefObject, useCallback, useRef, useState } from 'react';
 
-import { FocusPosition } from "../types";
-import { HoverActionTypes, focusFirstInput, indexOfNode } from "../utils";
+import { FocusPosition } from '../types';
+import { focusFirstInput, HoverActionTypes, indexOfNode } from '../utils';
 
 export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObject<any> | undefined) => {
   const [hoverItem, setHoverItem] = useState<
@@ -46,7 +46,7 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
       const { items, hoverIndex } = mutableState;
       const sortItems = () => {
         if (mutableState.sorted) return;
-        const orderedNodes = menuRef.current.querySelectorAll(".szh-menu__item");
+        const orderedNodes = menuRef.current.querySelectorAll('.szh-menu__item');
         items.sort((a, b) => indexOfNode(orderedNodes, a) - indexOfNode(orderedNodes, b));
         mutableState.sorted = true;
       };
@@ -81,12 +81,12 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
           break;
 
         case HoverActionTypes.SET_INDEX:
-          if (typeof nextIndex !== "number") break;
+          if (typeof nextIndex !== 'number') break;
           sortItems();
           index = nextIndex;
           newItem = items[index];
           defer(() =>
-            (newItem as HTMLElement).scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" }),
+            (newItem as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }),
           );
           break;
 
@@ -112,7 +112,7 @@ export const useItems = (menuRef: MutableRefObject<any>, focusRef: MutableRefObj
         }
 
         default:
-          if (process.env.NODE_ENV !== "production")
+          if (process.env.NODE_ENV !== 'production')
             throw new Error(`[React-Menu] Unknown hover action type: ${actionType}`);
       }
 

@@ -1,8 +1,8 @@
-import { act, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { isEqual } from "lodash-es";
+import { act, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { isEqual } from 'lodash-es';
 
-import { IQueryQuick, findQuick, getAllQuick, getMatcher, getQuick, queryQuick } from "./testQuick";
+import { findQuick, getAllQuick, getMatcher, getQuick, IQueryQuick, queryQuick } from './testQuick';
 
 let user = userEvent;
 /**
@@ -10,16 +10,17 @@ let user = userEvent;
  * @param customisedUserEvent
  */
 export const setUpUserEvent = (customisedUserEvent: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   user = customisedUserEvent;
 };
 
-export const countRows = async (within?: HTMLElement): Promise<number> => {
+export const countRows = (within?: HTMLElement): number => {
   return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
 };
 
 export const findRowByIndex = async (rowIndex: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
-  await waitFor(async () => {
-    expect(getAllQuick({ classes: ".ag-row" }).length > 0).toBe(true);
+  await waitFor(() => {
+    expect(getAllQuick({ classes: '.ag-row' }).length > 0).toBe(true);
   });
   //if this is not wrapped in an act console errors are logged during testing
   let row!: HTMLDivElement;
@@ -28,7 +29,6 @@ export const findRowByIndex = async (rowIndex: number | string, within?: HTMLEle
       { tagName: `.ag-center-cols-container div[row-index='${rowIndex}']:not(:empty)` },
       within,
     );
-    // @ts-ignore
     let combineChildren = [...Array.from(row.children)];
 
     const leftCols = queryQuick<HTMLDivElement>(
@@ -36,7 +36,6 @@ export const findRowByIndex = async (rowIndex: number | string, within?: HTMLEle
       within,
     );
     if (leftCols) {
-      // @ts-ignore
       combineChildren = [...Array.from(leftCols.children), ...combineChildren];
     }
 
@@ -45,7 +44,6 @@ export const findRowByIndex = async (rowIndex: number | string, within?: HTMLEle
       within,
     );
     if (rightCols) {
-      // @ts-ignore
       combineChildren = [...Array.from(rightCols.children), ...combineChildren];
     }
 
@@ -55,8 +53,8 @@ export const findRowByIndex = async (rowIndex: number | string, within?: HTMLEle
 };
 
 export const findRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
-  await waitFor(async () => {
-    expect(getAllQuick({ classes: ".ag-row" }).length > 0).toBe(true);
+  await waitFor(() => {
+    expect(getAllQuick({ classes: '.ag-row' }).length > 0).toBe(true);
   });
   //if this is not wrapped in an act console errors are logged during testing
   let row!: HTMLDivElement;
@@ -65,7 +63,6 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
       { tagName: `.ag-center-cols-container div[row-id='${rowId}']:not(:empty)` },
       within,
     );
-    // @ts-ignore
     let combineChildren = [...Array.from(row.children)];
 
     const leftCols = queryQuick<HTMLDivElement>(
@@ -73,7 +70,6 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
       within,
     );
     if (leftCols) {
-      // @ts-ignore
       combineChildren = [...Array.from(leftCols.children), ...combineChildren];
     }
 
@@ -82,7 +78,6 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
       within,
     );
     if (rightCols) {
-      // @ts-ignore
       combineChildren = [...Array.from(rightCols.children), ...combineChildren];
     }
 
@@ -91,33 +86,33 @@ export const findRow = async (rowId: number | string, within?: HTMLElement): Pro
   return row;
 };
 
-export const queryRow = async (rowId: number | string, within?: HTMLElement): Promise<HTMLDivElement | null> => {
+export const queryRow = (rowId: number | string, within?: HTMLElement): HTMLDivElement | null => {
   return queryQuick<HTMLDivElement>({ tagName: `div[row-id='${rowId}']:not(:empty)` }, within);
 };
 
 const _selectRow = async (
-  select: "select" | "deselect" | "toggle",
+  select: 'select' | 'deselect' | 'toggle',
   rowId: string | number,
   within?: HTMLElement,
 ): Promise<void> => {
   const row = await findRow(rowId, within);
-  const isSelected = row.className.includes("ag-row-selected");
-  if (select === "toggle" || (select === "select" && !isSelected) || (select === "deselect" && isSelected)) {
-    const cell = await findCell(rowId, "selection", within);
+  const isSelected = row.className.includes('ag-row-selected');
+  if (select === 'toggle' || (select === 'select' && !isSelected) || (select === 'deselect' && isSelected)) {
+    const cell = await findCell(rowId, 'selection', within);
     await user.click(cell);
     await waitFor(async () => {
       const row = await findRow(rowId, within);
-      const nowSelected = row.className.includes("ag-row-selected");
+      const nowSelected = row.className.includes('ag-row-selected');
       if (nowSelected === isSelected) throw `Row ${rowId} won't select`;
     });
   }
 };
 
 export const selectRow = async (rowId: string | number, within?: HTMLElement): Promise<void> =>
-  _selectRow("select", rowId, within);
+  _selectRow('select', rowId, within);
 
 export const deselectRow = async (rowId: string | number, within?: HTMLElement): Promise<void> =>
-  _selectRow("deselect", rowId, within);
+  _selectRow('deselect', rowId, within);
 
 export const findCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<HTMLElement> => {
   const row = await findRow(rowId, within);
@@ -157,14 +152,14 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
 
 export const isCellReadOnly = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<boolean> => {
   const cell = await findCell(rowId, colId, within);
-  return cell.className.includes("GridCell-readonly");
+  return cell.className.includes('GridCell-readonly');
 };
 
-export const findOpenPopover = () => findQuick({ classes: ".szh-menu--state-open" });
+export const findOpenPopover = () => findQuick({ classes: '.szh-menu--state-open' });
 
 export const queryMenuOption = async (menuOptionText: string | RegExp): Promise<HTMLElement | null> => {
   const openMenu = await findOpenPopover();
-  const els = await within(openMenu).findAllByRole("menuitem");
+  const els = await within(openMenu).findAllByRole('menuitem');
   const matcher = getMatcher(menuOptionText);
   const result = els.find(matcher);
   return result ?? null;
@@ -190,7 +185,7 @@ export const validateMenuOptions = async (
 ): Promise<boolean> => {
   await editCell(rowId, colId);
   const openMenu = await findOpenPopover();
-  const actualOptions = (await within(openMenu).findAllByRole("menuitem")).map((menuItem) => menuItem.textContent);
+  const actualOptions = (await within(openMenu).findAllByRole('menuitem')).map((menuItem) => menuItem.textContent);
   return isEqual(actualOptions, expectedMenuOptions);
 };
 
@@ -221,7 +216,7 @@ export const openAndFindMenuOption = async (
 
 export const getMultiSelectOptions = async () => {
   const openMenu = await findOpenPopover();
-  return getAllQuick<HTMLInputElement>({ role: "menuitem", child: { tagName: "input,textarea" } }, openMenu).map(
+  return getAllQuick<HTMLInputElement>({ role: 'menuitem', child: { tagName: 'input,textarea' } }, openMenu).map(
     (input) => {
       return {
         v: input.value,
@@ -233,7 +228,7 @@ export const getMultiSelectOptions = async () => {
 
 export const findMultiSelectOption = async (value: string): Promise<HTMLElement> => {
   const openMenu = await findOpenPopover();
-  return getQuick({ role: "menuitem", child: { tagName: `input[value='${value}']` } }, openMenu);
+  return getQuick({ role: 'menuitem', child: { tagName: `input[value='${value}']` } }, openMenu);
 };
 
 export const clickMultiSelectOption = async (value: string): Promise<void> => {
@@ -255,14 +250,14 @@ export const typeOnlyInput = async (value: string): Promise<void> =>
   typeInput(value, { child: { tagName: "input[type='text'], textarea" } });
 
 export const typeInputByLabel = async (value: string, labelText: string): Promise<void> => {
-  const labels = getAllQuick({ child: { tagName: "label" } }).filter((l) => l.textContent === labelText);
+  const labels = getAllQuick({ child: { tagName: 'label' } }).filter((l) => l.textContent === labelText);
   if (labels.length === 0) {
     throw Error(`Label not found for text: ${labelText}`);
   }
   if (labels.length > 1) {
     throw Error(`Multiple labels found for text: ${labelText}`);
   }
-  const inputId = labels[0].getAttribute("for");
+  const inputId = labels[0].getAttribute('for');
   await typeInput(value, { child: { tagName: `input[id='${inputId}'], textarea[id='${inputId}']` } });
 };
 
@@ -272,16 +267,16 @@ export const typeInputByPlaceholder = async (value: string, placeholder: string)
   });
 
 export const typeOtherInput = async (value: string): Promise<void> =>
-  typeInput(value, { classes: ".subComponent", child: { tagName: "input[type='text']" } });
+  typeInput(value, { classes: '.subComponent', child: { tagName: "input[type='text']" } });
 
 export const typeOtherTextArea = async (value: string): Promise<void> =>
-  typeInput(value, { classes: ".subComponent", child: { tagName: "textarea" } });
+  typeInput(value, { classes: '.subComponent', child: { tagName: 'textarea' } });
 
 export const closeMenu = () => user.click(document.body);
 export const closePopover = () => user.click(document.body);
 
 export const findActionButton = (text: string, container?: HTMLElement): Promise<HTMLElement> =>
-  findQuick({ tagName: "button", child: { classes: ".ActionButton-minimalAreaDisplay", text: text } }, container);
+  findQuick({ tagName: 'button', child: { classes: '.ActionButton-minimalAreaDisplay', text: text } }, container);
 
 export const clickActionButton = async (text: string, container?: HTMLElement): Promise<void> => {
   const button = await findActionButton(text, container);
@@ -289,11 +284,11 @@ export const clickActionButton = async (text: string, container?: HTMLElement): 
 };
 
 export const waitForGridReady = async (props?: { grid?: HTMLElement; timeout?: number }) =>
-  waitFor(() => expect(getAllQuick({ classes: ".Grid-ready" }, props?.grid)).toBeInTheDocument(), {
+  waitFor(() => expect(getAllQuick({ classes: '.Grid-ready' }, props?.grid)).toBeInTheDocument(), {
     timeout: props?.timeout ?? 5000,
   });
 
 export const waitForGridRows = async (props?: { grid?: HTMLElement; timeout?: number }) =>
-  waitFor(async () => expect(getAllQuick({ classes: ".ag-row" }, props?.grid).length > 0).toBe(true), {
+  waitFor(() => expect(getAllQuick({ classes: '.ag-row' }, props?.grid).length > 0).toBe(true), {
     timeout: props?.timeout ?? 5000,
   });

@@ -1,12 +1,11 @@
-import { CsvExportParams } from "ag-grid-community";
-import { delay } from "lodash-es";
-import { useContext } from "react";
+import { LuiMiniSpinner } from '@linzjs/lui';
+import { CsvExportParams } from 'ag-grid-community';
+import { delay } from 'lodash-es';
+import { useContext } from 'react';
 
-import { LuiMiniSpinner } from "@linzjs/lui";
-
-import { GridContext } from "../../contexts/GridContext";
-import { useStateDeferred } from "../../lui/stateDeferredHook";
-import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
+import { GridContext } from '../../contexts/GridContext';
+import { useStateDeferred } from '../../lui/stateDeferredHook';
+import { GridFilterHeaderIconButton } from './GridFilterHeaderIconButton';
 
 export const GridFilterDownloadCsvButton = (csvExportParams: CsvExportParams) => {
   const { downloadCsv } = useContext(GridContext);
@@ -27,15 +26,15 @@ export const GridFilterDownloadCsvButton = (csvExportParams: CsvExportParams) =>
     <LuiMiniSpinner
       size={22}
       divProps={{
-        role: "status",
-        ["aria-label"]: "Downloading...",
-        style: { width: 42, display: "flex", justifyContent: "center" },
+        role: 'status',
+        ['aria-label']: 'Downloading...',
+        style: { width: 42, display: 'flex', justifyContent: 'center' },
       }}
     />
   ) : (
     <GridFilterHeaderIconButton
-      icon={"ic_csv_file"}
-      title={"Download CSV"}
+      icon={'ic_csv_file'}
+      title={'Download CSV'}
       onClick={handleDownloadClick}
       disabled={downloading}
     />

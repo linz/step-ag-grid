@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-import { FocusPosition } from "../types";
+import { FocusPosition } from '../types';
 
 interface MenuListItemContextType {
   isParentOpen?: boolean;

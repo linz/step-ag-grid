@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from 'react';
 
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { TextInputValidator, TextInputValidatorProps } from "../../utils/textValidator";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { TextInputFormatted } from '../../lui/TextInputFormatted';
+import { TextInputValidator, TextInputValidatorProps } from '../../utils/textValidator';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { useGridPopoverHook } from '../GridPopoverHook';
 
 export interface GridFormTextInputProps<TData extends GridBaseRow>
   extends TextInputValidatorProps<TData>,
@@ -20,9 +20,9 @@ export interface GridFormTextInputProps<TData extends GridBaseRow>
 export const GridFormTextInput = <TData extends GridBaseRow>(props: GridFormTextInputProps<TData>) => {
   const { field, value: initialVale, data } = useGridPopoverContext<TData>();
 
-  const helpText = props.helpText ?? "Press enter or tab to save";
+  const helpText = props.helpText ?? 'Press enter or tab to save';
 
-  const initValue = useMemo(() => (initialVale == null ? "" : `${initialVale}`), [initialVale]);
+  const initValue = useMemo(() => (initialVale == null ? '' : `${initialVale}`), [initialVale]);
   const [value, setValue] = useState(initValue);
 
   const invalid = useCallback(() => TextInputValidator<TData>(props, value, data, {}), [data, props, value]);
@@ -51,14 +51,14 @@ export const GridFormTextInput = <TData extends GridBaseRow>(props: GridFormText
   });
 
   return popoverWrapper(
-    <div style={{ display: "flex", flexDirection: "row" }} className={"FormTest subComponent"}>
+    <div style={{ display: 'flex', flexDirection: 'row' }} className={'FormTest subComponent'}>
       <TextInputFormatted
         value={value}
         onChange={(e) => setValue(e.target.value)}
         error={invalid()}
         formatted={props.units}
         style={{ width: props.width ?? 240 }}
-        placeholder={props.placeholder ?? "Type here"}
+        placeholder={props.placeholder ?? 'Type here'}
         helpText={helpText}
       />
     </div>,

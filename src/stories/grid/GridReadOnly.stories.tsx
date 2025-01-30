@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { ReactElement, useCallback, useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { ReactElement, useCallback, useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -26,32 +25,32 @@ import {
   MenuItem,
   useGridFilter,
   wait,
-} from "../..";
-import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from "../../components";
-import { GridCellFiller } from "../../components/GridCellFiller";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
+} from '../..';
+import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from '../../components';
+import { GridCellFiller } from '../../components/GridCellFiller';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
     quickFilter: true,
-    quickFilterValue: "",
-    quickFilterPlaceholder: "Quick filter...",
+    quickFilterValue: '',
+    quickFilterPlaceholder: 'Quick filter...',
     selectable: false,
-    rowSelection: "single",
+    rowSelection: 'single',
   },
   // Storybook hangs otherwise
   parameters: {
     docs: {
       source: {
-        type: "code",
+        type: 'code',
       },
     },
   },
   decorators: [
     (Story) => (
-      <div style={{ maxWidth: 1024, height: 400, display: "flex", flexDirection: "column" }}>
+      <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -76,42 +75,42 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
         lockVisible: true,
       }),
-      GridCell<ITestRow, ITestRow["position"]>({
-        field: "position",
-        headerName: "Position",
+      GridCell<ITestRow, ITestRow['position']>({
+        field: 'position',
+        headerName: 'Position',
         cellRendererParams: {
-          warning: ({ value }) => value === "Tester" && "Testers are testing",
-          info: ({ value }) => value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === 'Tester' && 'Testers are testing',
+          info: ({ value }) => value === 'Developer' && 'Developers are awesome',
         },
       }),
       {
-        headerName: "Metrics",
+        headerName: 'Metrics',
         marryChildren: true,
         children: [
-          GridCell<ITestRow, ITestRow["age"]>({
-            field: "age",
-            headerName: "Age",
+          GridCell<ITestRow, ITestRow['age']>({
+            field: 'age',
+            headerName: 'Age',
           }),
-          GridCell<ITestRow, ITestRow["height"]>({
-            field: "height",
-            headerName: "Height",
+          GridCell<ITestRow, ITestRow['height']>({
+            field: 'height',
+            headerName: 'Height',
           }),
         ],
       },
       GridCell({
-        field: "desc",
-        headerName: "Description",
+        field: 'desc',
+        headerName: 'Description',
         flex: 1,
         initialHide: true,
       }),
       GridCellFiller(),
       GridPopoverMessage(
         {
-          headerName: "Popout message",
+          headerName: 'Popout message',
           cellRenderer: () => <>Single Click me!</>,
           exportable: false,
         },
@@ -126,20 +125,20 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         },
       ),
       GridCell({
-        headerName: "Custom edit",
+        headerName: 'Custom edit',
         editable: true,
         flex: 1,
-        valueFormatter: () => "Press E",
+        valueFormatter: () => 'Press E',
         cellRendererParams: {
           rightHoverElement: (
-            <GridIcon icon={"ic_launch_modal"} title={"Title text"} className={"GridCell-editableIcon"} />
+            <GridIcon icon={'ic_launch_modal'} title={'Title text'} className={'GridCell-editableIcon'} />
           ),
           editAction: (selectedRows: ITestRow[]) => {
-            alert(`Custom edit ${selectedRows.map((r) => r.id)} rowId(s) selected`);
+            alert(`Custom edit ${selectedRows.map((r) => r.id).join()} rowId(s) selected`);
           },
           shortcutKeys: {
             e: () => {
-              alert("Hi");
+              alert('Hi');
             },
           },
         },
@@ -149,61 +148,61 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {
           multiEdit: true,
           editorParams: {
-            defaultAction: async ({ menuOption }) => {
+            defaultAction: ({ menuOption }) => {
               // eslint-disable-next-line no-console
-              console.log("clicked", { menuOption });
+              console.log('clicked', { menuOption });
             },
             options: async (selectedItems) => {
               // Just doing a timeout here to demonstrate deferred loading
               await wait(500);
               return [
                 {
-                  label: "Single edit only",
+                  label: 'Single edit only',
                   action: async ({ selectedRows }) => {
-                    alert(`Single-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
+                    alert(`Single-edit: ${selectedRows.map((r) => r.id).join()} rowId(s) selected`);
                     await wait(1500);
                   },
                   disabled: selectedItems.length > 1,
                 },
                 {
-                  label: "Multi-edit",
+                  label: 'Multi-edit',
                   action: async ({ selectedRows }) => {
-                    alert(`Multi-edit: ${selectedRows.map((r) => r.id)} rowId(s) selected`);
+                    alert(`Multi-edit: ${selectedRows.map((r) => r.id).join()} rowId(s) selected`);
                     await wait(1500);
                   },
                 },
                 {
-                  label: "Sub menu...",
+                  label: 'Sub menu...',
                   subMenu: () => <MenuItem>Find...</MenuItem>,
                 },
                 {
-                  label: "Disabled item",
-                  disabled: "Disabled for test",
+                  label: 'Disabled item',
+                  disabled: 'Disabled for test',
                 },
                 {
-                  label: "Developer Only",
-                  hidden: selectedItems.some((x) => x.position != "Developer"),
+                  label: 'Developer Only',
+                  hidden: selectedItems.some((x) => x.position != 'Developer'),
                 },
                 {
-                  label: "Other (TextInput)",
+                  label: 'Other (TextInput)',
                   action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextInput placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextInput placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
                 {
-                  label: "Other (TextArea)",
+                  label: 'Other (TextArea)',
                   action: async ({ menuOption }) => {
                     // eslint-disable-next-line no-console
                     console.log(`Sub selected value was ${JSON.stringify(menuOption.subValue)}`);
                     await wait(500);
                   },
                   subComponent: () => (
-                    <GridFormSubComponentTextArea placeholder={"Other"} maxLength={5} required defaultValue={""} />
+                    <GridFormSubComponentTextArea placeholder={'Other'} maxLength={5} required defaultValue={''} />
                   ),
                 },
               ];
@@ -216,33 +215,33 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   );
 
   const [rowData] = useState<ITestRow[]>([
-    { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
-    { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
+    { id: 1000, position: 'Tester', age: 30, height: `6'4"`, desc: 'Tests application', dd: '1' },
+    { id: 1001, position: 'Developer', age: 12, height: `5'3"`, desc: 'Develops application', dd: '2' },
+    { id: 1002, position: 'Manager', age: 65, height: `5'9"`, desc: 'Manages', dd: '3' },
   ]);
 
   return (
     <GridWrapper maxHeight={400}>
       <GridFilters>
         <GridFilterQuick />
-        <GridFilterLessThan text="Age <" field={"age"} />
+        <GridFilterLessThan text="Age <" field={'age'} />
         <GridFilterButtons<ITestRow>
-          luiButtonProps={{ style: { whiteSpace: "nowrap" } }}
+          luiButtonProps={{ style: { whiteSpace: 'nowrap' } }}
           options={[
             {
-              label: "All",
+              label: 'All',
             },
             {
-              label: "< 30",
+              label: '< 30',
               filter: (row) => row.age < 30,
             },
           ]}
         />
         <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton fileName={"readOnlyGrid"} />
+        <GridFilterDownloadCsvButton fileName={'readOnlyGrid'} />
       </GridFilters>
       <Grid
-        data-testid={"readonly"}
+        data-testid={'readonly'}
         {...props}
         selectable={true}
         autoSelectFirstRow={true}
@@ -274,17 +273,17 @@ const GridFilterLessThan = (props: {
 
   const updateValue = (newValue: string) => {
     try {
-      setValue(newValue.trim() == "" ? undefined : parseInt(newValue));
+      setValue(newValue.trim() == '' ? undefined : parseInt(newValue));
     } catch {
       // ignore number parse exception
     }
   };
 
   return (
-    <div className={"GridFilter-container flex-row-center"}>
-      <div style={{ whiteSpace: "nowrap" }}>{props.text}</div>
+    <div className={'GridFilter-container flex-row-center'}>
+      <div style={{ whiteSpace: 'nowrap' }}>{props.text}</div>
       &#160;
-      <input type={"text"} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
+      <input type={'text'} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
     </div>
   );
 };

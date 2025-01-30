@@ -1,18 +1,17 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import { expect, fn, userEvent, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { StoryFn } from '@storybook/react';
+import { expect, fn, userEvent, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridContext, GridFormDropDown, GridFormDropDownProps, GridFormSubComponentTextInput } from "../../..";
+import { GridContext, GridFormDropDown, GridFormDropDownProps, GridFormSubComponentTextInput } from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormDropDown,
   args: {},
 };
@@ -25,16 +24,16 @@ const onSelectedItem = fn(async () => {});
 
 const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
   const config: GridFormDropDownProps<any> = {
-    filtered: "local",
+    filtered: 'local',
     onSelectedItem,
     options: [
-      { label: "Enabled", value: 1 },
-      { label: "Disabled", value: 0, disabled: true },
+      { label: 'Enabled', value: 1 },
+      { label: 'Disabled', value: 0, disabled: true },
       {
-        label: "Sub menu",
+        label: 'Sub menu',
         value: 0,
         subComponent: () => (
-          <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+          <GridFormSubComponentTextInput placeholder={'Text input'} maxLength={5} required defaultValue={''} />
         ),
       },
     ],
@@ -42,7 +41,7 @@ const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -56,12 +55,12 @@ const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps
           value={{
             anchorRef,
             updateValue,
-            data: { value: "" },
-            colId: "",
-            value: "",
-            field: "value",
+            data: { value: '' },
+            colId: '',
+            value: '',
+            field: 'value',
             selectedRows: [],
-            formatValue: () => "",
+            formatValue: () => '',
             saving: false,
             setSaving: () => {},
           }}
@@ -78,10 +77,10 @@ export const GridFormDropDownInteractions_: typeof Template = Template.bind({});
 GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  const getOption = (name: string) => canvas.findByRole("menuitem", { name });
+  const getOption = (name: string) => canvas.findByRole('menuitem', { name });
 
   // Check enabled menu handles click
-  const enabledMenuOption = await getOption("Enabled");
+  const enabledMenuOption = await getOption('Enabled');
   expect(enabledMenuOption).toBeInTheDocument();
 
   await userEvent.click(enabledMenuOption);
@@ -91,24 +90,24 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   // Check disabled menu ignores click
   updateValue.mockClear();
   onSelectedItem.mockClear();
-  const disabledMenuOption = await getOption("Disabled");
+  const disabledMenuOption = await getOption('Disabled');
   await userEvent.click(disabledMenuOption);
   expect(updateValue).not.toHaveBeenCalled();
   expect(onSelectedItem).not.toHaveBeenCalled();
 
   // Check sub menu works
-  const subTextInput = await getOption("Sub menu...");
+  const subTextInput = await getOption('Sub menu...');
   expect(subTextInput).toBeInTheDocument();
 
-  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text input')).not.toBeInTheDocument();
 
   await userEvent.click(subTextInput);
-  const textInput = await canvas.findByPlaceholderText("Text input");
+  const textInput = await canvas.findByPlaceholderText('Text input');
   expect(textInput).toBeInTheDocument();
-  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+  expect(await canvas.findByText('Must not be empty')).toBeInTheDocument();
 
-  await userEvent.type(textInput, "Hello");
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  await userEvent.type(textInput, 'Hello');
+  expect(await canvas.findByText('Press enter or tab to save')).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -122,19 +121,19 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
 
   // Test escape to not save
   updateValue.mockClear();
-  await userEvent.type(textInput, "{Escape}");
+  await userEvent.type(textInput, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   await userEvent.clear(textInput);
-  await userEvent.type(textInput, "{Enter}");
+  await userEvent.type(textInput, '{Enter}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test filter
-  const filterText = await canvas.findByPlaceholderText("Filter...");
-  await userEvent.type(filterText, "ena");
-  expect(canvas.queryByText("Enabled")).toBeInTheDocument();
-  expect(canvas.queryByText("Disabled")).not.toBeInTheDocument();
-  expect(canvas.queryByText("Sub menu...")).not.toBeInTheDocument();
+  const filterText = await canvas.findByPlaceholderText('Filter...');
+  await userEvent.type(filterText, 'ena');
+  expect(canvas.queryByText('Enabled')).toBeInTheDocument();
+  expect(canvas.queryByText('Disabled')).not.toBeInTheDocument();
+  expect(canvas.queryByText('Sub menu...')).not.toBeInTheDocument();
 };

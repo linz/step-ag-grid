@@ -1,4 +1,5 @@
-import { defer, fromPairs, groupBy, isEmpty, pick, toPairs } from "lodash-es";
+import { LuiCheckboxInput } from '@linzjs/lui';
+import { defer, fromPairs, groupBy, isEmpty, pick, toPairs } from 'lodash-es';
 import React, {
   Dispatch,
   ForwardedRef,
@@ -11,22 +12,20 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
+} from 'react';
 
-import { LuiCheckboxInput } from "@linzjs/lui";
-
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { FormError } from "../../lui/FormError";
-import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { ClickEvent } from "../../react-menu3/types";
-import { textMatch } from "../../utils/textMatcher";
-import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { GridIcon } from "../GridIcon";
-import { useGridPopoverHook } from "../GridPopoverHook";
-import { MenuSeparatorString } from "./GridFormDropDown";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
+import { FormError } from '../../lui/FormError';
+import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from '../../react-menu3';
+import { ClickEvent } from '../../react-menu3/types';
+import { textMatch } from '../../utils/textMatcher';
+import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { GridIcon } from '../GridIcon';
+import { useGridPopoverHook } from '../GridPopoverHook';
+import { MenuSeparatorString } from './GridFormDropDown';
 
 type HeaderGroupType = Record<string, MultiSelectOption[]> | undefined;
 
@@ -51,11 +50,14 @@ export interface GridFormMultiSelectSaveProps<TData extends GridBaseRow> {
 }
 
 export interface GridFormMultiSelectProps<TData extends GridBaseRow> extends CellEditorCommon {
-  className?:
-    | "GridMultiSelect-containerSmall"
-    | "GridMultiSelect-containerMedium"
-    | "GridMultiSelect-containerLarge"
-    | "GridMultiSelect-containerUnlimited"
+  className?: // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  | 'GridMultiSelect-containerSmall'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridMultiSelect-containerMedium'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridMultiSelect-containerLarge'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridMultiSelect-containerUnlimited'
     | string
     | undefined;
   filtered?: boolean;
@@ -76,8 +78,8 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
   const optionsInitialising = useRef(false);
   const firstInputSubComponent = useRef<HTMLInputElement | null>(null);
 
-  const [filter, setFilter] = useState("");
-  const [initialValues, setInitialValues] = useState("");
+  const [filter, setFilter] = useState('');
+  const [initialValues, setInitialValues] = useState('');
   const [options, setOptions] = useState<MultiSelectOption[]>();
 
   const invalid = useCallback(() => {
@@ -114,8 +116,8 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
 
-    (async () => {
-      const optionsList = typeof props.options === "function" ? await props.options(selectedRows) : props.options;
+    void (async () => {
+      const optionsList = typeof props.options === 'function' ? await props.options(selectedRows) : props.options;
       setInitialValues(JSON.stringify(optionsList));
       setOptions(optionsList);
       optionsInitialising.current = false;
@@ -129,7 +131,7 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
     if (!options) return undefined;
     const result = groupBy(
       options.filter((o) => textMatch(o.label, filter) && o.value != null),
-      "filter",
+      'filter',
     );
     // remove leading/trailing/duplicate dividers
     return fromPairs(
@@ -154,7 +156,7 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
     ) as HeaderGroupType;
   }, [filter, options]);
 
-  const headers: GridFormMultiSelectGroup[] = useMemo(() => props.headers ?? [{ header: "" }], [props.headers]);
+  const headers: GridFormMultiSelectGroup[] = useMemo(() => props.headers ?? [{ header: '' }], [props.headers]);
 
   const { popoverWrapper, triggerSave } = useGridPopoverHook({
     className: props.className,
@@ -163,7 +165,7 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
   });
 
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={!options} className={"GridFormMultiSelect-container"}>
+    <ComponentLoadingWrapper loading={!options} className={'GridFormMultiSelect-container'}>
       {options && (
         <>
           {props.filtered && (
@@ -176,12 +178,12 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
           )}
           {headerGroups &&
             (isEmpty(headerGroups) || !toPairs(headerGroups).some(([_, options]) => !isEmpty(options))) && (
-              <MenuItem key={"noOptions"} className={"GridMultiSelect-noOptions"} disabled={true}>
-                {props.noOptionsMessage ?? "No Options"}
+              <MenuItem key={'noOptions'} className={'GridMultiSelect-noOptions'} disabled={true}>
+                {props.noOptionsMessage ?? 'No Options'}
               </MenuItem>
             )}
           {headerGroups && !isEmpty(headerGroups) && (
-            <div className={"GridFormMultiSelect-options"}>
+            <div className={'GridFormMultiSelect-options'}>
               {headers.map((header, index) => {
                 const subOptions = headerGroups[`${header.filter}`];
                 return (
@@ -280,7 +282,7 @@ const FilterInput = (props: {
 
     const filterTrimmed = filter.trim();
     if (isEmpty(filterTrimmed)) {
-      triggerSave().then();
+      void triggerSave();
       return;
     }
 
@@ -290,18 +292,18 @@ const FilterInput = (props: {
     if (preFilterOptions === JSON.stringify(options)) return;
 
     setOptions([...options]);
-    setFilter("");
+    setFilter('');
   }, [filter, onSelectFilter, options, setFilter, setOptions, triggerSave]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       enterHasBeenPressed.current = true;
     }
   }, []);
 
   const handleKeyUp = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
+      if (e.key === 'Enter') {
         e.stopPropagation();
         e.preventDefault();
 
@@ -309,14 +311,14 @@ const FilterInput = (props: {
         else if (enterHasBeenPressed.current) {
           const filterTrimmed = filter.trim();
           if (isEmpty(filterTrimmed)) {
-            triggerSave().then();
+            void triggerSave();
             return;
           }
           onSelectFilter && addCustomFilterValue();
         }
         lastKeyWasEnter.current = true;
-      } else if (e.key === "Control") {
-        lastKeyWasEnter.current && setFilter("");
+      } else if (e.key === 'Control') {
+        lastKeyWasEnter.current && setFilter('');
         lastKeyWasEnter.current = false;
       } else {
         lastKeyWasEnter.current = false;
@@ -327,14 +329,14 @@ const FilterInput = (props: {
 
   return (
     <>
-      <FocusableItem className={"filter-item"} key={"filter"}>
+      <FocusableItem className={'filter-item'} key={'filter'}>
         {(_: any) => (
-          <div style={{ width: "100%" }} className={"GridFormMultiSelect-filter"}>
+          <div style={{ width: '100%' }} className={'GridFormMultiSelect-filter'}>
             <input
-              className={"LuiTextInput-input"}
+              className={'LuiTextInput-input'}
               type="text"
-              placeholder={filterPlaceholder ?? "Filter..."}
-              data-testid={"filteredMenu-free-text-input"}
+              placeholder={filterPlaceholder ?? 'Filter...'}
+              data-testid={'filteredMenu-free-text-input'}
               value={filter}
               data-disableenterautosave={true}
               data-allowtabtosave={true}
@@ -346,7 +348,7 @@ const FilterInput = (props: {
               <FormError
                 error={null}
                 helpText={
-                  typeof filterHelpText === "function" ? filterHelpText(filter.trim(), options) : filterHelpText
+                  typeof filterHelpText === 'function' ? filterHelpText(filter.trim(), options) : filterHelpText
                 }
               />
             )}
@@ -378,7 +380,7 @@ const MenuRadioItem = (props: {
     <MenuItem
       onClick={(e: ClickEvent) => {
         // Global react-menu MenuItem handler handles tabs
-        if (e.key !== "Tab" && e.key !== "Enter") {
+        if (e.key !== 'Tab' && e.key !== 'Enter') {
           e.keepOpen = true;
           toggleValue(item);
         }
@@ -390,7 +392,7 @@ const MenuRadioItem = (props: {
         value={`${item.value}`}
         label={
           <>
-            {item.warning && <GridIcon icon={"ic_warning_outline"} title={item.warning} />}
+            {item.warning && <GridIcon icon={'ic_warning_outline'} title={item.warning} />}
             {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
           </>
         }
@@ -427,8 +429,8 @@ function MenuSubComponentFr(
 
   useEffect(() => {
     if (focusableRef.current) {
-      const firstInputElement = focusableRef.current.querySelectorAll("input")[0] ?? null;
-      if (typeof ref === "function") {
+      const firstInputElement = focusableRef.current.querySelectorAll('input')[0] ?? null;
+      if (typeof ref === 'function') {
         ref(firstInputElement);
       } else if (ref) {
         ref.current = firstInputElement;
@@ -437,7 +439,7 @@ function MenuSubComponentFr(
   }, [ref]);
 
   return (
-    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.value}_subcomponent`} ref={focusableRef}>
+    <FocusableItem className={'LuiDeprecatedForms'} key={`${item.value}_subcomponent`} ref={focusableRef}>
       {() => (
         <GridSubComponentContext.Provider
           value={{
@@ -454,7 +456,7 @@ function MenuSubComponentFr(
             triggerSave,
           }}
         >
-          <div className={"subComponent"}>{item.subComponent && <item.subComponent />}</div>
+          <div className={'subComponent'}>{item.subComponent && <item.subComponent />}</div>
         </GridSubComponentContext.Provider>
       )}
     </FocusableItem>

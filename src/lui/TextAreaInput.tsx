@@ -1,8 +1,8 @@
-import clsx from "clsx";
-import { omit } from "lodash-es";
-import { InputHTMLAttributes, ReactElement, useId } from "react";
+import clsx from 'clsx';
+import { omit } from 'lodash-es';
+import { InputHTMLAttributes, ReactElement, useId } from 'react';
 
-import { FormError } from "./FormError";
+import { FormError } from './FormError';
 
 export interface LuiTextAreaInputProps extends InputHTMLAttributes<HTMLTextAreaElement> {
   // overrides value in base class to be string type only
@@ -23,9 +23,9 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
   return (
     <div
       className={clsx(
-        "LuiTextAreaInput Grid-popoverContainer",
-        props.disabled ? "isDisabled" : "",
-        props.error ? "hasError" : "",
+        'LuiTextAreaInput Grid-popoverContainer',
+        props.disabled ? 'isDisabled' : '',
+        props.error ? 'hasError' : '',
         props.className,
       )}
     >
@@ -36,9 +36,9 @@ export const TextAreaInput = (props: LuiTextAreaInputProps) => {
           {/* wrapper div used for error styling */}
           <textarea
             rows={5}
-            {...omit(props, ["error", "value", "helpText", "formatted", "className", "allowTabToSave"])}
+            {...omit(props, ['error', 'value', 'helpText', 'formatted', 'className', 'allowTabToSave'])}
             id={id}
-            value={props.value ?? ""}
+            value={props.value ?? ''}
             spellCheck={true}
             onMouseEnter={(e) => {
               if (document.activeElement != e.currentTarget) {

@@ -1,8 +1,8 @@
-import { CellClassParams, CellClassRules } from "ag-grid-community";
-import { ICellEditorParams } from "ag-grid-community";
+import { CellClassParams, CellClassRules } from 'ag-grid-community';
+import { ICellEditorParams } from 'ag-grid-community';
 
 export const GridCellMultiSelectClassRules: CellClassRules = {
-  "ag-selected-for-edit": (params: CellClassParams) => {
+  'ag-selected-for-edit': (params: CellClassParams) => {
     const { api, node, colDef } = params;
     const cep = colDef.cellEditorSelector
       ? colDef.cellEditorSelector(params as ICellEditorParams)?.params

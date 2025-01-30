@@ -1,1 +1,1 @@
-export * from "./useGridContextMenu";
+export * from './useGridContextMenu';

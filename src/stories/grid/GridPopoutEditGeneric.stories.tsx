@@ -1,21 +1,20 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useMemo, useState } from "react";
+import { Meta, StoryFn } from '@storybook/react';
+import { useMemo, useState } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
-import { FormTest, IFormTestRow } from "./FormTest";
+import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { FormTest, IFormTestRow } from './FormTest';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
-    quickFilterValue: "",
+    quickFilterValue: '',
     selectable: true,
   },
   decorators: [
@@ -36,13 +35,13 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
   const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
       GridCell(
         {
-          field: "name",
-          headerName: "Popout Generic Edit",
+          field: 'name',
+          headerName: 'Popout Generic Edit',
         },
         {
           multiEdit: true,
@@ -55,8 +54,8 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
   );
 
   const [rowData] = useState([
-    { id: 1000, name: "IS IS DP12345", nameType: "IS", numba: "IX", plan: "DP 12345" },
-    { id: 1001, name: "PEG V SD523", nameType: "PEG", numba: "V", plan: "SD 523" },
+    { id: 1000, name: 'IS IS DP12345', nameType: 'IS', numba: 'IX', plan: 'DP 12345' },
+    { id: 1001, name: 'PEG V SD523', nameType: 'PEG', numba: 'V', plan: 'SD 523' },
   ] as IFormTestRow[]);
 
   return (
@@ -66,7 +65,7 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
       rowData={rowData}
-      domLayout={"autoHeight"}
+      domLayout={'autoHeight'}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export const useDeferredPromise = <T>() => {
   const promiseResolve = useRef<((value: T | PromiseLike<T>) => void) | undefined>();

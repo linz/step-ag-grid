@@ -1,11 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from 'react';
 
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { TextInputFormatted } from "../../lui/TextInputFormatted";
-import { bearingNumberParser, bearingStringValidator } from "../../utils/bearing";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { TextInputFormatted } from '../../lui/TextInputFormatted';
+import { bearingNumberParser, bearingStringValidator } from '../../utils/bearing';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { useGridPopoverHook } from '../GridPopoverHook';
 
 export interface GridFormEditBearingProps<TData extends GridBaseRow> extends CellEditorCommon {
   formatValue?: (value: any) => string;
@@ -19,7 +19,7 @@ export const GridFormEditBearing = <TData extends GridBaseRow>(props: GridFormEd
 
   // This clears out any scientific precision
   const defaultValue = useMemo(
-    () => (initialValue == null ? "" : parseFloat(parseFloat(initialValue).toFixed(10)).toString()),
+    () => (initialValue == null ? '' : parseFloat(parseFloat(initialValue).toFixed(10)).toString()),
     [initialValue],
   );
 
@@ -39,7 +39,7 @@ export const GridFormEditBearing = <TData extends GridBaseRow>(props: GridFormEd
         return await props.onSave({ selectedRows, value: parsedValue });
       } else {
         if (field == null) {
-          console.error("field is not defined in ColDef");
+          console.error('field is not defined in ColDef');
         } else {
           selectedRows.forEach((row) => {
             row[field] = parsedValue as any;
@@ -57,7 +57,7 @@ export const GridFormEditBearing = <TData extends GridBaseRow>(props: GridFormEd
   });
 
   return popoverWrapper(
-    <div className={"GridFormEditBearing-input"}>
+    <div className={'GridFormEditBearing-input'}>
       <TextInputFormatted
         value={defaultValue}
         onChange={(e) => {
@@ -67,11 +67,11 @@ export const GridFormEditBearing = <TData extends GridBaseRow>(props: GridFormEd
         placeholder={props.placeHolder}
         formatted={
           bearingStringValidator(value, props.range) || !props.formatValue
-            ? "?"
+            ? '?'
             : props.formatValue(bearingNumberParser(value))
         }
         error={bearingStringValidator(value, props.range)}
-        helpText={"Press enter or tab to save"}
+        helpText={'Press enter or tab to save'}
       />
     </div>,
   );

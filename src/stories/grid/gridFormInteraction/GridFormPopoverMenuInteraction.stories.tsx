@@ -1,14 +1,13 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import * as test from "@storybook/test";
-import { expect, userEvent, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { StoryFn } from '@storybook/react';
+import * as test from '@storybook/test';
+import { expect, userEvent, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
 import {
   GridBaseRow,
@@ -19,10 +18,10 @@ import {
   GridFormSubComponentTextInput,
   PopoutMenuSeparator,
   SelectedMenuOptionResult,
-} from "../../..";
+} from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormPopoverMenu,
   args: {},
 };
@@ -43,7 +42,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -58,9 +57,9 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
             anchorRef,
             value: null,
             updateValue,
-            data: { value: "" },
-            colId: "",
-            field: "value",
+            data: { value: '' },
+            colId: '',
+            field: 'value',
             selectedRows: [],
             saving: false,
             setSaving: () => {},
@@ -69,25 +68,25 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
         >
           <GridFormPopoverMenu
             {...props}
-            options={async () => [
-              { label: "Enabled", value: 1, action: enabledAction },
+            options={() => [
+              { label: 'Enabled', value: 1, action: enabledAction },
               PopoutMenuSeparator,
-              { label: "Disabled", value: 0, disabled: true, action: disabledAction },
+              { label: 'Disabled', value: 0, disabled: true, action: disabledAction },
               {
-                label: "Sub text input",
+                label: 'Sub text input',
                 value: 0,
                 subComponent: () => (
-                  <GridFormSubComponentTextInput placeholder={"Text input"} maxLength={5} required defaultValue={""} />
+                  <GridFormSubComponentTextInput placeholder={'Text input'} maxLength={5} required defaultValue={''} />
                 ),
               },
               {
-                label: "Sub text area",
+                label: 'Sub text area',
                 value: 0,
                 subComponent: () => (
-                  <GridFormSubComponentTextArea placeholder={"Text area"} maxLength={5} required defaultValue={""} />
+                  <GridFormSubComponentTextArea placeholder={'Text area'} maxLength={5} required defaultValue={''} />
                 ),
               },
-              { label: "ERROR! this should be hidden", value: 3, hidden: true },
+              { label: 'ERROR! this should be hidden', value: 3, hidden: true },
             ]}
           />
         </GridPopoverContext.Provider>
@@ -100,36 +99,36 @@ export const GridFormPopoverMenuInteractions_: typeof Template = Template.bind({
 GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  const getOption = (name: string) => canvas.findByRole("menuitem", { name });
+  const getOption = (name: string) => canvas.findByRole('menuitem', { name });
 
-  const enabledMenuOption = await getOption("Enabled");
+  const enabledMenuOption = await getOption('Enabled');
   expect(enabledMenuOption).toBeInTheDocument();
   await userEvent.click(enabledMenuOption);
   expect(enabledAction).toHaveBeenCalled();
 
   enabledAction.mockClear();
-  const disabledMenuOption = await getOption("Disabled");
+  const disabledMenuOption = await getOption('Disabled');
   expect(disabledMenuOption).toBeInTheDocument();
   await userEvent.click(disabledMenuOption);
   expect(disabledAction).not.toHaveBeenCalled();
 
   // Sub input tests
-  const subTextInput = await getOption("Sub text input");
+  const subTextInput = await getOption('Sub text input');
   expect(subTextInput).toBeInTheDocument();
-  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text input')).not.toBeInTheDocument();
 
-  const subTextArea = await getOption("Sub text area");
+  const subTextArea = await getOption('Sub text area');
   expect(subTextArea).toBeInTheDocument();
-  expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text area')).not.toBeInTheDocument();
 
   await userEvent.click(subTextInput);
-  const textInput = await canvas.findByPlaceholderText("Text input");
+  const textInput = await canvas.findByPlaceholderText('Text input');
   expect(textInput).toBeInTheDocument();
-  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
-  expect(canvas.queryByPlaceholderText("Text area")).not.toBeInTheDocument();
+  expect(await canvas.findByText('Must not be empty')).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text area')).not.toBeInTheDocument();
 
-  await userEvent.type(textInput, "Hello");
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  await userEvent.type(textInput, 'Hello');
+  expect(await canvas.findByText('Press enter or tab to save')).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -143,25 +142,25 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test escape to not save
   updateValue.mockClear();
-  await userEvent.type(textInput, "{Escape}");
+  await userEvent.type(textInput, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   await userEvent.clear(textInput);
-  await userEvent.type(textInput, "{Enter}");
+  await userEvent.type(textInput, '{Enter}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Sub text area tests
   subTextArea.click();
 
-  const textArea = await canvas.findByPlaceholderText("Text area");
+  const textArea = await canvas.findByPlaceholderText('Text area');
   expect(textArea).toBeInTheDocument();
-  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
-  expect(canvas.queryByPlaceholderText("Text input")).not.toBeInTheDocument();
+  expect(await canvas.findByText('Must not be empty')).toBeInTheDocument();
+  expect(canvas.queryByPlaceholderText('Text input')).not.toBeInTheDocument();
 
-  await userEvent.type(textArea, "Hello");
-  expect(await canvas.findByText("Press tab to save")).toBeInTheDocument();
+  await userEvent.type(textArea, 'Hello');
+  expect(await canvas.findByText('Press tab to save')).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -175,12 +174,12 @@ GridFormPopoverMenuInteractions_.play = async ({ canvasElement }) => {
 
   // Test escape to not save
   updateValue.mockClear();
-  await userEvent.type(textArea, "{Escape}");
+  await userEvent.type(textArea, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   await userEvent.clear(textArea);
-  await userEvent.type(textArea, "{Enter}");
+  await userEvent.type(textArea, '{Enter}');
   expect(updateValue).not.toHaveBeenCalled();
 };

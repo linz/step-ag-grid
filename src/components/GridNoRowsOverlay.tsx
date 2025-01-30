@@ -1,5 +1,5 @@
-import { LuiStatusSpinner } from "@linzjs/lui";
-import { ForwardedRef, forwardRef } from "react";
+import { LuiStatusSpinner } from '@linzjs/lui';
+import { ForwardedRef, forwardRef } from 'react';
 
 const GridLoadingOverlayComponentFr = (
   props: { headerRowHeight: number },
@@ -12,12 +12,12 @@ const GridLoadingOverlayComponentFr = (
       top: 0,
       bottom: 0,
       right: 0,
-      position: "absolute",
-      backgroundColor: "rgba(255,255,255,0.5)",
+      position: 'absolute',
+      backgroundColor: 'rgba(255,255,255,0.5)',
     }}
   >
-    <div style={{ height: "100%", position: "relative" }}>
-      <div style={{ position: "absolute", left: 0, top: props.headerRowHeight, right: 0, bottom: 0 }}>
+    <div style={{ height: '100%', position: 'relative' }}>
+      <div style={{ position: 'absolute', left: 0, top: props.headerRowHeight, right: 0, bottom: 0 }}>
         <LuiStatusSpinner />
       </div>
     </div>
@@ -40,10 +40,10 @@ export const GridNoRowsOverlayFr = (props: GridNoRowsOverlayProps, externalRef: 
     return <GridLoadingOverlayComponent ref={externalRef} headerRowHeight={props.headerRowHeight} />;
   }
   if (props.rowCount === 0) {
-    return <div ref={externalRef}>{props.noRowsOverlayText ?? "There are currently no rows"}</div>;
+    return <div ref={externalRef}>{props.noRowsOverlayText ?? 'There are currently no rows'}</div>;
   }
   if (props.filteredRowCount === 0) {
-    return <div ref={externalRef}>{props.noRowsMatchingOverlayText ?? "All rows have been filtered"}</div>;
+    return <div ref={externalRef}>{props.noRowsMatchingOverlayText ?? 'All rows have been filtered'}</div>;
   }
   return <div ref={externalRef} />;
 };

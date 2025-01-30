@@ -1,1 +1,1 @@
-export * from "./GridHeaderSelect";
+export * from './GridHeaderSelect';

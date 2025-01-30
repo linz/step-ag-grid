@@ -1,11 +1,11 @@
-import { KeyboardEvent, Ref, useContext, useMemo } from "react";
+import { KeyboardEvent, Ref, useContext, useMemo } from 'react';
 
-import { EventHandlersContext } from "../contexts/EventHandlersContext";
-import { RadioGroupContext } from "../contexts/RadioGroupContext";
-import { useBEM, useCombinedRef, useItemState } from "../hooks";
-import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from "../types";
-import { Keys, RMEvent, commonProps, menuClass, menuItemClass, mergeProps, safeCall, withHovering } from "../utils";
-import { withHoveringResultProps } from "../utils/withHovering";
+import { EventHandlersContext } from '../contexts/EventHandlersContext';
+import { RadioGroupContext } from '../contexts/RadioGroupContext';
+import { useBEM, useCombinedRef, useItemState } from '../hooks';
+import { BaseProps, ClickEvent, EventHandler, Hoverable, MenuItemTypeProp, RenderProp } from '../types';
+import { commonProps, Keys, menuClass, menuItemClass, mergeProps, RMEvent, safeCall, withHovering } from '../utils';
+import { withHoveringResultProps } from '../utils/withHovering';
 
 //
 // MenuItem
@@ -33,7 +33,7 @@ export type MenuItemModifiers = Readonly<{
   anchor: boolean;
 }>;
 
-export interface MenuItemProps extends Omit<BaseProps<MenuItemModifiers>, "onClick">, Hoverable {
+export interface MenuItemProps extends Omit<BaseProps<MenuItemModifiers>, 'onClick'>, Hoverable {
   /**
    * Any value provided to this prop will be available in the event object of click events.
    *
@@ -85,8 +85,8 @@ const MenuItemFr = ({
   const { setHover, ...restStateProps } = useItemState(menuItemRef, menuItemRef, isHovering, isDisabled);
   const eventHandlers = useContext(EventHandlersContext);
   const radioGroup = useContext(RadioGroupContext);
-  const isRadio = type === "radio";
-  const isCheckBox = type === "checkbox";
+  const isRadio = type === 'radio';
+  const isCheckBox = type === 'checkbox';
   const isAnchor = !!href && !isDisabled && !isRadio && !isCheckBox;
   const isChecked = isRadio ? radioGroup.value === value : isCheckBox ? !!checked : false;
 
@@ -122,7 +122,7 @@ const MenuItemFr = ({
 
   const handleKeyDown = (e: KeyboardEvent) => {
     // if tab is allowed the handleKeyUp event can't process the tab
-    if (e.key === "Tab") {
+    if (e.key === 'Tab') {
       e.preventDefault();
       e.stopPropagation();
     }
@@ -176,8 +176,8 @@ const MenuItemFr = ({
   // 2. Merged outer and local props
   // 3. ref, className
   const menuItemProps = {
-    role: isRadio ? "menuitemradio" : isCheckBox ? "menuitemcheckbox" : "menuitem",
-    "aria-checked": isRadio || isCheckBox ? isChecked : undefined,
+    role: isRadio ? 'menuitemradio' : isCheckBox ? 'menuitemcheckbox' : 'menuitem',
+    'aria-checked': isRadio || isCheckBox ? isChecked : undefined,
     ...mergedProps,
     ...commonProps(isDisabled, isHovering),
     ref: useCombinedRef(externalRef as Ref<any>, menuItemRef),
@@ -196,4 +196,4 @@ const MenuItemFr = ({
   }
 };
 
-export const MenuItem = withHovering("MenuItem", MenuItemFr);
+export const MenuItem = withHovering('MenuItem', MenuItemFr);

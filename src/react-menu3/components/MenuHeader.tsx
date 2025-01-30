@@ -1,8 +1,8 @@
-import { ForwardedRef, forwardRef, memo } from "react";
+import { ForwardedRef, forwardRef, memo } from 'react';
 
-import { useBEM } from "../hooks";
-import { BasePropsWithChildren } from "../types";
-import { menuClass, menuHeaderClass } from "../utils";
+import { useBEM } from '../hooks';
+import { BasePropsWithChildren } from '../types';
+import { menuClass, menuHeaderClass } from '../utils';
 
 export const MenuHeaderFr = (
   { className, ...restProps }: BasePropsWithChildren,
