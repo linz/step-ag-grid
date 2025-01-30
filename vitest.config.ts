@@ -5,9 +5,11 @@ export default defineConfig({
     test: {
         globals: true,
         setupFiles: ['./vitest.setup.ts'],
-        environment: 'happy-dom', // Use jsdom for browser-like tests
-        deps: {
-            inline: ['vitest-canvas-mock'],
+        environment: 'jsdom',
+        server: {
+            deps: {
+                inline: ['vitest-canvas-mock'],
+            },
         },
         environmentOptions: {
             jsdom: {

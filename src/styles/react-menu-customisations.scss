@@ -1,4 +1,4 @@
-@use "@linzjs/lui/dist/scss/Core" as lui;
+@use "../../node_modules/@linzjs/lui/dist/scss/Core" as lui;
 
 /**
  * Here is where we can override the styles of react-menu
@@ -28,22 +28,10 @@
 /**
  * Here are styles for lui select menu
  */
-.lui-select-menu.szh-menu-container {
-  @include breakpoint(sm) {
-    position: absolute;
-  }
-}
-
 .lui-select-menu.szh-menu {
   z-index: 900;
   width: 92vw;
   overflow-y: scroll;
-
-  @include breakpoint(sm) {
-    overflow: visible;
-    height: auto;
-    width: 240px;
-  }
 
   color: lui.$base-type-color;
   @include lui.font-light();

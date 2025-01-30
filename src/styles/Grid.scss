@@ -1,6 +1,6 @@
 @use "../react-menu3/styles/index";
 @use "./react-menu-customisations";
-@use "@linzjs/lui/dist/scss/Core" as lui;
+@use "../../node_modules/@linzjs/lui/dist/scss/Core" as lui;
 
 .LabelPreferencesPanelGridCellAlignCenter .ag-wrapper {
   margin-left: auto;
