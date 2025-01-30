@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-import { RMEvent } from "../utils";
+import { RMEvent } from '../utils';
 
 export interface EventHandlersContextType {
   handleClose?: () => void;

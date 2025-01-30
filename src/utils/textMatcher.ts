@@ -1,5 +1,5 @@
-import { isEmpty, partition } from "lodash-es";
-import { isMatch } from "matcher";
+import { isEmpty, partition } from 'lodash-es';
+import { isMatch } from 'matcher';
 
 /**
  * Text matching with wildcards and multiple matchers.
@@ -17,22 +17,22 @@ export const textMatch = (text: string | undefined | null, filter: string): bool
   if (text == null) return true;
 
   const superFilters = filter
-    .split(",")
+    .split(',')
     .map((sf) => sf.trim())
     .filter((sf) => sf)
     .map((r) =>
       r
         .split(/\s+/)
-        .map((f) => (f.startsWith("=") ? f.slice(1) : f + "*"))
-        .join(" "),
+        .map((f) => (f.startsWith('=') ? f.slice(1) : f + '*'))
+        .join(' '),
     );
-  const [negativeFilters, positiveFilters] = partition(superFilters, (superFilters) => superFilters.startsWith("!"));
+  const [negativeFilters, positiveFilters] = partition(superFilters, (superFilters) => superFilters.startsWith('!'));
 
-  const values = text.replaceAll(",", " ").trim().split(/\s+/);
+  const values = text.replaceAll(',', ' ').trim().split(/\s+/);
   return (
     (isEmpty(positiveFilters) || // Not filtered
       positiveFilters.some((superFilter) => {
-        const subFilters = superFilter.split(/\s+/).map((s) => s.replaceAll(/([!?])/g, "\\$1"));
+        const subFilters = superFilter.split(/\s+/).map((s) => s.replaceAll(/([!?])/g, '\\$1'));
         return subFilters.every((subFilter) => values.some((value) => isMatch(value, subFilter)));
       })) &&
     (isEmpty(negativeFilters) ||

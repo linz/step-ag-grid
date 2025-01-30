@@ -1,8 +1,8 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject } from 'react';
 
-import { MenuDirection } from "../types";
-import { getPositionHelpers } from "./getPositionHelpers";
-import { placeArrowVertical } from "./placeArrowVertical";
+import { MenuDirection } from '../types';
+import { getPositionHelpers } from './getPositionHelpers';
+import { placeArrowVertical } from './placeArrowVertical';
 
 export interface placeLeftorRightParams {
   anchorRect: DOMRect;
@@ -12,7 +12,7 @@ export interface placeLeftorRightParams {
   arrowRef: MutableRefObject<HTMLElement | null>;
   arrow?: boolean;
   direction: MenuDirection;
-  position: "auto" | "anchor" | "initial";
+  position: 'auto' | 'anchor' | 'initial';
 }
 
 export const placeLeftorRight = (
@@ -36,9 +36,9 @@ export const placeLeftorRight = (
   } = props;
   let computedDirection = direction;
   let y = placeLeftorRightY;
-  if (position !== "initial") {
+  if (position !== 'initial') {
     y = confineVertically(y);
-    if (position === "anchor") {
+    if (position === 'anchor') {
       // restrict menu to the edge of anchor element
       y = Math.min(y, anchorRect.bottom - containerRect.top);
       y = Math.max(y, anchorRect.top - containerRect.top - menuRect.height);
@@ -46,10 +46,10 @@ export const placeLeftorRight = (
   }
 
   let x, leftOverflow, rightOverflow;
-  if (computedDirection === "left") {
+  if (computedDirection === 'left') {
     x = placeLeftX;
 
-    if (position !== "initial") {
+    if (position !== 'initial') {
       // if menu overflows to the left,
       // try to reposition it to the right of the anchor.
       leftOverflow = getLeftOverflow(x);
@@ -59,7 +59,7 @@ export const placeLeftorRight = (
         rightOverflow = getRightOverflow(placeRightX);
         if (rightOverflow <= 0 || -leftOverflow > rightOverflow) {
           x = placeRightX;
-          computedDirection = "right";
+          computedDirection = 'right';
         }
       }
     }
@@ -67,19 +67,19 @@ export const placeLeftorRight = (
     // Opposite logic to the 'left' direction above
     x = placeRightX;
 
-    if (position !== "initial") {
+    if (position !== 'initial') {
       rightOverflow = getRightOverflow(x);
       if (rightOverflow > 0) {
         leftOverflow = getLeftOverflow(placeLeftX);
         if (leftOverflow >= 0 || -leftOverflow < rightOverflow) {
           x = placeLeftX;
-          computedDirection = "left";
+          computedDirection = 'left';
         }
       }
     }
   }
 
-  if (position === "auto") x = confineHorizontally(x);
+  if (position === 'auto') x = confineHorizontally(x);
   const arrowY = arrow
     ? placeArrowVertical({
         menuY: y,

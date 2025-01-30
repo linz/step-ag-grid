@@ -1,6 +1,6 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject } from 'react';
 
-import { parsePadding } from "../utils";
+import { parsePadding } from '../utils';
 
 export const getPositionHelpers = (
   containerRef: MutableRefObject<HTMLElement | undefined>,

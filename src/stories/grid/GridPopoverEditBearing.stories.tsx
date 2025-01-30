@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -22,14 +21,14 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
   wait,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
-    quickFilterValue: "",
+    quickFilterValue: '',
     selectable: true,
     alwaysShowVerticalScroll: false,
   },
@@ -57,16 +56,16 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
       }),
       GridPopoverEditBearingCorrection(
         {
-          field: "bearingCorrection",
-          headerName: "Bearing correction",
+          field: 'bearingCorrection',
+          headerName: 'Bearing correction',
           cellRendererParams: {
-            warning: ({ data }) => data?.id == 1002 && "Testers are testing",
-            info: ({ data }) => data?.id == 1001 && "Developers are developing",
+            warning: ({ data }) => data?.id == 1002 && 'Testers are testing',
+            info: ({ data }) => data?.id == 1001 && 'Developers are developing',
           },
         },
         {
@@ -75,14 +74,14 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
       ),
       GridPopoverEditBearing(
         {
-          field: "bearing",
-          headerName: "Bearing",
+          field: 'bearing',
+          headerName: 'Bearing',
         },
         {
           editorParams: {
             onSave: async ({ selectedRows, value }) => {
               await wait(1000);
-              selectedRows.forEach((row) => (row["bearing"] = value));
+              selectedRows.forEach((row) => (row['bearing'] = value));
               return true;
             },
           },
@@ -94,11 +93,11 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
 
   const [rowData] = useState([
     { id: 1000, bearing: 1.234, bearingCorrection: null },
-    { id: 1001, bearing: "0E-12", bearingCorrection: 240 },
+    { id: 1001, bearing: '0E-12', bearingCorrection: 240 },
     { id: 1002, bearing: null, bearingCorrection: 355.1 },
     { id: 1003, bearing: null, bearingCorrection: 0 },
-    { id: 1004, bearing: 5.0, bearingCorrection: "1.00500" },
-    { id: 1005, bearing: null, bearingCorrection: "0E-12" },
+    { id: 1004, bearing: 5.0, bearingCorrection: '1.00500' },
+    { id: 1005, bearing: null, bearingCorrection: '0E-12' },
   ] as ITestRow[]);
 
   return (
@@ -106,17 +105,17 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
       <GridFilters>
         <GridFilterQuick />
         <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton fileName={"customFilename"} />
+        <GridFilterDownloadCsvButton fileName={'customFilename'} />
       </GridFilters>
       <Grid
-        data-testid={"bearingsTestTable"}
+        data-testid={'bearingsTestTable'}
         {...props}
         readOnly={false}
         externalSelectedItems={externalSelectedItems}
         setExternalSelectedItems={setExternalSelectedItems}
         columnDefs={columnDefs}
         rowData={rowData}
-        domLayout={"autoHeight"}
+        domLayout={'autoHeight'}
       />
     </GridWrapper>
   );

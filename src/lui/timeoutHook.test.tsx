@@ -1,8 +1,8 @@
-import { render } from "@testing-library/react";
+import { render } from '@testing-library/react';
 
-import { useTimeoutHook } from "./timeoutHook";
+import { useTimeoutHook } from './timeoutHook';
 
-describe("useTimeoutHook", () => {
+describe('useTimeoutHook', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -19,7 +19,7 @@ describe("useTimeoutHook", () => {
     return <div />;
   };
 
-  test("invokes on timeout", async () => {
+  test('invokes on timeout', () => {
     const callback = jest.fn();
 
     render(<TestComponent callback={callback} />);
@@ -28,7 +28,7 @@ describe("useTimeoutHook", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  test("invokes once on double invocation", async () => {
+  test('invokes once on double invocation', () => {
     const callback = jest.fn();
 
     render(<TestComponent callback={callback} repeat={2} />);

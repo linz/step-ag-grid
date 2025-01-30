@@ -1,20 +1,19 @@
-import { isEqual } from "lodash-es";
-import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { LuiCheckboxInput } from '@linzjs/lui';
+import { isEqual } from 'lodash-es';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { LuiCheckboxInput } from "@linzjs/lui";
-
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { MenuItem } from "../../react-menu3";
-import { ClickEvent } from "../../react-menu3/types";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { GridIcon } from "../GridIcon";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { MenuItem } from '../../react-menu3';
+import { ClickEvent } from '../../react-menu3/types';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { GridIcon } from '../GridIcon';
+import { useGridPopoverHook } from '../GridPopoverHook';
 
 export interface MultiSelectGridOption {
   value: any;
   label?: string | ReactElement;
-  checked?: boolean | "partial";
+  checked?: boolean | 'partial';
   canSelectPartial?: boolean;
   warning?: string | undefined;
 }
@@ -96,9 +95,9 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
     if (options || optionsInitialising.current) return;
     optionsInitialising.current = true;
 
-    (async () => {
-      const optionsList = typeof props.options === "function" ? await props.options(selectedRows) : props.options;
-      setInitialValues(optionsList.map((o) => ({ ...o, label: "" })));
+    void (async () => {
+      const optionsList = typeof props.options === 'function' ? await props.options(selectedRows) : props.options;
+      setInitialValues(optionsList.map((o) => ({ ...o, label: '' })));
       setOptions(optionsList);
       optionsInitialising.current = false;
     })();
@@ -107,7 +106,7 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
   const toggleValue = useCallback(
     (item: MultiSelectGridOption) => {
       if (options) {
-        item.checked = item.checked === true && item.canSelectPartial ? "partial" : !item.checked;
+        item.checked = item.checked === true && item.canSelectPartial ? 'partial' : !item.checked;
         setOptions([...options]);
       }
     },
@@ -116,14 +115,14 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
 
   return popoverWrapper(
     <>
-      <div className={"Grid-popoverContainer"}>
+      <div className={'Grid-popoverContainer'}>
         <div
           style={{
-            display: "grid",
-            gridAutoFlow: "column",
+            display: 'grid',
+            gridAutoFlow: 'column',
             gridTemplateRows: `repeat(${props.maxRowCount ?? 10}, auto)`,
-            maxWidth: "calc(min(100vw,500px))",
-            overflowX: "auto",
+            maxWidth: 'calc(min(100vw,500px))',
+            overflowX: 'auto',
           }}
         >
           {options &&
@@ -133,7 +132,7 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
                   key={JSON.stringify(o.value)}
                   onClick={(e: ClickEvent) => {
                     // Global react-menu MenuItem handler handles tabs
-                    if (e.key !== "Tab" && e.key !== "Enter") {
+                    if (e.key !== 'Tab' && e.key !== 'Enter') {
                       e.keepOpen = true;
                       toggleValue(o);
                     }
@@ -141,12 +140,12 @@ export const GridFormMultiSelectGrid = <TData extends GridBaseRow>(
                 >
                   <LuiCheckboxInput
                     isChecked={!!o.checked}
-                    isIndeterminate={o.checked === "partial"}
+                    isIndeterminate={o.checked === 'partial'}
                     value={`${o.value}`}
                     label={
                       <>
-                        {o.warning && <GridIcon key={"$$icon$$"} icon={"ic_warning_outline"} title={o.warning} />}
-                        <span key={"$$label$$"} className={"GridMultiSelectGrid-Label"}>
+                        {o.warning && <GridIcon key={'$$icon$$'} icon={'ic_warning_outline'} title={o.warning} />}
+                        <span key={'$$label$$'} className={'GridMultiSelectGrid-Label'}>
                           {o.label ?? (o.value == null ? `<${o.value}>` : `${o.value}`)}
                         </span>
                       </>

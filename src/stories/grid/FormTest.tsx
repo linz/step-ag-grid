@@ -1,10 +1,9 @@
-import "./FormTest.scss";
+import './FormTest.scss';
 
-import { ReactElement, useCallback, useState } from "react";
+import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from '@linzjs/lui';
+import { ReactElement, useCallback, useState } from 'react';
 
-import { LuiAlertModal, LuiAlertModalButtons, LuiButton, LuiTextInput } from "@linzjs/lui";
-
-import { CellEditorCommon, FormError, useGridPopoverContext, useGridPopoverHook, wait } from "../..";
+import { CellEditorCommon, FormError, useGridPopoverContext, useGridPopoverHook, wait } from '../..';
 
 export interface IFormTestRow {
   id: number;
@@ -18,17 +17,17 @@ export interface IFormTestRow {
 
 export const FormTest = (props: CellEditorCommon): ReactElement => {
   const { value } = useGridPopoverContext<IFormTestRow>();
-  const [v1, ...v2] = value.split(" ");
+  const [v1, ...v2] = value.split(' ');
 
   const [nameType, setNameType] = useState(v1);
-  const [numba, setNumba] = useState(v2.join(" "));
+  const [numba, setNumba] = useState(v2.join(' '));
 
   const save = useCallback(
     async (selectedRows: IFormTestRow[]): Promise<boolean> => {
       // eslint-disable-next-line no-console
-      console.log("onSave", selectedRows, nameType, numba);
+      console.log('onSave', selectedRows, nameType, numba);
 
-      selectedRows.forEach((row) => (row.name = [nameType, numba].join(" ")));
+      selectedRows.forEach((row) => (row.name = [nameType, numba].join(' ')));
       await wait(1000);
 
       // Close form
@@ -38,7 +37,7 @@ export const FormTest = (props: CellEditorCommon): ReactElement => {
   );
 
   const invalid = useCallback(() => {
-    if (numba.length < 3) return "Number should be at least 3 characters";
+    if (numba.length < 3) return 'Number should be at least 3 characters';
     return null;
   }, [numba.length]);
 
@@ -79,7 +78,7 @@ export const FormTest = (props: CellEditorCommon): ReactElement => {
               level="primary"
               onClick={() => {
                 setShowModal(false);
-                triggerSave().then();
+                void triggerSave();
               }}
               data-testid="WarningAlertWithButtons-ok"
             >
@@ -88,13 +87,13 @@ export const FormTest = (props: CellEditorCommon): ReactElement => {
           </LuiAlertModalButtons>
         </LuiAlertModal>
       )}
-      <div className={"Grid-popoverContainer"}>
+      <div className={'Grid-popoverContainer'}>
         <div className="FormTest">
-          <div className={"FormTest-textInput"}>
-            <LuiTextInput label={"Name type"} value={nameType} onChange={(e) => setNameType(e.target.value)} />
+          <div className={'FormTest-textInput'}>
+            <LuiTextInput label={'Name type'} value={nameType} onChange={(e) => setNameType(e.target.value)} />
           </div>
-          <div className={"FormTest-textInput"}>
-            <LuiTextInput label={"Number"} value={numba} onChange={(e) => setNumba(e.target.value)} />
+          <div className={'FormTest-textInput'}>
+            <LuiTextInput label={'Number'} value={numba} onChange={(e) => setNumba(e.target.value)} />
           </div>
           <div style={{ marginTop: 25 }}>
             <input

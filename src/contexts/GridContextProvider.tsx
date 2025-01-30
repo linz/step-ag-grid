@@ -1,15 +1,15 @@
-import { CellPosition, ColDef, GridApi, IRowNode, RowNode } from "ag-grid-community";
-import { CsvExportParams, ProcessCellForExportParams } from "ag-grid-community";
-import debounce from "debounce-promise";
-import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from "lodash-es";
-import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { CellPosition, ColDef, GridApi, IRowNode, RowNode } from 'ag-grid-community';
+import { CsvExportParams, ProcessCellForExportParams } from 'ag-grid-community';
+import debounce from 'debounce-promise';
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from 'lodash-es';
+import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { ColDefT, GridBaseRow } from "../components";
-import { GridCellFillerColId, isGridCellFiller } from "../components/GridCellFiller";
-import { getColId, isFlexColumn } from "../components/gridUtil";
-import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from "../utils/util";
-import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from "./GridContext";
-import { GridUpdatingContext } from "./GridUpdatingContext";
+import { ColDefT, GridBaseRow } from '../components';
+import { GridCellFillerColId, isGridCellFiller } from '../components/GridCellFiller';
+import { getColId, isFlexColumn } from '../components/gridUtil';
+import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from '../utils/util';
+import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from './GridContext';
+import { GridUpdatingContext } from './GridUpdatingContext';
 
 /**
  * Context for AgGrid operations.
@@ -20,7 +20,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
-  const [quickFilter, _setQuickFilter] = useState("");
+  const [quickFilter, _setQuickFilter] = useState('');
   const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const idsBeforeUpdate = useRef<number[]>([]);
@@ -47,7 +47,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Set quick filter directly on grid, based on previously save quickFilter state.
    */
   useEffect(() => {
-    gridApi?.setGridOption("quickFilterText", quickFilter);
+    gridApi?.setGridOption('quickFilterText', quickFilter);
   }, [gridApi, quickFilter]);
 
   /**
@@ -57,7 +57,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * @param noApiFn Execute if api is not ready.
    */
   const gridApiOp = useCallback(
-    <T extends unknown, R extends unknown>(hasApiFn: (gridApi: GridApi) => T, noApiFn?: () => R): T | R => {
+    <T, R>(hasApiFn: (gridApi: GridApi) => T, noApiFn?: () => R): T | R => {
       if (!noApiFn) {
         noApiFn = (() => {}) as () => R;
       }
@@ -87,9 +87,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     let id = 0;
     try {
       gridApi?.forEachNodeAfterFilterAndSort((rowNode) => {
-        id = parseInt(rowNode.id ?? "0");
+        id = parseInt(rowNode.id ?? '0');
         // this is the only way to get out of the loop
-        throw "expected exception - exit_loop";
+        throw 'expected exception - exit_loop';
       });
     } catch (ex) {
       // ignore
@@ -104,7 +104,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     (gridApi: GridApi | undefined, dataTestId?: string) => {
       testId.current = dataTestId;
       setGridApi(gridApi);
-      gridApi?.setGridOption("quickFilterText", quickFilter);
+      gridApi?.setGridOption('quickFilterText', quickFilter);
       setGridReady(!!gridApi);
     },
     [quickFilter],
@@ -113,10 +113,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   /**
    * Used to check if it's OK to autosize.
    */
-  const gridRenderState = useCallback((): null | "empty" | "rows-visible" => {
+  const gridRenderState = useCallback((): null | 'empty' | 'rows-visible' => {
     if (!gridApi) return null;
-    if (!gridApi.getDisplayedRowCount()) return "empty";
-    if (!isEmpty(gridApi.getRenderedNodes())) return "rows-visible";
+    if (!gridApi.getDisplayedRowCount()) return 'empty';
+    if (!isEmpty(gridApi.getRenderedNodes())) return 'rows-visible';
     // If there are rows to render, but there are no rendered nodes then we should wait
     return null;
   }, [gridApi]);
@@ -182,7 +182,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const _getNewNodes = useCallback((): IRowNode[] => {
     return gridApiOp(
       (gridApi) =>
-        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode("" + rowId))),
+        compact(difference(_getAllRowIds(), idsBeforeUpdate.current).map((rowId) => gridApi.getRowNode('' + rowId))),
       () => [],
     );
   }, [_getAllRowIds, gridApiOp]);
@@ -196,7 +196,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const _rowIdsToNodes = useCallback(
     (rowIds: number[]): IRowNode[] => {
       return gridApiOp(
-        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode("" + rowId))),
+        (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode('' + rowId))),
         () => [] as RowNode[],
       );
     },
@@ -362,14 +362,14 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [_selectRowsWithOptionalFlash],
   );
 
-  const getSelectedRows = useCallback(<T extends unknown>(): T[] => {
+  const getSelectedRows = useCallback(<T,>(): T[] => {
     return gridApiOp(
       (gridApi) => gridApi.getSelectedRows(),
       () => [],
     );
   }, [gridApiOp]);
 
-  const getFilteredSelectedRows = useCallback(<T extends unknown>(): T[] => {
+  const getFilteredSelectedRows = useCallback(<T,>(): T[] => {
     return gridApiOp((gridApi) => {
       const rowData: T[] = [];
       gridApi.forEachNodeAfterFilter((node) => {
@@ -431,7 +431,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       return {
         width: sumBy(
           gridApi.getColumnState().filter((col) => !col.hide),
-          "width",
+          'width',
         ),
       };
     },
@@ -454,7 +454,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   }, [gridApi]);
 
   const startCellEditing = useCallback(
-    async ({ rowId, colId }: { rowId: number; colId: string }) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    ({ rowId, colId }: { rowId: number; colId: string }) => {
       if (!gridApi) return;
 
       const colDef = gridApi.getColumnDef(colId);
@@ -471,7 +472,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       }
 
       // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([colDef.field ?? ""], rowId)) {
+      if (checkUpdating([colDef.field ?? ''], rowId)) {
         return;
       }
 
@@ -565,13 +566,13 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         let ok = false;
 
         await modifyUpdating(
-          props.field ?? "",
+          props.field ?? '',
           selectedRows.map((data) => data.id),
           async () => {
             // Need to refresh to get spinners to work on all rows
             gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
             ok = await fnUpdate(selectedRows).catch((ex) => {
-              console.error("Exception during modifyUpdating", ex);
+              console.error('Exception during modifyUpdating', ex);
               return false;
             });
           },
@@ -611,14 +612,14 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [gridApiOp, modifyUpdating, selectNextEditableCell],
   );
 
-  const redrawRows = useMemo(
+  const redrawRows: any = useMemo(
     () =>
       debounce((rowNodes?: IRowNode[]) => {
         try {
           gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
         } catch (ex) {
           // Hide errors in jest, but log them in browser
-          if (typeof jest === "undefined") console.error(ex);
+          if (typeof jest === 'undefined') console.error(ex);
         }
       }, 50),
     [gridApi],
@@ -646,7 +647,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           gridApi?.forEachNodeAfterFilter((rowNode) => {
             arr.push(rowNode.id);
           });
-          return arr.join("|");
+          return arr.join('|');
         };
 
         if (gridApi) {
@@ -664,12 +665,12 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
   const addExternalFilter = (filter: GridFilterExternal<TData>) => {
     externalFilters.current.push(filter);
-    onFilterChanged().then();
+    void onFilterChanged();
   };
 
   const removeExternalFilter = (filter: GridFilterExternal<TData>) => {
     remove(externalFilters.current, (v) => v === filter);
-    onFilterChanged().then();
+    void onFilterChanged();
   };
 
   const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
@@ -798,10 +799,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 export const downloadCsvUseValueFormattersProcessCellCallback = (params: ProcessCellForExportParams): string => {
   const encodeToString = (value: any): string => {
     // Convert nullish values to blank
-    if (value === "-" || value === "–" || value == null) {
-      return "";
+    if (value === '-' || value === '–' || value == null) {
+      return '';
     }
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
       return value;
     }
     return JSON.stringify(value);
@@ -816,14 +817,14 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   const valueFormatter = colDef.valueFormatter;
   // If no valueFormatter then value _must_ be a string
   if (valueFormatter == null) {
-    if (params.value != null && typeof params.value !== "string") {
+    if (params.value != null && typeof params.value !== 'string') {
       console.error(`downloadCsv: valueFormatter missing and getValue is not a string, colId: ${colDef.colId}`);
     }
     return encodeToString(params.value);
   }
 
   // We don't have access to registered functions, so we can't call them
-  if (typeof valueFormatter !== "function") {
+  if (typeof valueFormatter !== 'function') {
     console.error(
       `downloadCsv: String type (registered) value formatters are unsupported in downloadCsv, colId: ${colDef.colId}`,
     );
@@ -832,7 +833,7 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
 
   const result = valueFormatter({ ...params, data: params.node?.data, colDef, node: null });
   // type may not be string due to casting, leave the type check in
-  if (params.value != null && typeof result !== "string") {
+  if (params.value != null && typeof result !== 'string') {
     console.error(`downloadCsv: valueFormatter is returning non string values, colDef:", colId: ${colDef.colId}`);
   }
   // We add an extra encodeToString here just in case valueFormatter is returning non string values

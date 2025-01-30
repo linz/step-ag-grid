@@ -1,12 +1,11 @@
-import clsx, { ClassValue } from "clsx";
-import { ReactElement, useMemo, useState } from "react";
+import { LuiButton, LuiButtonGroup } from '@linzjs/lui';
+import { LuiButtonProps } from '@linzjs/lui/dist/components/LuiButton/LuiButton';
+import clsx, { ClassValue } from 'clsx';
+import { ReactElement, useMemo, useState } from 'react';
 
-import { LuiButton, LuiButtonGroup } from "@linzjs/lui";
-import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
-
-import { GridFilterExternal } from "../../contexts/GridContext";
-import { GridBaseRow } from "../Grid";
-import { useGridFilter } from "./useGridFilter";
+import { GridFilterExternal } from '../../contexts/GridContext';
+import { GridBaseRow } from '../Grid';
+import { useGridFilter } from './useGridFilter';
 
 export interface GridFilterButtonsOption<TData extends GridBaseRow> {
   defaultSelected?: boolean;
@@ -32,7 +31,7 @@ export const GridFilterButtons = <TData extends GridBaseRow>({
   useGridFilter(filter);
 
   return (
-    <div className={clsx(className, "flex-col-center")}>
+    <div className={clsx(className, 'flex-col-center')}>
       <LuiButtonGroup>
         {options.map((option, index) => (
           <LuiButton

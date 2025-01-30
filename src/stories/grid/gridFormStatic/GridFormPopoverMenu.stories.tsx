@@ -1,12 +1,11 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
-import { useRef } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { GridPopoverContext, GridPopoverContextType } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
 import {
   GridBaseRow,
@@ -14,25 +13,25 @@ import {
   GridFormPopoverMenu,
   GridFormPopoverMenuProps,
   PopoutMenuSeparator,
-} from "../../..";
+} from '../../..';
 
 export default {
-  title: "GridForm / Static Tests",
+  title: 'GridForm / Static Tests',
   component: GridFormPopoverMenu,
   args: {},
 } as Meta<typeof GridFormPopoverMenu>;
 
 const Template: StoryFn<typeof GridFormPopoverMenu> = (props) => {
   const configs: [string, GridFormPopoverMenuProps<GridBaseRow>][] = [
-    ["No options", { options: async () => [] }],
+    ['No options', { options: () => [] }],
     [
-      "Enabled/disabled/hidden and divider",
+      'Enabled/disabled/hidden and divider',
       {
-        options: async () => [
-          { label: "Enabled", value: 1 },
+        options: () => [
+          { label: 'Enabled', value: 1 },
           PopoutMenuSeparator,
-          { label: "Disabled", value: 0, disabled: true },
-          { label: "ERROR! this should be hidden", value: 3, hidden: true },
+          { label: 'Disabled', value: 0, disabled: true },
+          { label: 'ERROR! this should be hidden', value: 3, hidden: true },
         ],
       },
     ],
@@ -41,7 +40,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props) => {
   const anchorRefs = configs.map(() => useRef<HTMLHeadingElement>(null));
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContextProvider>
         {configs.map((config, index) => (
           <>

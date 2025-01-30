@@ -1,13 +1,12 @@
-import { isEmpty } from "lodash-es";
-import { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { LuiCheckboxInput, LuiIcon } from '@linzjs/lui';
+import { ColDef } from 'ag-grid-community';
+import { isEmpty } from 'lodash-es';
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { LuiCheckboxInput, LuiIcon } from "@linzjs/lui";
-
-import { GridContext } from "../../contexts/GridContext";
-import { Menu, MenuDivider, MenuItem } from "../../react-menu3";
-import { ClickEvent } from "../../react-menu3/types";
-import { GridFilterHeaderIconButton } from "./GridFilterHeaderIconButton";
-import { ColDef } from "ag-grid-community";
+import { GridContext } from '../../contexts/GridContext';
+import { Menu, MenuDivider, MenuItem } from '../../react-menu3';
+import { ClickEvent } from '../../react-menu3/types';
+import { GridFilterHeaderIconButton } from './GridFilterHeaderIconButton';
 
 export interface GridFilterColumnsToggleProps {
   saveState?: boolean;
@@ -21,13 +20,13 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
     () =>
       isEmpty(getColumnIds())
         ? null // Grid hasn't been initialised yet
-        : "stepAgGrid_invisibleColumnIds_" + getColumnIds().join("_"),
+        : 'stepAgGrid_invisibleColumnIds_' + getColumnIds().join('_'),
     [getColumnIds],
   );
 
   // infer the invisible ids from colDefs
   const resetColumns = useCallback(
-    () => setInvisibleColumnIds(getColumnIds("initialHide")),
+    () => setInvisibleColumnIds(getColumnIds('initialHide')),
     [getColumnIds, setInvisibleColumnIds],
   );
 
@@ -40,10 +39,10 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
         if (!stored) {
           resetColumns();
         } else {
-          const invisibleIds = JSON.parse(stored ?? "[]");
+          const invisibleIds = JSON.parse(stored ?? '[]');
           if (!Array.isArray(invisibleIds)) {
             console.error(`stored invisible ids not an array: ${stored}`);
-          } else if (!invisibleIds.every((id) => typeof id === "string")) {
+          } else if (!invisibleIds.every((id) => typeof id === 'string')) {
             console.error(`stored invisible ids not strings: ${stored}`);
           } else {
             invisibleIds && setInvisibleColumnIds(invisibleIds);
@@ -81,30 +80,30 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
 
   return (
     <Menu
-      menuButton={<GridFilterHeaderIconButton icon={"ic_columns"} title={"Column visibility"} />}
-      menuClassName={"step-ag-grid-react-menu"}
+      menuButton={<GridFilterHeaderIconButton icon={'ic_columns'} title={'Column visibility'} />}
+      menuClassName={'step-ag-grid-react-menu'}
       portal={true}
       unmountOnClose={true}
     >
-      <div className={"GridFilterColumnsToggle-container"}>
-        {getColumns("headerName").map((col) => (
+      <div className={'GridFilterColumnsToggle-container'}>
+        {getColumns('headerName').map((col) => (
           <MenuItem
-            key={col.colId ?? "no_col_id"}
+            key={col.colId ?? 'no_col_id'}
             disabled={isNonManageableColumn(col)}
             onClick={(e: ClickEvent) => {
               // Global react-menu MenuItem handler handles tabs
-              if (e.key !== "Tab") {
+              if (e.key !== 'Tab') {
                 e.keepOpen = true;
-                if (e.key !== "Enter") {
+                if (e.key !== 'Enter') {
                   toggleColumn(col.colId);
                 }
               }
             }}
           >
             <LuiCheckboxInput
-              isChecked={!!invisibleColumnIds && !invisibleColumnIds.includes(col.colId ?? "")}
+              isChecked={!!invisibleColumnIds && !invisibleColumnIds.includes(col.colId ?? '')}
               value={`${col.colId}`}
-              label={col.headerName ?? ""}
+              label={col.headerName ?? ''}
               isDisabled={isNonManageableColumn(col)}
               inputProps={{
                 onClick: (e) => {
@@ -122,16 +121,16 @@ export const GridFilterColumnsToggle = ({ saveState = true }: GridFilterColumnsT
       </div>
       <MenuDivider key={`$$divider_reset_columns`} />
       <MenuItem
-        key={"$$reset_columns"}
+        key={'$$reset_columns'}
         onClick={(e: ClickEvent) => {
           // Global react-menu MenuItem handler handles tabs
-          if (e.key !== "Tab") {
-            e.keepOpen = e.key !== "Enter";
+          if (e.key !== 'Tab') {
+            e.keepOpen = e.key !== 'Enter';
             resetColumns();
           }
         }}
       >
-        <LuiIcon name={"ic_regenerate"} alt={"Reset columns"} size={"md"} className={"MenuItem-icon"} />
+        <LuiIcon name={'ic_regenerate'} alt={'Reset columns'} size={'md'} className={'MenuItem-icon'} />
         Reset columns
       </MenuItem>
     </Menu>

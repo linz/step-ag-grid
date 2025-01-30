@@ -1,6 +1,6 @@
-import { MutableRefObject, PropsWithRef, ReactElement, forwardRef, memo, useContext, useRef } from "react";
+import { forwardRef, memo, MutableRefObject, PropsWithRef, ReactElement, useContext, useRef } from 'react';
 
-import { HoverItemContext } from "../contexts/HoverItemContext";
+import { HoverItemContext } from '../contexts/HoverItemContext';
 
 export interface withHoveringResultProps {
   isHovering?: boolean;
@@ -18,7 +18,7 @@ export const withHovering = <X extends Record<string, any>, T extends PropsWithR
 
     return (
       <>
-        {/* @ts-ignore Can't work out what the ref issue is here */}
+        {/* @ts-expect-error Can't work out what the ref issue is here */}
         <Component
           {...props}
           menuItemRef={menuItemRef}

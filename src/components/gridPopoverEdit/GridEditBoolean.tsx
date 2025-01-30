@@ -1,12 +1,13 @@
-import { CellFocusedEvent } from "ag-grid-community";
-import { CellEditorCommon, ColDefT, GridCell } from "../GridCell";
-import { useEffect, useRef } from "react";
-import { fnOrVar } from "../../utils/util";
-import clsx from "clsx";
-import { GenericCellColDef } from "../gridRender";
-import { GridBaseRow } from "../Grid";
-import { CustomCellEditorProps } from "ag-grid-react";
-import { clickInputWhenContainingCellClicked } from "../clickInputWhenContainingCellClicked";
+import { CellFocusedEvent } from 'ag-grid-community';
+import { CustomCellEditorProps } from 'ag-grid-react';
+import clsx from 'clsx';
+import { useEffect, useRef } from 'react';
+
+import { fnOrVar } from '../../utils/util';
+import { clickInputWhenContainingCellClicked } from '../clickInputWhenContainingCellClicked';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon, ColDefT, GridCell } from '../GridCell';
+import { GenericCellColDef } from '../gridRender';
 
 const BooleanCellRenderer = (props: CustomCellEditorProps) => {
   const { onValueChange, value, api, node, column, colDef, data } = props;
@@ -18,9 +19,9 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
         inputRef.current?.focus();
       }
     };
-    api.addEventListener("cellFocused", checkFocus);
+    api.addEventListener('cellFocused', checkFocus);
     return () => {
-      api.removeEventListener("cellFocused", checkFocus);
+      api.removeEventListener('cellFocused', checkFocus);
     };
   }, [api, column, node.rowIndex]);
 
@@ -28,9 +29,9 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
 
   return (
     <div
-      className={clsx("ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper", {
-        "ag-checked": props.value,
-        "ag-disabled": isDisabled,
+      className={clsx('ag-wrapper ag-input-wrapper ag-checkbox-input-wrapper', {
+        'ag-checked': props.value,
+        'ag-disabled': isDisabled,
       })}
     >
       <input
@@ -58,7 +59,7 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
 
           const checked = !value;
           onValueChange(checked);
-          params.onClick({ selectedRows, selectedRowIds: selectedRows.map((r) => r.id), checked }).then();
+          void params.onClick({ selectedRows, selectedRowIds: selectedRows.map((r) => r.id), checked });
         }}
       />
     </div>
@@ -66,7 +67,7 @@ const BooleanCellRenderer = (props: CustomCellEditorProps) => {
 };
 
 export interface GridEditBooleanEditorProps<TData extends GridBaseRow> extends CellEditorCommon {
-  onClick: (props: { selectedRows: TData[]; selectedRowIds: TData["id"][]; checked: boolean }) => Promise<boolean>;
+  onClick: (props: { selectedRows: TData[]; selectedRowIds: TData['id'][]; checked: boolean }) => Promise<boolean>;
 }
 
 export const GridEditBoolean = <TData extends GridBaseRow>(
@@ -83,8 +84,8 @@ export const GridEditBoolean = <TData extends GridBaseRow>(
     singleClickEdit: true,
     resizable: false,
     editable: true,
-    cellClass: "GridCellAlignCenter",
-    headerClass: "GridHeaderAlignCenter",
+    cellClass: 'GridCellAlignCenter',
+    headerClass: 'GridHeaderAlignCenter',
     ...colDef,
   });
 };

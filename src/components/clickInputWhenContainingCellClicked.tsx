@@ -1,4 +1,4 @@
-import { CellClickedEvent } from "ag-grid-community";
+import { CellClickedEvent } from 'ag-grid-community';
 
 /**
  * AgGrid checkbox select does not pass clicks within cell but not on the checkbox to checkbox.
@@ -11,13 +11,13 @@ export const clickInputWhenContainingCellClicked = (params: CellClickedEvent) =>
   const element = event.target as Element;
   // Already handled
   if (
-    element.closest(".GridCell-readonly") ||
-    (["BUTTON", "INPUT"].includes(element?.tagName) && element.closest(".ag-cell-inline-editing"))
+    element.closest('.GridCell-readonly') ||
+    (['BUTTON', 'INPUT'].includes(element?.tagName) && element.closest('.ag-cell-inline-editing'))
   ) {
     return;
   }
 
-  const row = element.closest("[row-id]");
+  const row = element.closest('[row-id]');
   if (!row) return;
 
   const colId = colDef.colId;
@@ -27,7 +27,7 @@ export const clickInputWhenContainingCellClicked = (params: CellClickedEvent) =>
     const cell = row.querySelector(`[col-id='${colId}']`);
     if (!cell) return;
 
-    const input = cell.querySelector("input, button");
+    const input = cell.querySelector('input, button');
     if (!input) return;
 
     input?.dispatchEvent(event);

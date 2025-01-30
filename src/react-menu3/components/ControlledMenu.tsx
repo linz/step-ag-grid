@@ -1,18 +1,18 @@
-import { FocusEvent, ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
-import { createPortal } from "react-dom";
+import { FocusEvent, ForwardedRef, forwardRef, MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
-import { hasParentClass } from "../../utils/util";
-import { EventHandlersContext, EventHandlersContextType } from "../contexts/EventHandlersContext";
-import { ItemSettingsContext } from "../contexts/ItemSettingsContext";
-import { SettingsContext } from "../contexts/SettingsContext";
-import { useBEM } from "../hooks";
-import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from "../types";
-import { CloseReason, Keys, getTransition, isMenuOpen, menuContainerClass, mergeProps, safeCall } from "../utils";
-import { MenuList } from "./MenuList";
+import { hasParentClass } from '../../utils/util';
+import { EventHandlersContext, EventHandlersContextType } from '../contexts/EventHandlersContext';
+import { ItemSettingsContext } from '../contexts/ItemSettingsContext';
+import { SettingsContext } from '../contexts/SettingsContext';
+import { useBEM } from '../hooks';
+import { ControlledMenuProps, PortalFieldType, RadioChangeEvent } from '../types';
+import { CloseReason, getTransition, isMenuOpen, Keys, menuContainerClass, mergeProps, safeCall } from '../utils';
+import { MenuList } from './MenuList';
 
 export const ControlledMenuFr = (
   {
-    "aria-label": ariaLabel,
+    'aria-label': ariaLabel,
     className,
     containerProps,
     initialMounted,
@@ -21,11 +21,11 @@ export const ControlledMenuFr = (
     transitionTimeout,
     boundingBoxRef,
     boundingBoxPadding,
-    reposition = "auto",
+    reposition = 'auto',
     submenuOpenDelay = 300,
     submenuCloseDelay = 150,
     skipOpen,
-    viewScroll = "initial",
+    viewScroll = 'initial',
     portal,
     theming,
     onItemClick,
@@ -68,10 +68,10 @@ export const ControlledMenuFr = (
 
   const isWithinMenu = useCallback(
     (target: EventTarget | null) =>
-      hasParentClass("szh-menu--state-open", target as Node) ||
+      hasParentClass('szh-menu--state-open', target as Node) ||
       // This is temporary, it will be removed when the overlay click is fixed
-      hasParentClass("LuiModalPrefab", target as Node) ||
-      hasParentClass("prefab-modal", target as Node),
+      hasParentClass('LuiModalPrefab', target as Node) ||
+      hasParentClass('prefab-modal', target as Node),
     [],
   );
 
@@ -85,7 +85,7 @@ export const ControlledMenuFr = (
         // This doesn't happen in React18
         // To work around it, I invoke the save by clicking on a passed in invisible button ref
         if (saveButtonRef?.current) {
-          saveButtonRef.current.setAttribute("data-reason", CloseReason.BLUR);
+          saveButtonRef.current.setAttribute('data-reason', CloseReason.BLUR);
           saveButtonRef.current.click();
         } else safeCall(onClose, { reason: CloseReason.BLUR });
 
@@ -121,7 +121,7 @@ export const ControlledMenuFr = (
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
       const activeElement = thisDocument.activeElement;
       if (!anchorRef?.current || !activeElement) return;
-      if (ev.key !== "Tab" && ev.key !== "Enter") return;
+      if (ev.key !== 'Tab' && ev.key !== 'Enter') return;
 
       if (ev.repeat) {
         ev.preventDefault();
@@ -131,14 +131,14 @@ export const ControlledMenuFr = (
 
       const invokeSave = (reason: string) => {
         if (!saveButtonRef?.current) return;
-        saveButtonRef.current?.setAttribute("data-reason", reason);
+        saveButtonRef.current?.setAttribute('data-reason', reason);
         saveButtonRef?.current?.click();
       };
 
       // data-allowtabtosave is used such that list filter inputs can use tab to save
-      const allowTabToSave = activeElement.getAttribute("data-allowtabtosave") == "true";
+      const allowTabToSave = activeElement.getAttribute('data-allowtabtosave') == 'true';
 
-      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>(".szh-menu--state-open input,textarea");
+      const inputElsIterator = thisDocument.querySelectorAll<HTMLElement>('.szh-menu--state-open input,textarea');
       let inputEls: HTMLElement[] = [];
       inputElsIterator.forEach((el) => inputEls.push(el));
       inputEls = inputEls.filter((el) => !(el as any).disabled);
@@ -146,10 +146,10 @@ export const ControlledMenuFr = (
       const firstInputEl = inputEls[0];
       const lastInputEl = inputEls[inputEls.length - 1];
 
-      const isTextArea = activeElement.nodeName === "TEXTAREA";
-      const suppressEnterAutoSave = activeElement.getAttribute("data-disableenterautosave") == "true" || isTextArea;
+      const isTextArea = activeElement.nodeName === 'TEXTAREA';
+      const suppressEnterAutoSave = activeElement.getAttribute('data-disableenterautosave') == 'true' || isTextArea;
 
-      if (ev.key === "Tab") {
+      if (ev.key === 'Tab') {
         const tabDirection = ev.shiftKey ? CloseReason.TAB_BACKWARD : CloseReason.TAB_FORWARD;
         if (
           (activeElement === lastInputEl && !ev.shiftKey) ||
@@ -167,14 +167,14 @@ export const ControlledMenuFr = (
         }
       }
 
-      const type = activeElement.getAttribute("type");
-      const isTextInput = type === "text" || type == null || type === "textarea";
+      const type = activeElement.getAttribute('type');
+      const isTextInput = type === 'text' || type == null || type === 'textarea';
 
       switch (activeElement.nodeName) {
-        case "INPUT":
+        case 'INPUT':
           {
             // If there's only one input element, we support tab and enter
-            if (isTextInput && ev.key === "Enter" && !suppressEnterAutoSave) {
+            if (isTextInput && ev.key === 'Enter' && !suppressEnterAutoSave) {
               ev.preventDefault();
               ev.stopPropagation();
               if (isDown) {
@@ -196,19 +196,19 @@ export const ControlledMenuFr = (
   useEffect(() => {
     if (isMenuOpen(state)) {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
-      thisDocument.addEventListener("keydown", handleKeydownTabAndEnter, true);
-      thisDocument.addEventListener("keyup", handleKeyupTabAndEnter, true);
-      thisDocument.addEventListener("mousedown", handleScreenEventForSave, true);
-      thisDocument.addEventListener("mouseup", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("click", handleScreenEventForCancel, true);
-      thisDocument.addEventListener("dblclick", handleScreenEventForCancel, true);
+      thisDocument.addEventListener('keydown', handleKeydownTabAndEnter, true);
+      thisDocument.addEventListener('keyup', handleKeyupTabAndEnter, true);
+      thisDocument.addEventListener('mousedown', handleScreenEventForSave, true);
+      thisDocument.addEventListener('mouseup', handleScreenEventForCancel, true);
+      thisDocument.addEventListener('click', handleScreenEventForCancel, true);
+      thisDocument.addEventListener('dblclick', handleScreenEventForCancel, true);
       return () => {
-        thisDocument.removeEventListener("keydown", handleKeydownTabAndEnter, true);
-        thisDocument.removeEventListener("keyup", handleKeyupTabAndEnter, true);
-        thisDocument.removeEventListener("mousedown", handleScreenEventForSave, true);
-        thisDocument.removeEventListener("mouseup", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("click", handleScreenEventForCancel, true);
-        thisDocument.removeEventListener("dblclick", handleScreenEventForCancel, true);
+        thisDocument.removeEventListener('keydown', handleKeydownTabAndEnter, true);
+        thisDocument.removeEventListener('keyup', handleKeyupTabAndEnter, true);
+        thisDocument.removeEventListener('mousedown', handleScreenEventForSave, true);
+        thisDocument.removeEventListener('mouseup', handleScreenEventForCancel, true);
+        thisDocument.removeEventListener('click', handleScreenEventForCancel, true);
+        thisDocument.removeEventListener('dblclick', handleScreenEventForCancel, true);
       };
     }
     return () => {};
@@ -248,7 +248,7 @@ export const ControlledMenuFr = (
             key: event.key,
             shiftKey: event.shiftKey,
             reason:
-              event.key === "Tab"
+              event.key === 'Tab'
                 ? event.shiftKey
                   ? CloseReason.TAB_BACKWARD
                   : CloseReason.TAB_FORWARD
@@ -295,7 +295,7 @@ export const ControlledMenuFr = (
     }
   };
 
-  const itemTransition = getTransition(transition, "item");
+  const itemTransition = getTransition(transition, 'item');
   const modifiers = useMemo(() => ({ theme: theming, itemTransition }), [theming, itemTransition]);
 
   const menuList = (
@@ -306,7 +306,7 @@ export const ControlledMenuFr = (
         modifiers,
         className,
       })}
-      style={{ ...containerProps?.style, position: "relative" }}
+      style={{ ...containerProps?.style, position: 'relative' }}
       ref={containerRef}
     >
       {state && (
@@ -315,7 +315,7 @@ export const ControlledMenuFr = (
             <EventHandlersContext.Provider value={eventHandlers}>
               <MenuList
                 {...restProps}
-                ariaLabel={ariaLabel || "Menu"}
+                ariaLabel={ariaLabel || 'Menu'}
                 externalRef={externalRef}
                 containerRef={containerRef}
                 onClose={onClose}
@@ -328,7 +328,7 @@ export const ControlledMenuFr = (
   );
 
   if (portal === true && anchorRef?.current != null) {
-    if (hasParentClass("react-menu-inline-test", anchorRef.current)) {
+    if (hasParentClass('react-menu-inline-test', anchorRef.current)) {
       portal = false;
     } else {
       portal = { target: anchorRef.current.ownerDocument.body } as PortalFieldType;
@@ -336,8 +336,8 @@ export const ControlledMenuFr = (
   }
 
   if (portal) {
-    if (typeof portal === "boolean") {
-      if (portal && typeof document !== "undefined") {
+    if (typeof portal === 'boolean') {
+      if (portal && typeof document !== 'undefined') {
         return createPortal(menuList, document.body);
       }
     } else {

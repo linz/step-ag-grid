@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 /**
  * Track previous values of states.
  *
  * @param value Value to track.
  */
-export const usePrevious = <T extends unknown>(value: T): T | undefined => {
+export const usePrevious = <T,>(value: T): T | undefined => {
   const ref = useRef<T>();
   useEffect(() => {
     ref.current = value;

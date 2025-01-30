@@ -1,11 +1,11 @@
-import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { GridContext } from "../contexts/GridContext";
-import { useGridPopoverContext } from "../contexts/GridPopoverContext";
-import { ControlledMenu } from "../react-menu3";
-import { MenuCloseEvent } from "../react-menu3/types";
-import { CloseReason } from "../react-menu3/utils";
-import { GridBaseRow } from "./Grid";
+import { GridContext } from '../contexts/GridContext';
+import { useGridPopoverContext } from '../contexts/GridPopoverContext';
+import { ControlledMenu } from '../react-menu3';
+import { MenuCloseEvent } from '../react-menu3/types';
+import { CloseReason } from '../react-menu3/utils';
+import { GridBaseRow } from './Grid';
 
 export interface GridPopoverHookProps<TData> {
   className: string | undefined;
@@ -64,36 +64,36 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
         <>
           {anchorRef.current && (
             <ControlledMenu
-              state={isOpen ? "open" : "closed"}
+              state={isOpen ? 'open' : 'closed'}
               portal={true}
               unmountOnClose={true}
               anchorRef={anchorRef}
               saveButtonRef={saveButtonRef}
-              menuClassName={"step-ag-grid-react-menu"}
+              menuClassName={'step-ag-grid-react-menu'}
               onClose={(event: MenuCloseEvent) => {
                 // Prevent menu from closing when modals are invoked
                 if (event.reason === CloseReason.BLUR) return;
-                triggerSave(event.reason).then();
+                void triggerSave(event.reason);
               }}
-              viewScroll={"auto"}
+              viewScroll={'auto'}
               dontShrinkIfDirectionIsTop={true}
               className={props.className}
             >
               {saving && ( // This is the overlay that prevents editing when the editor is saving
-                <div className={"ComponentLoadingWrapper-saveOverlay"} />
+                <div className={'ComponentLoadingWrapper-saveOverlay'} />
               )}
               {children}
               <button
                 ref={saveButtonRef}
-                data-reason={""}
+                data-reason={''}
                 onClick={(e) => {
-                  let reason = e.currentTarget.getAttribute("data-reason") ?? undefined;
+                  let reason = e.currentTarget.getAttribute('data-reason') ?? undefined;
                   if (props.dontSaveOnExternalClick && reason === CloseReason.BLUR) {
                     reason = CloseReason.CANCEL;
                   }
-                  triggerSave(reason).then();
+                  void triggerSave(reason);
                 }}
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
               />
             </ControlledMenu>
           )}

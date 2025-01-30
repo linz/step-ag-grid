@@ -1,9 +1,9 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject } from 'react';
 
-import { MenuDirection } from "../types";
-import { getPositionHelpers } from "./getPositionHelpers";
-import { placeLeftorRight } from "./placeLeftorRight";
-import { placeToporBottom } from "./placeToporBottom";
+import { MenuDirection } from '../types';
+import { getPositionHelpers } from './getPositionHelpers';
+import { placeLeftorRight } from './placeLeftorRight';
+import { placeToporBottom } from './placeToporBottom';
 
 interface positionMenuProps {
   offsetX: number;
@@ -12,8 +12,8 @@ interface positionMenuProps {
   anchorRef: MutableRefObject<Element | null>;
   arrow?: boolean;
   direction: MenuDirection;
-  position: "auto" | "anchor" | "initial";
-  align: "start" | "center" | "end";
+  position: 'auto' | 'anchor' | 'initial';
+  align: 'start' | 'center' | 'end';
   positionHelpers: ReturnType<typeof getPositionHelpers>;
 }
 
@@ -24,7 +24,7 @@ export const positionMenu = (props: positionMenuProps) => {
   let horizontalOffset = offsetX;
   let verticalOffset = offsetY;
   if (arrow && arrowRef.current) {
-    if (direction === "left" || direction === "right") {
+    if (direction === 'left' || direction === 'right') {
       horizontalOffset += arrowRef.current.offsetWidth;
     } else {
       verticalOffset += arrowRef.current.offsetHeight;
@@ -40,10 +40,10 @@ export const positionMenu = (props: positionMenuProps) => {
   const placeBottomY = anchorRect.bottom - containerRect.top + verticalOffset;
 
   let placeToporBottomX, placeLeftorRightY;
-  if (align === "end") {
+  if (align === 'end') {
     placeToporBottomX = anchorRect.right - containerRect.left - menuRect.width;
     placeLeftorRightY = anchorRect.bottom - containerRect.top - menuRect.height;
-  } else if (align === "center") {
+  } else if (align === 'center') {
     placeToporBottomX = anchorRect.left - containerRect.left - (menuRect.width - anchorRect.width) / 2;
     placeLeftorRightY = anchorRect.top - containerRect.top - (menuRect.height - anchorRect.height) / 2;
   } else {
@@ -69,12 +69,12 @@ export const positionMenu = (props: positionMenuProps) => {
   };
 
   switch (direction) {
-    case "left":
-    case "right":
+    case 'left':
+    case 'right':
       return placeLeftorRight(options);
 
-    case "top":
-    case "bottom":
+    case 'top':
+    case 'bottom':
     default:
       return placeToporBottom(options);
   }

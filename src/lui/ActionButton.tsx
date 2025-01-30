@@ -1,27 +1,27 @@
-import "./ActionButton.scss";
+import './ActionButton.scss';
 
-import clsx from "clsx";
-import { CSSProperties, ReactElement, useEffect, useState } from "react";
+import { LuiButton, LuiIcon, LuiMiniSpinner } from '@linzjs/lui';
+import { LuiButtonProps } from '@linzjs/lui/dist/components/LuiButton/LuiButton';
+import { IconName } from '@linzjs/lui/dist/components/LuiIcon/LuiIcon';
+import clsx from 'clsx';
+import { CSSProperties, ReactElement, useEffect, useState } from 'react';
 
-import { LuiButton, LuiIcon, LuiMiniSpinner } from "@linzjs/lui";
-import { LuiButtonProps } from "@linzjs/lui/dist/components/LuiButton/LuiButton";
-import { IconName } from "@linzjs/lui/dist/components/LuiIcon/LuiIcon";
-
-import { usePrevious } from "./reactUtils";
-import { useStateDeferred } from "./stateDeferredHook";
+import { usePrevious } from './reactUtils';
+import { useStateDeferred } from './stateDeferredHook';
 
 export interface ActionButtonProps {
   icon: IconName;
   name?: string;
-  "aria-label"?: string;
+  'aria-label'?: string;
   inProgressName?: string;
   title?: string;
   dataTestId?: string;
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "ns";
-  iconPosition?: "left" | "right";
-  className?: "ActionButton-fill" | "ActionButton-tight" | string;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'ns';
+  iconPosition?: 'left' | 'right';
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  className?: 'ActionButton-fill' | 'ActionButton-tight' | string;
   onClick: () => Promise<void> | void;
-  level?: LuiButtonProps["level"];
+  level?: LuiButtonProps['level'];
   style?: CSSProperties;
   disabled?: boolean;
 }
@@ -39,10 +39,10 @@ export const ActionButton = ({
   className,
   title,
   onClick,
-  size = "sm",
-  iconPosition = "left",
-  level = "tertiary",
-  "aria-label": ariaLabel,
+  size = 'sm',
+  iconPosition = 'left',
+  level = 'tertiary',
+  'aria-label': ariaLabel,
 }: ActionButtonProps): ReactElement => {
   const [inProgress, setInProgress] = useState(false);
   const lastInProgress = usePrevious(inProgress ?? false);
@@ -54,63 +54,64 @@ export const ActionButton = ({
   }, [inProgress, lastInProgress, setLocalInProgress, setLocalInProgressDeferred]);
 
   const buttonText = (
-    <span className={"ActionButton-minimalArea"}>
-      <span className={"ActionButton-minimalAreaDisplay"}>{(localInProgress ? inProgressName : name) ?? name}</span>
+    <span className={'ActionButton-minimalArea'}>
+      <span className={'ActionButton-minimalAreaDisplay'}>{(localInProgress ? inProgressName : name) ?? name}</span>
       {/* This makes sure the button expands to fill maximum length text at all times */}
-      <span className={"ActionButton-minimalAreaExpand"}>{name}</span>
+      <span className={'ActionButton-minimalAreaExpand'}>{name}</span>
     </span>
   );
 
   return (
     <LuiButton
       data-testid={dataTestId}
-      type={"button"}
+      type={'button'}
       level={level}
       title={title ?? ariaLabel ?? name}
-      buttonProps={{ "aria-label": ariaLabel ?? name }}
+      buttonProps={{ 'aria-label': ariaLabel ?? name }}
       className={clsx(
-        "lui-button-icon-right",
-        "ActionButton",
+        'lui-button-icon-right',
+        'ActionButton',
         className,
-        localInProgress && "ActionButton-inProgress",
-        name != null && !className?.includes("ActionButton-fill") && "ActionButton-minimal",
-        name == null && "ActionButton-iconOnly",
+        localInProgress && 'ActionButton-inProgress',
+        name != null && !className?.includes('ActionButton-fill') && 'ActionButton-minimal',
+        name == null && 'ActionButton-iconOnly',
       )}
-      size={"lg"}
+      size={'lg'}
       style={style}
-      onClick={async () => {
+      onClick={() => {
         const promise = onClick();
-        const isPromise = typeof promise !== "undefined";
+        const isPromise = typeof promise !== 'undefined';
         if (isPromise) {
           setInProgress(true);
-          if (isPromise) await promise;
-          setInProgress(false);
+          void promise.finally(() => {
+            setInProgress(false);
+          });
         }
       }}
       disabled={localInProgress || disabled}
     >
-      {iconPosition === "right" && buttonText}
+      {iconPosition === 'right' && buttonText}
       {localInProgress && (
-        <div style={{ position: "relative" }}>
+        <div style={{ position: 'relative' }}>
           <LuiMiniSpinner
             size={14}
             divProps={{
-              "data-testid": "loading-spinner",
+              'data-testid': 'loading-spinner',
               style: {
-                position: "absolute",
+                position: 'absolute',
                 left: 4,
                 top: -10,
                 bottom: 10,
                 right: -4,
               },
-              role: "status",
-              "aria-label": "Loading",
+              role: 'status',
+              'aria-label': 'Loading',
             }}
           />
         </div>
       )}
-      <LuiIcon name={icon} alt={ariaLabel ?? name ?? ""} size={size} />
-      {iconPosition === "left" && buttonText}
+      <LuiIcon name={icon} alt={ariaLabel ?? name ?? ''} size={size} />
+      {iconPosition === 'left' && buttonText}
     </LuiButton>
   );
 };

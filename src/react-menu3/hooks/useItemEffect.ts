@@ -1,6 +1,6 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject } from 'react';
 
-import { useLayoutEffect } from "./useIsomorphicLayoutEffect";
+import { useLayoutEffect } from './useIsomorphicLayoutEffect';
 
 export const useItemEffect = (
   isDisabled: boolean | undefined,
@@ -9,7 +9,7 @@ export const useItemEffect = (
 ) => {
   useLayoutEffect(() => {
     if (!menuItemRef) return;
-    if (process.env.NODE_ENV !== "production" && !updateItems) {
+    if (process.env.NODE_ENV !== 'production' && !updateItems) {
       throw new Error(
         `[React-Menu] This menu item or submenu should be rendered under a menu: ${menuItemRef.current.outerHTML}`,
       );

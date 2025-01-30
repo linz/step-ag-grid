@@ -1,10 +1,10 @@
-import { LegacyRef, ReactElement, useContext, useMemo, useRef } from "react";
+import { LegacyRef, ReactElement, useContext, useMemo, useRef } from 'react';
 
-import { EventHandlersContext } from "../contexts/EventHandlersContext";
-import { useBEM, useCombinedRef, useItemState } from "../hooks";
-import { BaseProps } from "../types";
-import { commonProps, menuClass, menuItemClass, mergeProps, safeCall, withHovering } from "../utils";
-import { withHoveringResultProps } from "../utils/withHovering";
+import { EventHandlersContext } from '../contexts/EventHandlersContext';
+import { useBEM, useCombinedRef, useItemState } from '../hooks';
+import { BaseProps } from '../types';
+import { commonProps, menuClass, menuItemClass, mergeProps, safeCall, withHovering } from '../utils';
+import { withHoveringResultProps } from '../utils/withHovering';
 
 export interface FocusableItemProps extends BaseProps, withHoveringResultProps {
   disabled?: boolean;
@@ -66,4 +66,4 @@ export const FocusableItemFr = ({
   );
 };
 
-export const FocusableItem = withHovering("FocusableItem", FocusableItemFr);
+export const FocusableItem = withHovering('FocusableItem', FocusableItemFr);

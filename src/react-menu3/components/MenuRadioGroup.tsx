@@ -1,9 +1,9 @@
-import { ForwardedRef, ReactNode, forwardRef, useMemo } from "react";
+import { ForwardedRef, forwardRef, ReactNode, useMemo } from 'react';
 
-import { RadioGroupContext } from "../contexts/RadioGroupContext";
-import { useBEM } from "../hooks";
-import { BaseProps, EventHandler, RadioChangeEvent } from "../types";
-import { menuClass, radioGroupClass } from "../utils";
+import { RadioGroupContext } from '../contexts/RadioGroupContext';
+import { useBEM } from '../hooks';
+import { BaseProps, EventHandler, RadioChangeEvent } from '../types';
+import { menuClass, radioGroupClass } from '../utils';
 
 //
 // MenuRadioGroup
@@ -31,7 +31,7 @@ export interface MenuRadioGroupProps extends BaseProps {
 }
 
 export const MenuRadioGroupFr = (
-  { "aria-label": ariaLabel, className, name, value, onRadioChange, ...restProps }: MenuRadioGroupProps,
+  { 'aria-label': ariaLabel, className, name, value, onRadioChange, ...restProps }: MenuRadioGroupProps,
   externalRef: ForwardedRef<HTMLUListElement>,
 ) => {
   const contextValue = useMemo(() => ({ name, value, onRadioChange }), [name, value, onRadioChange]);
@@ -41,7 +41,7 @@ export const MenuRadioGroupFr = (
       <li role="presentation">
         <ul
           role="group"
-          aria-label={ariaLabel || name || "Radio group"}
+          aria-label={ariaLabel || name || 'Radio group'}
           {...restProps}
           ref={externalRef}
           className={useBEM({ block: menuClass, element: radioGroupClass, className })}

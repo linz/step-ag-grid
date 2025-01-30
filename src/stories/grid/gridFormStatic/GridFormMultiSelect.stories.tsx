@@ -1,42 +1,41 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { Meta, StoryFn } from '@storybook/react';
+import { GridPopoverContext, GridPopoverContextType } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridBaseRow, GridContextProvider, GridFormMultiSelect, GridFormMultiSelectProps } from "../../..";
+import { GridBaseRow, GridContextProvider, GridFormMultiSelect, GridFormMultiSelectProps } from '../../..';
 
 export default {
-  title: "GridForm / Static Tests",
+  title: 'GridForm / Static Tests',
   component: GridFormMultiSelect,
   args: {},
 } as Meta<typeof GridFormMultiSelect>;
 
 const Template: StoryFn<typeof GridFormMultiSelect> = (props) => {
   const configs: [string, GridFormMultiSelectProps<GridBaseRow>, string?][] = [
-    ["No options", { options: [] }],
-    ["Custom no options", { options: [], noOptionsMessage: "Custom no options" }],
+    ['No options', { options: [] }],
+    ['Custom no options', { options: [], noOptionsMessage: 'Custom no options' }],
     [
-      "With options",
+      'With options',
       {
         options: [
-          { label: "One", value: 0, checked: true },
-          { label: "Two", value: 1 },
+          { label: 'One', value: 0, checked: true },
+          { label: 'Two', value: 1 },
         ],
       },
     ],
     [
-      "With filter",
+      'With filter',
       {
         filtered: true,
         options: [
-          { label: "One", value: 0 },
-          { label: "With warning", value: 1, warning: "Test warning" },
-          { label: "Three", value: 2, checked: true },
+          { label: 'One', value: 0 },
+          { label: 'With warning', value: 1, warning: 'Test warning' },
+          { label: 'Three', value: 2, checked: true },
         ],
       },
     ],
@@ -45,7 +44,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props) => {
   const anchorRefs = configs.map(() => useRef<HTMLHeadingElement>(null));
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContextProvider>
         {configs.map((config, index) => (
           <div key={`${index}`}>
@@ -56,7 +55,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props) => {
                   anchorRef: anchorRefs[index],
                   data: { value: config[2] },
                   value: config[2],
-                  field: "value",
+                  field: 'value',
                 } as any as GridPopoverContextType<any>
               }
             >

@@ -1,10 +1,10 @@
-import { ColDef } from "ag-grid-community";
-import { CellContextMenuEvent } from "ag-grid-community";
-import { ReactElement, useCallback, useContext, useRef, useState } from "react";
+import { ColDef } from 'ag-grid-community';
+import { CellContextMenuEvent } from 'ag-grid-community';
+import { ReactElement, useCallback, useContext, useRef, useState } from 'react';
 
-import { GridContext } from "../../contexts/GridContext";
-import { ControlledMenu } from "../../react-menu3";
-import { GridBaseRow } from "../Grid";
+import { GridContext } from '../../contexts/GridContext';
+import { ControlledMenu } from '../../react-menu3';
+import { GridBaseRow } from '../Grid';
 
 export interface GridContextMenuComponentProps<TData extends GridBaseRow> {
   selectedRows: TData[];
@@ -73,7 +73,7 @@ export const useGridContextMenu = <TData extends GridBaseRow>({
       <>
         <ControlledMenu
           anchorPoint={anchorPoint}
-          state={isOpen ? "open" : "closed"}
+          state={isOpen ? 'open' : 'closed'}
           direction="right"
           onClose={closeMenu}
         >

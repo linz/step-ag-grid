@@ -1,4 +1,4 @@
-import { isEmpty, negate } from "lodash-es";
+import { isEmpty, negate } from 'lodash-es';
 
 export const isNotEmpty = negate(isEmpty);
 
@@ -44,17 +44,17 @@ export const hasParentClass = function (className: string, child: Node) {
 export const stringByteLengthIsInvalid = (str: string, maxBytes: number) =>
   new TextEncoder().encode(str).length > maxBytes;
 
-export const fnOrVar = (fn: any, param?: any) => (typeof fn === "function" ? fn(param) : fn);
+export const fnOrVar = (fn: any, param?: any) => (typeof fn === 'function' ? fn(param) : fn);
 
 export const sanitiseFileName = (filename: string): string => {
   const valid = filename
     .trim()
-    .replaceAll(/(\/|\\)+/g, "-")
-    .replaceAll(/\s+/g, "_")
-    .replaceAll(/[^\w\-āēīōūĀĒĪŌŪ.]/g, "");
-  const parts = valid.split(".");
+    .replaceAll(/(\/|\\)+/g, '-')
+    .replaceAll(/\s+/g, '_')
+    .replaceAll(/[^\w\-āēīōūĀĒĪŌŪ.]/g, '');
+  const parts = valid.split('.');
   const fileExt = parts.length > 1 ? parts.pop() : undefined;
   // Arbitrary max filename length of 64 chars + extension
   if (!fileExt) return valid.slice().slice(0, 64);
-  return valid.slice(0, -fileExt.length - 1).slice(0, 64) + "." + fileExt;
+  return valid.slice(0, -fileExt.length - 1).slice(0, 64) + '.' + fileExt;
 };

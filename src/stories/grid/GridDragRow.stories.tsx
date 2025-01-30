@@ -1,11 +1,10 @@
-import "../../styles/GridTheme.scss";
-import "../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { useMemo, useState } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { Meta, StoryFn } from '@storybook/react';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -15,30 +14,30 @@ import {
   GridProps,
   GridUpdatingContextProvider,
   GridWrapper,
-} from "../..";
-import { waitForGridReady } from "../../utils/storybookTestUtil";
+} from '../..';
+import { waitForGridReady } from '../../utils/storybookTestUtil';
 
 export default {
-  title: "Components / Grids",
+  title: 'Components / Grids',
   component: Grid,
   args: {
     quickFilter: true,
-    quickFilterValue: "",
-    quickFilterPlaceholder: "Quick filter...",
+    quickFilterValue: '',
+    quickFilterPlaceholder: 'Quick filter...',
     selectable: false,
-    rowSelection: "single",
+    rowSelection: 'single',
   },
   // Storybook hangs otherwise
   parameters: {
     docs: {
       source: {
-        type: "code",
+        type: 'code',
       },
     },
   },
   decorators: [
     (Story) => (
-      <div style={{ maxWidth: 1024, height: 400, display: "flex", flexDirection: "column" }}>
+      <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -62,29 +61,29 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
-        field: "id",
-        headerName: "Id",
+        field: 'id',
+        headerName: 'Id',
         lockVisible: true,
       }),
-      GridCell<ITestRow, ITestRow["position"]>({
-        field: "position",
-        headerName: "Position",
+      GridCell<ITestRow, ITestRow['position']>({
+        field: 'position',
+        headerName: 'Position',
         cellRendererParams: {
-          warning: ({ value }) => value === "Tester" && "Testers are testing",
-          info: ({ value }) => value === "Developer" && "Developers are awesome",
+          warning: ({ value }) => value === 'Tester' && 'Testers are testing',
+          info: ({ value }) => value === 'Developer' && 'Developers are awesome',
         },
       }),
       GridCell({
-        field: "age",
-        headerName: "Age",
+        field: 'age',
+        headerName: 'Age',
       }),
       GridCell({
-        field: "height",
-        headerName: "Height",
+        field: 'height',
+        headerName: 'Height',
       }),
       GridCell({
-        field: "desc",
-        headerName: "Description",
+        field: 'desc',
+        headerName: 'Description',
         flex: 1,
       }),
     ],
@@ -92,16 +91,16 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   );
 
   const [rowData, setRowData] = useState([
-    { id: 1000, position: "Tester", age: 30, height: `6'4"`, desc: "Tests application", dd: "1" },
-    { id: 1001, position: "Developer", age: 12, height: `5'3"`, desc: "Develops application", dd: "2" },
-    { id: 1002, position: "Manager", age: 65, height: `5'9"`, desc: "Manages", dd: "3" },
-    { id: 1003, position: "BA", age: 42, height: `5'7"`, desc: "BAs", dd: "4" },
+    { id: 1000, position: 'Tester', age: 30, height: `6'4"`, desc: 'Tests application', dd: '1' },
+    { id: 1001, position: 'Developer', age: 12, height: `5'3"`, desc: 'Develops application', dd: '2' },
+    { id: 1002, position: 'Manager', age: 65, height: `5'9"`, desc: 'Manages', dd: '3' },
+    { id: 1003, position: 'BA', age: 42, height: `5'7"`, desc: 'BAs', dd: '4' },
   ]);
 
   return (
     <GridWrapper maxHeight={300}>
       <Grid
-        data-testid={"readonly"}
+        data-testid={'readonly'}
         {...props}
         selectable={true}
         rowSelection="multiple"
@@ -109,7 +108,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         columnDefs={columnDefs}
         defaultColDef={{ sortable: false }}
         rowData={rowData}
-        onRowDragEnd={async (movedRow, targetRow, _targetIndex) => {
+        onRowDragEnd={(movedRow, targetRow, _targetIndex) => {
           setRowData(
             rowData.map((r) => {
               if (r.id === movedRow.id) return targetRow;

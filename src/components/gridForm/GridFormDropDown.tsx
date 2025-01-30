@@ -1,23 +1,23 @@
-import debounce from "debounce-promise";
-import { isEmpty } from "lodash-es";
-import { Fragment, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import debounce from 'debounce-promise';
+import { isEmpty } from 'lodash-es';
+import { Fragment, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { FormError } from "../../lui/FormError";
-import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from "../../react-menu3";
-import { ClickEvent } from "../../react-menu3/types";
-import { textMatch } from "../../utils/textMatcher";
-import { isNotEmpty } from "../../utils/util";
-import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
+import { FormError } from '../../lui/FormError';
+import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from '../../react-menu3';
+import { ClickEvent } from '../../react-menu3/types';
+import { textMatch } from '../../utils/textMatcher';
+import { isNotEmpty } from '../../utils/util';
+import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { useGridPopoverHook } from '../GridPopoverHook';
 
 export interface GridPopoutEditDropDownSelectedItem<TData extends GridBaseRow, TValue> {
   // Note the row that was clicked on will be first
   selectedRows: TData[];
-  selectedRowIds: TData["id"][];
+  selectedRowIds: TData['id'][];
   value: TValue;
   subComponentValue?: any;
 }
@@ -29,10 +29,10 @@ interface FinalSelectOption {
   subComponent?: (props: any, ref: any) => any;
 }
 
-export const MenuSeparatorString = "_____MENU_SEPARATOR_____";
+export const MenuSeparatorString = '_____MENU_SEPARATOR_____';
 export const MenuSeparator = Object.freeze({ value: MenuSeparatorString });
 
-export const MenuHeaderString = "_____MENU_HEADER_____";
+export const MenuHeaderString = '_____MENU_HEADER_____';
 export const MenuHeaderItem = (title: string) => {
   return { label: title, value: MenuHeaderString };
 };
@@ -41,22 +41,26 @@ export type SelectOption = null | string | FinalSelectOption;
 
 export interface GridFormDropDownProps<TData extends GridBaseRow, TValue> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options
-  className?:
-    | "GridPopoverEditDropDown-containerSmall"
-    | "GridPopoverEditDropDown-containerMedium"
-    | "GridPopoverEditDropDown-containerLarge"
-    | "GridPopoverEditDropDown-containerUnlimited"
-    | "GridPopoverEditDropDown-containerAutoWidth"
+  className?: // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  | 'GridPopoverEditDropDown-containerSmall'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridPopoverEditDropDown-containerMedium'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridPopoverEditDropDown-containerLarge'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridPopoverEditDropDown-containerUnlimited'
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    | 'GridPopoverEditDropDown-containerAutoWidth'
     | string
     | undefined;
   // local means the use the local filter, otherwise it's expected options will be passed a function that takes a filter
-  filtered?: "local" | "reload";
+  filtered?: 'local' | 'reload';
   filterDefaultValue?: string;
   filterPlaceholder?: string;
   filterHelpText?: string;
   noOptionsMessage?: string;
-  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void>;
-  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void>;
+  onSelectedItem?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void> | void;
+  onSelectFilter?: (props: GridPopoutEditDropDownSelectedItem<TData, TValue>) => Promise<void> | void;
   options:
     | SelectOption[]
     | ((selectedRows: TData[], filter?: string) => Promise<SelectOption[] | undefined> | SelectOption[] | undefined)
@@ -64,14 +68,14 @@ export interface GridFormDropDownProps<TData extends GridBaseRow, TValue> extend
 }
 
 const fieldToString = (field: any) => {
-  return typeof field == "symbol" ? field.toString() : `${field}`;
+  return typeof field === 'symbol' ? field.toString() : `${field}`;
 };
 
 export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridFormDropDownProps<TData, TValue>) => {
   const { selectedRows, field, data } = useGridPopoverContext<TData>();
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
-  const [filter, setFilter] = useState(props.filterDefaultValue ?? "");
+  const [filter, setFilter] = useState(props.filterDefaultValue ?? '');
   const [filteredValues, setFilteredValues] = useState<any[]>();
   const [options, setOptions] = useState<FinalSelectOption[] | null>(null);
   const subComponentIsValid = useRef(false);
@@ -83,7 +87,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
   const selectItemHandler = useCallback(
     async (value: any, subComponentValue?: any): Promise<boolean> => {
       const hasChanged =
-        selectedRows.some((row) => row[field as keyof TData] !== value) ||
+        selectedRows.some((row) => row[field] !== value) ||
         (subComponentValue !== undefined && subComponentInitialValue.current !== JSON.stringify(subComponentValue));
       if (hasChanged) {
         if (props.onSelectedItem) {
@@ -94,7 +98,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
             subComponentValue,
           });
         } else {
-          selectedRows.forEach((row) => (row[field] = value as any));
+          selectedRows.forEach((row) => (row[field] = value));
         }
       }
       return true;
@@ -107,13 +111,13 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
     if (options) return;
     let optionsConf = props.options;
 
-    (async () => {
-      if (typeof optionsConf == "function") {
+    void (async () => {
+      if (typeof optionsConf === 'function') {
         optionsConf = await optionsConf(selectedRows, filter);
       }
       if (optionsConf !== undefined) {
         const optionsList = optionsConf?.map((item) =>
-          item == null || typeof item == "string"
+          item == null || typeof item === 'string'
             ? ({
                 value: item,
                 label: item,
@@ -129,16 +133,16 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
 
   // Local filtering.
   useEffect(() => {
-    if (props.filtered == "local") {
+    if (props.filtered == 'local') {
       if (options == null) return;
       setFilteredValues(
         options
           .map((option) => {
-            if (option.label != null && typeof option.label !== "string") {
-              console.error("Cannot filter non-string labels", option);
+            if (option.label != null && typeof option.label !== 'string') {
+              console.error('Cannot filter non-string labels', option);
               return undefined;
             }
-            return textMatch((option.label as string) || "", filter) ? option : undefined;
+            return textMatch((option.label as string) || '', filter) ? option : undefined;
           })
           .filter((r) => r !== undefined),
       );
@@ -157,9 +161,9 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
 
   // Reload filtering.
   useEffect(() => {
-    if (previousFilter.current != filter && props.filtered == "reload") {
+    if (previousFilter.current != filter && props.filtered == 'reload') {
       previousFilter.current = filter;
-      reSearchOnFilterChange().then();
+      void reSearchOnFilterChange();
     }
   }, [filter, props, reSearchOnFilterChange]);
 
@@ -202,9 +206,9 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
   return popoverWrapper(
     <>
       {props.filtered && (
-        <div className={"GridFormDropDown-filter"}>
+        <div className={'GridFormDropDown-filter'}>
           <FocusableItem
-            className={"filter-item"}
+            className={'filter-item'}
             onFocus={() => {
               setSelectedItem(null);
               setSubSelectedValue(null);
@@ -212,13 +216,13 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
             }}
           >
             {({ ref }: any) => (
-              <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+              <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                 <input
-                  className={"LuiTextInput-input"}
+                  className={'LuiTextInput-input'}
                   ref={ref}
                   type="text"
-                  placeholder={props.filterPlaceholder ?? "Filter..."}
-                  data-testid={"filteredMenu-free-text-input"}
+                  placeholder={props.filterPlaceholder ?? 'Filter...'}
+                  data-testid={'filteredMenu-free-text-input'}
                   defaultValue={filter}
                   data-allowtabtosave={true}
                   data-disableenterautosave={
@@ -236,15 +240,15 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
           <MenuDivider key={`$$divider_filter`} />
         </div>
       )}
-      <ComponentLoadingWrapper loading={!options} className={"GridFormDropDown-options"}>
+      <ComponentLoadingWrapper loading={!options} className={'GridFormDropDown-options'}>
         <>
           {options && (isEmpty(options) || (filteredValues && isEmpty(filteredValues))) && (
             <MenuItem
               key={`${fieldToString(field)}-empty`}
-              className={"GridPopoverEditDropDown-noOptions"}
+              className={'GridPopoverEditDropDown-noOptions'}
               disabled={true}
             >
-              {props.noOptionsMessage ?? "No Options"}
+              {props.noOptionsMessage ?? 'No Options'}
             </MenuItem>
           )}
           {options?.map((item: FinalSelectOption, index) => {
@@ -268,7 +272,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
                     <MenuItem
                       key={`${fieldToString(field)}-${index}`}
                       disabled={!!item.disabled}
-                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                      title={item.disabled && typeof item.disabled !== 'boolean' ? item.disabled : ''}
                       value={item.value}
                       onFocus={() => {
                         if (selectedItem !== item) {
@@ -285,11 +289,11 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
                       }}
                     >
                       {item.label ?? (item.value == null ? `<${item.value}>` : `${item.value}`)}
-                      {item.subComponent ? "..." : ""}
+                      {item.subComponent ? '...' : ''}
                     </MenuItem>
 
                     {item.subComponent && selectedItem === item && (
-                      <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                      <FocusableItem className={'LuiDeprecatedForms'} key={`${String(item.label)}_subcomponent`}>
                         {() => (
                           <GridSubComponentContext.Provider
                             value={{
@@ -312,7 +316,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TValue>(props: GridF
                             }}
                           >
                             {item.subComponent && (
-                              <div className={"subComponent"}>
+                              <div className={'subComponent'}>
                                 <item.subComponent />
                               </div>
                             )}

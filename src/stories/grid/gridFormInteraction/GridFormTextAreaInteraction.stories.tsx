@@ -1,18 +1,17 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import { expect, fn, userEvent, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { StoryFn } from '@storybook/react';
+import { expect, fn, userEvent, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridContext, GridFormTextArea, GridFormTextAreaProps } from "../../..";
+import { GridContext, GridFormTextArea, GridFormTextAreaProps } from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormTextArea,
   args: {},
 };
@@ -23,7 +22,7 @@ const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -39,8 +38,8 @@ const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps
             value: null,
             updateValue,
             data: { value: null },
-            colId: "",
-            field: "value",
+            colId: '',
+            field: 'value',
             selectedRows: [],
             saving: false,
             setSaving: () => {},
@@ -58,12 +57,12 @@ export const GridFormTextAreaInteractions_: typeof Template = Template.bind({});
 GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  expect(await canvas.findByText("Must not be empty")).toBeInTheDocument();
+  expect(await canvas.findByText('Must not be empty')).toBeInTheDocument();
 
-  const inputField = canvas.getByPlaceholderText("Type here");
-  await userEvent.type(inputField, "Hello");
+  const inputField = canvas.getByPlaceholderText('Type here');
+  await userEvent.type(inputField, 'Hello');
 
-  expect(await canvas.findByText("Press tab to save")).toBeInTheDocument();
+  expect(await canvas.findByText('Press tab to save')).toBeInTheDocument();
 
   // Test tab to save
   updateValue.mockClear();
@@ -77,14 +76,14 @@ GridFormTextAreaInteractions_.play = async ({ canvasElement }) => {
 
   // Test escape not to save
   updateValue.mockClear();
-  await userEvent.type(inputField, "{Escape}");
+  await userEvent.type(inputField, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
   await userEvent.clear(inputField);
 
-  expect(canvas.getByText("Must not be empty")).toBeInTheDocument();
+  expect(canvas.getByText('Must not be empty')).toBeInTheDocument();
   await userEvent.tab();
   expect(updateValue).not.toHaveBeenCalled();
   await userEvent.tab({ shift: true });

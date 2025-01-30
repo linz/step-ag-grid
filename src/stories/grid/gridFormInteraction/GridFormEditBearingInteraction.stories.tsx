@@ -1,23 +1,22 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from "@storybook/react";
-import { expect, fn, userEvent, within } from "@storybook/test";
-import { GridPopoverContext } from "contexts/GridPopoverContext";
-import { useRef } from "react";
-
-import "@linzjs/lui/dist/fonts";
+import { StoryFn } from '@storybook/react';
+import { expect, fn, userEvent, within } from '@storybook/test';
+import { GridPopoverContext } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
 import {
   GridContext,
   GridFormEditBearing,
   GridFormEditBearingProps,
   GridPopoverEditBearingEditorParams,
-} from "../../..";
+} from '../../..';
 
 export default {
-  title: "GridForm / Interactions",
+  title: 'GridForm / Interactions',
   component: GridFormEditBearing,
   args: {},
 };
@@ -28,7 +27,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
   const anchorRef = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContext.Provider
         value={
           {
@@ -41,15 +40,15 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
         <GridPopoverContext.Provider
           value={{
             anchorRef,
-            colId: "",
+            colId: '',
             value: null,
             updateValue,
             formatValue: (value) => value,
             setSaving: () => {},
             saving: false,
             selectedRows: [],
-            data: { value: "" },
-            field: "value",
+            data: { value: '' },
+            field: 'value',
           }}
         >
           <GridFormEditBearing {...props} {...GridPopoverEditBearingEditorParams} />
@@ -63,21 +62,21 @@ export const GridFormEditBearingInteractions_: typeof Template = Template.bind({
 GridFormEditBearingInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
 
-  expect(await canvas.findByText("Press enter or tab to save")).toBeInTheDocument();
+  expect(await canvas.findByText('Press enter or tab to save')).toBeInTheDocument();
 
-  const inputField = canvas.getByPlaceholderText("Enter bearing");
+  const inputField = canvas.getByPlaceholderText('Enter bearing');
 
   // Test formatting null
-  expect(await canvas.findByText("–")).toBeInTheDocument();
+  expect(await canvas.findByText('–')).toBeInTheDocument();
 
   // Test formatting a bearing
   expect(inputField).toBeInTheDocument();
-  await userEvent.type(inputField, "1.2345");
-  expect(await canvas.findByText("1° 23' 45\"")).toBeInTheDocument();
+  await userEvent.type(inputField, '1.2345');
+  expect(await canvas.findByText('1° 23\' 45"')).toBeInTheDocument();
 
   // Test enter to save
   updateValue.mockClear();
-  await userEvent.type(inputField, "{Enter}");
+  await userEvent.type(inputField, '{Enter}');
   expect(updateValue).toHaveBeenCalledWith(expect.anything(), 0); // 0 = Enter
 
   // Test tab to save
@@ -92,15 +91,15 @@ GridFormEditBearingInteractions_.play = async ({ canvasElement }) => {
 
   // Test escape not to save
   updateValue.mockClear();
-  await userEvent.type(inputField, "{Escape}");
+  await userEvent.type(inputField, '{Escape}');
   expect(updateValue).not.toHaveBeenCalled();
 
   // Test invalid value doesn't save
   updateValue.mockClear();
-  await userEvent.type(inputField, "xxx");
-  expect(await canvas.findByText("?")).toBeInTheDocument();
-  expect(canvas.getByText("Bearing must be a number in D.MMSSS format")).toBeInTheDocument();
-  await userEvent.type(inputField, "{Enter}");
+  await userEvent.type(inputField, 'xxx');
+  expect(await canvas.findByText('?')).toBeInTheDocument();
+  expect(canvas.getByText('Bearing must be a number in D.MMSSS format')).toBeInTheDocument();
+  await userEvent.type(inputField, '{Enter}');
   expect(updateValue).not.toHaveBeenCalled();
   await userEvent.tab();
   expect(updateValue).not.toHaveBeenCalled();

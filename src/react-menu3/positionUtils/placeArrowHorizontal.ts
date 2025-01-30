@@ -1,4 +1,4 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject } from 'react';
 
 export const placeArrowHorizontal = (p: {
   arrowRef: MutableRefObject<HTMLElement | null>;

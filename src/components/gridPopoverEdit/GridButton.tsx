@@ -1,9 +1,10 @@
-import { CellFocusedEvent, ICellEditorParams } from "ag-grid-community";
-import { ColDefT, GridCell, SAICellRendererParams } from "../GridCell";
-import { GenericCellColDef } from "../gridRender";
-import { GridBaseRow } from "../Grid";
-import { LuiButton, LuiIcon } from "@linzjs/lui";
-import { useEffect, useRef } from "react";
+import { LuiButton, LuiIcon } from '@linzjs/lui';
+import { CellFocusedEvent, ICellEditorParams } from 'ag-grid-community';
+import { useEffect, useRef } from 'react';
+
+import { GridBaseRow } from '../Grid';
+import { ColDefT, GridCell, SAICellRendererParams } from '../GridCell';
+import { GenericCellColDef } from '../gridRender';
 
 const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererParams<TData>) => {
   const { data, node, column, colDef, api } = props;
@@ -15,9 +16,9 @@ const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererPar
         inputRef.current?.focus();
       }
     };
-    api.addEventListener("cellFocused", checkFocus);
+    api.addEventListener('cellFocused', checkFocus);
     return () => {
-      api.removeEventListener("cellFocused", checkFocus);
+      api.removeEventListener('cellFocused', checkFocus);
     };
   }, [api, column, node.rowIndex]);
 
@@ -32,7 +33,7 @@ const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererPar
         const selectedRowIds = selectedRows.map((r) => r.id);
         colDef?.cellEditorParams.onClick?.({ selectedRows, selectedRowIds });
       }}
-      style={{ display: colDef?.cellEditorParams?.visible?.(props) !== false ? "" : "none" }}
+      style={{ display: colDef?.cellEditorParams?.visible?.(props) !== false ? '' : 'none' }}
     >
       <LuiIcon name="ic_redo" alt="revert" size="md" />
     </LuiButton>
@@ -41,7 +42,7 @@ const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererPar
 
 export interface GridButtonProps<TData extends GridBaseRow> {
   visible?: (cellEditorParams: ICellEditorParams) => boolean;
-  onClick?: (props: { selectedRows: TData[]; selectedRowIds: TData["id"][] }) => void;
+  onClick?: (props: { selectedRows: TData[]; selectedRowIds: TData['id'][] }) => void;
 }
 
 export const GridButton = <TData extends GridBaseRow>(
@@ -52,8 +53,8 @@ export const GridButton = <TData extends GridBaseRow>(
     minWidth: 72,
     maxWidth: 72,
     resizable: false,
-    headerClass: "GridHeaderAlignCenter",
-    cellClass: "GridCellAlignCenter",
+    headerClass: 'GridHeaderAlignCenter',
+    cellClass: 'GridCellAlignCenter',
     cellRenderer: ButtonCellRenderer,
     cellEditorParams: {
       ...editor,

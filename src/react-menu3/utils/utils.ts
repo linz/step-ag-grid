@@ -1,10 +1,10 @@
-import { findIndex } from "lodash-es";
-import { unstable_batchedUpdates } from "react-dom";
+import { findIndex } from 'lodash-es';
+import { unstable_batchedUpdates } from 'react-dom';
 
-import { MenuButtonProps } from "../components/MenuButton";
-import { MenuState, MenuStateOptions } from "../types";
+import { MenuButtonProps } from '../components/MenuButton';
+import { MenuState, MenuStateOptions } from '../types';
 
-export const isMenuOpen = (state?: MenuState) => !!state && state[0] === "o";
+export const isMenuOpen = (state?: MenuState) => !!state && state[0] === 'o';
 export const batchedUpdates = unstable_batchedUpdates || ((callback: () => any) => callback());
 export const values = Object.values || ((obj: { [x: string]: any }) => Object.keys(obj).map((key) => obj[key]));
 export const floatEqual = (a: number, b: number, diff = 0.0001) => Math.abs(a - b) < diff;
@@ -14,17 +14,17 @@ export type TransitionMap = {
   close?: boolean;
   item?: boolean;
 };
-export const getTransition = (transition: MenuStateOptions["transition"], name: keyof TransitionMap) =>
+export const getTransition = (transition: MenuStateOptions['transition'], name: keyof TransitionMap) =>
   transition === true || !!(transition && transition[name]);
 
 export function safeCall<T, R>(fn: (arg?: T) => R, arg?: T): R;
 export function safeCall<T, R>(fn: T, arg: R): T;
 export function safeCall<T, R>(fn: (arg?: T) => R, arg?: T): T | R {
-  return typeof fn === "function" ? fn(arg) : fn;
+  return typeof fn === 'function' ? fn(arg) : fn;
 }
 
-const internalKey = "_szhsinMenu";
-export const getName = (component: Record<string, any | undefined>) => component[internalKey];
+const internalKey = '_szhsinMenu';
+export const getName = (component: Record<string, any>) => component[internalKey];
 //export const defineName = <T extends any[]>(name: string, component: (...args: T) => ReactElement) =>
 //  Object.defineProperty(component, internalKey, { value: name });
 
@@ -38,7 +38,7 @@ export const mergeProps = (target: any, source: any) => {
     Object.keys(source).forEach((key) => {
       const targetProp = target[key];
       const sourceProp = source[key];
-      if (typeof sourceProp === "function" && targetProp) {
+      if (typeof sourceProp === 'function' && targetProp) {
         target[key] = (...arg: any[]) => {
           sourceProp(...arg);
           targetProp(...arg);
@@ -81,7 +81,7 @@ export const getScrollAncestor = (node: Node | null): Element | null => {
 
 export function commonProps(isDisabled?: boolean, isHovering?: boolean) {
   return {
-    "aria-disabled": isDisabled || undefined,
+    'aria-disabled': isDisabled || undefined,
     tabIndex: isHovering ? 0 : -1,
   };
 }
@@ -90,15 +90,15 @@ export const indexOfNode = (nodeList: NodeListOf<Node>, node: Node) => findIndex
 
 export const focusFirstInput = (container: any) => {
   // We can't use instanceof Element in portals, so I use querySelectorAll as a proxy here
-  if (!container || !("querySelectorAll" in container)) return false;
+  if (!container || !('querySelectorAll' in container)) return false;
   const inputs = container.querySelectorAll("input[type='text'],input:not([type]),textarea");
   const input = inputs[0];
   // Using focus as proxy for HTMLElement
-  if (!input || !("focus" in input)) return false;
+  if (!input || !('focus' in input)) return false;
   input.focus();
   // Text areas should start at end
   // this is a proxy for instanceof HTMLTextAreaElement
-  if (["textarea", "text"].includes(input.type)) {
+  if (['textarea', 'text'].includes(input.type)) {
     input.setSelectionRange(0, input.value.length);
   }
   return true;

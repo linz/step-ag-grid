@@ -1,22 +1,25 @@
-import { isEmpty } from "lodash-es";
-import { Fragment, ReactElement, useCallback, useEffect, useRef, useState } from "react";
+import { isEmpty } from 'lodash-es';
+import { Fragment, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { useGridPopoverContext } from "../../contexts/GridPopoverContext";
-import { GridSubComponentContext } from "../../contexts/GridSubComponentContext";
-import { FocusableItem, MenuDivider, MenuItem, SubMenu } from "../../react-menu3";
-import { ClickEvent } from "../../react-menu3/types";
-import { ComponentLoadingWrapper } from "../ComponentLoadingWrapper";
-import { GridBaseRow } from "../Grid";
-import { CellEditorCommon } from "../GridCell";
-import { useGridPopoverHook } from "../GridPopoverHook";
+import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
+import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
+import { FocusableItem, MenuDivider, MenuItem, SubMenu } from '../../react-menu3';
+import { ClickEvent } from '../../react-menu3/types';
+import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
+import { GridBaseRow } from '../Grid';
+import { CellEditorCommon } from '../GridCell';
+import { useGridPopoverHook } from '../GridPopoverHook';
 
 export interface GridFormPopoverMenuProps<TData extends GridBaseRow> extends CellEditorCommon {
-  options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]>;
-  defaultAction?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => Promise<void>;
+  options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]> | MenuOption<TData>[];
+  defaultAction?: (props: {
+    selectedRows: TData[];
+    menuOption: SelectedMenuOptionResult<TData>;
+  }) => Promise<void> | void;
 }
 
 /** Menu configuration types **/
-const __isMenuSeparator__ = "__isMenuSeparator__";
+const __isMenuSeparator__ = '__isMenuSeparator__';
 export const PopoutMenuSeparator = Object.freeze({ label: __isMenuSeparator__ });
 
 interface MenuSeparatorType {
@@ -53,7 +56,7 @@ export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPo
   const defaultAction = useCallback(
     async (params: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => {
       if (props.defaultAction) await props.defaultAction(params);
-      else console.error(`No action specified for ${params.menuOption.label} menu options`);
+      else console.error(`No action specified for ${String(params.menuOption.label)} menu options`);
     },
     [props],
   );
@@ -64,8 +67,8 @@ export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPo
     optionsInitialising.current = true;
     const optionsConf = props.options ?? [];
 
-    (async () => {
-      const newOptions = typeof optionsConf == "function" ? await optionsConf(selectedRows) : optionsConf;
+    void (async () => {
+      const newOptions = typeof optionsConf === 'function' ? await optionsConf(selectedRows) : optionsConf;
       setOptions(newOptions);
       if (!props.defaultAction) {
         const anyOptionsAreMissingAction = newOptions.some((option) => !option.action);
@@ -100,7 +103,7 @@ export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPo
       } else {
         subComponentIsValid.current = true;
         setSubSelectedValue(null);
-        await updateValue(async () => actionClick(item), e.key === "Tab" ? (e.shiftKey ? -1 : 1) : 0);
+        await updateValue(async () => actionClick(item), e.key === 'Tab' ? (e.shiftKey ? -1 : 1) : 0);
       }
     },
     [actionClick, subComponentSelected, updateValue],
@@ -123,40 +126,40 @@ export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPo
   });
 
   return popoverWrapper(
-    <ComponentLoadingWrapper loading={!options} className={"GridFormPopupMenu"}>
+    <ComponentLoadingWrapper loading={!options} className={'GridFormPopupMenu'}>
       <>
         {isEmpty(options) ? (
-          <MenuItem key={`GridPopoverMenu-empty`} className={"GridPopoverMenu-noOptions"} disabled={true}>
+          <MenuItem key={`GridPopoverMenu-empty`} className={'GridPopoverMenu-noOptions'} disabled={true}>
             No actions
           </MenuItem>
         ) : (
           options?.map((item, index) =>
-            item.label === "__isMenuSeparator__" ? (
+            item.label === '__isMenuSeparator__' ? (
               <MenuDivider key={`$$divider_${index}`} />
             ) : (
               !item.hidden && (
-                <Fragment key={`${item.label}`}>
+                <Fragment key={`${String(item.label)}`}>
                   {item.subMenu ? (
                     <SubMenu
-                      key={`${item.label}`}
+                      key={`${String(item.label)}`}
                       disabled={!!item.disabled}
                       label={item.label as string}
-                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                      title={item.disabled && typeof item.disabled !== 'boolean' ? item.disabled : ''}
                     >
                       <item.subMenu />
                     </SubMenu>
                   ) : (
                     <MenuItem
-                      key={`${item.label}`}
-                      onClick={(e: ClickEvent) => onMenuItemClick(e, item)}
+                      key={`${String(item.label)}`}
+                      onClick={(e: ClickEvent) => void onMenuItemClick(e, item)}
                       disabled={!!item.disabled}
-                      title={item.disabled && typeof item.disabled !== "boolean" ? item.disabled : ""}
+                      title={item.disabled && typeof item.disabled !== 'boolean' ? item.disabled : ''}
                     >
                       {item.label as ReactElement | string}
                     </MenuItem>
                   )}
                   {item.subComponent && subComponentSelected === item && (
-                    <FocusableItem className={"LuiDeprecatedForms"} key={`${item.label}_subcomponent`}>
+                    <FocusableItem className={'LuiDeprecatedForms'} key={`${String(item.label)}_subcomponent`}>
                       {() => (
                         <GridSubComponentContext.Provider
                           value={{
@@ -172,7 +175,7 @@ export const GridFormPopoverMenu = <TData extends GridBaseRow>(props: GridFormPo
                             triggerSave,
                           }}
                         >
-                          <div className={"subComponent"}>{item.subComponent && <item.subComponent />}</div>
+                          <div className={'subComponent'}>{item.subComponent && <item.subComponent />}</div>
                         </GridSubComponentContext.Provider>
                       )}
                     </FocusableItem>

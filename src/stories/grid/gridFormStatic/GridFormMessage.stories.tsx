@@ -1,17 +1,16 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { Meta, StoryFn } from '@storybook/react';
+import { GridPopoverContext, GridPopoverContextType } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridContextProvider, GridFormMessage, GridFormMessageProps } from "../../..";
+import { GridContextProvider, GridFormMessage, GridFormMessageProps } from '../../..';
 
 export default {
-  title: "GridForm / Static Tests",
+  title: 'GridForm / Static Tests',
   component: GridFormMessage,
   args: {},
 } as Meta<typeof GridFormMessage>;
@@ -20,7 +19,7 @@ const Template: StoryFn<typeof GridFormMessage> = (props: GridFormMessageProps<a
   const anchorRef1 = useRef<HTMLHeadingElement>(null);
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContextProvider>
         <h6 ref={anchorRef1}>Standard Message</h6>
         <GridPopoverContext.Provider value={{ anchorRef: anchorRef1 } as any as GridPopoverContextType<any>}>

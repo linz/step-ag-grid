@@ -1,32 +1,31 @@
-import "../../../react-menu3/styles/index.scss";
-import "../../../styles/index.scss";
-import "@linzjs/lui/dist/scss/base.scss";
+import '../../../react-menu3/styles/index.scss';
+import '../../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from "@storybook/react";
-import { GridPopoverContext, GridPopoverContextType } from "contexts/GridPopoverContext";
-import { useRef } from "react";
+import { Meta, StoryFn } from '@storybook/react';
+import { GridPopoverContext, GridPopoverContextType } from 'contexts/GridPopoverContext';
+import { useRef } from 'react';
 
-import "@linzjs/lui/dist/fonts";
-
-import { GridBaseRow, GridContextProvider, GridFormTextArea, GridFormTextAreaProps } from "../../..";
+import { GridBaseRow, GridContextProvider, GridFormTextArea, GridFormTextAreaProps } from '../../..';
 
 export default {
-  title: "GridForm / Static Tests",
+  title: 'GridForm / Static Tests',
   component: GridFormTextArea,
   args: {},
 } as Meta<typeof GridFormTextArea>;
 
 const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps<any>) => {
   const configs: [string, GridFormTextAreaProps<GridBaseRow>, string?][] = [
-    ["Text area", {}],
-    ["Text area with text", {}, "Some text"],
-    ["Text area with error & placeholder", { required: true, placeholder: "Custom placeholder" }],
+    ['Text area', {}],
+    ['Text area with text', {}, 'Some text'],
+    ['Text area with error & placeholder', { required: true, placeholder: 'Custom placeholder' }],
   ];
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const anchorRefs = configs.map(() => useRef<HTMLHeadingElement>(null));
 
   return (
-    <div className={"react-menu-inline-test"}>
+    <div className={'react-menu-inline-test'}>
       <GridContextProvider>
         {configs.map((config, index) => (
           <>

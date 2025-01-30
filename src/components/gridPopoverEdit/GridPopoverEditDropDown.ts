@@ -1,8 +1,9 @@
-import clsx from "clsx";
-import { GridBaseRow } from "../Grid";
-import { ColDefT, GenericCellEditorProps, GridCell } from "../GridCell";
-import { GridFormDropDown, GridFormDropDownProps } from "../gridForm/GridFormDropDown";
-import { GenericCellColDef } from "../gridRender/GridRenderGenericCell";
+import clsx from 'clsx';
+
+import { GridBaseRow } from '../Grid';
+import { ColDefT, GenericCellEditorProps, GridCell } from '../GridCell';
+import { GridFormDropDown, GridFormDropDownProps } from '../gridForm/GridFormDropDown';
+import { GenericCellColDef } from '../gridRender/GridRenderGenericCell';
 
 export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any>(
   colDef: GenericCellColDef<TData, TValue>,
@@ -15,8 +16,8 @@ export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any>
       ...(props.editorParams as GridFormDropDownProps<TData, TValue>),
       className: clsx(
         {
-          "GridPopoverEditDropDown-containerLarge": !props.editorParams?.className?.includes(
-            "GridPopoverEditDropDown-container",
+          'GridPopoverEditDropDown-containerLarge': !props.editorParams?.className?.includes(
+            'GridPopoverEditDropDown-container',
           ),
         },
         props.editorParams?.className,
