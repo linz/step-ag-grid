@@ -1,6 +1,6 @@
 @use "../react-menu3/styles/index";
 @use "./react-menu-customisations";
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+@use "@linzjs/lui/dist/scss/Core" as lui;
 
 .LabelPreferencesPanelGridCellAlignCenter .ag-wrapper {
   margin-left: auto;
@@ -40,9 +40,9 @@
   align-items: center;
   flex-direction: row;
   padding: 12px;
-  background-color: colors.$hint;
-  border-bottom: 1px solid colors.$silver;
-  border-top: 2px solid colors.$lily;
+  background-color: lui.$hint;
+  border-bottom: 1px solid lui.$silver;
+  border-top: 2px solid lui.$lily;
 }
 
 .Grid-container-filters button {
@@ -68,21 +68,21 @@
   position: absolute;
   margin: 8px;
   pointer-events: none;
-  fill: colors.$fuscous;
+  fill: lui.$fuscous;
 }
 
 .GridFilterQuick-input {
   width: 100%;
   height: 40px;
   min-height: 40px;
-  border: 0.06rem solid colors.$silver;
+  border: 0.06rem solid lui.$silver;
   border-radius: 3px;
   padding-left: 36px;
   padding-right: 0.75rem;
   font-family: "Open Sans", system-ui, sans-serif;
 
   &::placeholder {
-    color: colors.$fuscous;
+    color: lui.$fuscous;
     font-style: italic;
   }
 }
@@ -109,11 +109,11 @@
 }
 
 .ag-floating-top-container .ag-row {
-  background-color: colors.$hint;
+  background-color: lui.$hint;
 }
 
 .ag-floating-bottom-container .ag-row {
-  background-color: colors.$hint;
+  background-color: lui.$hint;
 }
 
 .GridHeaderAlignCenter .ag-header-cell-text {

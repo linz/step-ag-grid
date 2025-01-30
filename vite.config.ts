@@ -13,6 +13,13 @@ export default defineConfig(async (): Promise<UserConfig> => {
       outDir: './build',
       target: 'esnext',
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern',
+        },
+      },
+    },
     base: '/',
   };
 });

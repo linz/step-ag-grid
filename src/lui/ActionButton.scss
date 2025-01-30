@@ -1,4 +1,4 @@
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+@use "@linzjs/lui/dist/scss/Core" as lui;
 
 .ActionButton {
   display: flex;
@@ -44,7 +44,7 @@
 .ActionButton-inProgress.lui-button-lg.lui-button-icon-right {
   cursor: progress;
   color: #007198;
-  background-color: colors.$polar;
+  background-color: lui.$polar;
 }
 
 .ActionButton-fill {

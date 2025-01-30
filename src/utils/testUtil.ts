@@ -1,6 +1,7 @@
 import { act, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { isEqual } from 'lodash-es';
+import { expect } from 'vitest';
 
 import { findQuick, getAllQuick, getMatcher, getQuick, IQueryQuick, queryQuick } from './testQuick';
 

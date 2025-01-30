@@ -1,4 +1,4 @@
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
+@use "@linzjs/lui/dist/scss/Core" as lui;
 
 .AgGridGenericCellRenderer-icon {
   margin-right: 4px;
@@ -6,24 +6,24 @@
 
 .AgGridGenericCellRenderer-ic_infoIcon {
   margin-right: 4px;
-  fill: colors.$info;
+  fill: lui.$info;
 }
 
 .AgGridGenericCellRenderer-ic_info_outlineIcon {
   margin-right: 4px;
-  fill: colors.$info;
+  fill: lui.$info;
 }
 
 .AgGridGenericCellRenderer-ic_warningIcon {
   margin-right: 4px;
-  fill: colors.$warning;
+  fill: lui.$warning;
 }
 
 .AgGridGenericCellRenderer-ic_warning_outlineIcon {
   margin-right: 4px;
-  fill: colors.$warning;
+  fill: lui.$warning;
 }
 
 .GridIcon-disabled {
-  fill: colors.$silver !important;
+  fill: lui.$silver !important;
 }
