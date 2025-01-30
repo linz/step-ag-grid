@@ -1,18 +1,18 @@
-import { defineConfig, UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import { createHtmlPlugin } from "vite-plugin-html";
-import react from "@vitejs/plugin-react-swc";
+import react from '@vitejs/plugin-react-swc';
+import { defineConfig, UserConfig } from 'vite';
+import { createHtmlPlugin } from 'vite-plugin-html';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(async (): Promise<UserConfig> => {
   return {
-    envDir: "app-env",
+    envDir: 'app-env',
     plugins: [react(), tsconfigPaths(), createHtmlPlugin()],
     build: {
       sourcemap: true,
       chunkSizeWarningLimit: 7500,
-      outDir: "./build",
-      target: "esnext",
+      outDir: './build',
+      target: 'esnext',
     },
-    base: "/",
+    base: '/',
   };
 });
