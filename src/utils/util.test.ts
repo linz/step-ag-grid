@@ -1,5 +1,6 @@
-import { isFloat, sanitiseFileName } from './util';
+import { describe, expect, test } from 'vitest';
 
+import { isFloat, sanitiseFileName } from './util';
 describe('sanitiseFileName', () => {
   test('isFloat', () => {
     expect(isFloat('')).toBe(false);

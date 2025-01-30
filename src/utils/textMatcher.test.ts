@@ -1,5 +1,6 @@
-import { textMatch } from './textMatcher';
+import { describe, expect, test } from 'vitest';
 
+import { textMatch } from './textMatcher';
 /**
  * "L" => L*
  * "=L" => L
