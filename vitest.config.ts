@@ -9,9 +9,6 @@ export default defineConfig({
         deps: {
             inline: ['vitest-canvas-mock'],
         },
-        coverage: {
-            reporter: ['text', 'json', 'html'], // Optional: Add coverage reports
-        },
         environmentOptions: {
             jsdom: {
                 resources: 'usable',
