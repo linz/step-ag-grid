@@ -2,6 +2,7 @@ import { screen } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReactElement, useEffect, useState } from 'react';
+import { describe, expect, test } from 'vitest';
 
 import { usePrevious } from './reactUtils';
 

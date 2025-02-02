@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from 'vitest';
+
 import {
   bearingCorrectionRangeValidator,
   bearingRangeValidator,
@@ -57,7 +59,7 @@ describe('bearing', () => {
     });
 
     // calls custom invalid
-    const fn = jest.fn();
+    const fn = vi.fn();
     bearingStringValidator('1.2', fn);
     expect(fn).toHaveBeenCalledWith(1.2);
   });

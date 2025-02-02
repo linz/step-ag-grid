@@ -14,4 +14,6 @@ export * from './react-menu3/index';
 export * from './react-menu3/types';
 export * from './utils/bearing';
 export * from './utils/deferredPromise';
+export * from './utils/textMatcher';
+export * from './utils/textValidator';
 export * from './utils/util';

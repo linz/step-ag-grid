@@ -1,25 +1,22 @@
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/FontVars" as fonts;
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/SpacingVars" as spacing;
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Utilities" as *;
+@use "../../node_modules/@linzjs/lui/dist/scss/Core" as lui;
 
 /**
  * Here is where we can override the styles of react-menu
  */
 .step-ag-grid-react-menu.szh-menu {
   z-index: 900;
-  color: colors.$base-type-color;
-  @include fonts.font-regular();
+  color: lui.$base-type-color;
+  @include lui.font-regular();
 
   div,
   a[role="menuitem"] {
     text-decoration: none;
-    color: colors.$base-type-color;
-    @include fonts.font-regular();
+    color: lui.$base-type-color;
+    @include lui.font-regular();
   }
 
   li[role="menuitem"]:hover {
-    background-color: colors.$polar;
+    background-color: lui.$polar;
   }
 
   .szh-menu__header {
@@ -31,85 +28,73 @@
 /**
  * Here are styles for lui select menu
  */
-.lui-select-menu.szh-menu-container {
-  @include breakpoint(sm) {
-    position: absolute;
-  }
-}
-
 .lui-select-menu.szh-menu {
   z-index: 900;
   width: 92vw;
   overflow-y: scroll;
 
-  @include breakpoint(sm) {
-    overflow: visible;
-    height: auto;
-    width: 240px;
-  }
-
-  color: colors.$base-type-color;
-  @include fonts.font-light();
+  color: lui.$base-type-color;
+  @include lui.font-light();
 }
 
 .lui-select-menuItem {
-  padding: spacing.$unit-xs spacing.$unit-sm spacing.$unit-xs spacing.$unit-xs;
+  padding: lui.$unit-xs lui.$unit-sm lui.$unit-xs lui.$unit-xs;
   display: flex;
   line-height: 1;
   transition: all 0.2s ease-in-out;
-  fill: colors.$fuscous;
+  fill: lui.$fuscous;
 
   &:hover {
-    background-color: colors.$polar;
+    background-color: lui.$polar;
   }
 }
 
 .lui-select-menuItem--error {
   p {
-    color: colors.$error;
+    color: lui.$error;
   }
 
   .LuiIcon {
-    fill: colors.$error;
+    fill: lui.$error;
   }
 }
 
 .lui-select-menuItemText {
-  @include fonts.font-regular();
-  color: colors.$charcoal;
+  @include lui.font-regular();
+  color: lui.$charcoal;
   margin: 0;
-  padding-left: spacing.$unit-lg;
+  padding-left: lui.$unit-lg;
 
   // if no icon, give it 4px to align with the group header
   &--noPadding {
-    padding-left: spacing.$unit-xxs;
+    padding-left: lui.$unit-xxs;
   }
 }
 
 .lui-select-icon + .lui-select-menuItemText {
-  padding-left: spacing.$unit-xs;
+  padding-left: lui.$unit-xs;
 }
 
 .lui-select-menu-group {
   height: 32px;
-  color: colors.$fuscous;
+  color: lui.$fuscous;
   padding-left: 0.75rem;
   text-transform: none;
-  @include fonts.font-semibold();
+  @include lui.font-semibold();
 }
 
 .lui-select-submenu {
   flex: 1;
 
   div[role="menuitem"] {
-    padding: spacing.$unit-xs spacing.$unit-xs spacing.$unit-xs 2.5rem;
+    padding: lui.$unit-xs lui.$unit-xs lui.$unit-xs 2.5rem;
     text-decoration: none;
-    @include fonts.font-regular();
+    @include lui.font-regular();
     height: 40px;
   }
   // overwrite the hover color
   .szh-menu__item--hover {
-    background-color: colors.$polar;
+    background-color: lui.$polar;
   }
 }
 
@@ -119,7 +104,7 @@
   div[role="menuitem"] {
     padding-left: 0;
     text-decoration: none;
-    @include fonts.font-regular();
+    @include lui.font-regular();
     height: 40px;
   }
 }
@@ -130,6 +115,6 @@
 
 
 .step-ag-grid-react-menu-sub-header-icon {
-  margin: spacing.$unit-xs;
-  fill: colors.$fuscous;
+  margin: lui.$unit-xs;
+  fill: lui.$fuscous;
 }

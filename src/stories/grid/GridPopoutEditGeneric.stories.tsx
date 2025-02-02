@@ -7,7 +7,7 @@ import { Meta, StoryFn } from '@storybook/react';
 import { useMemo, useState } from 'react';
 
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from '../..';
-import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 import { FormTest, IFormTestRow } from './FormTest';
 
 export default {

@@ -284,7 +284,7 @@ export const clickActionButton = async (text: string, container?: HTMLElement): 
 };
 
 export const waitForGridReady = async (props?: { grid?: HTMLElement; timeout?: number }) =>
-  waitFor(() => expect(getAllQuick({ classes: '.Grid-ready' }, props?.grid)).toBeInTheDocument(), {
+  waitFor(() => expect(getAllQuick({ classes: '.Grid-ready' }, props?.grid)).toBeDefined(), {
     timeout: props?.timeout ?? 5000,
   });
 

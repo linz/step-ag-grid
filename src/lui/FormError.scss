@@ -1,12 +1,11 @@
-@use "../../node_modules/@linzjs/lui/dist/scss/Foundation/Variables/ColorVars" as colors;
-
+@use "../../node_modules/@linzjs/lui/dist/scss/Core" as lui;
 
 .FormError {
   display: flex;
 
   &-helpText {
     font-size: 0.75rem;
-    color: colors.$fuscous;
+    color: lui.$fuscous;
     font-weight: 400;
   }
 
@@ -19,7 +18,7 @@
     padding-left: 0;
     font-size: 14px;
     font-weight: 600;
-    color: colors.$charcoal;
+    color: lui.$charcoal;
     align-items: center;
   }
 }

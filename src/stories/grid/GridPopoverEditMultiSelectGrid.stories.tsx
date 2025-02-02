@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react';
 import { ColDefT, Grid, GridCell, GridContextProvider, GridProps, GridUpdatingContextProvider } from '../..';
 import { MultiSelectGridOption } from '../../components/gridForm/GridFormMultiSelectGrid';
 import { GridPopoutEditMultiSelectGrid } from '../../components/gridPopoverEdit/GridPopoutEditMultiSelectGrid';
-import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 import { EditMultiSelect } from './GridPopoverEditMultiSelect.stories';
 
 export default {

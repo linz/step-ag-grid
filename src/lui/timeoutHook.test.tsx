@@ -1,14 +1,15 @@
 import { render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { useTimeoutHook } from './timeoutHook';
 
 describe('useTimeoutHook', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   const TestComponent = (props: { callback: () => void; repeat?: number }) => {
@@ -20,20 +21,20 @@ describe('useTimeoutHook', () => {
   };
 
   test('invokes on timeout', () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     render(<TestComponent callback={callback} />);
     expect(callback).toHaveBeenCalledTimes(0);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
   test('invokes once on double invocation', () => {
-    const callback = jest.fn();
+    const callback = vi.fn();
 
     render(<TestComponent callback={callback} repeat={2} />);
     expect(callback).toHaveBeenCalledTimes(0);
-    jest.runAllTimers();
+    vi.runAllTimers();
     expect(callback).toHaveBeenCalledTimes(1);
   });
 });

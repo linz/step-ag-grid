@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from 'vitest';
+
 import { GridBaseRow } from '../components/Grid';
 import { TextInputValidator, TextInputValidatorProps } from './textValidator';
 
@@ -88,18 +90,15 @@ describe('TextInputValidator', () => {
       },
     ] as (TextInputValidatorProps<GridBaseRow> & { tests: [string, string | undefined][] })[];
 
-    validate.forEach((v, i) => {
+    validate.forEach((v) => {
       for (const test of v.tests) {
-        expect(
-          TextInputValidator(v, test[0], { id: 0 }, {}),
-          `Test ${i}: "${test[0]}" should return "${test[1]}"`,
-        ).toBe(test[1]);
+        expect(TextInputValidator(v, test[0], { id: 0 }, {})).toBe(test[1]);
       }
     });
   });
 
   test('validator is called', () => {
-    const fn = jest.fn();
+    const fn = vi.fn();
     TextInputValidator({ invalid: fn }, '', { id: 0 }, {});
     expect(fn).toHaveBeenCalled();
   });

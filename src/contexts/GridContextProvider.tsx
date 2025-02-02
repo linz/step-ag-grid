@@ -618,8 +618,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         try {
           gridApi && gridApi.redrawRows(rowNodes ? { rowNodes } : undefined);
         } catch (ex) {
-          // Hide errors in jest, but log them in browser
-          if (typeof jest === 'undefined') console.error(ex);
+          console.error(ex);
         }
       }, 50),
     [gridApi],
