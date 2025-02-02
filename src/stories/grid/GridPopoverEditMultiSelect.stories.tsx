@@ -20,7 +20,7 @@ import {
   MultiSelectOption,
   wait,
 } from '../..';
-import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
 export default {
   title: 'Components / Grids',

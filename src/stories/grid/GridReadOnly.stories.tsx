@@ -28,7 +28,7 @@ import {
 } from '../..';
 import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from '../../components';
 import { GridCellFiller } from '../../components/GridCellFiller';
-import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
 export default {
   title: 'Components / Grids',

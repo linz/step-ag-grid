@@ -15,7 +15,7 @@ import {
   GridEditBoolean,
   GridUpdatingContextProvider,
 } from '../..';
-import { waitForGridReady } from '../../utils/storybookTestUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 import { IFormTestRow } from './FormTest';
 
 export default {
