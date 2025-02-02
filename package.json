@@ -12,7 +12,7 @@
     "react",
     "react-component"
   ],
-  "main": "dist/step-ag-grid.cjs.js",
+  "main": "dist/step-ag-grid.cjs",
   "type": "module",
   "typings": "dist/src/index.d.ts",
   "module": "dist/step-ag-grid.esm.js",
@@ -37,14 +37,13 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "debounce-promise": "^3.1.2",
-    "lodash-es": ">=4",
     "matcher": "^5.0.0",
     "react-transition-state": "^2.2.0",
     "usehooks-ts": "^3.1.0"
   },
   "scripts": {
     "build": "run-s clean stylelint lint css bundle",
-    "yalc": "run-s clean css bundle && yalc publish",
+    "yalc": "run-s clean css bundle && yalc push",
     "clean": "rimraf dist && mkdirp ./dist",
     "bundle": "rollup -c",
     "stylelint": "stylelint src/**/*.scss src/**/*.css --fix",
@@ -109,6 +108,7 @@
     "chromatic": "^11.25.1",
     "css-loader": "^7.1.2",
     "jsdom": "^26.0.0",
+    "lodash-es": "^4.17.21",
     "mkdirp": "^3.0.1",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.5.1",
