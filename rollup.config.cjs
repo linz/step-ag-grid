@@ -47,7 +47,7 @@ module.exports = {
     resolve({ preferBuiltins: true }),
     commonjs(),
     typescript({
-      exclude: ['src/stories/**/*.*'],
+      exclude: ['src/stories/**/*.*', 'src/**/__tests__/*.*'],
     }),
     postcss(postcssOptions()),
     json(),
@@ -56,6 +56,10 @@ module.exports = {
         {
           src: 'src/styles/GridTheme.scss',
           dest: `${outputDir}`,
+        },
+        {
+          src: 'src/utils/__tests__/*.ts',
+          dest: `${outputDir}/src/utils/__tests__/`,
         },
       ],
     }),

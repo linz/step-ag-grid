@@ -3,7 +3,7 @@ import { defineConfig, UserConfig } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig(async (): Promise<UserConfig> => {
+export default defineConfig((): UserConfig => {
   return {
     envDir: 'app-env',
     plugins: [react(), tsconfigPaths(), createHtmlPlugin()],
