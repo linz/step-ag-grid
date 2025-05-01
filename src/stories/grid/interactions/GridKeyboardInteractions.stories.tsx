@@ -66,10 +66,12 @@ interface ITestRow {
 }
 
 const multiEditAction = fn(async () => {
+  console.log('multiEditAction');
   await wait(500);
 });
 
 const eAction = fn(() => {
+  console.log('eAction');
   return true;
 });
 
@@ -223,8 +225,8 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
 
 export const GridKeyboardInteractions: StoryFn<typeof Grid> = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
-  multiEditAction.mockReset();
-  eAction.mockReset();
+  multiEditAction.mockClear();
+  eAction.mockClear();
 
   await waitForGridReady({ canvasElement });
 
@@ -243,7 +245,9 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Enter}');
     await wait(200);
     await userEvent.keyboard('{arrowdown}{arrowdown}');
+    await wait(200);
     fn();
+    await wait(200);
     await waitFor(() => {
       expect(multiEditAction).toHaveBeenCalled();
     });
