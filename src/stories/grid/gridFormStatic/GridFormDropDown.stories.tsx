@@ -15,7 +15,7 @@ export default {
   args: {},
 } as Meta<typeof GridFormDropDown>;
 
-const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
+const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps<GridBaseRow>) => {
   const configs: [string, GridFormDropDownProps<GridBaseRow>, string?][] = [
     ['No options', { options: [] }],
     ['Custom no options', { options: [], noOptionsMessage: 'Custom no options' }],

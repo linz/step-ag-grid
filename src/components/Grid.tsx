@@ -30,8 +30,6 @@ import { useInterval } from 'usehooks-ts';
 import { GridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
-import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
-import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
@@ -40,7 +38,7 @@ export interface GridBaseRow {
   id: string | number;
 }
 
-export interface GridProps {
+export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
   selectable?: boolean;
@@ -50,12 +48,8 @@ export interface GridProps {
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   defaultColDef?: GridOptions['defaultColDef'];
-  columnDefs: ColDef[];
+  columnDefs: ColDef<TData>[];
   rowData: GridOptions['rowData'];
-  /**
-   * Whether select column is pinned.  Defaults to "left".
-   */
-  selectColumnPinned?: ColDef['pinned'];
   noRowsOverlayText?: string;
   noRowsMatchingOverlayText?: string;
   animateRows?: boolean;
@@ -116,20 +110,20 @@ export interface GridProps {
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
-export const Grid = ({
+export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   'data-testid': dataTestId,
   defaultPostSort = true,
   rowSelection = 'multiple',
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
   sizeColumns = 'auto',
-  selectColumnPinned = null,
   contextMenuSelectRow = false,
   singleClickEdit = false,
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
+  selectable,
   ...params
-}: GridProps): ReactElement => {
+}: GridProps<TData>): ReactElement => {
   const {
     gridReady,
     gridRenderState,
@@ -352,48 +346,8 @@ export const Grid = ({
       };
     });
 
-    return params.selectable || params.onRowDragEnd
-      ? [
-          {
-            colId: 'selection',
-            editable: false,
-            rowDrag: !!params.onRowDragEnd,
-            minWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
-            maxWidth: params.selectable && params.onRowDragEnd ? 76 : 48,
-            pinned: selectColumnPinned,
-            headerComponentParams: {
-              exportable: false,
-            },
-            checkboxSelection: params.selectable,
-            headerClass: params.onRowDragEnd ? 'ag-header-select-draggable' : undefined,
-            headerComponent: rowSelection === 'multiple' ? GridHeaderSelect : null,
-            suppressHeaderKeyboardEvent: (e) => {
-              if (!params.selectable) return false;
-              if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
-                if (isEmpty(e.api.getSelectedRows())) {
-                  e.api.selectAllFiltered();
-                } else {
-                  e.api.deselectAll();
-                }
-                return true;
-              }
-              return false;
-            },
-            onCellClicked: clickInputWhenContainingCellClicked,
-          },
-          ...adjustColDefs,
-        ]
-      : adjustColDefs;
-  }, [
-    params.columnDefs,
-    params.selectable,
-    params.onRowDragEnd,
-    params.loading,
-    params.readOnly,
-    params.defaultColDef?.editable,
-    selectColumnPinned,
-    rowSelection,
-  ]);
+    return adjustColDefs;
+  }, [params.columnDefs, params.loading, params.readOnly, params.defaultColDef?.editable]);
 
   /**
    * When grid is ready set the apis to the grid context and sync selected items to grid.
@@ -535,15 +489,15 @@ export const Grid = ({
    * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
    */
   const columnDefsAdjusted = useMemo(() => {
-    const adjustColDefOrGroup = (colDef: ColDef | ColGroupDef) =>
+    const adjustColDefOrGroup = (colDef: ColDef<TData> | ColGroupDef<TData>) =>
       'children' in colDef ? adjustGroupColDef(colDef) : adjustColDef(colDef);
 
-    const adjustGroupColDef = (colDef: ColGroupDef): ColGroupDef => ({
+    const adjustGroupColDef = (colDef: ColGroupDef<TData>): ColGroupDef<TData> => ({
       ...colDef,
       children: colDef.children.map((colDef) => adjustColDefOrGroup(colDef)),
     });
 
-    const adjustColDef = (colDef: ColDef): ColDef => ({
+    const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
       suppressSizeToFit: (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') && !colDef.flex,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
@@ -703,19 +657,19 @@ export const Grid = ({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          rowSelection={
+            selectable
+              ? { enableClickSelection: false, mode: rowSelection == 'single' ? 'singleRow' : 'multiRow' }
+              : undefined
+          }
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
           getRowId={(params) => `${params.data.id}`}
-          suppressRowClickSelection={true}
-          rowSelection={rowSelection}
-          suppressBrowserResizeObserver={true}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
-          onColumnVisible={() => {
-            setInitialContentSize();
-          }}
+          onColumnVisible={setInitialContentSize}
           onRowDataUpdated={onRowDataChanged}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}

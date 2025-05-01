@@ -15,6 +15,7 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
 } from '../..';
+import { GridCellDrag } from '../../components/GridCellDrag';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
 export default {
@@ -57,7 +58,7 @@ interface ITestRow {
   dd: string;
 }
 
-const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
@@ -86,6 +87,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         headerName: 'Description',
         flex: 1,
       }),
+      GridCellDrag,
     ],
     [],
   );

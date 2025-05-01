@@ -2,6 +2,19 @@
 @use "./react-menu-customisations";
 @use "../../node_modules/@linzjs/lui/dist/scss/Core" as lui;
 
+// Don't hide the drag handle
+.ag-theme-step-default.theme-specific .ag-drag-handle.ag-row-drag, .ag-theme-step-compact.theme-specific div.ag-drag-handle.ag-row-drag {
+  opacity: 1 !important;
+}
+
+.ag-drag-handle.ag-row-drag {
+  width: 100%;
+
+  .ag-icon.ag-icon-grip {
+    margin: auto;
+  }
+}
+
 .LabelPreferencesPanelGridCellAlignCenter .ag-wrapper {
   margin-left: auto;
   margin-right: auto;
