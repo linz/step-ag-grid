@@ -274,7 +274,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           defer(() => gridApi.ensureNodeVisible(firstNode));
           const colDefs = getColumns();
           if (!isEmpty(colDefs)) {
-            const col = colDefs[0];
+            let col = colDefs[0];
+            // We don't auto select drag columns
+            if (col?.colId === 'drag') {
+              col = colDefs[1];
+            }
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
@@ -283,8 +287,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
               colId &&
                 delay(() => {
                   if (isEmpty(gridApi.getEditingCells()) && (!ifNoCellFocused || gridApi.getFocusedCell() == null)) {
-                    // ifNoCellFocused
                     gridApi.setFocusedCell(rowIndex, colId);
+                    // It may be that the first cell is the selection cell, this doesn't exist as a colDef
+                    // so instead, I just try and select it.  If it doesn't exist selection will stay on the
+                    // previously focused cell
+                    gridApi.setFocusedCell(rowIndex, 'ag-Grid-ControlsColumn');
                   }
                 }, 100);
             }

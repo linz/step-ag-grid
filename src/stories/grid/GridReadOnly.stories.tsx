@@ -10,7 +10,6 @@ import {
   ColDefT,
   Grid,
   GridCell,
-  GridCellDrag,
   GridContextProvider,
   GridFilterButtons,
   GridFilterQuick,
@@ -75,7 +74,6 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
-      GridCellDrag,
       GridCell({
         field: 'id',
         headerName: 'Id',

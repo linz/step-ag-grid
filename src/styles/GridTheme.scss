@@ -70,10 +70,6 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     justify-content: center;
   }
 
-  .ag-header-select-draggable .ag-header-cell-comp-wrapper {
-    justify-content: end;
-  }
-
   .ag-header-cell {
     font-size: 14px;
     font-weight: 600;

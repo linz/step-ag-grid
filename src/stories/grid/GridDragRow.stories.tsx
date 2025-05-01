@@ -61,6 +61,7 @@ interface ITestRow {
 const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
+      GridCellDrag,
       GridCell({
         field: 'id',
         headerName: 'Id',
@@ -87,7 +88,6 @@ const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<IT
         headerName: 'Description',
         flex: 1,
       }),
-      GridCellDrag,
     ],
     [],
   );

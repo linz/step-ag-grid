@@ -410,7 +410,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const startCellEditing = useCallback(
     (event: CellKeyDownEvent | CellClickedEvent | CellDoubleClickedEvent) => {
       prePopupOps();
-      if (!event.node.isSelected()) {
+      const shouldSelectRow = !event.node.isSelected();
+      if (shouldSelectRow) {
         event.node.setSelected(true, true);
       }
       // Cell already being edited, so don't re-edit until finished
@@ -419,10 +420,22 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
 
       if (event.rowIndex !== null) {
-        event.api.startEditingCell({
-          rowIndex: event.rowIndex,
-          colKey: event.column.getColId(),
-        });
+        // node.setSelected above kills start editing so we have to defer it
+        const rowIndex = event.rowIndex;
+        const colKey = event.column.getColId();
+        if (shouldSelectRow) {
+          setTimeout(() => {
+            event.api.startEditingCell({
+              rowIndex,
+              colKey,
+            });
+          }, 100);
+        } else {
+          event.api.startEditingCell({
+            rowIndex,
+            colKey,
+          });
+        }
       }
     },
     [checkUpdating, prePopupOps],
@@ -642,7 +655,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   setOnCellEditingComplete(params.onCellEditingComplete);
 
   const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
-
   return (
     <div
       data-testid={dataTestId}
