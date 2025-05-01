@@ -141,7 +141,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
             },
             options: async (selectedItems) => {
               // Just doing a timeout here to demonstrate deferred loading
-              await wait(500);
+              await wait(50);
               return [
                 {
                   label: 'Single edit only',
@@ -241,7 +241,7 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   // Test enter post focus
   const test = async (fn: () => any, colId: string, rowId: string) => {
     await userEvent.keyboard('{Enter}');
-    await wait(1000);
+    await wait(200);
     await userEvent.keyboard('{arrowdown}{arrowdown}');
     fn();
     await waitFor(() => {
@@ -254,7 +254,7 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
       expect(activeCell).toHaveAttribute('aria-colindex', colId);
       expect(activeCell?.parentElement).toHaveAttribute('row-index', rowId);
     });
-    await wait(1000);
+    await wait(200);
   };
 
   await test(() => userEvent.keyboard('{Enter}'), '8', '2');
