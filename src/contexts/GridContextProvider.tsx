@@ -287,7 +287,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
                     // It may be that the first cell is the selection cell, this doesn't exist as a colDef
                     // so instead, I just try and select it.  If it doesn't exist selection will stay on the
                     // previously focused cell
-                    gridApi.setFocusedCell(rowIndex, 'ag-Grid-ControlsColumn');
+                    gridApi.setFocusedCell(rowIndex, 'ag-Grid-SelectionColumn');
                   }
                 }, 100);
             }

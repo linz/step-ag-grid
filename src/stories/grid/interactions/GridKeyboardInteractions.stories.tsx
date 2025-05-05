@@ -243,11 +243,9 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   // Test enter post focus
   const test = async (fn: () => any, colId: string, rowId: string) => {
     await userEvent.keyboard('{Enter}');
-    await wait(200);
+    await wait(1000);
     await userEvent.keyboard('{arrowdown}{arrowdown}');
-    await wait(200);
     fn();
-    await wait(200);
     await waitFor(() => {
       expect(multiEditAction).toHaveBeenCalled();
     });
