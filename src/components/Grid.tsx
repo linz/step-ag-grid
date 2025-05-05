@@ -39,6 +39,12 @@ export interface GridBaseRow {
   id: string | number;
 }
 
+export interface GridOnRowDragEndProps<TData extends GridBaseRow> {
+  movedRow: TData;
+  targetRow: TData;
+  direction: -1 | 1;
+}
+
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
@@ -61,7 +67,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
-  onRowDragEnd?: (movedRow: TData, targetRow: TData, direction: -1 | 1) => Promise<void> | void;
+  onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
   /**
@@ -572,30 +578,52 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
   const startDragYRef = useRef<number | null>(null);
-  const onRowDragMove = useCallback((event: RowDragMoveEvent) => {
-    if (startDragYRef.current === null) {
-      startDragYRef.current = event.y;
-    }
+
+  const clearHighlightRowClasses = useCallback(() => {
+    document.querySelectorAll(`.ag-row-highlight-above`)?.forEach((el) => {
+      el.classList.remove('ag-row-highlight-above');
+    });
+    document.querySelectorAll(`.ag-row-highlight-below`)?.forEach((el) => {
+      el.classList.remove('ag-row-highlight-below');
+    });
   }, []);
 
-  const onRowDragEnd = useCallback(
-    (event: RowDragEndEvent) => {
-      console.log(event);
+  const onRowDragMove = useCallback(
+    (event: RowDragMoveEvent) => {
       if (startDragYRef.current === null) {
+        startDragYRef.current = event.y;
+      }
+
+      const yDiff = event.y - startDragYRef.current;
+      const data = event.overNode?.data;
+      if (data) {
+        clearHighlightRowClasses();
+        document.querySelectorAll(`[row-id='${data.id}']`)?.forEach((el) => {
+          el.classList.add(yDiff < 0 ? 'ag-row-highlight-above' : 'ag-row-highlight-below');
+        });
+      }
+    },
+    [clearHighlightRowClasses],
+  );
+
+  const onRowDragEnd = useCallback(
+    (event: RowDragEndEvent<TData>) => {
+      clearHighlightRowClasses();
+      if (!params.onRowDragEnd || startDragYRef.current === null) {
         return;
       }
       const yDiff = event.y - startDragYRef.current;
-      console.log({ yDiff });
       startDragYRef.current = null;
       if (event.node.rowIndex != null) {
-        const moved = event.node.data as TData;
-        const target = event.overNode?.data as TData | undefined;
-        if (params.onRowDragEnd && target && moved !== target && yDiff !== 0) {
-          void params.onRowDragEnd(moved, target, yDiff > 0 ? 1 : -1);
+        const movedRow = event.node.data;
+        const targetRow = event.overNode?.data;
+        if (!movedRow || !targetRow || movedRow === targetRow || yDiff === 0) {
+          return;
         }
+        void params.onRowDragEnd({ movedRow, targetRow, direction: yDiff > 0 ? 1 : -1 });
       }
     },
-    [params],
+    [params, clearHighlightRowClasses],
   );
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
@@ -670,6 +698,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           preventDefaultOnContextMenu={true}
           onCellContextMenu={gridContextMenu.cellContextMenu}
           rowDragText={params.rowDragText}
+          onRowDragCancel={clearHighlightRowClasses}
           onRowDragMove={onRowDragMove}
           onRowDragEnd={onRowDragEnd}
           suppressCellFocus={params.suppressCellFocus}

@@ -11,6 +11,7 @@ import {
   Grid,
   GridCell,
   GridContextProvider,
+  GridOnRowDragEndProps,
   GridProps,
   GridUpdatingContextProvider,
   GridWrapper,
@@ -97,8 +98,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<IT
     { id: 1003, position: 'BA', age: 42, height: `5'7"`, desc: 'BAs', dd: '4' },
   ]);
 
-  const onRowDragEnd = useCallback((movedRow: ITestRow, targetRow: ITestRow, direction: -1 | 1) => {
-    console.log({ onRowDragEnd: { movedRow, targetRow, direction } });
+  const onRowDragEnd = useCallback(({ movedRow, targetRow }: GridOnRowDragEndProps<ITestRow>) => {
     setRowData((rowData) =>
       rowData.map((r) => {
         if (r.id === movedRow.id) return targetRow;
