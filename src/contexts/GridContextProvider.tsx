@@ -529,7 +529,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Returns true if an editable cell on same row was selected, else false.
    */
   const selectNextEditableCell = useCallback(
-    async (_tabDirection: -1 | 1): Promise<boolean> => {
+    async (tabDirection: -1 | 1): Promise<boolean> => {
       // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
       if (!gridApi) return true;
       // If we don't wait the tab to next element won't work
@@ -549,23 +549,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
       // Just in case I've missed something, we don't want the loop to hang everything
       for (let maxIterations = 0; maxIterations < 50; maxIterations++) {
-        console.log('uiter');
         const preRow = gridApi.getFocusedCell();
-        if (!preRow) {
-          break;
-        }
-
-        // tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
-        const cols = gridApi.getColumns();
-        const i = cols?.findIndex((c) => c.getColId() === preRow?.column.getColId());
-        if (i == null) {
-          break;
-        }
-        const nextCol = cols?.[i + 1]?.getColId();
-        if (!nextCol) {
-          break;
-        }
-        gridApi.setFocusedCell(preRow?.rowIndex, nextCol);
+        tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
         const postRow = gridApi.getFocusedCell();
         if (preRow?.rowIndex !== postRow?.rowIndex || preRow?.column === postRow?.column) {
           // We didn't find an editable cell in the same row, or the cell column didn't change
@@ -575,23 +560,19 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
         if (focusedCellIsEditable()) {
           const focusedCell = gridApi?.getFocusedCell();
-          if (!focusedCell) {
-            return false;
+          if (focusedCell) {
+            prePopupOps();
+            gridApi.startEditingCell({
+              rowIndex: focusedCell.rowIndex,
+              colKey: focusedCell.column.getColId(),
+            });
+            return true;
           }
-          const data = gridApi.getDisplayedRowAtIndex(focusedCell?.rowIndex)?.data;
-          if (!data) {
-            return false;
-          }
-          await startCellEditing({
-            rowId: data.id,
-            colId: focusedCell.column.getColId(),
-          });
-          return true;
         }
       }
       return false;
     },
-    [gridApi, startCellEditing],
+    [gridApi, prePopupOps],
   );
 
   const updatingCells = useCallback(
@@ -612,8 +593,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           selectedRows.map((data) => data.id),
           async () => {
             // Need to refresh to get spinners to work on all rows
-            console.log('refreshSelectedRows skipped 2');
-            // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+            gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
             ok = await fnUpdate(selectedRows).catch((ex) => {
               console.error('Exception during modifyUpdating', ex);
               return false;
@@ -622,8 +602,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         );
 
         // async processes need to refresh their own rows
-        console.log('refreshSelectedRows skipped 3');
-        // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+        gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
         if (ok) {
           const cell = gridApi.getFocusedCell();
@@ -631,8 +610,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
             gridApi.setFocusedCell(cell.rowIndex, cell.column);
           }
           // This is needed to trigger postSortRowsHook
-          console.log('refreshSelectedRows skipped 3');
-          // gridApi.refreshClientSideRowModel();
+          gridApi.refreshClientSideRowModel();
         } else {
           // Don't set saving if ok as the form has already closed
           setSaving?.(false);

@@ -399,12 +399,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Force-refresh all selected rows to re-run class function, to update selection highlighting
    */
-  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
-    console.log('refreshSelectedRows skipped');
-    /*event.api.refreshCells({
-          force: true,
-          rowNodes: event.api.getSelectedNodes(),
-        });*/
+  const refreshSelectedRows = useCallback((event: CellEditingStartedEvent): void => {
+    event.api.refreshCells({
+      force: true,
+      rowNodes: event.api.getSelectedNodes(),
+    });
   }, []);
 
   /**
