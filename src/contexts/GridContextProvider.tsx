@@ -475,13 +475,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
       const colDef = gridApi.getColumnDef(colId);
       if (!colDef) {
-        console.log('no coldef');
         return;
       }
 
       const rowNode = gridApi.getRowNode(`${rowId}`);
       if (!rowNode) {
-        console.log('no row', rowId);
         return;
       }
 
@@ -618,16 +616,13 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
         // Only focus next cell if user hasn't already manually changed focus
         const postPopupFocusedCell = gridApi.getFocusedCell();
-        console.log('postPopupFocusedCell', postPopupFocusedCell);
         if (
           prePopupFocusedCell.current &&
           postPopupFocusedCell &&
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          console.log('cec callback 2', { tabDirection });
           if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
-            console.log('cec callback');
             cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
           }
         }
