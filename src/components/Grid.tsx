@@ -1,5 +1,6 @@
 import {
   AgGridEvent,
+  AllCommunityModule,
   CellClassParams,
   CellClickedEvent,
   CellDoubleClickedEvent,
@@ -12,13 +13,10 @@ import {
   EditableCallbackParams,
   GridOptions,
   GridReadyEvent,
-  IClientSideRowModel,
   ModelUpdatedEvent,
+  ModuleRegistry,
   RowDragEndEvent,
-  RowDragLeaveEvent,
   RowDragMoveEvent,
-  RowHighlightPosition,
-  RowNode,
   SelectionChangedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
@@ -27,12 +25,15 @@ import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { GridContext } from '../contexts/GridContext';
+import { GridContext, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
+import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface GridBaseRow {
   id: string | number;
@@ -50,6 +51,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   defaultColDef?: GridOptions['defaultColDef'];
   columnDefs: ColDef<TData>[];
   rowData: GridOptions['rowData'];
+  selectColumnPinned?: ColDef['pinned'];
   noRowsOverlayText?: string;
   noRowsMatchingOverlayText?: string;
   animateRows?: boolean;
@@ -59,7 +61,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   autoSelectFirstRow?: boolean;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
-  onRowDragEnd?: (movedRow: any, targetRow: any, targetIndex: number) => Promise<void> | void;
+  onRowDragEnd?: (movedRow: TData, targetRow: TData, direction: -1 | 1) => Promise<void> | void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
   /**
@@ -117,6 +119,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
   sizeColumns = 'auto',
+  selectColumnPinned = 'left',
   contextMenuSelectRow = false,
   singleClickEdit = false,
   rowData,
@@ -145,7 +148,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     stopEditing,
   } = useContext(GridContext);
-  const { checkUpdating, updatedDep, updatingCols } = useContext(GridUpdatingContext);
+  const { startCellEditing } = useGridContext();
+  const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
@@ -329,7 +333,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    * Add selectable column to colDefs.  Adjust column defs to block fit for auto sized columns.
    */
   const columnDefs = useMemo((): (ColDef | ColGroupDef)[] => {
-    const adjustColDefs = params.columnDefs.map((colDef) => {
+    return params.columnDefs.map((colDef) => {
       const colDefEditable = colDef.editable;
       const editable = combineEditables(
         params.loading !== true && params.readOnly !== true,
@@ -345,8 +349,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         },
       };
     });
-
-    return adjustColDefs;
   }, [params.columnDefs, params.loading, params.readOnly, params.defaultColDef?.editable]);
 
   /**
@@ -397,56 +399,22 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Force-refresh all selected rows to re-run class function, to update selection highlighting
    */
-  const refreshSelectedRows = useCallback((event: CellEditingStartedEvent): void => {
-    event.api.refreshCells({
-      force: true,
-      rowNodes: event.api.getSelectedNodes(),
-    });
+  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
+    console.log('refreshSelectedRows skipped');
+    /*event.api.refreshCells({
+          force: true,
+          rowNodes: event.api.getSelectedNodes(),
+        });*/
   }, []);
-
-  /**
-   * Make sure node is selected for editing and start edit
-   */
-  const startCellEditing = useCallback(
-    (event: CellKeyDownEvent | CellClickedEvent | CellDoubleClickedEvent) => {
-      prePopupOps();
-      const shouldSelectRow = !event.node.isSelected();
-      if (shouldSelectRow) {
-        event.node.setSelected(true, true);
-      }
-      // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([event.colDef.field ?? ''], event.data.id)) {
-        return;
-      }
-
-      if (event.rowIndex !== null) {
-        // node.setSelected above kills start editing so we have to defer it
-        const rowIndex = event.rowIndex;
-        const colKey = event.column.getColId();
-        if (shouldSelectRow) {
-          setTimeout(() => {
-            event.api.startEditingCell({
-              rowIndex,
-              colKey,
-            });
-          }, 100);
-        } else {
-          event.api.startEditingCell({
-            rowIndex,
-            colKey,
-          });
-        }
-      }
-    },
-    [checkUpdating, prePopupOps],
-  );
 
   /**
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
-      if (!invokeEditAction(event)) startCellEditing(event);
+      if (!invokeEditAction(event)) {
+        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
+      }
     },
     [startCellEditing],
   );
@@ -457,7 +425,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onCellClicked = useCallback(
     (event: CellClickedEvent) => {
       if (event.colDef?.cellRendererParams?.singleClickEdit ?? singleClickEdit) {
-        startCellEditing(event);
+        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },
     [singleClickEdit, startCellEditing],
@@ -487,10 +455,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     (e: CellKeyDownEvent) => {
       const kbe = e.event as KeyboardEvent;
       if (kbe.key === 'Enter') {
-        if (!invokeEditAction(e)) startCellEditing(e);
+        if (!invokeEditAction(e)) {
+          void startCellEditing({ rowId: e.data.id, colId: e.column.getColId() });
+        }
       }
       if (kbe.key === 'Tab') {
-        // eslint-disable-next-line
         prePopupOps();
       }
     },
@@ -603,50 +572,29 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
-  const onRowDragLeave = useCallback((event: RowDragLeaveEvent) => {
-    const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-    clientSideRowModel.highlightRowAtPixel(null);
-  }, []);
-
+  const startDragYRef = useRef<number | null>(null);
   const onRowDragMove = useCallback((event: RowDragMoveEvent) => {
-    if (event.overNode && event.node.rowIndex != null) {
-      const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-
-      //position 0 means highlight above, 1 means below
-      const position = clientSideRowModel.getHighlightPosition(event.y, event.overNode as RowNode);
-
-      //we don't want to show the row highlight if it wouldn't result in the row moving
-      const targetIndex = event.overIndex + position - (event.node.rowIndex < event.overIndex ? 1 : 0);
-      if (event.node.rowIndex != targetIndex) {
-        clientSideRowModel.highlightRowAtPixel(event.node as RowNode, event.y);
-      }
+    if (startDragYRef.current === null) {
+      startDragYRef.current = event.y;
     }
   }, []);
 
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent) => {
-      void (async () => {
-        const clientSideRowModel = event.api.getModel() as IClientSideRowModel;
-        if (event.node.rowIndex != null) {
-          const lastHighlightedRowNode = clientSideRowModel.getLastHighlightedRowNode();
-          const isBelow = lastHighlightedRowNode && lastHighlightedRowNode.highlighted === RowHighlightPosition.Below;
-
-          let targetIndex = event.overIndex;
-          if (event.node.rowIndex > event.overIndex) {
-            targetIndex += isBelow ? 1 : 0;
-          } else {
-            targetIndex += isBelow ? 0 : -1;
-          }
-
-          const moved = event.node.data;
-          const target = event.overNode?.data;
-          moved.id !== target?.id && //moved over a different row
-            event.node.rowIndex != targetIndex && //moved to a different index
-            params.onRowDragEnd &&
-            (await params.onRowDragEnd(moved, target, targetIndex));
+      console.log(event);
+      if (startDragYRef.current === null) {
+        return;
+      }
+      const yDiff = event.y - startDragYRef.current;
+      console.log({ yDiff });
+      startDragYRef.current = null;
+      if (event.node.rowIndex != null) {
+        const moved = event.node.data as TData;
+        const target = event.overNode?.data as TData | undefined;
+        if (params.onRowDragEnd && target && moved !== target && yDiff !== 0) {
+          void params.onRowDragEnd(moved, target, yDiff > 0 ? 1 : -1);
         }
-        clientSideRowModel.highlightRowAtPixel(null);
-      })();
+      }
     },
     [params],
   );
@@ -669,9 +617,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       {gridContextMenu.component}
       <div style={{ flex: 1 }} ref={gridDivRef}>
         <AgGridReact
+          theme={'legacy'}
           rowSelection={
             selectable
-              ? { enableClickSelection: false, mode: rowSelection == 'single' ? 'singleRow' : 'multiRow' }
+              ? {
+                  enableClickSelection: false,
+                  mode: rowSelection == 'single' ? 'singleRow' : 'multiRow',
+                }
               : undefined
           }
           rowHeight={rowHeight}
@@ -721,10 +673,32 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           rowDragText={params.rowDragText}
           onRowDragMove={onRowDragMove}
           onRowDragEnd={onRowDragEnd}
-          onRowDragLeave={onRowDragLeave}
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
+          selectionColumnDef={{
+            rowDrag: !!params.onRowDragEnd,
+            minWidth: selectable && params.onRowDragEnd ? 76 : 48,
+            maxWidth: selectable && params.onRowDragEnd ? 76 : 48,
+            pinned: selectColumnPinned,
+            headerComponentParams: {
+              exportable: false,
+            },
+            headerClass: params.onRowDragEnd ? 'ag-header-select-draggable' : undefined,
+            suppressHeaderKeyboardEvent: (e) => {
+              if (!selectable) return false;
+              if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
+                if (isEmpty(e.api.getSelectedRows())) {
+                  e.api.selectAll('filtered');
+                } else {
+                  e.api.deselectAll();
+                }
+                return true;
+              }
+              return false;
+            },
+            onCellClicked: clickInputWhenContainingCellClicked,
+          }}
         />
       </div>
     </div>

@@ -75,29 +75,14 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-weight: 600;
 
     // fix: Display descender line
-    padding: 0 11px;
+    //padding: 0 11px;
 
     .LuiIcon {
       fill: lui.$surfie;
     }
   }
-
-  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 17px;
-    padding-right: 15px;
-  }
-
   .ag-text-area-input:focus {
     border-color: lui.$sea;
-  }
-
-  .ag-cell[col-id="selection"] {
-    display: flex; // Fix that when you click below checkbox it doesn't process a click
-  }
-
-  // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
-    height: auto;
   }
 
   .ag-row:last-of-type {
@@ -105,23 +90,33 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
 
   .ag-cell-label-container {
-    padding: 8px 0;
+    // padding: 8px 0;
 
     // Help ag-grid to calculate column height in react portal
     height: fit-content;
   }
 
+  /*.ag-header .ag-header-cell[aria-colindex="1"] {
+    padding-left: 17px;
+    padding-right: 15px;
+  }*/
 
-  .ag-cell[aria-colindex="1"] {
-    padding-left: lui.$unit-rg;
-  }
-
-  .ag-cell {
-    padding-left: 11px;
-    padding-right: 11px;
-    display: flex;
+  /*.ag-cell[aria-colindex="1"] {
     align-items: center;
+    .ag-selection-checkbox {
+      margin-right: 0 !important;
+    }
+  }*/
+
+  //:not([aria-colindex="1"])
+  .ag-cell .ag-cell-wrapper {
+    width: 100%;
   }
+
+/*  .ag-cell[aria-colindex="1"] .ag-cell-wrapper {
+    margin: auto;
+  }*/
+
 
   .ag-cell-wrap-text {
     word-break: break-word;
@@ -163,7 +158,12 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     }
   }
 
+
   .ag-cell {
+    //padding-left: 11px;
+    //padding-right: 11px;
+    display: flex;
+    align-items: center;
     font-weight: 400;
   }
 
@@ -213,11 +213,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     visibility: inherit;
   }
 
-  .ag-cell-wrapper {
-    width: 100%;
-  }
-
-  .ag-row-highlight-above::after, .ag-row-highlight-below::after {
+/*  .ag-row-highlight-above::after, .ag-row-highlight-below::after {
     content: '';
     height: 2px;
     background-color: transparent;
@@ -234,7 +230,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
   .ag-row-highlight-below::after {
     border-bottom: 2px dashed lui.$andrea;
-  }
+  }*/
 
   .ag-pinned-left-header,
   .ag-pinned-right-header,
@@ -263,17 +259,17 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-weight: 600;
 
     // fix: Display descender line
-    padding: 0 12px;
+    // padding: 0 12px;
 
     .LuiIcon {
       fill: lui.$surfie;
     }
   }
 
-  .ag-header .ag-header-cell[aria-colindex="1"] {
+/*  .ag-header .ag-header-cell[aria-colindex="1"] {
     padding-left: 32px;
     padding-right: 12px;
-  }
+  }*/
 
   .ag-header-group-cell {
     font-weight: normal;
@@ -284,11 +280,11 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-size: 14px;
   }
 
-  .ag-row .ag-cell:first-of-type {
+/*  .ag-row .ag-cell:first-of-type {
     padding-left: 32px;
   }
 
   .ag-row .ag-cell:last-of-type {
     padding-right: 32px;
-  }
+  }*/
 }

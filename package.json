@@ -28,8 +28,8 @@
   },
   "peerDependencies": {
     "@linzjs/lui": ">=21",
-    "ag-grid-community": "^32.3.7",
-    "ag-grid-react": "^32.3.7",
+    "ag-grid-community": "^33.2.4",
+    "ag-grid-react": "^33.2.4",
     "lodash-es": ">=4",
     "react": ">=18",
     "react-dom": ">=18"
@@ -101,8 +101,8 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "@vitest/ui": "^3.1.2",
-    "ag-grid-community": "^32.3.7",
-    "ag-grid-react": "^32.3.7",
+    "ag-grid-community": "^33.2.4",
+    "ag-grid-react": "^33.2.4",
     "babel-preset-react-app": "^10.1.0",
     "chromatic": "^11.28.2",
     "css-loader": "^7.1.2",

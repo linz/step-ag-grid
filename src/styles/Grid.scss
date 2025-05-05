@@ -7,9 +7,11 @@
   opacity: 1 !important;
 }
 
-.ag-drag-handle.ag-row-drag {
-  width: 100%;
+div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] {
+   padding-left: 40px;
+}
 
+.ag-drag-handle.ag-row-drag {
   .ag-icon.ag-icon-grip {
     margin: auto;
   }

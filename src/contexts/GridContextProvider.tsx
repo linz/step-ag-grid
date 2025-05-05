@@ -274,11 +274,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           defer(() => gridApi.ensureNodeVisible(firstNode));
           const colDefs = getColumns();
           if (!isEmpty(colDefs)) {
-            let col = colDefs[0];
-            // We don't auto select drag columns
-            if (col?.colId === 'drag') {
-              col = colDefs[1];
-            }
+            const col = colDefs[0];
             const rowIndex = firstNode.rowIndex;
             if (rowIndex != null && col != null) {
               const colId = col.colId;
@@ -460,26 +456,45 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     gridApi.stopEditing();
   }, [gridApi]);
 
+  // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
+  const externallySelectedItemsAreInSyncRef = useRef(false);
+  useEffect(() => {
+    externallySelectedItemsAreInSyncRef.current = externallySelectedItemsAreInSync;
+  }, [externallySelectedItemsAreInSync]);
+
+  const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
+    // Wait for up to 5 seconds
+    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSyncRef.current; i++) {
+      await wait(200);
+    }
+  }, []);
+
   const startCellEditing = useCallback(
-    // eslint-disable-next-line @typescript-eslint/require-await
-    ({ rowId, colId }: { rowId: number; colId: string }) => {
+    async ({ rowId, colId }: { rowId: number; colId: string }) => {
       if (!gridApi) return;
 
       const colDef = gridApi.getColumnDef(colId);
-      if (!colDef) return;
-
-      prePopupOps();
-      const rowNode = gridApi.getRowNode(`${rowId}`);
-      if (!rowNode) {
+      if (!colDef) {
+        console.log('no coldef');
         return;
       }
 
-      if (!rowNode.isSelected()) {
+      const rowNode = gridApi.getRowNode(`${rowId}`);
+      if (!rowNode) {
+        console.log('no row', rowId);
+        return;
+      }
+
+      prePopupOps();
+      const shouldSelectNode = !rowNode.isSelected();
+      if (shouldSelectNode) {
+        externallySelectedItemsAreInSyncRef.current = false;
         rowNode.setSelected(true, true);
+        await waitForExternallySelectedItemsToBeInSync();
       }
 
       // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([colDef.field ?? ''], rowId)) {
+      if (checkUpdating([colDef.field ?? colDef.colId ?? ''], rowId)) {
         return;
       }
 
@@ -494,7 +509,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         defer(focusAndEdit);
       }
     },
-    [checkUpdating, gridApi, prePopupOps],
+    [checkUpdating, gridApi, prePopupOps, waitForExternallySelectedItemsToBeInSync],
   );
 
   /**
@@ -514,10 +529,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Returns true if an editable cell on same row was selected, else false.
    */
   const selectNextEditableCell = useCallback(
-    (tabDirection: -1 | 1): boolean => {
+    async (_tabDirection: -1 | 1): Promise<boolean> => {
       // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
       if (!gridApi) return true;
-
+      // If we don't wait the tab to next element won't work
+      await wait(1);
       const focusedCellIsEditable = () => {
         const focusedCell = gridApi.getFocusedCell();
         const nextColumn = focusedCell?.column;
@@ -533,8 +549,23 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
       // Just in case I've missed something, we don't want the loop to hang everything
       for (let maxIterations = 0; maxIterations < 50; maxIterations++) {
+        console.log('uiter');
         const preRow = gridApi.getFocusedCell();
-        tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        if (!preRow) {
+          break;
+        }
+
+        // tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        const cols = gridApi.getColumns();
+        const i = cols?.findIndex((c) => c.getColId() === preRow?.column.getColId());
+        if (i == null) {
+          break;
+        }
+        const nextCol = cols?.[i + 1]?.getColId();
+        if (!nextCol) {
+          break;
+        }
+        gridApi.setFocusedCell(preRow?.rowIndex, nextCol);
         const postRow = gridApi.getFocusedCell();
         if (preRow?.rowIndex !== postRow?.rowIndex || preRow?.column === postRow?.column) {
           // We didn't find an editable cell in the same row, or the cell column didn't change
@@ -544,19 +575,23 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
         if (focusedCellIsEditable()) {
           const focusedCell = gridApi?.getFocusedCell();
-          if (focusedCell) {
-            prePopupOps();
-            gridApi.startEditingCell({
-              rowIndex: focusedCell.rowIndex,
-              colKey: focusedCell.column.getColId(),
-            });
-            return true;
+          if (!focusedCell) {
+            return false;
           }
+          const data = gridApi.getDisplayedRowAtIndex(focusedCell?.rowIndex)?.data;
+          if (!data) {
+            return false;
+          }
+          await startCellEditing({
+            rowId: data.id,
+            colId: focusedCell.column.getColId(),
+          });
+          return true;
         }
       }
       return false;
     },
-    [gridApi, prePopupOps],
+    [gridApi, startCellEditing],
   );
 
   const updatingCells = useCallback(
@@ -577,7 +612,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           selectedRows.map((data) => data.id),
           async () => {
             // Need to refresh to get spinners to work on all rows
-            gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+            console.log('refreshSelectedRows skipped 2');
+            // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
             ok = await fnUpdate(selectedRows).catch((ex) => {
               console.error('Exception during modifyUpdating', ex);
               return false;
@@ -586,7 +622,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         );
 
         // async processes need to refresh their own rows
-        gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+        console.log('refreshSelectedRows skipped 3');
+        // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
         if (ok) {
           const cell = gridApi.getFocusedCell();
@@ -594,7 +631,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
             gridApi.setFocusedCell(cell.rowIndex, cell.column);
           }
           // This is needed to trigger postSortRowsHook
-          gridApi.refreshClientSideRowModel();
+          console.log('refreshSelectedRows skipped 3');
+          // gridApi.refreshClientSideRowModel();
         } else {
           // Don't set saving if ok as the form has already closed
           setSaving?.(false);
@@ -602,13 +640,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
         // Only focus next cell if user hasn't already manually changed focus
         const postPopupFocusedCell = gridApi.getFocusedCell();
+        console.log('postPopupFocusedCell', postPopupFocusedCell);
         if (
           prePopupFocusedCell.current &&
           postPopupFocusedCell &&
           prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
-          if (!tabDirection || !selectNextEditableCell(tabDirection)) {
+          console.log('cec callback 2', { tabDirection });
+          if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
+            console.log('cec callback');
             cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
           }
         }
@@ -630,19 +671,6 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       }, 50),
     [gridApi],
   );
-
-  // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
-  const externallySelectedItemsAreInSyncRef = useRef(false);
-  useEffect(() => {
-    externallySelectedItemsAreInSyncRef.current = externallySelectedItemsAreInSync;
-  }, [externallySelectedItemsAreInSync]);
-
-  const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
-    // Wait for up to 5 seconds
-    for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSyncRef.current; i++) {
-      await wait(200);
-    }
-  }, []);
 
   const onFilterChanged = useMemo(
     () =>

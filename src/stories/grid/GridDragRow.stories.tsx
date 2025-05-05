@@ -4,7 +4,7 @@ import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -15,7 +15,6 @@ import {
   GridUpdatingContextProvider,
   GridWrapper,
 } from '../..';
-import { GridCellDrag } from '../../components/GridCellDrag';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
 export default {
@@ -53,7 +52,7 @@ interface ITestRow {
   id: number;
   position: string;
   age: number;
-  height: number;
+  height: string;
   desc: string;
   dd: string;
 }
@@ -61,7 +60,6 @@ interface ITestRow {
 const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
-      GridCellDrag,
       GridCell({
         field: 'id',
         headerName: 'Id',
@@ -92,12 +90,23 @@ const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<IT
     [],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData, setRowData] = useState<ITestRow[]>([
     { id: 1000, position: 'Tester', age: 30, height: `6'4"`, desc: 'Tests application', dd: '1' },
     { id: 1001, position: 'Developer', age: 12, height: `5'3"`, desc: 'Develops application', dd: '2' },
     { id: 1002, position: 'Manager', age: 65, height: `5'9"`, desc: 'Manages', dd: '3' },
     { id: 1003, position: 'BA', age: 42, height: `5'7"`, desc: 'BAs', dd: '4' },
   ]);
+
+  const onRowDragEnd = useCallback((movedRow: ITestRow, targetRow: ITestRow, direction: -1 | 1) => {
+    console.log({ onRowDragEnd: { movedRow, targetRow, direction } });
+    setRowData((rowData) =>
+      rowData.map((r) => {
+        if (r.id === movedRow.id) return targetRow;
+        if (r.id === targetRow.id) return movedRow;
+        return r;
+      }),
+    );
+  }, []);
 
   return (
     <GridWrapper maxHeight={300}>
@@ -110,15 +119,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<IT
         columnDefs={columnDefs}
         defaultColDef={{ sortable: false }}
         rowData={rowData}
-        onRowDragEnd={(movedRow, targetRow, _targetIndex) => {
-          setRowData(
-            rowData.map((r) => {
-              if (r.id === movedRow.id) return targetRow;
-              if (r.id === targetRow.id) return movedRow;
-              return r;
-            }),
-          );
-        }}
+        onRowDragEnd={onRowDragEnd}
         rowDragText={({ rowNode }) => `${rowNode?.data.id} - ${rowNode?.data.position}`}
       />
     </GridWrapper>
