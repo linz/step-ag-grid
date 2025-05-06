@@ -75,9 +75,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const ensureRowVisible = useCallback(
     (id: number | string): boolean => {
       if (!gridApi) return false;
-      const node = gridApi?.getRowNode(`${id}`);
+      const node = gridApi.getRowNode(`${id}`);
       if (!node) return false;
-      defer(() => gridApi.ensureNodeVisible(node));
+      defer(() => !gridApi.isDestroyed() && gridApi.ensureNodeVisible(node));
       return true;
     },
     [gridApi],
@@ -271,7 +271,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         );
         const firstNode = rowsThatNeedSelecting[0];
         if (firstNode) {
-          defer(() => gridApi.ensureNodeVisible(firstNode));
+          defer(() => !gridApi.isDestroyed() && gridApi.ensureNodeVisible(firstNode));
           const colDefs = getColumns();
           if (!isEmpty(colDefs)) {
             const col = colDefs[0];
@@ -406,7 +406,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     gridApiOp((gridApi) => {
       const selectedNodes = gridApi.getSelectedNodes();
       if (isEmpty(selectedNodes)) return;
-      defer(() => gridApi.ensureNodeVisible(last(selectedNodes)));
+      defer(() => !gridApi.isDestroyed() && gridApi.ensureNodeVisible(last(selectedNodes)));
     });
   }, [gridApiOp]);
 
