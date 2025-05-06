@@ -29,6 +29,7 @@ import { GridContext, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
+import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
@@ -405,11 +406,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Force-refresh all selected rows to re-run class function, to update selection highlighting
    */
-  const refreshSelectedRows = useCallback((event: CellEditingStartedEvent): void => {
-    event.api.refreshCells({
+  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
+    // MATT Disabled I don't believe these are needed anymore
+    // I've left them here just in case they are
+    /*event.api.refreshCells({
       force: true,
       rowNodes: event.api.getSelectedNodes(),
-    });
+    });*/
   }, []);
 
   /**
@@ -712,7 +715,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             headerComponentParams: {
               exportable: false,
             },
-            headerClass: params.onRowDragEnd ? 'ag-header-select-draggable' : undefined,
+            headerClass: clsx('ag-header-hide-default-select', params.onRowDragEnd && 'ag-header-select-draggable'),
+            headerComponent: rowSelection == 'multiple' ? GridHeaderSelect : undefined,
             suppressHeaderKeyboardEvent: (e) => {
               if (!selectable) return false;
               if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {

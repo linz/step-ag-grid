@@ -18,6 +18,7 @@ const postcssOptions = () => ({
     stylus: undefined,
     less: undefined,
     sass: {
+      api: 'modern',
       includePaths: [
         './node_modules',
         // This is only needed because we're using a local module. :-/

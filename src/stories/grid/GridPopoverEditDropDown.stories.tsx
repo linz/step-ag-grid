@@ -170,7 +170,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
       ),
       GridPopoverEditDropDown(
         {
-          colId: 'position4',
+          field: 'position4',
           headerName: 'Filtered (object)',
           valueGetter: ({ data }) => data?.position4?.desc,
         },

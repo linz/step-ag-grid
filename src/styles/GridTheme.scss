@@ -58,6 +58,29 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
+// Don't hide the drag handle
+.ag-theme-step-default.theme-specific .ag-drag-handle.ag-row-drag, .ag-theme-step-compact.theme-specific div.ag-drag-handle.ag-row-drag {
+  opacity: 1 !important;
+}
+
+.ag-header-hide-default-select .ag-labeled {
+  display: none;
+}
+
+.ag-header-hide-default-select .ag-wrapper.ag-checkbox-input-wrapper {
+  margin-right: 9px;
+}
+
+div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] {
+  padding-left: 40px;
+}
+
+.ag-drag-handle.ag-row-drag {
+  .ag-icon.ag-icon-grip {
+    margin: auto;
+  }
+}
+
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
   div.ag-center-cols-viewport {
@@ -228,19 +251,10 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-size: 14px;
     font-weight: 600;
 
-    // fix: Display descender line
-    // padding: 0 12px;
-
     .LuiIcon {
       fill: lui.$surfie;
     }
   }
-
-/*  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 32px;
-    padding-right: 12px;
-  }*/
-
   .ag-header-group-cell {
     font-weight: normal;
     font-size: 22px;
@@ -249,12 +263,4 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-header-cell {
     font-size: 14px;
   }
-
-/*  .ag-row .ag-cell:first-of-type {
-    padding-left: 32px;
-  }
-
-  .ag-row .ag-cell:last-of-type {
-    padding-right: 32px;
-  }*/
 }

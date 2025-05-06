@@ -450,10 +450,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
   const stopEditing = useCallback((): void => {
     if (!gridApi) return;
-    if (prePopupFocusedCell.current) {
-      gridApi?.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
-    }
     gridApi.stopEditing();
+    if (prePopupFocusedCell.current) {
+      gridApi.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+    }
   }, [gridApi]);
 
   // waitForExternallySelectedItemsToBeInSync can't use the state as it won't be updated during function execution
@@ -530,8 +530,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     async (tabDirection: -1 | 1): Promise<boolean> => {
       // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
       if (!gridApi) return true;
-      // If we don't wait the tab to next element won't work
-      await wait(1);
+
       const focusedCellIsEditable = () => {
         const focusedCell = gridApi.getFocusedCell();
         const nextColumn = focusedCell?.column;
@@ -548,7 +547,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       // Just in case I've missed something, we don't want the loop to hang everything
       for (let maxIterations = 0; maxIterations < 50; maxIterations++) {
         const preRow = gridApi.getFocusedCell();
-        tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        if (tabDirection === 1) {
+          gridApi.tabToNextCell();
+        } else {
+          gridApi.tabToPreviousCell();
+        }
+
+        // If we don't wait the tab to next element won't work
+        // I think this is due to the grid resizing
+        await wait(150);
+
         const postRow = gridApi.getFocusedCell();
         if (preRow?.rowIndex !== postRow?.rowIndex || preRow?.column === postRow?.column) {
           // We didn't find an editable cell in the same row, or the cell column didn't change
@@ -590,8 +598,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           props.field ?? '',
           selectedRows.map((data) => data.id),
           async () => {
+            // MATT Disabled I don't believe these are needed anymore
+            // I've left them here just in case they are
             // Need to refresh to get spinners to work on all rows
-            gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+            // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
             ok = await fnUpdate(selectedRows).catch((ex) => {
               console.error('Exception during modifyUpdating', ex);
               return false;
@@ -599,8 +609,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           },
         );
 
+        // MATT Disabled I don't believe these are needed anymore
+        // I've left them here just in case they are
         // async processes need to refresh their own rows
-        gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+        // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
         if (ok) {
           const cell = gridApi.getFocusedCell();
