@@ -198,7 +198,7 @@ export const ControlledMenuFr = (
           break;
       }
     },
-    [anchorRef, saveButtonRef],
+    [anchorRef, onClose, saveButtonRef],
   );
 
   const handleKeydownTabAndEnter = useMemo(() => handleKeyboardTabAndEnter(true), [handleKeyboardTabAndEnter]);

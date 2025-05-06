@@ -1,6 +1,5 @@
 import { ColDef, EditableCallback, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import {
-  EditableCallbackParams,
   SuppressKeyboardEventParams,
   ValueFormatterFunc,
   ValueFormatterParams,
@@ -22,11 +21,6 @@ export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
   editor?: (editorProps: E) => ReactElement;
   editorParams?: E;
-}
-
-export interface SAICellRendererParams<TData = any, TValue = any, TContext = any>
-  extends Omit<ICellRendererParams<TData, TValue, TContext>, 'data'> {
-  data: TData;
 }
 
 export const GridCellRenderer = (props: ICellRendererParams) => {
@@ -63,41 +57,13 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   );
 };
 
-export interface SAValueGetterParams<TData = any, TValue = any> extends Omit<ValueGetterParams<TData, TValue>, 'data'> {
-  data: TData;
-  getValue: (field: string) => any;
-}
-
-export interface SAValueGetterFunc<TData = any, TValue = any> {
-  (params: SAValueGetterParams<TData, TValue>): TValue | null | undefined;
-}
-
-export interface SAEditableCallbackParams<TData = any, TValue = any>
-  extends Omit<EditableCallbackParams<TData, TValue>, 'data'> {
-  data: TData;
-}
-
-export interface SAEditableCallback<TData = any, TValue = any> {
-  (params: SAEditableCallbackParams<TData, TValue>): boolean;
-}
-
-export interface SAValueFormatterParams<TData = any, TValue = any>
-  extends Omit<ValueFormatterParams<TData, TValue>, 'data' | 'value'> {
-  data: TData;
-  value: TValue;
-}
-
-export interface SAValueFormatterFunc<TData = any, TValue = any> {
-  (params: SAValueFormatterParams<TData, TValue>): string;
-}
-
 // This is so that typescript retains the row type to pass to the GridCells
 export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends ColDef<TData, ValueType> {
   editable?: boolean | EditableCallback<TData, ValueType>;
   valueGetter?: string | ValueGetterFunc<TData, ValueType>;
   valueFormatter?: string | ValueFormatterFunc<TData, ValueType>;
   cellRenderer?:
-    | ((props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
+    | ((props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
     | string;
   cellRendererParams?: {
     singleClickEdit?: boolean;
@@ -105,8 +71,8 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
     originalCellRenderer?: any;
     editAction?: (selectedRows: TData[]) => void;
     shortcutKeys?: Record<string, () => void>;
-    warning?: (props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
-    info?: (props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
+    warning?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
+    info?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
   };
   editor?: (editorProps: any) => ReactElement;
 }
@@ -129,7 +95,7 @@ export const generateFilterGetter = <TData extends GridBaseRow, ValueType>(
   field: string | undefined,
   filterValueGetter: string | ValueGetterFunc<TData, ValueType> | undefined,
   valueFormatter: string | ValueFormatterFunc<TData, ValueType> | undefined,
-): string | SAValueGetterFunc<TData, ValueType> | undefined => {
+): string | ValueGetterFunc<TData, ValueType> | undefined => {
   if (filterValueGetter) return filterValueGetter;
   // aggrid will default to valueGetter
   if (typeof valueFormatter !== 'function' || !field) return undefined;
