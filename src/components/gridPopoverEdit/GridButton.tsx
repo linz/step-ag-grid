@@ -1,12 +1,12 @@
 import { LuiButton, LuiIcon } from '@linzjs/lui';
-import { CellFocusedEvent, ICellEditorParams } from 'ag-grid-community';
+import { CellFocusedEvent, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
 
 import { GridBaseRow } from '../Grid';
-import { ColDefT, GridCell, SAICellRendererParams } from '../GridCell';
+import { ColDefT, GridCell } from '../GridCell';
 import { GenericCellColDef } from '../gridRender';
 
-const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererParams<TData>) => {
+const ButtonCellRenderer = <TData extends GridBaseRow>(props: ICellRendererParams<TData>) => {
   const { data, node, column, colDef, api } = props;
   const inputRef = useRef<HTMLButtonElement>(null);
 
@@ -30,7 +30,7 @@ const ButtonCellRenderer = <TData extends GridBaseRow>(props: SAICellRendererPar
       level="text"
       onClick={() => {
         const selectedRows = [data];
-        const selectedRowIds = selectedRows.map((r) => r.id);
+        const selectedRowIds = selectedRows.map((r) => r!.id);
         colDef?.cellEditorParams.onClick?.({ selectedRows, selectedRowIds });
       }}
       style={{ display: colDef?.cellEditorParams?.visible?.(props) !== false ? '' : 'none' }}
