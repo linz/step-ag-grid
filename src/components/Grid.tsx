@@ -591,6 +591,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     });
   }, []);
 
+  const gridElementRef = useRef<Element>();
   const onRowDragMove = useCallback(
     (event: RowDragMoveEvent) => {
       if (startDragYRef.current === null) {
@@ -601,7 +602,16 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       const data = event.overNode?.data;
       if (data) {
         clearHighlightRowClasses();
-        document.querySelectorAll(`[row-id='${data.id}']`)?.forEach((el) => {
+        // Find the grid element, this can only be found on start drag.
+        // Once dragging is no progress the event target is the drag element not the start drag column.
+        const targetEl = event.event.target as Element | undefined;
+        if (targetEl) {
+          const gridElement = targetEl.closest('.ag-body');
+          if (gridElement) {
+            gridElementRef.current = gridElement;
+          }
+        }
+        gridElementRef.current?.querySelectorAll(`[row-id='${data.id}']`)?.forEach((el) => {
           el.classList.add(yDiff < 0 ? 'ag-row-highlight-above' : 'ag-row-highlight-below');
         });
       }
@@ -612,6 +622,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent<TData>) => {
       clearHighlightRowClasses();
+      gridElementRef.current = undefined;
       if (!params.onRowDragEnd || startDragYRef.current === null) {
         return;
       }
