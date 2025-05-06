@@ -58,6 +58,29 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
+// Don't hide the drag handle
+.ag-theme-step-default.theme-specific .ag-drag-handle.ag-row-drag, .ag-theme-step-compact.theme-specific div.ag-drag-handle.ag-row-drag {
+  opacity: 1 !important;
+}
+
+.ag-header-hide-default-select .ag-labeled {
+  display: none;
+}
+
+.ag-header-hide-default-select .ag-wrapper.ag-checkbox-input-wrapper {
+  margin-right: 9px;
+}
+
+div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] {
+  padding-left: 40px;
+}
+
+.ag-drag-handle.ag-row-drag {
+  .ag-icon.ag-icon-grip {
+    margin: auto;
+  }
+}
+
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
   div.ag-center-cols-viewport {
@@ -70,38 +93,16 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     justify-content: center;
   }
 
-  .ag-header-select-draggable .ag-header-cell-comp-wrapper {
-    justify-content: end;
-  }
-
   .ag-header-cell {
     font-size: 14px;
     font-weight: 600;
-
-    // fix: Display descender line
-    padding: 0 11px;
 
     .LuiIcon {
       fill: lui.$surfie;
     }
   }
-
-  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 17px;
-    padding-right: 15px;
-  }
-
   .ag-text-area-input:focus {
     border-color: lui.$sea;
-  }
-
-  .ag-cell[col-id="selection"] {
-    display: flex; // Fix that when you click below checkbox it doesn't process a click
-  }
-
-  // Fix that when you click below checkbox it doesn't process a click
-  .ag-cell-wrapper > *:not(.ag-cell-value, .ag-group-value) {
-    height: auto;
   }
 
   .ag-row:last-of-type {
@@ -109,22 +110,12 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
 
   .ag-cell-label-container {
-    padding: 8px 0;
-
     // Help ag-grid to calculate column height in react portal
     height: fit-content;
   }
 
-
-  .ag-cell[aria-colindex="1"] {
-    padding-left: lui.$unit-rg;
-  }
-
-  .ag-cell {
-    padding-left: 11px;
-    padding-right: 11px;
-    display: flex;
-    align-items: center;
+  .ag-cell .ag-cell-wrapper {
+    width: 100%;
   }
 
   .ag-cell-wrap-text {
@@ -167,7 +158,10 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     }
   }
 
+
   .ag-cell {
+    display: flex;
+    align-items: center;
     font-weight: 400;
   }
 
@@ -217,23 +211,14 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     visibility: inherit;
   }
 
-  .ag-cell-wrapper {
-    width: 100%;
-  }
-
   .ag-row-highlight-above::after, .ag-row-highlight-below::after {
     content: '';
-    height: 2px;
+    height: 3px;
     background-color: transparent;
   }
 
   .ag-row-highlight-above::after {
-    top:-3px; // moves the top highlight to the position of the bottom highlight
     border-top: 2px dashed lui.$andrea;
-  }
-
-  .ag-row-highlight-above:first-of-type::after {
-    top:0; // the first row highlight needs to in the normal position otherwise it is cut off by the top of the table
   }
 
   .ag-row-highlight-below::after {
@@ -266,19 +251,10 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     font-size: 14px;
     font-weight: 600;
 
-    // fix: Display descender line
-    padding: 0 12px;
-
     .LuiIcon {
       fill: lui.$surfie;
     }
   }
-
-  .ag-header .ag-header-cell[aria-colindex="1"] {
-    padding-left: 32px;
-    padding-right: 12px;
-  }
-
   .ag-header-group-cell {
     font-weight: normal;
     font-size: 22px;
@@ -286,13 +262,5 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
   .ag-header-cell {
     font-size: 14px;
-  }
-
-  .ag-row .ag-cell:first-of-type {
-    padding-left: 32px;
-  }
-
-  .ag-row .ag-cell:last-of-type {
-    padding-right: 32px;
   }
 }

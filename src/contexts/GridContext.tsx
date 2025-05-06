@@ -45,7 +45,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
   cancelEdit: () => void;
-  startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => void;
+  startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => Promise<void>;
   stopEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
@@ -167,7 +167,8 @@ export const GridContext = createContext<GridContextType<any>>({
   cancelEdit: () => {
     console.error('no context provider for cancelEdit');
   },
-  startCellEditing: () => {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  startCellEditing: async () => {
     console.error('no context provider for startCellEditing');
   },
   stopEditing: () => {

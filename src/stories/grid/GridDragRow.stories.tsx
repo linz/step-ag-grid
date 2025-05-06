@@ -4,13 +4,14 @@ import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   ColDefT,
   Grid,
   GridCell,
   GridContextProvider,
+  GridOnRowDragEndProps,
   GridProps,
   GridUpdatingContextProvider,
   GridWrapper,
@@ -52,12 +53,12 @@ interface ITestRow {
   id: number;
   position: string;
   age: number;
-  height: number;
+  height: string;
   desc: string;
   dd: string;
 }
 
-const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridDragRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
@@ -90,12 +91,22 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
     [],
   );
 
-  const [rowData, setRowData] = useState([
+  const [rowData, setRowData] = useState<ITestRow[]>([
     { id: 1000, position: 'Tester', age: 30, height: `6'4"`, desc: 'Tests application', dd: '1' },
     { id: 1001, position: 'Developer', age: 12, height: `5'3"`, desc: 'Develops application', dd: '2' },
     { id: 1002, position: 'Manager', age: 65, height: `5'9"`, desc: 'Manages', dd: '3' },
     { id: 1003, position: 'BA', age: 42, height: `5'7"`, desc: 'BAs', dd: '4' },
   ]);
+
+  const onRowDragEnd = useCallback(({ movedRow, targetRow }: GridOnRowDragEndProps<ITestRow>) => {
+    setRowData((rowData) =>
+      rowData.map((r) => {
+        if (r.id === movedRow.id) return targetRow;
+        if (r.id === targetRow.id) return movedRow;
+        return r;
+      }),
+    );
+  }, []);
 
   return (
     <GridWrapper maxHeight={300}>
@@ -108,15 +119,7 @@ const GridDragRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         columnDefs={columnDefs}
         defaultColDef={{ sortable: false }}
         rowData={rowData}
-        onRowDragEnd={(movedRow, targetRow, _targetIndex) => {
-          setRowData(
-            rowData.map((r) => {
-              if (r.id === movedRow.id) return targetRow;
-              if (r.id === targetRow.id) return movedRow;
-              return r;
-            }),
-          );
-        }}
+        onRowDragEnd={onRowDragEnd}
         rowDragText={({ rowNode }) => `${rowNode?.data.id} - ${rowNode?.data.position}`}
       />
     </GridWrapper>

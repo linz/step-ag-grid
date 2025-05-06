@@ -1,4 +1,4 @@
-import { ColDef, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
+import { ColDef, EditableCallback, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import {
   EditableCallbackParams,
   SuppressKeyboardEventParams,
@@ -92,12 +92,10 @@ export interface SAValueFormatterFunc<TData = any, TValue = any> {
 }
 
 // This is so that typescript retains the row type to pass to the GridCells
-// @ts-expect-error types
 export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends ColDef<TData, ValueType> {
-  _?: TData;
-  editable?: boolean | SAEditableCallback<TData, ValueType>;
-  valueGetter?: string | SAValueGetterFunc<TData, ValueType>;
-  valueFormatter?: string | SAValueFormatterFunc<TData, ValueType>;
+  editable?: boolean | EditableCallback<TData, ValueType>;
+  valueGetter?: string | ValueGetterFunc<TData, ValueType>;
+  valueFormatter?: string | ValueFormatterFunc<TData, ValueType>;
   cellRenderer?:
     | ((props: SAICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
     | string;

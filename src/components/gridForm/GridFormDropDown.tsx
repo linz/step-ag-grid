@@ -39,7 +39,7 @@ export const MenuHeaderItem = (title: string) => {
 
 export type SelectOption = null | string | FinalSelectOption;
 
-export interface GridFormDropDownProps<TData extends GridBaseRow, TValue> extends CellEditorCommon {
+export interface GridFormDropDownProps<TData extends GridBaseRow, TValue = any> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options
   className?: // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | 'GridPopoverEditDropDown-containerSmall'

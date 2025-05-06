@@ -66,10 +66,12 @@ interface ITestRow {
 }
 
 const multiEditAction = fn(async () => {
+  console.log('multiEditAction');
   await wait(500);
 });
 
 const eAction = fn(() => {
+  console.log('eAction');
   return true;
 });
 
@@ -141,7 +143,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
             },
             options: async (selectedItems) => {
               // Just doing a timeout here to demonstrate deferred loading
-              await wait(500);
+              await wait(50);
               return [
                 {
                   label: 'Single edit only',
@@ -223,8 +225,8 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
 
 export const GridKeyboardInteractions: StoryFn<typeof Grid> = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
-  multiEditAction.mockReset();
-  eAction.mockReset();
+  multiEditAction.mockClear();
+  eAction.mockClear();
 
   await waitForGridReady({ canvasElement });
 
@@ -254,7 +256,7 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
       expect(activeCell).toHaveAttribute('aria-colindex', colId);
       expect(activeCell?.parentElement).toHaveAttribute('row-index', rowId);
     });
-    await wait(1000);
+    await wait(200);
   };
 
   await test(() => userEvent.keyboard('{Enter}'), '8', '2');

@@ -98,7 +98,13 @@ const GridFilterButtonsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           ]}
         />
       </GridFilters>
-      <Grid {...props} columnDefs={columnDefs} rowData={rowData} sizeColumns={'auto-skip-headers'} />
+      <Grid
+        {...props}
+        rowSelection={'multiple'}
+        columnDefs={columnDefs}
+        rowData={rowData}
+        sizeColumns={'auto-skip-headers'}
+      />
     </GridWrapper>
   );
 };

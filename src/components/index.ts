@@ -1,4 +1,3 @@
-export * from './clickInputWhenContainingCellClicked';
 export * from './ComponentLoadingWrapper';
 export * from './Grid';
 export * from './GridCell';
@@ -7,7 +6,6 @@ export * from './GridCellMultiEditor';
 export * from './GridCellMultiSelectClassRules';
 export * from './gridFilter';
 export * from './gridForm';
-export * from './gridHeader';
 export * from './gridHook';
 export * from './GridIcon';
 export * from './GridLoadableCell';

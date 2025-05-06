@@ -25,7 +25,7 @@ export const GridHeaderSelect = ({ api }: IHeaderParams) => {
 
   const handleMultiSelect = () => {
     if (selectedNodeCount == 0) {
-      api.selectAllFiltered();
+      api.selectAll('filtered');
     } else {
       api.deselectAll();
     }
