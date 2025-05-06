@@ -50,6 +50,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
   selectable?: boolean;
+  hideSelectColumn?: boolean;
   theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
   domLayout?: GridOptions['domLayout'];
@@ -643,6 +644,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 
+  const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
   const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
   return (
     <div
@@ -719,9 +721,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
           selectionColumnDef={{
+            suppressNavigable: params.hideSelectColumn,
             rowDrag: !!params.onRowDragEnd,
-            minWidth: selectable && params.onRowDragEnd ? 76 : 48,
-            maxWidth: selectable && params.onRowDragEnd ? 76 : 48,
+            minWidth: selectWidth,
+            maxWidth: selectWidth,
             pinned: selectColumnPinned,
             headerComponentParams: {
               exportable: false,
