@@ -120,12 +120,23 @@ export const ControlledMenuFr = (
     (isDown: boolean) => (ev: KeyboardEvent) => {
       const thisDocument = anchorRef?.current ? anchorRef?.current.ownerDocument : document;
       const activeElement = thisDocument.activeElement;
-      if (!anchorRef?.current || !activeElement) return;
-      if (ev.key !== 'Tab' && ev.key !== 'Enter') return;
+      if (!anchorRef?.current || !activeElement) {
+        return;
+      }
+      if (ev.key !== 'Tab' && ev.key !== 'Enter' && ev.key !== 'Esc') {
+        return;
+      }
 
       if (ev.repeat) {
         ev.preventDefault();
         ev.stopPropagation();
+        return;
+      }
+
+      if (ev.key === 'Esc') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        safeCall(onClose, { key: ev.key, reason: CloseReason.CANCEL });
         return;
       }
 
@@ -265,6 +276,7 @@ export const ControlledMenuFr = (
   );
 
   const onKeyUp = (e: KeyboardEvent) => {
+    console.log(e);
     switch (e.key) {
       case Keys.ESC:
         e.preventDefault();
@@ -319,6 +331,7 @@ export const ControlledMenuFr = (
                 externalRef={externalRef}
                 containerRef={containerRef}
                 onClose={onClose}
+                onBlur={() => console.log('blur')}
               />
             </EventHandlersContext.Provider>
           </ItemSettingsContext.Provider>
