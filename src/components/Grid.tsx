@@ -433,7 +433,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onCellClicked = useCallback(
     (event: CellClickedEvent) => {
-      if (event.colDef?.cellRendererParams?.singleClickEdit ?? singleClickEdit) {
+      if (event.colDef.singleClickEdit ?? singleClickEdit) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },

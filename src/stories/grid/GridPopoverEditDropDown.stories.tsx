@@ -102,6 +102,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {
           field: 'position2',
           headerName: 'Multi-edit',
+          singleClickEdit: true,
         },
         {
           multiEdit: true,
