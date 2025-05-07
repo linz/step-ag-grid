@@ -25,6 +25,7 @@ import {
   MenuHeaderItem,
   MenuSeparator,
   MenuSeparatorString,
+  primitiveToSelectOption,
   wait,
 } from '../..';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
@@ -72,16 +73,9 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
     console.log('optionsFn selected rows', selectedRows, filter);
     filter = filter?.toLowerCase();
     await wait(1000);
-    return [
-      null,
-      'Architect',
-      'Developer',
-      'Product Owner',
-      'Scrum Master',
-      'Tester',
-      MenuSeparatorString,
-      'Custom',
-    ].filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true));
+    return [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester', MenuSeparatorString, 'Custom']
+      .filter((v) => (filter != null ? v != null && v.toLowerCase().indexOf(filter) === 0 : true))
+      .map(primitiveToSelectOption);
   }, []);
 
   const optionsObjects = useMemo(
@@ -121,7 +115,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           },
         },
       ),
-      GridPopoverEditDropDown(
+      GridPopoverEditDropDown<ITestRow, ITestRow['position3'], string | null>(
         {
           field: 'position3',
           headerName: 'Custom callback',
@@ -129,7 +123,9 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         {
           multiEdit: true,
           editorParams: {
-            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
+            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'].map(
+              primitiveToSelectOption,
+            ),
             onSelectedItem: async (selected) => {
               await wait(2000);
               selected.selectedRows.forEach((row) => {
@@ -139,7 +135,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           },
         },
       ),
-      GridPopoverEditDropDown(
+      GridPopoverEditDropDown<ITestRow, ITestRow['position3'], string | null>(
         {
           field: 'position',
           headerName: 'Options Fn',
@@ -165,7 +161,9 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           editorParams: {
             filtered: 'local',
             filterPlaceholder: 'Filter this',
-            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
+            options: [null, 'Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'].map(
+              primitiveToSelectOption,
+            ),
           },
         },
       ),
@@ -186,7 +184,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           },
         },
       ),
-      GridPopoverEditDropDown(
+      GridPopoverEditDropDown<ITestRow, ITestRow['code'], string | null>(
         {
           field: 'code',
           headerName: 'Filter Selectable',
@@ -198,17 +196,21 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
             filterPlaceholder: 'Filter this',
             filterHelpText: 'Press enter to save custom value',
             options: optionsObjects.map((o) => {
-              return { value: o, label: o.desc, disabled: false };
+              return { value: o.code, label: o.desc, disabled: false };
             }),
             onSelectedItem: (selected) => {
               // eslint-disable-next-line no-console
               console.log('onSelectedItem selected', selected);
-              selected.selectedRows.forEach((row) => (row.code = selected.value.code));
+              selected.selectedRows.forEach((row) => {
+                row.code = selected.value;
+              });
             },
             onSelectFilter: (selected) => {
               // eslint-disable-next-line no-console
               console.log('onSelectFilter selected', selected);
-              selected.selectedRows.forEach((row) => (row.code = selected.value));
+              selected.selectedRows.forEach((row) => {
+                row.code = selected.value;
+              });
             },
           },
         },

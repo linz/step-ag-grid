@@ -331,7 +331,6 @@ export const ControlledMenuFr = (
                 externalRef={externalRef}
                 containerRef={containerRef}
                 onClose={onClose}
-                onBlur={() => console.log('blur')}
               />
             </EventHandlersContext.Provider>
           </ItemSettingsContext.Provider>
