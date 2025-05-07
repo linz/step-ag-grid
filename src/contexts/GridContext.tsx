@@ -23,7 +23,7 @@ export interface GridContextType<TData extends GridBaseRow> {
     filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string),
   ) => ColDefT<TData, any>[];
   getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
-  setApis: (gridApi: GridApi | undefined, dataTestId?: string) => void;
+  setApis: (gridApi: GridApi | undefined, hasExternallySelectedItems: boolean, dataTestId?: string) => void;
   prePopupOps: () => void;
   postPopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
