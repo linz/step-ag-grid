@@ -359,16 +359,18 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     });
   }, [params.columnDefs, params.loading, params.readOnly, params.defaultColDef?.editable]);
 
+  const hasExternallySelectedItems = !!params.setExternalSelectedItems;
+
   /**
    * When grid is ready set the apis to the grid context and sync selected items to grid.
    */
   const onGridReady = useCallback(
     (event: GridReadyEvent) => {
-      setApis(event.api, dataTestId);
+      setApis(event.api, hasExternallySelectedItems, dataTestId);
       event.api.showNoRowsOverlay();
       synchroniseExternallySelectedItemsToGrid();
     },
-    [dataTestId, setApis, synchroniseExternallySelectedItemsToGrid],
+    [dataTestId, hasExternallySelectedItems, setApis, synchroniseExternallySelectedItemsToGrid],
   );
 
   /**
@@ -433,7 +435,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onCellClicked = useCallback(
     (event: CellClickedEvent) => {
-      if (event.colDef?.cellRendererParams?.singleClickEdit ?? singleClickEdit) {
+      if (event.colDef.singleClickEdit ?? singleClickEdit) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },

@@ -66,7 +66,6 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
     | ((props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
     | string;
   cellRendererParams?: {
-    singleClickEdit?: boolean;
     rightHoverElement?: ReactElement;
     originalCellRenderer?: any;
     editAction?: (selectedRows: TData[]) => void;

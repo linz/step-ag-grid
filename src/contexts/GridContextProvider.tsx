@@ -23,6 +23,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const [quickFilter, _setQuickFilter] = useState('');
   const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
+  const hasExternallySelectedItemsRef = useRef(false);
   const idsBeforeUpdate = useRef<number[]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
@@ -101,7 +102,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Set the grid api when the grid is ready.
    */
   const setApis = useCallback(
-    (gridApi: GridApi | undefined, dataTestId?: string) => {
+    (gridApi: GridApi | undefined, hasExternallySelectedItems: boolean, dataTestId?: string) => {
+      hasExternallySelectedItemsRef.current = hasExternallySelectedItems;
       testId.current = dataTestId;
       setGridApi(gridApi);
       gridApi?.setGridOption('quickFilterText', quickFilter);
@@ -474,9 +476,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   }, [externallySelectedItemsAreInSync]);
 
   const waitForExternallySelectedItemsToBeInSync = useCallback(async () => {
+    if (!hasExternallySelectedItemsRef.current) {
+      externallySelectedItemsAreInSyncRef.current = true;
+      return;
+    }
     // Wait for up to 5 seconds
     for (let i = 0; i < 5000 / 200 && !externallySelectedItemsAreInSyncRef.current; i++) {
       await wait(200);
+    }
+    if (!externallySelectedItemsAreInSyncRef.current) {
+      console.error('externallySelectedItems did not sync with ag-grid selection');
     }
   }, []);
 
