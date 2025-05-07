@@ -11,10 +11,7 @@ export const GridPopoverMessage = <TData extends GridBaseRow, TValue = any>(
     {
       resizable: true,
       ...colDef,
-      cellRendererParams: {
-        singleClickEdit: true,
-        ...colDef.cellRendererParams,
-      },
+      singleClickEdit: true,
     },
     {
       editor: GridFormMessage,

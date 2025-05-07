@@ -21,11 +21,9 @@ export const GridPopoverMenu = <TData extends GridBaseRow>(
       exportable: false,
       cellStyle: { flex: 1, justifyContent: 'center' },
       cellRenderer: GridRenderPopoutMenuCell,
+      // Menus open on single click, this parameter is picked up in Grid.tsx
+      singleClickEdit: true,
       ...colDef,
-      cellRendererParams: {
-        // Menus open on single click, this parameter is picked up in Grid.tsx
-        singleClickEdit: true,
-      },
     },
     {
       editor: GridFormPopoverMenu,
