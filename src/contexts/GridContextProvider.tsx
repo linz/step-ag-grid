@@ -692,6 +692,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const onFilterChanged = useMemo(
     () =>
       debounce(() => {
+        if (!gridApi || gridApi?.isDestroyed()) {
+          return;
+        }
         // This is terrible, but there's no other way for me to check whether a filter has changed the grid
         const getDisplayedRowsHash = () => {
           const arr: any[] = [];
