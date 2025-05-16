@@ -62,7 +62,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       if (!noApiFn) {
         noApiFn = (() => {}) as () => R;
       }
-      return gridApi ? hasApiFn(gridApi) : noApiFn();
+      return gridApi && !gridApi.isDestroyed() ? hasApiFn(gridApi) : noApiFn();
     },
     [gridApi],
   );
@@ -290,9 +290,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
               colId &&
                 delay(() => {
                   if (
+                    !gridApi.isDestroyed() &&
                     isEmpty(gridApi.getEditingCells()) &&
-                    (!ifNoCellFocused || gridApi.getFocusedCell() == null) &&
-                    !gridApi.isDestroyed()
+                    (!ifNoCellFocused || gridApi.getFocusedCell() == null)
                   ) {
                     gridApi.setFocusedCell(rowIndex, colId);
                     // It may be that the first cell is the selection cell, this doesn't exist as a colDef
@@ -456,7 +456,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Resize columns to fit container
    */
   const sizeColumnsToFit = useCallback((): void => {
-    gridApi?.sizeColumnsToFit();
+    if (gridApi && !gridApi?.isDestroyed()) {
+      gridApi.sizeColumnsToFit();
+    }
   }, [gridApi]);
 
   const stopEditing = useCallback((): void => {
@@ -639,6 +641,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         // I've left them here just in case they are
         // async processes need to refresh their own rows
         // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+
+        if (gridApi.isDestroyed()) {
+          return ok;
+        }
 
         if (ok) {
           const cell = gridApi.getFocusedCell();
