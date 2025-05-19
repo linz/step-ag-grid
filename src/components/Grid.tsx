@@ -50,6 +50,8 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
   defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
   selectable?: boolean;
+  enableClickSelection?: boolean;
+  enableSelectionWithoutKeys?: boolean;
   hideSelectColumn?: boolean;
   theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
@@ -668,7 +670,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           rowSelection={
             selectable
               ? {
-                  enableClickSelection: false,
+                  enableSelectionWithoutKeys: params.enableSelectionWithoutKeys ?? false,
+                  enableClickSelection: params.enableClickSelection ?? false,
                   mode: rowSelection == 'single' ? 'singleRow' : 'multiRow',
                 }
               : undefined
