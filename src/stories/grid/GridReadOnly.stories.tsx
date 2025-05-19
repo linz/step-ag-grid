@@ -244,6 +244,8 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         data-testid={'readonly'}
         {...props}
         selectable={true}
+        enableClickSelection={true}
+        enableSelectionWithoutKeys={true}
         autoSelectFirstRow={true}
         externalSelectedItems={externalSelectedItems}
         setExternalSelectedItems={setExternalSelectedItems}
