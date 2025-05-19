@@ -10,4 +10,5 @@ export const GridCellFiller = <TData extends GridBaseRow>(): ColDef<TData, any> 
   colId: GridCellFillerColId,
   headerName: '',
   flex: 1,
+  editable: false,
 });
