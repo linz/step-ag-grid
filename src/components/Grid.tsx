@@ -423,7 +423,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
-      if (!invokeEditAction(event)) {
+      const editable = fnOrVar(event.colDef?.editable, event);
+      if (editable && !invokeEditAction(event)) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },
@@ -435,7 +436,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onCellClicked = useCallback(
     (event: CellClickedEvent) => {
-      if (event.colDef.singleClickEdit ?? singleClickEdit) {
+      const editable = fnOrVar(event.colDef?.editable, event);
+      if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },

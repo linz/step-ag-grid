@@ -509,6 +509,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       const shouldSelectNode = !rowNode.isSelected();
       if (shouldSelectNode) {
         externallySelectedItemsAreInSyncRef.current = false;
+        setExternallySelectedItemsAreInSync(false);
         rowNode.setSelected(true, true);
         await waitForExternallySelectedItemsToBeInSync();
       }
