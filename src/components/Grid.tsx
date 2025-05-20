@@ -750,7 +750,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               }
               return false;
             },
-            onCellClicked: clickInputWhenContainingCellClicked,
+            onCellClicked:
+              params.enableSelectionWithoutKeys || params.enableClickSelection
+                ? undefined
+                : clickInputWhenContainingCellClicked,
           }}
         />
       </div>

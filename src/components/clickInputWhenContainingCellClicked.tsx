@@ -28,9 +28,11 @@ export const clickInputWhenContainingCellClicked = (params: CellClickedEvent) =>
     if (!cell) return;
 
     const input = cell.querySelector('input, button');
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
-    input?.dispatchEvent(event);
+    input.dispatchEvent(event);
   };
 
   setTimeout(clickInput, 20);
