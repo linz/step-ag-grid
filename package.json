@@ -76,7 +76,8 @@
     ]
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.41.1"
+    "@rollup/rollup-linux-x64-gnu": "^4.41.1",
+    "@swc/core-linux-x64-gnu": "^1.11.29"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
