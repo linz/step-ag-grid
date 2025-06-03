@@ -1,0 +1,1 @@
+import{c as a}from"./util-FCHWxW_t.js";import{G as i,m as e}from"./GridWrapper-nASS91gz.js";const t=(o,r)=>i(o,{editor:e,...r,editorParams:{...r.editorParams,className:a({"GridPopoverEditDropDown-containerLarge":!r.editorParams?.className?.includes("GridPopoverEditDropDown-container")},r.editorParams?.className)}});export{t as G};
