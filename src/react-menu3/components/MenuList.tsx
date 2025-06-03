@@ -365,7 +365,9 @@ export const MenuList = ({
 
   // Matt added window resize observer
   useEffect(() => {
-    if (typeof ResizeObserver !== 'function' || reposition === 'initial') return;
+    if (typeof ResizeObserver !== 'function' || reposition === 'initial' || !menuRef.current) {
+      return;
+    }
 
     const callback = debounce(() => {
       const { width, height } = menuRef.current.ownerDocument.body.getBoundingClientRect();
@@ -418,7 +420,7 @@ export const MenuList = ({
       const id = setTimeout(
         () => {
           // If focus has already been set to a children element, don't set focus on menu or item
-          if (!menuRef.current.contains(document.activeElement)) {
+          if (menuRef.current && !menuRef.current.contains(document.activeElement)) {
             // Handle popover portal focus
             const popupElement = focusRef.current?.nextSibling;
             if (!focusFirstInput(popupElement)) {
