@@ -105,7 +105,7 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react-swc": "^3.10.1",
     "@vitest/ui": "^3.2.1",
-    "ag-grid-community": "^33.3.1",
+    "ag-grid-community": "^33.3.2",
     "ag-grid-react": "^33.3.1",
     "babel-preset-react-app": "^10.1.0",
     "chromatic": "^11.28.2",
