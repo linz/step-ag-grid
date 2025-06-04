@@ -80,7 +80,7 @@
     "@swc/core-linux-x64-gnu": "^1.11.29"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^3.2.6",
+    "@chromatic-com/storybook": "^4.0.0",
     "@linzjs/lui": "^22.12.4",
     "@linzjs/style": "^5.4.0",
     "@rollup/plugin-commonjs": "^28.0.3",
