@@ -98,7 +98,7 @@ const _selectRow = async (
   const row = await findRow(rowId, within);
   const isSelected = row.className.includes('ag-row-selected');
   if (select === 'toggle' || (select === 'select' && !isSelected) || (select === 'deselect' && isSelected)) {
-    const cell = await findCell(rowId, 'selection', within);
+    const cell = await findCell(rowId, 'ag-Grid-SelectionColumn', within);
     await user.click(cell);
     await waitFor(async () => {
       const row = await findRow(rowId, within);
