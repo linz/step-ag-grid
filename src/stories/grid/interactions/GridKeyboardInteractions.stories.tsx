@@ -3,11 +3,11 @@ import '../../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from '@storybook/react';
-import { expect } from '@storybook/test';
-import { fn } from '@storybook/test';
-import { userEvent, waitFor } from '@storybook/test';
+import { Meta, StoryFn } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
+import { expect } from 'storybook/test';
+import { fn } from 'storybook/test';
+import { userEvent, waitFor } from 'storybook/test';
 
 import {
   ColDefT,

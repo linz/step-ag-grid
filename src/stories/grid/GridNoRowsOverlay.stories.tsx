@@ -1,9 +1,8 @@
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from '@storybook/react';
-import { expect } from '@storybook/test';
-import { within } from '@storybook/test';
+import { Meta, StoryFn } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 
 import { GridNoRowsOverlay, GridNoRowsOverlayProps } from '../../components';
 

@@ -647,6 +647,15 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [params, clearHighlightRowClasses],
   );
 
+  useEffect(() => {
+    if (params.setExternalSelectedItems && selectable == null) {
+      console.warn(
+        '<Grid/> has setExternalSelectedItems parameter, but is missing selectable parameter,' +
+          'this will cause weird delays in editing.\nIf you need to hide selection column use hideSelectColumn=true',
+      );
+    }
+  }, [params.setExternalSelectedItems, selectable]);
+
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnCellEditingComplete(params.onCellEditingComplete);
 

@@ -1,9 +1,9 @@
 import '../../react-menu3/styles/index.scss';
 
-import { Meta, StoryFn } from '@storybook/react';
-import { expect } from '@storybook/test';
-import * as test from '@storybook/test';
-import { userEvent, within } from '@storybook/test';
+import { Meta, StoryFn } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
+import * as test from 'storybook/test';
+import { userEvent, within } from 'storybook/test';
 
 import { Grid } from '../../components/Grid';
 import { Menu, MenuButton, MenuDivider, MenuItem, SubMenu } from '../../react-menu3';

@@ -3,10 +3,10 @@ import '../../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
-import { StoryFn } from '@storybook/react';
-import { expect, fn, userEvent, within } from '@storybook/test';
+import { StoryFn } from '@storybook/react-vite';
 import { GridPopoverContext } from 'contexts/GridPopoverContext';
 import { useRef } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { GridContext, GridFormTextInput, GridFormTextInputProps } from '../../..';
 
