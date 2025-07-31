@@ -19,6 +19,7 @@ import {
   GridProps,
   GridUpdatingContextProvider,
   MenuOption,
+  primitiveToSelectOption,
   wait,
 } from '../..';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
@@ -69,7 +70,7 @@ const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           editorParams: {
             filtered: 'local',
             filterPlaceholder: 'Filter',
-            options: ['Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'],
+            options: ['Architect', 'Developer', 'Product Owner', 'Scrum Master', 'Tester'].map(primitiveToSelectOption),
           },
         },
       ),
