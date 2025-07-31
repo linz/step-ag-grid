@@ -3,7 +3,7 @@ import '../../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-vite';
 import { GridPopoverContext, GridPopoverContextType } from 'contexts/GridPopoverContext';
 import { useRef } from 'react';
 

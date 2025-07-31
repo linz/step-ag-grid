@@ -3,7 +3,7 @@ import '../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
-import { Meta, StoryFn } from '@storybook/react';
+import { Meta, StoryFn } from '@storybook/react-vite';
 import { GridPopoverEditDropDown } from 'components/gridPopoverEdit/GridPopoverEditDropDown';
 import { GridPopoverTextArea } from 'components/gridPopoverEdit/GridPopoverTextArea';
 import { useMemo, useState } from 'react';

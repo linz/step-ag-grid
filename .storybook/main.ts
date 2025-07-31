@@ -20,10 +20,6 @@ const config: StorybookConfig = {
     "@chromatic-com/storybook"
   ],
 
-  docs: {
-    autodocs: true
-  },
-
   async viteFinal(config) {
     const { config: userConfig } = (await loadConfigFromFile({
           command: 'serve',

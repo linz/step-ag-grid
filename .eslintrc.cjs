@@ -1,6 +1,5 @@
 module.exports = {
-  extends: ['./node_modules/@linzjs/style/.eslintrc.cjs'],
-
+  extends: ['./node_modules/@linzjs/style/.eslintrc.cjs', 'plugin:storybook/recommended'],
   overrides: [
     {
       /** Overrides for typescript */
