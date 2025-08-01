@@ -14,7 +14,7 @@ export const GridCellMultiSelectClassRules: CellClassRules = {
         .getSelectedNodes()
         ?.map((row) => row.id)
         ?.includes(node.id) &&
-      api.getEditingCells().some((cell) => cell.column.getColDef() === colDef)
+      api.getEditingCells().some((cell) => cell.colId === colDef.colId)
     );
   },
 };
