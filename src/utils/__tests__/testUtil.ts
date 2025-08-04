@@ -292,3 +292,8 @@ export const waitForGridRows = async (props?: { grid?: HTMLElement; timeout?: nu
   waitFor(() => expect(getAllQuick({ classes: '.ag-row' }, props?.grid).length > 0).toBe(true), {
     timeout: props?.timeout ?? 5000,
   });
+
+export const clickColumnHeaderToSort = async (colId: string, within?: HTMLElement): Promise<void> => {
+  const header = await findQuick({ tagName: `.ag-header-cell[col-id='${colId}']` }, within);
+  await user.click(header);
+};
