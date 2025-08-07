@@ -8,7 +8,13 @@ import { GridPopoverContext } from 'contexts/GridPopoverContext';
 import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { GridContext, GridFormDropDown, GridFormDropDownProps, GridFormSubComponentTextInput } from '../../..';
+import {
+  GridBaseRow,
+  GridContext,
+  GridFormDropDown,
+  GridFormDropDownProps,
+  GridFormSubComponentTextInput,
+} from '../../..';
 
 export default {
   title: 'GridForm / Interactions',
@@ -22,8 +28,10 @@ const updateValue = fn(async (saveFn: (selectedRows: any[]) => Promise<boolean>,
 
 const onSelectedItem = fn(async () => {});
 
-const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps<any>) => {
-  const config: GridFormDropDownProps<any> = {
+const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
+  props: GridFormDropDownProps<GridBaseRow, number>,
+) => {
+  const config: GridFormDropDownProps<GridBaseRow, number> = {
     filtered: 'local',
     onSelectedItem,
     options: [
@@ -72,7 +80,6 @@ const Template: StoryFn<typeof GridFormDropDown> = (props: GridFormDropDownProps
   );
 };
 
-//console.log({ extendedExpect });
 export const GridFormDropDownInteractions_: typeof Template = Template.bind({});
 GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   const canvas = within(canvasElement);
