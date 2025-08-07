@@ -37,18 +37,33 @@ import { usePostSortRowsHook } from './PostSortRowsHook';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 let timeOfLastSingleClick = 0;
+let lastClickColId: unknown;
+let lastClickRowIndex: unknown;
+
+const resetClickDebounce = () => {
+  timeOfLastSingleClick = 0;
+  lastClickColId = '';
+  lastClickRowIndex = -1;
+};
 
 /**
  * If click is more than 200ms since last click return true.
  */
-const clickDebounce = (): boolean => {
+const clickDebounceSkipClick = (colId: unknown, rowIndex: unknown): boolean => {
   const doubleClickMs = 200;
-  if (Date.now() - timeOfLastSingleClick < doubleClickMs) {
+
+  if (
+    Date.now() - timeOfLastSingleClick < doubleClickMs &&
+    lastClickColId === colId &&
+    lastClickRowIndex === rowIndex
+  ) {
     // Skipping double click due to single click edit
-    return false;
+    return true;
   }
   timeOfLastSingleClick = Date.now();
-  return true;
+  lastClickColId = colId;
+  lastClickRowIndex = rowIndex;
+  return false;
 };
 
 export interface GridBaseRow {
@@ -435,14 +450,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     });*/
   }, []);
 
-  const timeOfLastSingleClickRef = useRef(0);
-
   /**
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
-      if (clickDebounce()) {
+      if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
+        // the next click will be a single click, we want it to pass
+        resetClickDebounce();
         return;
       }
       const editable = fnOrVar(event.colDef?.editable, event);
@@ -460,7 +475,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     (event: CellClickedEvent) => {
       const editable = fnOrVar(event.colDef?.editable, event);
       if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
-        if (clickDebounce()) {
+        if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
           return;
         }
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
