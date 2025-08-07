@@ -136,8 +136,13 @@ export const findCellContains = async (
 };
 
 export const selectCell = async (rowId: string | number, colId: string, within?: HTMLElement): Promise<void> => {
-  const cell = await findCell(rowId, colId, within);
-  await user.click(cell);
+  await waitFor(
+    async () => {
+      const cell = await findCell(rowId, colId, within);
+      await user.click(cell);
+    },
+    { timeout: 10000 },
+  );
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
@@ -179,7 +184,7 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
   );
 };
 
-export const validateMenuOptions = async (
+export const editValidateMenuOptions = async (
   rowId: number | string,
   colId: string,
   expectedMenuOptions: Array<string>,
@@ -190,12 +195,23 @@ export const validateMenuOptions = async (
   return isEqual(actualOptions, expectedMenuOptions);
 };
 
+export const validateMenuOptions = async (
+  rowId: number | string,
+  colId: string,
+  expectedMenuOptions: Array<string>,
+): Promise<boolean> => {
+  await selectCell(rowId, colId);
+  const openMenu = await findOpenPopover();
+  const actualOptions = (await within(openMenu).findAllByRole('menuitem')).map((menuItem) => menuItem.textContent);
+  return isEqual(actualOptions, expectedMenuOptions);
+};
+
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
   const menuOption = await findMenuOption(menuOptionText);
   await user.click(menuOption);
 };
 
-export const openAndClickMenuOption = async (
+export const editAndClickMenuOption = async (
   rowId: number | string,
   colId: string,
   menuOptionText: string | RegExp,
@@ -205,13 +221,23 @@ export const openAndClickMenuOption = async (
   await clickMenuOption(menuOptionText);
 };
 
+export const openAndClickMenuOption = async (
+  rowId: number | string,
+  colId: string,
+  menuOptionText: string | RegExp,
+  within?: HTMLElement,
+): Promise<void> => {
+  await selectCell(rowId, colId, within);
+  await clickMenuOption(menuOptionText);
+};
+
 export const openAndFindMenuOption = async (
   rowId: number | string,
   colId: string,
   menuOptionText: string | RegExp,
   within?: HTMLElement,
 ): Promise<HTMLElement> => {
-  await editCell(rowId, colId, within);
+  await selectCell(rowId, colId, within);
   return await findMenuOption(menuOptionText);
 };
 

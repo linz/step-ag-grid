@@ -183,7 +183,7 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
   );
 };
 
-export const validateMenuOptions = async (
+export const editValidateMenuOptions = async (
   rowId: number | string,
   colId: string,
   expectedMenuOptions: Array<string>,
@@ -194,9 +194,30 @@ export const validateMenuOptions = async (
   return isEqual(actualOptions, expectedMenuOptions);
 };
 
+export const validateMenuOptions = async (
+  rowId: number | string,
+  colId: string,
+  expectedMenuOptions: Array<string>,
+): Promise<boolean> => {
+  await selectCell(rowId, colId);
+  const openMenu = await findOpenPopover();
+  const actualOptions = (await within(openMenu).findAllByRole('menuitem')).map((menuItem) => menuItem.textContent);
+  return isEqual(actualOptions, expectedMenuOptions);
+};
+
 export const clickMenuOption = async (menuOptionText: string | RegExp): Promise<void> => {
   const menuOption = await findMenuOption(menuOptionText);
   await user.click(menuOption);
+};
+
+export const editAndClickMenuOption = async (
+  rowId: number | string,
+  colId: string,
+  menuOptionText: string | RegExp,
+  within?: HTMLElement,
+): Promise<void> => {
+  await editCell(rowId, colId, within);
+  await clickMenuOption(menuOptionText);
 };
 
 export const openAndClickMenuOption = async (
@@ -215,7 +236,7 @@ export const openAndFindMenuOption = async (
   menuOptionText: string | RegExp,
   within?: HTMLElement,
 ): Promise<HTMLElement> => {
-  await editCell(rowId, colId, within);
+  await selectCell(rowId, colId, within);
   return await findMenuOption(menuOptionText);
 };
 
