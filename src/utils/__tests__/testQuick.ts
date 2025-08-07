@@ -147,7 +147,7 @@ export const getQuick = (filter: IQueryQuick, container?: HTMLElement): HTMLElem
  * @return HTMLElement.  Throws exception if not found.
  */
 export const findQuick = async <T extends HTMLElement>(filter: IQueryQuick, container?: HTMLElement): Promise<T> => {
-  const endTime = Date.now() + 5000;
+  const endTime = Date.now() + 1000;
   while (Date.now() < endTime) {
     const el = queryQuick<T>(filter, container);
     if (el) return el;

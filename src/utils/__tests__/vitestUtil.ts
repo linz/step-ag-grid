@@ -131,7 +131,7 @@ export const findCellContains = async (
       const row = await findRow(rowId, within);
       return getQuick({ tagName: `[col-id='${colId}']`, text }, row);
     },
-    { timeout: 10000 },
+    { timeout: 2200 },
   );
 };
 
@@ -141,7 +141,7 @@ export const selectCell = async (rowId: string | number, colId: string, within?:
       const cell = await findCell(rowId, colId, within);
       await user.click(cell);
     },
-    { timeout: 10000 },
+    { timeout: 2200 },
   );
 };
 
@@ -150,9 +150,9 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
     async () => {
       const cell = await findCell(rowId, colId, within);
       await user.dblClick(cell);
-      await waitFor(findOpenPopover, { timeout: 1000 });
+      await waitFor(findOpenPopover);
     },
-    { timeout: 10000 },
+    { timeout: 2200 },
   );
 };
 
@@ -180,7 +180,7 @@ export const findMenuOption = async (menuOptionText: string | RegExp): Promise<H
       }
       return menuOption;
     },
-    { timeout: 5000 },
+    { timeout: 4000 },
   );
 };
 
@@ -312,12 +312,12 @@ export const clickActionButton = async (text: string, container?: HTMLElement): 
 
 export const waitForGridReady = async (props?: { grid?: HTMLElement; timeout?: number }) =>
   waitFor(() => expect(getAllQuick({ classes: '.Grid-ready' }, props?.grid)).toBeDefined(), {
-    timeout: props?.timeout ?? 5000,
+    timeout: props?.timeout ?? 4000,
   });
 
 export const waitForGridRows = async (props?: { grid?: HTMLElement; timeout?: number }) =>
   waitFor(() => expect(getAllQuick({ classes: '.ag-row' }, props?.grid).length > 0).toBe(true), {
-    timeout: props?.timeout ?? 5000,
+    timeout: props?.timeout ?? 4000,
   });
 
 export const clickColumnHeaderToSort = async (colId: string, within?: HTMLElement): Promise<void> => {
