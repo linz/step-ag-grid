@@ -276,7 +276,6 @@ export const ControlledMenuFr = (
   );
 
   const onKeyUp = (e: KeyboardEvent) => {
-    console.log(e);
     switch (e.key) {
       case Keys.ESC:
         e.preventDefault();

@@ -10,14 +10,12 @@ import * as test from 'storybook/test';
 import { expect, userEvent, within } from 'storybook/test';
 
 import {
-  GridBaseRow,
   GridContext,
   GridFormPopoverMenu,
   GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
   GridFormSubComponentTextInput,
   PopoutMenuSeparator,
-  SelectedMenuOptionResult,
 } from '../../..';
 
 export default {
@@ -30,13 +28,9 @@ const updateValue = test.fn((saveFn: (selectedRows: any[]) => Promise<boolean>, 
   saveFn([]),
 );
 
-const enabledAction = test
-  .fn<[{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }], Promise<void>>()
-  .mockResolvedValue(undefined);
+const enabledAction = test.fn().mockResolvedValue(undefined);
 
-const disabledAction = test
-  .fn<[{ selectedRows: GridBaseRow[]; menuOption: SelectedMenuOptionResult<GridBaseRow> }], Promise<void>>()
-  .mockResolvedValue(undefined);
+const disabledAction = test.fn().mockResolvedValue(undefined);
 
 const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMenuProps<any>) => {
   const anchorRef = useRef<HTMLHeadingElement>(null);
