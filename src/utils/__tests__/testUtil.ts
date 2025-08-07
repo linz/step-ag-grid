@@ -135,8 +135,13 @@ export const findCellContains = async (
 };
 
 export const selectCell = async (rowId: string | number, colId: string, within?: HTMLElement): Promise<void> => {
-  const cell = await findCell(rowId, colId, within);
-  await user.click(cell);
+  await waitFor(
+    async () => {
+      const cell = await findCell(rowId, colId, within);
+      await user.click(cell);
+    },
+    { timeout: 10000 },
+  );
 };
 
 export const editCell = async (rowId: number | string, colId: string, within?: HTMLElement): Promise<void> => {
@@ -200,7 +205,7 @@ export const openAndClickMenuOption = async (
   menuOptionText: string | RegExp,
   within?: HTMLElement,
 ): Promise<void> => {
-  await editCell(rowId, colId, within);
+  await selectCell(rowId, colId, within);
   await clickMenuOption(menuOptionText);
 };
 
