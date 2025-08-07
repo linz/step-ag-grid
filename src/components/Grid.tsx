@@ -36,6 +36,21 @@ import { usePostSortRowsHook } from './PostSortRowsHook';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+let timeOfLastSingleClick = 0;
+
+/**
+ * If click is more than 200ms since last click return true.
+ */
+const clickDebounce = (): boolean => {
+  const doubleClickMs = 200;
+  if (Date.now() - timeOfLastSingleClick < doubleClickMs) {
+    // Skipping double click due to single click edit
+    return false;
+  }
+  timeOfLastSingleClick = Date.now();
+  return true;
+};
+
 export interface GridBaseRow {
   id: string | number;
 }
@@ -420,11 +435,16 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     });*/
   }, []);
 
+  const timeOfLastSingleClickRef = useRef(0);
+
   /**
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
+      if (clickDebounce()) {
+        return;
+      }
       const editable = fnOrVar(event.colDef?.editable, event);
       if (editable && !invokeEditAction(event)) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
@@ -440,6 +460,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     (event: CellClickedEvent) => {
       const editable = fnOrVar(event.colDef?.editable, event);
       if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
+        if (clickDebounce()) {
+          return;
+        }
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },
