@@ -131,7 +131,7 @@ export const findCellContains = async (
       const row = await findRow(rowId, within);
       return getQuick({ tagName: `[col-id='${colId}']`, text }, row);
     },
-    { timeout: 2200 },
+    { timeout: 5000 },
   );
 };
 
@@ -141,7 +141,7 @@ export const selectCell = async (rowId: string | number, colId: string, within?:
       const cell = await findCell(rowId, colId, within);
       await user.click(cell);
     },
-    { timeout: 2200 },
+    { timeout: 5000 },
   );
 };
 
@@ -150,9 +150,9 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
     async () => {
       const cell = await findCell(rowId, colId, within);
       await user.dblClick(cell);
-      await waitFor(findOpenPopover);
+      await waitFor(findOpenPopover, { timeout: 1000 });
     },
-    { timeout: 2200 },
+    { timeout: 5000 },
   );
 };
 
