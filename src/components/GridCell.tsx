@@ -139,7 +139,7 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
     colId: props.field ?? props.field,
     headerTooltip: props.headerName,
     // Technically valueGetter should not be here as it may not be sortable
-    sortable: !!(props?.field || props?.valueGetter || props?.valueFormatter),
+    sortable: !!(props?.field || props?.valueGetter || props?.valueFormatter || props?.comparator),
     resizable: true,
     editable: props.editable ?? false,
     ...(custom?.editor && {
