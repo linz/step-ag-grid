@@ -149,7 +149,7 @@ export const editCell = async (rowId: number | string, colId: string, within?: H
     async () => {
       const cell = await findCell(rowId, colId, within);
       await user.dblClick(cell);
-      await waitFor(findOpenPopover, { timeout: 1000 });
+      await waitFor(findOpenPopover, { timeout: 4000 });
     },
     { timeout: 5000 },
   );

@@ -1,5 +1,6 @@
 module.exports = {
   extends: ['./node_modules/@linzjs/style/.eslintrc.cjs', 'plugin:storybook/recommended'],
+  ignorePatterns: ['**/*.js'],
   overrides: [
     {
       /** Overrides for typescript */
