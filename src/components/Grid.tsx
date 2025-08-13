@@ -755,6 +755,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               />
             );
           }}
+          quickFilterParser={(filterStr) => {
+            filterStr = filterStr.trim();
+            const quoted = filterStr.startsWith('"');
+            filterStr = filterStr.replace(/^"/, '').replace(/"$/, '');
+            // If the user encloses the search term in quotes, treat it as an exact match otherwise split by space
+            return quoted ? [filterStr] : filterStr.split(' ');
+          }}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
