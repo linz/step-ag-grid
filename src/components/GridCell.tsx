@@ -1,4 +1,10 @@
-import { ColDef, EditableCallback, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
+import {
+  ColDef,
+  EditableCallback,
+  GetQuickFilterTextParams,
+  ICellEditorParams,
+  ICellRendererParams,
+} from 'ag-grid-community';
 import {
   SuppressKeyboardEventParams,
   ValueFormatterFunc,
@@ -91,25 +97,24 @@ export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
 };
 
 export const generateFilterGetter = <TData extends GridBaseRow, ValueType>(
-  field: string | undefined,
-  filterValueGetter: string | ValueGetterFunc<TData, ValueType> | undefined,
   valueFormatter: string | ValueFormatterFunc<TData, ValueType> | undefined,
-): string | ValueGetterFunc<TData, ValueType> | undefined => {
-  if (filterValueGetter) return filterValueGetter;
+): string | ((params: GetQuickFilterTextParams<TData, ValueType>) => string) | undefined => {
   // aggrid will default to valueGetter
-  if (typeof valueFormatter !== 'function' || !field) return undefined;
+  if (typeof valueFormatter !== 'function') {
+    return undefined;
+  }
 
-  return (params: ValueGetterParams<TData, ValueType>): any => {
-    const value = params.getValue(field);
-    let formattedValue = valueFormatter({ ...params, value });
-    // Search for null values using standard dash
-    if (formattedValue === '–') formattedValue += ' -';
-    // Search by raw value as well as formatted
-    const gotValue = ['string', 'number'].includes(typeof value) ? value : undefined;
-    return (formattedValue + (gotValue != null && formattedValue != gotValue ? ' ' + gotValue : '')) //
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
+  return (params: GetQuickFilterTextParams<TData, ValueType>) => valueFormatter(params);
+};
+
+const stringableValueFormatterTypes = ['number', 'boolean', 'string'];
+export const defaultValueFormatter = ({ value }: ValueFormatterParams) => {
+  if (value == null) {
+    return '–';
+  }
+  return stringableValueFormatterTypes.includes(typeof value) //
+    ? String(value)
+    : JSON.stringify(value);
 };
 
 /*
@@ -128,17 +133,18 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
   // Generate a default filter value getter which uses the formatted value plus
   // the editable value if it's a string and different from the formatted value.
   // This is so that e.g. bearings can be searched for by DMS or raw number.
-  const valueFormatter = props.valueFormatter;
+  const valueFormatter = props.valueFormatter ?? defaultValueFormatter;
   // FIXME
-  const filterValueGetter = generateFilterGetter(props.field, props.filterValueGetter as any, valueFormatter as any);
+  const filterValueGetter = props.filterValueGetter ?? generateFilterGetter(valueFormatter as any);
   const exportable = props.exportable;
   // Can't leave this here ag-grid will complain
   delete props.exportable;
 
   return {
-    colId: props.field ?? props.field,
+    // Will be overridden if specified later
+    colId: props.field,
     headerTooltip: props.headerName,
-    sortable: !!(props?.field || props?.valueGetter),
+    sortable: true,
     resizable: true,
     editable: props.editable ?? false,
     ...(custom?.editor && {
@@ -155,15 +161,9 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
       },
     }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
-    // FIXME
-    filterValueGetter: filterValueGetter as any,
+    getQuickFilterText: filterValueGetter as any,
     // Default value formatter, otherwise react freaks out on objects
-    valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value == null) return '–';
-      const types = ['number', 'boolean', 'string'];
-      if (types.includes(typeof params.value)) return `${params.value}`;
-      else return JSON.stringify(params.value);
-    },
+    valueFormatter,
     ...props,
     cellRenderer: typeof props.cellRenderer === 'string' ? props.cellRenderer : GridCellRenderer,
     cellRendererParams: {

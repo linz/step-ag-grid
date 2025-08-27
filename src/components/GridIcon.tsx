@@ -16,6 +16,7 @@ export const GridIcon = (props: {
     alt={props.title}
     size={props.size ?? 'md'}
     className={clsx(
+      `step-ag-grid__alert-icon`,
       `AgGridGenericCellRenderer-${props.icon}Icon`,
       props.className,
       props.disabled && 'GridIcon-disabled',

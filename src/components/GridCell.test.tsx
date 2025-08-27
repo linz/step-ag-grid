@@ -1,35 +1,37 @@
-import { ValueGetterParams } from 'ag-grid-community';
 import { describe, expect, test } from 'vitest';
 
-import { GridBaseRow } from './Grid';
-import { generateFilterGetter } from './GridCell';
+import { defaultValueFormatter, generateFilterGetter } from './GridCell';
 
 describe('GridCell', () => {
-  test('generateFilterGetter returns passed filterValueGetter', () => {
-    const filterValueGetter = () => 'a';
-    expect(generateFilterGetter(undefined, filterValueGetter, () => 'b')).toBe(filterValueGetter);
-    expect(generateFilterGetter('xxx', filterValueGetter, undefined)).toBe(filterValueGetter);
-    expect(generateFilterGetter(undefined, filterValueGetter, undefined)).toBe(filterValueGetter);
+  test('defaultValueFormatter', () => {
+    expect(defaultValueFormatter({ value: null } as any)).toBe('–');
+    expect(defaultValueFormatter({ value: undefined } as any)).toBe('–');
+    expect(defaultValueFormatter({ value: 'a' } as any)).toBe('a');
+    expect(defaultValueFormatter({ value: 1 } as any)).toBe('1');
+    expect(defaultValueFormatter({ value: false } as any)).toBe('false');
+    expect(defaultValueFormatter({ value: { x: 1 } } as any)).toBe('{"x":1}');
   });
 
   test('generateFilterGetter', () => {
-    expect(generateFilterGetter('xxx', undefined, undefined)).toBeUndefined();
-
-    const tests = [
-      { formatted: 'f1', value: 'v1', expected: 'f1 v1' },
-      { formatted: 'f2', value: {}, expected: 'f2' },
-      { formatted: '', value: 'v3', expected: 'v3' },
-    ];
-
-    tests.forEach((test) => {
-      const field = 'xxx';
-      const valueFormatter = test.formatted == null ? undefined : () => test.formatted;
-      const filterGetter = generateFilterGetter(field, undefined, valueFormatter);
-      expect(typeof filterGetter).toBe('function');
-      if (typeof filterGetter !== 'function') return;
-      expect(filterGetter({ getValue: () => test.value } as unknown as ValueGetterParams<GridBaseRow>)).toBe(
-        test.expected,
-      );
+    expect(generateFilterGetter(undefined)).toBeUndefined();
+    expect(generateFilterGetter('x')).toBeUndefined();
+    const fn = generateFilterGetter((props) => {
+      return String(props.value);
     });
+    expect(fn).toBeTypeOf('function');
+    if (typeof fn !== 'function') {
+      return;
+    }
+    expect(
+      fn({
+        value: 'x',
+        colDef: { colId: 'col1' },
+        node: undefined!,
+        data: undefined!,
+        column: undefined!,
+        api: undefined!,
+        context: undefined,
+      }),
+    ).toBe('x');
   });
 });
