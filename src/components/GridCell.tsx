@@ -10,7 +10,6 @@ import {
   ValueFormatterFunc,
   ValueFormatterParams,
   ValueGetterFunc,
-  ValueGetterParams,
 } from 'ag-grid-community';
 import { forwardRef, ReactElement, useContext } from 'react';
 
@@ -38,8 +37,12 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   let warningText = props.data !== undefined && warningFn ? warningFn(props) : undefined;
   const infoFn = rendererParams?.info;
   let infoText = props.data !== undefined && infoFn ? infoFn(props) : undefined;
-  if (Array.isArray(warningText)) warningText = warningText.join('\n');
-  if (Array.isArray(infoText)) infoText = infoText.join('\n');
+  if (Array.isArray(warningText)) {
+    warningText = warningText.join('\n');
+  }
+  if (Array.isArray(infoText)) {
+    infoText = infoText.join('\n');
+  }
 
   return checkUpdating(colDef.field ?? colDef.colId ?? '', props.data.id) ? (
     <GridLoadableCell />
@@ -53,7 +56,7 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
         {colDef.cellRendererParams?.originalCellRenderer ? (
           <colDef.cellRendererParams.originalCellRenderer {...props} />
         ) : (
-          <span title={props.valueFormatted ?? undefined}>{props.valueFormatted}</span>
+          <span title={props.valueFormatted ?? undefined}>{props.valueFormatted || '–'}</span>
         )}
       </div>
       {fnOrVar(colDef.editable, props) && rendererParams?.rightHoverElement && (
