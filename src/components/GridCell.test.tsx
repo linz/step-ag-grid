@@ -24,10 +24,10 @@ describe('GridCell', () => {
     }
     expect(
       fn({
+        value: 'x',
         colDef: { colId: 'col1' },
-        getValue: () => 'x',
-        node: null,
-        data: undefined,
+        node: undefined!,
+        data: undefined!,
         column: undefined!,
         api: undefined!,
         context: undefined,

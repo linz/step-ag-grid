@@ -104,15 +104,14 @@ export const generateFilterGetter = <TData extends GridBaseRow, ValueType>(
     return undefined;
   }
 
-  return (params: GetQuickFilterTextParams<TData, ValueType>): any => {
-    const { value } = params;
-    return valueFormatter({ ...params, value });
-  };
+  return (params: GetQuickFilterTextParams<TData, ValueType>) => valueFormatter(params);
 };
 
 const stringableValueFormatterTypes = ['number', 'boolean', 'string'];
 export const defaultValueFormatter = ({ value }: ValueFormatterParams) => {
-  if (value == null) return '–';
+  if (value == null) {
+    return '–';
+  }
   return stringableValueFormatterTypes.includes(typeof value) //
     ? String(value)
     : JSON.stringify(value);
