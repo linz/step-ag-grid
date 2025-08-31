@@ -426,7 +426,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const skipHeader = sizeColumns === 'auto-skip-headers';
     if (hasSetContentSize.current) {
-      autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
+      autoSizeColumns({
+        skipHeader,
+        userSizedColIds: userSizedColIds.current,
+        colIds: colIdsEdited.current,
+        includeFlex: true,
+      });
     }
     colIdsEdited.current.clear();
   }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
@@ -567,6 +572,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
                 skipHeader,
                 userSizedColIds: userSizedColIds.current,
                 colIds: colIdsEdited.current,
+                includeFlex: true,
               });
             }
           });
