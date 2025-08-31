@@ -1,3 +1,5 @@
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 

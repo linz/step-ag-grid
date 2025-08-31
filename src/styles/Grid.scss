@@ -144,3 +144,12 @@ div.ag-ltr div.ag-header-cell-resize {
   max-width: 34px;
   width: 34px;
 }
+
+.GridNoRowsOverlay {
+  display: flex;
+  gap: 4px;
+  fill: lui.$fuscous;
+  color: lui.$fuscous;
+  font-size: lui.$base-font-size;
+  @include lui.font-regular();
+}

@@ -1,4 +1,4 @@
-import { LuiStatusSpinner } from '@linzjs/lui';
+import { LuiIcon, LuiStatusSpinner } from '@linzjs/lui';
 import { ForwardedRef, forwardRef } from 'react';
 
 const GridLoadingOverlayComponentFr = (
@@ -40,10 +40,20 @@ export const GridNoRowsOverlayFr = (props: GridNoRowsOverlayProps, externalRef: 
     return <GridLoadingOverlayComponent ref={externalRef} headerRowHeight={props.headerRowHeight} />;
   }
   if (props.rowCount === 0) {
-    return <div ref={externalRef}>{props.noRowsOverlayText ?? 'There are currently no rows'}</div>;
+    return (
+      <div ref={externalRef} className={'GridNoRowsOverlay'}>
+        <LuiIcon name="ic_info_outline" alt="" size="md" />
+        {props.noRowsOverlayText ?? 'There are currently no rows'}
+      </div>
+    );
   }
   if (props.filteredRowCount === 0) {
-    return <div ref={externalRef}>{props.noRowsMatchingOverlayText ?? 'All rows have been filtered'}</div>;
+    return (
+      <div ref={externalRef} className={'GridNoRowsOverlay'}>
+        <LuiIcon name="ic_info_outline" alt="" size="md" />
+        {props.noRowsMatchingOverlayText ?? 'All rows have been filtered'}
+      </div>
+    );
   }
   return <div ref={externalRef} />;
 };
