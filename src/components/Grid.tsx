@@ -370,10 +370,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     if (previousRowDataLength.current !== length) {
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
         if (length === 0) {
-          autoSizeColumns({ skipHeader: false });
+          defer(() => autoSizeColumns({ skipHeader: false }));
         } else if (previousRowDataLength.current === 0) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          autoSizeColumns({ skipHeader });
+          defer(() => autoSizeColumns({ skipHeader }));
         }
       }
       previousRowDataLength.current = length;
@@ -471,7 +471,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
-      suppressAutoSize: !!colDef.flex,
+      // suppressAutoSize: !!colDef.flex,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
     });
 
