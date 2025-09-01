@@ -8,7 +8,7 @@ import { ColDefT, GridBaseRow } from '../components';
 import { GridCellFillerColId, isGridCellFiller } from '../components/GridCellFiller';
 import { getColId, isFlexColumn } from '../components/gridUtil';
 import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from '../utils/util';
-import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from './GridContext';
+import { AutoSizeColumnsProps, GridContext, GridFilterExternal } from './GridContext';
 import { GridUpdatingContext } from './GridUpdatingContext';
 
 /**
@@ -425,8 +425,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Resize columns to fit container
    */
   const autoSizeColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
-      if (!gridApi || !gridApi.getColumnState()) return null;
+    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): void => {
+      if (!gridApi || !gridApi.getColumnState()) {
+        return;
+      }
+
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
       const colsToResize = gridApi.getColumnState()?.filter?.((colState) => {
         const colId = colState.colId;
@@ -442,15 +445,20 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           skipHeader,
         );
       }
-      return {
-        width: sumBy(
-          gridApi.getColumnState().filter((col) => !col.hide),
-          'width',
-        ),
-      };
     },
     [gridApi],
   );
+
+  const gridWidth = useCallback(() => {
+    const columnState = gridApi?.getColumnState();
+    if (!columnState) {
+      return 1000;
+    }
+    return sumBy(
+      columnState.filter((col) => !col.hide),
+      'width',
+    );
+  }, [gridApi]);
 
   /**
    * Resize columns to fit container
@@ -824,6 +832,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         ensureSelectedRowIsVisible,
         sizeColumnsToFit,
         autoSizeColumns,
+        gridWidth,
         startCellEditing,
         stopEditing,
         cancelEdit,
