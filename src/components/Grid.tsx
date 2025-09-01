@@ -368,7 +368,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onRowDataChanged = useCallback(() => {
     const length = rowData?.length;
     if (previousRowDataLength.current !== length) {
-      if (length === 0 && ['auto', 'auto-skip-headers'].includes(sizeColumns) && !sentContentSizeCallbackRef.current) {
+      if (
+        (previousRowDataLength.current === 0 || length === 0) &&
+        ['auto', 'auto-skip-headers'].includes(sizeColumns)
+      ) {
         autoSizeColumns();
       }
       previousRowDataLength.current = length;
