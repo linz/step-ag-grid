@@ -471,6 +471,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
+      suppressAutoSize: !!colDef.flex,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
     });
 
