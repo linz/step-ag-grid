@@ -365,7 +365,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     const length = rowData?.length;
     if (previousRowDataLength.current !== length) {
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-        /*if (length === 0) {
+        if (length === 0) {
           delay(() => autoSizeColumns({ skipHeader: false }), 100);
         } else if (
           previousRowDataLength.current === 0 ||
@@ -373,7 +373,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         ) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
           delay(() => autoSizeColumns({ skipHeader }), 100);
-        }*/
+        }
       }
       previousRowDataLength.current = length;
     }
@@ -475,7 +475,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     });
 
     return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
-  }, [columnDefs, params.defaultColDef?.sortable]);
+  }, [columnDefs, params.defaultColDef?.sortable, sizeColumns]);
 
   /**
    * Set of colIds that need auto-sizing.
@@ -497,7 +497,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!isEmpty(colIdsEdited.current)) {
         if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          /*delay(() => {
+          delay(() => {
             autoSizeColumns({
               skipHeader,
               userSizedColIds: userSizedColIds.current,
@@ -505,7 +505,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               // If you autosize a flex column it will collapse
               includeFlex: false,
             });
-          }, 100);*/
+          }, 100);
         }
         colIdsEdited.current.clear();
       }
