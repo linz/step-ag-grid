@@ -211,7 +211,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     const currentDocument = gridDivRef.current?.ownerDocument;
     if (currentDocument !== lastOwnerDocumentRef.current) {
       if (lastOwnerDocumentRef.current != null && ['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-        autoSizeColumns();
+        //autoSizeColumns();
       }
       lastOwnerDocumentRef.current = currentDocument;
       return;
@@ -365,7 +365,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     const length = rowData?.length;
     if (previousRowDataLength.current !== length) {
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-        if (length === 0) {
+        /*if (length === 0) {
           delay(() => autoSizeColumns({ skipHeader: false }), 100);
         } else if (
           previousRowDataLength.current === 0 ||
@@ -373,7 +373,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         ) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
           delay(() => autoSizeColumns({ skipHeader }), 100);
-        }
+        }*/
       }
       previousRowDataLength.current = length;
     }
@@ -470,7 +470,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
-      suppressAutoSize: !!colDef.flex,
+      suppressSizeToFit: (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') && !colDef.flex,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
     });
 
@@ -497,7 +497,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!isEmpty(colIdsEdited.current)) {
         if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          delay(() => {
+          /*delay(() => {
             autoSizeColumns({
               skipHeader,
               userSizedColIds: userSizedColIds.current,
@@ -505,7 +505,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               // If you autosize a flex column it will collapse
               includeFlex: false,
             });
-          }, 100);
+          }, 100);*/
         }
         colIdsEdited.current.clear();
       }
