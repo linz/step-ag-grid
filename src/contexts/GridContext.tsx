@@ -13,6 +13,8 @@ export interface AutoSizeColumnsProps {
   includeFlex?: boolean;
 }
 
+export type AutoSizeColumnsResult = { width: number } | null;
+
 export interface GridContextType<TData extends GridBaseRow> {
   gridReady: boolean;
   gridRenderState: () => null | 'empty' | 'rows-visible';
@@ -40,8 +42,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
-  autoSizeColumns: (props?: AutoSizeColumnsProps) => void;
-  gridWidth: () => number;
+  autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
   cancelEdit: () => void;
   startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => Promise<void>;
@@ -154,9 +155,6 @@ export const GridContext = createContext<GridContextType<any>>({
   autoSizeColumns: () => {
     console.error('no context provider for autoSizeColumns');
     return null;
-  },
-  gridWidth: () => {
-    return 1000;
   },
   sizeColumnsToFit: () => {
     console.error('no context provider for autoSizeAllColumns');

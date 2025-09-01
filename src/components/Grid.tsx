@@ -4,6 +4,7 @@ import {
   CellClassParams,
   CellClickedEvent,
   CellDoubleClickedEvent,
+  CellEditingStartedEvent,
   CellKeyDownEvent,
   ColDef,
   ColGroupDef,
@@ -20,7 +21,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -148,8 +149,6 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
 }
 
-const resizeContentCallbackDebounceMs = 250;
-
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
@@ -170,12 +169,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 }: GridProps<TData>): ReactElement => {
   const {
     gridReady,
+    gridRenderState,
     setApis,
     ensureRowVisible,
     getFirstRowId,
     selectRowsById,
     focusByRowById,
     ensureSelectedRowIsVisible,
+    autoSizeColumns,
     sizeColumnsToFit,
     externallySelectedItemsAreInSync,
     setExternallySelectedItemsAreInSync,
@@ -187,10 +188,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     stopEditing,
   } = useContext(GridContext);
-  const { startCellEditing, autoSizeColumns, gridWidth } = useGridContext();
+  const { startCellEditing } = useGridContext();
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
-  // We wait for resizeContentCallbackDebounceMs after last autosize event before sending out an content size callback
-  const lastAutosizeTimestampRef = useRef(0);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
@@ -200,33 +199,83 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const postSortRows = usePostSortRowsHook({ setStaleGrid });
 
+  /**
+   * onContentSize should only be called at maximum twice.
+   * Once when an empty grid is loaded.
+   * And again when the grid has content.
+   */
+  const hasSetContentSize = useRef(false);
+  const hasSetContentSizeEmpty = useRef(false);
+  const needsAutoSize = useRef(true);
+
+  const lastFullResize = useRef<number>();
+
+  const setInitialContentSize = useCallback(() => {
+    if (!gridDivRef.current?.clientWidth || rowData == null) {
+      // Don't resize grids if they are offscreen as it doesn't work.
+      needsAutoSize.current = true;
+      return;
+    }
+
+    const gridRendered = gridRenderState();
+    if (gridRendered === null) {
+      // Don't resize until grid has rendered, or it has 0 rows.
+      needsAutoSize.current = true;
+      return;
+    }
+
+    const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
+    if (sizeColumns === 'auto' || skipHeader) {
+      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
+      if (!result) {
+        needsAutoSize.current = true;
+        return;
+      }
+      if (gridRendered === 'empty') {
+        if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
+          hasSetContentSizeEmpty.current = true;
+          params.onContentSize?.(result);
+        }
+      } else if (gridRendered === 'rows-visible') {
+        if (!hasSetContentSize.current) {
+          if (lastFullResize.current === result.width) {
+            hasSetContentSize.current = true;
+            params.onContentSize?.(result);
+          } else {
+            needsAutoSize.current = true;
+          }
+          lastFullResize.current = result.width;
+        }
+      } else {
+        // It should be impossible to get here
+        console.error('Unknown value returned from hasGridRendered');
+      }
+    }
+
+    if (sizeColumns !== 'none') {
+      sizeColumnsToFit();
+    }
+    setAutoSized(true);
+    needsAutoSize.current = false;
+  }, [autoSizeColumns, gridRenderState, params, rowData, sizeColumns, sizeColumnsToFit]);
+
   const lastOwnerDocumentRef = useRef<Document>();
-  const sentContentSizeCallbackRef = useRef(false);
 
   /**
-   * Auto-size windows that have popped out.  Call the callback for sizing panel if needed.
+   * Auto-size windows that had deferred auto-size
    */
   useInterval(() => {
     // Check if window has been popped out and needs resize
     const currentDocument = gridDivRef.current?.ownerDocument;
     if (currentDocument !== lastOwnerDocumentRef.current) {
-      if (lastOwnerDocumentRef.current != null && ['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-        const skipHeader = sizeColumns === 'auto-skip-headers';
-        autoSizeColumns({ skipHeader });
-      }
       lastOwnerDocumentRef.current = currentDocument;
-      return;
+      if (currentDocument) {
+        needsAutoSize.current = true;
+      }
     }
-
-    const lastAutosizeTimestamp = lastAutosizeTimestampRef.current;
-    if (
-      !sentContentSizeCallbackRef.current &&
-      lastAutosizeTimestamp !== 0 &&
-      Date.now() - lastAutosizeTimestamp > resizeContentCallbackDebounceMs
-    ) {
-      sentContentSizeCallbackRef.current = true;
-      setAutoSized(() => true);
-      params.onContentSize?.({ width: gridWidth() });
+    if (needsAutoSize.current || (!hasSetContentSize.current && sizeColumns === 'auto')) {
+      needsAutoSize.current = false;
+      setInitialContentSize();
     }
   }, 200);
 
@@ -367,13 +416,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     if (previousRowDataLength.current !== length) {
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
         if (length === 0) {
-          delay(() => autoSizeColumns({ skipHeader: false }), 100);
+          defer(() => autoSizeColumns({ skipHeader: false }));
         } else if (
           previousRowDataLength.current === 0 ||
           (length !== undefined && previousRowDataLength.current === undefined)
         ) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          delay(() => autoSizeColumns({ skipHeader }), 100);
+          defer(() => autoSizeColumns({ skipHeader }));
         }
       }
       previousRowDataLength.current = length;
@@ -385,6 +434,18 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onModelUpdated = useCallback((event: ModelUpdatedEvent) => {
     event.api.showNoRowsOverlay();
+  }, []);
+
+  /**
+   * Force-refresh all selected rows to re-run class function, to update selection highlighting
+   */
+  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
+    // MATT Disabled I don't believe these are needed anymore
+    // I've left them here just in case they are
+    /*event.api.refreshCells({
+      force: true,
+      rowNodes: event.api.getSelectedNodes(),
+    });*/
   }, []);
 
   /**
@@ -496,17 +557,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     if (isEmpty(colIds)) {
       // Columns to resize?
       if (!isEmpty(colIdsEdited.current)) {
-        if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-          const skipHeader = sizeColumns === 'auto-skip-headers';
-          delay(() => {
-            autoSizeColumns({
-              skipHeader,
-              userSizedColIds: userSizedColIds.current,
-              colIds: colIdsEdited.current,
-              // If you autosize a flex column it will collapse
-              includeFlex: false,
-            });
-          }, 100);
+        const skipHeader = sizeColumns === 'auto-skip-headers';
+        if (sizeColumns === 'auto' || skipHeader) {
+          defer(() => {
+            if (hasSetContentSize.current) {
+              autoSizeColumns({
+                skipHeader,
+                userSizedColIds: userSizedColIds.current,
+                colIds: colIdsEdited.current,
+              });
+            }
+          });
         }
         colIdsEdited.current.clear();
       }
@@ -549,17 +610,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onColumnResized = useCallback((e: ColumnResizedEvent) => {
     const colId = e.column?.getColId();
+    if (colId == null) return;
     switch (e.source) {
       case 'uiColumnDragged':
-        if (colId) {
-          userSizedColIds.current.add(colId);
-        }
+        userSizedColIds.current.add(colId);
         break;
       case 'autosizeColumns':
-        if (colId) {
-          userSizedColIds.current.delete(colId);
-        }
-        lastAutosizeTimestampRef.current = Date.now();
+        userSizedColIds.current.delete(colId);
         break;
     }
   }, []);
@@ -671,22 +728,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
+          onColumnVisible={setInitialContentSize}
           onRowDataUpdated={onRowDataChanged}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ['editable']) }}
           columnDefs={columnDefsAdjusted}
           rowData={rowData}
-          autoSizeStrategy={
-            sizeColumns === 'none'
-              ? undefined
-              : sizeColumns === 'fit'
-                ? { type: 'fitGridWidth' }
-                : { type: 'fitCellContents', skipHeader: sizeColumns === 'auto-skip-headers' }
-          }
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;
             event.api.forEachNode(() => rowCount++);
