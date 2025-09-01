@@ -105,6 +105,11 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
   /**
+   * Controls how columns are auto-sized to prevent text truncation.
+   * Using 'fitCellContents' is recommended to prevent truncation issues.
+   */
+  autoSizeStrategy?: GridOptions['autoSizeStrategy'];
+  /**
    * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
    * This allows you set the size of the panel to fit perfectly.
    */
@@ -226,7 +231,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
     if (sizeColumns === 'auto' || skipHeader) {
-      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
+      const result = autoSizeColumns({
+        skipHeader,
+        userSizedColIds: userSizedColIds.current,
+        includeFlex: true,
+      });
+
       if (!result) {
         needsAutoSize.current = true;
         return;
@@ -414,8 +424,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onRowDataChanged = useCallback(() => {
     const length = rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
+      // Data length changed - trigger full resize
       setInitialContentSize();
       previousRowDataLength.current = length;
+
+      // When data changes from empty to populated or vice versa, force a resize
+      // with a slight delay to ensure the DOM has updated
+      if ((previousRowDataLength.current === 0 && length > 0) || (previousRowDataLength.current > 0 && length === 0)) {
+        defer(() => {
+          setInitialContentSize();
+        });
+      }
     }
 
     if (lastUpdatedDep.current === updatedDep || isEmpty(colIdsEdited.current)) return;
@@ -539,7 +558,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
+      // Don't suppress size to fit for flex columns, allow them to be sized correctly
       suppressSizeToFit: (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') && !colDef.flex,
+      // If it's a flex column, ensure it has a reasonable minWidth to prevent truncation
+      minWidth: colDef.flex ? Math.max(colDef.minWidth || 0, 200) : colDef.minWidth,
+      // Set width for flex columns to be large enough to prevent truncation
+      width: colDef.flex && !colDef.width ? 250 : colDef.width,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
     });
 
@@ -566,23 +590,34 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!isEmpty(colIdsEdited.current)) {
         const skipHeader = sizeColumns === 'auto-skip-headers';
         if (sizeColumns === 'auto' || skipHeader) {
+          // Create a stable copy of the column IDs to resize
+          const colIdsToResize = new Set(colIdsEdited.current);
+          const currentUserSizedColIds = new Set(userSizedColIds.current);
+          const currentHasSetContentSize = hasSetContentSize.current;
+
+          // Clear column IDs BEFORE deferring to prevent race conditions
+          colIdsEdited.current.clear();
+
           defer(() => {
-            if (hasSetContentSize.current) {
+            if (currentHasSetContentSize) {
+              // Use captured variables to prevent race conditions
               autoSizeColumns({
                 skipHeader,
-                userSizedColIds: userSizedColIds.current,
-                colIds: colIdsEdited.current,
-                includeFlex: true,
+                userSizedColIds: currentUserSizedColIds,
+                colIds: colIdsToResize,
+                includeFlex: true, // Include flex columns to ensure proper sizing
               });
             }
           });
+        } else {
+          colIdsEdited.current.clear();
         }
-        colIdsEdited.current.clear();
       }
     } else {
       // Updates not complete, add them to a list of columns needing resize
       colIds.forEach((colId) => {
-        if (colId && !getColDef(colId)?.flex) {
+        // Include all columns (including those with flex) to ensure proper sizing
+        if (colId) {
           colIdsEdited.current.add(colId);
         }
       });
@@ -784,6 +819,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
+          autoSizeStrategy={
+            params.autoSizeStrategy || {
+              type: 'fitCellContents',
+              skipHeader: false,
+              defaultMinWidth: 120,
+            }
+          }
           selectionColumnDef={{
             suppressNavigable: params.hideSelectColumn,
             rowDrag: !!params.onRowDragEnd,

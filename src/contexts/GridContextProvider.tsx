@@ -428,20 +428,53 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!gridApi || !gridApi.getColumnState()) return null;
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
-      const colsToResize = gridApi.getColumnState()?.filter?.((colState) => {
+
+      // For flex columns, we need a more aggressive approach to prevent truncation
+      if (includeFlex) {
+        // Get all flex column IDs
+        const flexColsToResize = gridApi.getColumnState()?.filter?.((colState) => {
+          const colId = colState.colId;
+          return colState.flex && (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId);
+        });
+
+        if (!isEmpty(flexColsToResize)) {
+          // 1. First, auto-size flex columns
+          gridApi.autoSizeColumns(
+            flexColsToResize.map((colState) => colState.colId),
+            true,
+          );
+
+          // 2. Then ensure minimum widths for flex columns to prevent truncation
+          const columnWidths: Record<string, number> = {};
+
+          flexColsToResize.forEach((colState) => {
+            // Get current width and add extra space to prevent truncation
+            const currentWidth = colState.width || 0;
+            columnWidths[colState.colId] = Math.max(currentWidth, 220);
+          });
+
+          // Set all column widths at once
+          if (Object.keys(columnWidths).length > 0) {
+            gridApi.setColumnWidths([
+              ...Object.entries(columnWidths).map(([key, width]) => ({ key, newWidth: width })),
+            ]);
+          }
+        }
+      }
+
+      // Handle regular columns
+      const regularColsToResize = gridApi.getColumnState()?.filter?.((colState) => {
         const colId = colState.colId;
-        return (
-          (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
-          !userSizedColIds?.has(colId) &&
-          (includeFlex || !colState.flex)
-        );
+        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId) && !colState.flex;
       });
-      if (!isEmpty(colsToResize)) {
+
+      if (!isEmpty(regularColsToResize)) {
         gridApi.autoSizeColumns(
-          colsToResize.map((colState) => colState.colId),
+          regularColsToResize.map((colState) => colState.colId),
           skipHeader,
         );
       }
+
       return {
         width: sumBy(
           gridApi.getColumnState().filter((col) => !col.hide),
