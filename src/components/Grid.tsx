@@ -187,10 +187,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     stopEditing,
   } = useContext(GridContext);
-  // This is used as a hack to make auto resize redraw properly
-  // If you autoresize on empty rowData, then autoresize on having data, the flex column doesn't redraw
-  // until the component redraws
-  const [cnt, setCnt] = useState(0);
   const { startCellEditing, autoSizeColumns, gridWidth } = useGridContext();
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
   // We wait for resizeContentCallbackDebounceMs after last autosize event before sending out an content size callback
@@ -371,7 +367,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
         if (length === 0) {
           delay(() => autoSizeColumns({ skipHeader: false }), 100);
-        } else if (previousRowDataLength.current === 0 || previousRowDataLength.current === undefined) {
+        } else if (
+          previousRowDataLength.current === 0 ||
+          (length !== undefined && previousRowDataLength.current === undefined)
+        ) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
           delay(() => autoSizeColumns({ skipHeader }), 100);
         }
@@ -471,7 +470,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => ({
       ...colDef,
-      // suppressAutoSize: !!colDef.flex,
+      suppressAutoSize: !!colDef.flex,
       sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
     });
 
@@ -547,26 +546,22 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Lock/unlock column width on user edit/reset.
    */
-  const onColumnResized = useCallback(
-    (e: ColumnResizedEvent) => {
-      const colId = e.column?.getColId();
-      switch (e.source) {
-        case 'uiColumnDragged':
-          if (colId) {
-            userSizedColIds.current.add(colId);
-          }
-          break;
-        case 'autosizeColumns':
-          setCnt(() => cnt + 1);
-          if (colId) {
-            userSizedColIds.current.delete(colId);
-          }
-          lastAutosizeTimestampRef.current = Date.now();
-          break;
-      }
-    },
-    [cnt],
-  );
+  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
+    const colId = e.column?.getColId();
+    switch (e.source) {
+      case 'uiColumnDragged':
+        if (colId) {
+          userSizedColIds.current.add(colId);
+        }
+        break;
+      case 'autosizeColumns':
+        if (colId) {
+          userSizedColIds.current.delete(colId);
+        }
+        lastAutosizeTimestampRef.current = Date.now();
+        break;
+    }
+  }, []);
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
@@ -685,7 +680,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           columnDefs={columnDefsAdjusted}
           rowData={rowData}
           autoSizeStrategy={
-            sizeColumns === 'none' ? undefined : sizeColumns === 'fit' ? { type: 'fitGridWidth' } : undefined
+            sizeColumns === 'none'
+              ? undefined
+              : sizeColumns === 'fit'
+                ? { type: 'fitGridWidth' }
+                : { type: 'fitCellContents', skipHeader: sizeColumns === 'auto-skip-headers' }
           }
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;

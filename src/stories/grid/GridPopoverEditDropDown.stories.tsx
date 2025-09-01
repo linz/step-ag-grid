@@ -220,6 +220,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
           field: 'sub',
           headerName: 'Subcomponent',
           valueGetter: ({ data }) => data?.sub,
+          flex: 1,
         },
         {
           multiEdit: true,
