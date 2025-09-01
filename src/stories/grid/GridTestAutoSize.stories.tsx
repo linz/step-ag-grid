@@ -5,6 +5,7 @@ import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useCallback, useMemo, useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 
 import {
   ColDefT,
@@ -310,6 +311,7 @@ const GridTestAutoResizeTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   return (
     <>
       <button onClick={() => setRowData(testEmptyData)}>Set empty data</button>
+      &nbsp;
       <button onClick={() => setRowData(testRowData)}>Set populated data</button>
       <GridWrapper maxHeight={300}>
         <GridFilters>
@@ -335,4 +337,38 @@ const GridTestAutoResizeTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
 };
 
 export const GridTestAutoResize = GridTestAutoResizeTemplate.bind({});
-GridTestAutoResize.play = waitForGridReady;
+GridTestAutoResize.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await canvas.findByTestId('loading-spinner');
+
+  const setEmptyData = await canvas.findByText('Set empty data');
+  const setPopulatedData = await canvas.findByText('Set populated data');
+
+  const colHeaders = await canvas.findAllByRole('columnheader');
+  expect(colHeaders).toHaveLength(10);
+  let w = colHeaders[1].clientWidth;
+  expect(w > 180).toBeTruthy();
+  expect(w < 220).toBeTruthy();
+
+  await userEvent.click(setEmptyData);
+  await waitForGridReady({ canvasElement });
+
+  await wait(250);
+  w = colHeaders[1].clientWidth;
+  expect(w > 50).toBeTruthy();
+  expect(w < 64).toBeTruthy();
+
+  await userEvent.click(setPopulatedData);
+  await wait(250);
+
+  w = colHeaders[1].clientWidth;
+  expect(w > 70).toBeTruthy();
+  expect(w < 90).toBeTruthy();
+
+  await userEvent.click(setEmptyData);
+  await wait(250);
+  w = colHeaders[1].clientWidth;
+  expect(w > 50).toBeTruthy();
+  expect(w < 64).toBeTruthy();
+};
