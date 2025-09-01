@@ -368,11 +368,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onRowDataChanged = useCallback(() => {
     const length = rowData?.length;
     if (previousRowDataLength.current !== length) {
-      if (
-        (previousRowDataLength.current === 0 || length === 0) &&
-        ['auto', 'auto-skip-headers'].includes(sizeColumns)
-      ) {
-        autoSizeColumns();
+      if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
+        if (length === 0) {
+          autoSizeColumns({ skipHeader: false });
+        } else if (previousRowDataLength.current === 0) {
+          const skipHeader = sizeColumns === 'auto-skip-headers';
+          autoSizeColumns({ skipHeader });
+        }
       }
       previousRowDataLength.current = length;
     }

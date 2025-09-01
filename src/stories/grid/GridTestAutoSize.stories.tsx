@@ -65,6 +65,37 @@ interface ICode {
   desc: string;
 }
 
+const testEmptyData: ITestRow[] = [];
+const testRowData: ITestRow[] = [
+  {
+    id: 1000,
+    position: 'Tester',
+    position2: '1',
+    position3: 'Tester',
+    position4: { code: 'O1', desc: 'Object One' },
+    code: 'O1',
+    sub: 'two',
+  },
+  {
+    id: 1001,
+    position: 'Developer',
+    position2: '2',
+    position3: 'Developer',
+    position4: { code: 'O2', desc: 'Object Two' },
+    code: 'O2',
+    sub: 'one',
+  },
+  {
+    id: 1002,
+    position: 'Scrum Master',
+    position2: '2',
+    position3: 'Architect',
+    position4: { code: 'O2', desc: 'Object Two' },
+    code: 'O2',
+    sub: 'one',
+  },
+];
+
 const GridTestAutoResizeTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
@@ -276,63 +307,30 @@ const GridTestAutoResizeTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
 
   const [rowData, setRowData] = useState<ITestRow[]>();
 
-  useMemo(() => {
-    setTimeout(() => setRowData([] as ITestRow[]), 2000);
-    setTimeout(
-      () =>
-        setRowData([
-          {
-            id: 1000,
-            position: 'Tester',
-            position2: '1',
-            position3: 'Tester',
-            position4: { code: 'O1', desc: 'Object One' },
-            code: 'O1',
-            sub: 'two',
-          },
-          {
-            id: 1001,
-            position: 'Developer',
-            position2: '2',
-            position3: 'Developer',
-            position4: { code: 'O2', desc: 'Object Two' },
-            code: 'O2',
-            sub: 'one',
-          },
-          {
-            id: 1002,
-            position: 'Scrum Master',
-            position2: '2',
-            position3: 'Architect',
-            position4: { code: 'O2', desc: 'Object Two' },
-            code: 'O2',
-            sub: 'one',
-          },
-        ] as ITestRow[]),
-      5000,
-    );
-  }, []);
-
   return (
-    <GridWrapper maxHeight={300}>
-      <GridFilters>
-        <GridFilterQuick />
-        <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton fileName={'customFilename'} />
-      </GridFilters>
-      <Grid
-        {...props}
-        externalSelectedItems={externalSelectedItems}
-        setExternalSelectedItems={setExternalSelectedItems}
-        columnDefs={columnDefs}
-        rowData={rowData}
-        domLayout={'autoHeight'}
-        onCellEditingComplete={() => {
-          /* eslint-disable-next-line no-console */
-          console.log('Cell editing complete');
-        }}
-      />
-    </GridWrapper>
+    <>
+      <button onClick={() => setRowData(testEmptyData)}>Set empty data</button>
+      <button onClick={() => setRowData(testRowData)}>Set populated data</button>
+      <GridWrapper maxHeight={300}>
+        <GridFilters>
+          <GridFilterQuick />
+          <GridFilterColumnsToggle />
+          <GridFilterDownloadCsvButton fileName={'customFilename'} />
+        </GridFilters>
+        <Grid
+          {...props}
+          externalSelectedItems={externalSelectedItems}
+          setExternalSelectedItems={setExternalSelectedItems}
+          columnDefs={columnDefs}
+          rowData={rowData}
+          domLayout={'autoHeight'}
+          onCellEditingComplete={() => {
+            /* eslint-disable-next-line no-console */
+            console.log('Cell editing complete');
+          }}
+        />
+      </GridWrapper>
+    </>
   );
 };
 
