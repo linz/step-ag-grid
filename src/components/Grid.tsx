@@ -373,7 +373,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           defer(() => autoSizeColumns({ skipHeader: false }));
         } else if (previousRowDataLength.current === 0) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          defer(() => autoSizeColumns({ skipHeader }));
+          // defer(() => autoSizeColumns({ skipHeader }));
         }
       }
       previousRowDataLength.current = length;
