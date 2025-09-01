@@ -20,7 +20,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -370,10 +370,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     if (previousRowDataLength.current !== length) {
       if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
         if (length === 0) {
-          defer(() => autoSizeColumns({ skipHeader: false }));
-        } else if (previousRowDataLength.current === 0) {
+          delay(() => autoSizeColumns({ skipHeader: false }), 100);
+        } else if (previousRowDataLength.current === 0 || previousRowDataLength.current === undefined) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          // defer(() => autoSizeColumns({ skipHeader }));
+          delay(() => autoSizeColumns({ skipHeader }), 100);
         }
       }
       previousRowDataLength.current = length;
@@ -498,7 +498,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!isEmpty(colIdsEdited.current)) {
         if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
           const skipHeader = sizeColumns === 'auto-skip-headers';
-          defer(() => {
+          delay(() => {
             autoSizeColumns({
               skipHeader,
               userSizedColIds: userSizedColIds.current,
@@ -506,7 +506,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               // If you autosize a flex column it will collapse
               includeFlex: false,
             });
-          });
+          }, 100);
         }
         colIdsEdited.current.clear();
       }
