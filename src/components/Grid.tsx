@@ -211,7 +211,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     const currentDocument = gridDivRef.current?.ownerDocument;
     if (currentDocument !== lastOwnerDocumentRef.current) {
       if (lastOwnerDocumentRef.current != null && ['auto', 'auto-skip-headers'].includes(sizeColumns)) {
-        //autoSizeColumns();
+        const skipHeader = sizeColumns === 'auto-skip-headers';
+        autoSizeColumns({ skipHeader });
       }
       lastOwnerDocumentRef.current = currentDocument;
       return;
@@ -533,7 +534,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    * Resize columns to fit if required on window/container resize
    */
   const onGridSizeChanged = useCallback(() => {
-    if (sizeColumns === 'fit') {
+    if (sizeColumns !== 'none') {
       sizeColumnsToFit();
     }
   }, [sizeColumns, sizeColumnsToFit]);
