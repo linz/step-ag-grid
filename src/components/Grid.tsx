@@ -685,11 +685,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           columnDefs={columnDefsAdjusted}
           rowData={rowData}
           autoSizeStrategy={
-            sizeColumns === 'none'
-              ? undefined
-              : sizeColumns === 'fit'
-                ? { type: 'fitGridWidth' }
-                : { type: 'fitCellContents', skipHeader: sizeColumns === 'auto-skip-headers' }
+            sizeColumns === 'none' ? undefined : sizeColumns === 'fit' ? { type: 'fitGridWidth' } : undefined
           }
           noRowsOverlayComponent={(event: AgGridEvent) => {
             let rowCount = 0;
