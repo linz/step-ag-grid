@@ -158,7 +158,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowSelection = 'multiple',
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
-  sizeColumns = 'auto',
+  sizeColumns = 'auto-skip-headers',
   selectColumnPinned = 'left',
   contextMenuSelectRow = false,
   singleClickEdit = false,
@@ -273,7 +273,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         needsAutoSize.current = true;
       }
     }
-    if (needsAutoSize.current || (!hasSetContentSize.current && sizeColumns === 'auto')) {
+    if (
+      needsAutoSize.current ||
+      (!hasSetContentSize.current && (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers'))
+    ) {
       needsAutoSize.current = false;
       setInitialContentSize();
     }
