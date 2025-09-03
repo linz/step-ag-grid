@@ -273,7 +273,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         needsAutoSize.current = true;
       }
     }
-    if (needsAutoSize.current || (!hasSetContentSize.current && sizeColumns === 'auto')) {
+    if (
+      needsAutoSize.current ||
+      (!hasSetContentSize.current && (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers'))
+    ) {
       needsAutoSize.current = false;
       setInitialContentSize();
     }
