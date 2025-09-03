@@ -5,6 +5,7 @@ import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useCallback, useMemo, useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 
 import {
   ColDefT,
@@ -65,7 +66,38 @@ interface ICode {
   desc: string;
 }
 
-const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const testEmptyData: ITestRow[] = [];
+const testRowData: ITestRow[] = [
+  {
+    id: 1000,
+    position: 'Tester',
+    position2: '1',
+    position3: 'Tester',
+    position4: { code: 'O1', desc: 'Object One' },
+    code: 'O1',
+    sub: 'two',
+  },
+  {
+    id: 1001,
+    position: 'Developer',
+    position2: '2',
+    position3: 'Developer',
+    position4: { code: 'O2', desc: 'Object Two' },
+    code: 'O2',
+    sub: 'one',
+  },
+  {
+    id: 1002,
+    position: 'Scrum Master',
+    position2: '2',
+    position3: 'Architect',
+    position4: { code: 'O2', desc: 'Object Two' },
+    code: 'O2',
+    sub: 'one',
+  },
+];
+
+const GridTestAutoResizeTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
@@ -274,58 +306,69 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
     [optionsFn, optionsObjects],
   );
 
-  const [rowData] = useState([
-    {
-      id: 1000,
-      position: 'Tester',
-      position2: '1',
-      position3: 'Tester',
-      position4: { code: 'O1', desc: 'Object One' },
-      code: 'O1',
-      sub: 'two',
-    },
-    {
-      id: 1001,
-      position: 'Developer',
-      position2: '2',
-      position3: 'Developer',
-      position4: { code: 'O2', desc: 'Object Two' },
-      code: 'O2',
-      sub: 'one',
-    },
-    {
-      id: 1002,
-      position: 'Scrum Master',
-      position2: '2',
-      position3: 'Architect',
-      position4: { code: 'O2', desc: 'Object Two' },
-      code: 'O2',
-      sub: 'one',
-    },
-  ] as ITestRow[]);
+  const [rowData, setRowData] = useState<ITestRow[]>();
 
   return (
-    <GridWrapper maxHeight={300}>
-      <GridFilters>
-        <GridFilterQuick />
-        <GridFilterColumnsToggle />
-        <GridFilterDownloadCsvButton fileName={'customFilename'} />
-      </GridFilters>
-      <Grid
-        {...props}
-        externalSelectedItems={externalSelectedItems}
-        setExternalSelectedItems={setExternalSelectedItems}
-        columnDefs={columnDefs}
-        rowData={rowData}
-        domLayout={'autoHeight'}
-        onCellEditingComplete={() => {
-          /* eslint-disable-next-line no-console */
-          console.log('Cell editing complete');
-        }}
-      />
-    </GridWrapper>
+    <>
+      <button onClick={() => setRowData(testEmptyData)}>Set empty data</button>
+      &nbsp;
+      <button onClick={() => setRowData(testRowData)}>Set populated data</button>
+      <GridWrapper maxHeight={300}>
+        <GridFilters>
+          <GridFilterQuick />
+          <GridFilterColumnsToggle />
+          <GridFilterDownloadCsvButton fileName={'customFilename'} />
+        </GridFilters>
+        <Grid
+          {...props}
+          externalSelectedItems={externalSelectedItems}
+          setExternalSelectedItems={setExternalSelectedItems}
+          columnDefs={columnDefs}
+          rowData={rowData}
+          domLayout={'autoHeight'}
+          onCellEditingComplete={() => {
+            /* eslint-disable-next-line no-console */
+            console.log('Cell editing complete');
+          }}
+        />
+      </GridWrapper>
+    </>
   );
 };
 
-export const EditDropdown = GridEditDropDownTemplate.bind({});
-EditDropdown.play = waitForGridReady;
+export const GridTestAutoResize = GridTestAutoResizeTemplate.bind({});
+GridTestAutoResize.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await canvas.findByTestId('loading-spinner');
+
+  const setEmptyData = await canvas.findByText('Set empty data');
+  const setPopulatedData = await canvas.findByText('Set populated data');
+
+  const colHeaders = await canvas.findAllByRole('columnheader');
+  expect(colHeaders).toHaveLength(10);
+  let w = colHeaders[1].clientWidth;
+  expect(w > 180).toBeTruthy();
+  expect(w < 220).toBeTruthy();
+
+  await userEvent.click(setEmptyData);
+  await waitForGridReady({ canvasElement });
+
+  await wait(250);
+  w = colHeaders[1].clientWidth;
+  expect(w > 50).toBeTruthy();
+  expect(w < 64).toBeTruthy();
+
+  await userEvent.click(setPopulatedData);
+  await wait(250);
+
+  w = colHeaders[1].clientWidth;
+  expect(w > 70).toBeTruthy();
+  expect(w < 90).toBeTruthy();
+
+  await userEvent.click(setEmptyData);
+  await wait(250);
+  w = colHeaders[1].clientWidth;
+  expect(w > 50).toBeTruthy();
+  expect(w < 64).toBeTruthy();
+};

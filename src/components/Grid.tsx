@@ -158,7 +158,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowSelection = 'multiple',
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
-  sizeColumns = 'auto',
+  sizeColumns = 'auto-skip-headers',
   selectColumnPinned = 'left',
   contextMenuSelectRow = false,
   singleClickEdit = false,
@@ -412,27 +412,25 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    * When the grid is being initialized the data may be empty.
    * This will resize columns when we have at least one row.
    */
-  const previousRowDataLength = useRef(0);
+  const previousRowDataLength = useRef<number>();
 
   const onRowDataChanged = useCallback(() => {
-    const length = rowData?.length ?? 0;
+    const length = rowData?.length;
     if (previousRowDataLength.current !== length) {
-      setInitialContentSize();
+      if (['auto', 'auto-skip-headers'].includes(sizeColumns)) {
+        if (length === 0) {
+          defer(() => autoSizeColumns({ skipHeader: false }));
+        } else if (
+          previousRowDataLength.current === 0 ||
+          (length !== undefined && previousRowDataLength.current === undefined)
+        ) {
+          const skipHeader = sizeColumns === 'auto-skip-headers';
+          defer(() => autoSizeColumns({ skipHeader }));
+        }
+      }
       previousRowDataLength.current = length;
     }
-
-    if (lastUpdatedDep.current === updatedDep || isEmpty(colIdsEdited.current)) return;
-    lastUpdatedDep.current = updatedDep;
-
-    // Don't update while there are spinners
-    if (!isEmpty(updatingCols())) return;
-
-    const skipHeader = sizeColumns === 'auto-skip-headers';
-    if (hasSetContentSize.current) {
-      autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
-    }
-    colIdsEdited.current.clear();
-  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
+  }, [autoSizeColumns, rowData?.length, sizeColumns]);
 
   /**
    * Show/hide no rows overlay when model changes.
