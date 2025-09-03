@@ -158,7 +158,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowSelection = 'multiple',
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
-  sizeColumns = 'auto-skip-headers',
+  sizeColumns = 'auto',
   selectColumnPinned = 'left',
   contextMenuSelectRow = false,
   singleClickEdit = false,
