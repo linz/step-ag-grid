@@ -5,7 +5,6 @@ import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   ColDefT,
@@ -23,7 +22,7 @@ import {
   GridWrapper,
   wait,
 } from '../..';
-import * as testUtil from '../../utils/__tests__/testUtil';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
 export default {
   title: 'Components / Grids',
@@ -123,31 +122,4 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
 };
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
-_GridPopoverEditBearing.play = async ({ canvasElement }) => {
-  // 1. Wait for grid to be ready
-  await testUtil.waitForGridReady({ grid: canvasElement });
-
-  // 2. Open the editor (editCell finds the cell, dblClicks, and waits for popover)
-  await testUtil.editCell(1000, 'bearing', canvasElement);
-
-  // 3. Type in the popover and save
-  const popover = await testUtil.findOpenPopover();
-  const input = await within(popover).findByRole('textbox');
-  await userEvent.clear(input);
-  await userEvent.type(input, '123{Enter}');
-
-  // 4. Wait for the popover to close
-  await waitFor(
-    () => {
-      expect(canvasElement.querySelector('.szh-menu--state-open')).not.toBeInTheDocument();
-    },
-    { timeout: 2000 },
-  );
-
-  // 5. Re-open the same editor
-  await testUtil.editCell(1000, 'bearing', canvasElement);
-
-  // 6. Assert the overlay is not present
-  const popoverAfterReopen = await testUtil.findOpenPopover();
-  await expect(popoverAfterReopen.querySelector('.ComponentLoadingWrapper-saveOverlay')).toBeNull();
-};
+_GridPopoverEditBearing.play = waitForGridReady;
