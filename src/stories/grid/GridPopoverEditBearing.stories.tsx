@@ -127,7 +127,7 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
   await waitForGridReady({ canvasElement });
   const canvas = within(canvasElement);
 
-  const cell = await canvas.findByRole('gridcell', { name: /1° 23' 40"/i });
+  const cell = await canvas.findByRole('gridcell', { name: /1°\s23'\s40"/i });
   await userEvent.dblClick(cell);
 
   const popover = await canvas.findByRole('presentation');
