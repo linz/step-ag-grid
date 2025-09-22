@@ -1,6 +1,6 @@
 import { ICellEditorParams } from 'ag-grid-community';
 import { sortBy } from 'lodash-es';
-import { PropsWithChildren, RefObject, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import {PropsWithChildren, RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import { GridBaseRow } from '../components/Grid';
 import { GridContext } from './GridContext';
@@ -21,6 +21,12 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
 
   const { colDef } = props;
   const { cellEditorParams } = colDef;
+
+  useEffect(() => {
+    setSaving(false);
+    hasSaved.current = false;
+  }, [props]);
+
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   // Then item that is clicked on will always be first in the list
   const selectedRows = useMemo(
