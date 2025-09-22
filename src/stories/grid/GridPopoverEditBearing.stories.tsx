@@ -23,7 +23,7 @@ import {
   GridWrapper,
   wait,
 } from '../..';
-import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
+import * as testUtil from '../../utils/__tests__/testUtil';
 
 export default {
   title: 'Components / Grids',
@@ -124,32 +124,30 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
 _GridPopoverEditBearing.play = async ({ canvasElement }) => {
-  await waitForGridReady({ canvasElement });
-  const canvas = within(canvasElement);
+  // 1. Wait for grid to be ready
+  await testUtil.waitForGridReady({ grid: canvasElement });
 
-  const cell = await canvas.findByRole('gridcell', { name: /1°\s23'\s40"/i });
-  await userEvent.dblClick(cell);
+  // 2. Open the editor (editCell finds the cell, dblClicks, and waits for popover)
+  await testUtil.editCell(1000, 'bearing', canvasElement);
 
-  // Find the input, edit, and save
-  const popover = await canvas.findByRole('menu');
+  // 3. Type in the popover and save
+  const popover = await testUtil.findOpenPopover();
   const input = await within(popover).findByRole('textbox');
   await userEvent.clear(input);
   await userEvent.type(input, '123{Enter}');
 
-  // Wait for the popover to close after saving
+  // 4. Wait for the popover to close
   await waitFor(
     () => {
-      expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
+      expect(canvasElement.querySelector('.szh-menu--state-open')).not.toBeInTheDocument();
     },
     { timeout: 2000 },
   );
 
-  // Re-open the same cell
-  const cellAfterSave = await canvas.findByRole('gridcell', { name: /123/i });
-  await userEvent.dblClick(cellAfterSave);
+  // 5. Re-open the same editor
+  await testUtil.editCell(1000, 'bearing', canvasElement);
 
-  // Assert that the saving overlay is not present
-  const popoverAfterReopen = await canvas.findByRole('menu');
-  const overlay = popoverAfterReopen.querySelector('.ComponentLoadingWrapper-saveOverlay');
-  await expect(overlay).toBeNull();
+  // 6. Assert the overlay is not present
+  const popoverAfterReopen = await testUtil.findOpenPopover();
+  await expect(popoverAfterReopen.querySelector('.ComponentLoadingWrapper-saveOverlay')).toBeNull();
 };
