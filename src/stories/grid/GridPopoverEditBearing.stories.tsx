@@ -130,7 +130,8 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
   const cell = await canvas.findByRole('gridcell', { name: /1°\s23'\s40"/i });
   await userEvent.dblClick(cell);
 
-  const popover = await canvas.findByRole('presentation');
+  // Find the input, edit, and save
+  const popover = await canvas.findByRole('menu');
   const input = await within(popover).findByRole('textbox');
   await userEvent.clear(input);
   await userEvent.type(input, '123{Enter}');
@@ -138,7 +139,7 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
   // Wait for the popover to close after saving
   await waitFor(
     () => {
-      expect(canvas.queryByRole('presentation')).not.toBeInTheDocument();
+      expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
     },
     { timeout: 2000 },
   );
@@ -148,7 +149,7 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
   await userEvent.dblClick(cellAfterSave);
 
   // Assert that the saving overlay is not present
-  const popoverAfterReopen = await canvas.findByRole('presentation');
+  const popoverAfterReopen = await canvas.findByRole('menu');
   const overlay = popoverAfterReopen.querySelector('.ComponentLoadingWrapper-saveOverlay');
   await expect(overlay).toBeNull();
 };
