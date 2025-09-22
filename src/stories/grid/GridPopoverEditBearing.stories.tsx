@@ -122,4 +122,34 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
 };
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
-_GridPopoverEditBearing.play = waitForGridReady;
+_GridPopoverEditBearing.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+  await waitForGridReady(canvas);
+
+  // Find and open the editor
+  const cell = await canvas.findByRole('gridcell', { name: /1.234/i });
+  await userEvent.dblClick(cell);
+
+  // Find the input, edit, and save
+  const popover = await canvas.findByRole('presentation');
+  const input = await within(popover).findByRole('textbox');
+  await userEvent.clear(input);
+  await userEvent.type(input, '123{Enter}');
+
+  // Wait for the popover to close after saving
+  await waitFor(
+    () => {
+      expect(canvas.queryByRole('presentation')).not.toBeInTheDocument();
+    },
+    { timeout: 2000 },
+  );
+
+  // Re-open the same cell
+  const cellAfterSave = await canvas.findByRole('gridcell', { name: /123/i });
+  await userEvent.dblClick(cellAfterSave);
+
+  // Assert that the saving overlay is not present
+  const popoverAfterReopen = await canvas.findByRole('presentation');
+  const overlay = within(popoverAfterReopen).queryByRole('dialog', { name: /saveOverlay/i });
+  expect(overlay).not.toBeInTheDocument();
+};
