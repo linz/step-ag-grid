@@ -5,6 +5,7 @@ import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import {
   ColDefT,
@@ -123,8 +124,8 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
 
 export const _GridPopoverEditBearing = GridPopoverEditBearingTemplate.bind({});
 _GridPopoverEditBearing.play = async ({ canvasElement }) => {
+  await waitForGridReady({ canvasElement });
   const canvas = within(canvasElement);
-  await waitForGridReady(canvas);
 
   // Find and open the editor
   const cell = await canvas.findByRole('gridcell', { name: /1.234/i });
@@ -150,6 +151,6 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
 
   // Assert that the saving overlay is not present
   const popoverAfterReopen = await canvas.findByRole('presentation');
-  const overlay = within(popoverAfterReopen).queryByRole('dialog', { name: /saveOverlay/i });
-  expect(overlay).not.toBeInTheDocument();
+  const overlay = popoverAfterReopen.querySelector('.ComponentLoadingWrapper-saveOverlay');
+  await expect(overlay).toBeNull();
 };
