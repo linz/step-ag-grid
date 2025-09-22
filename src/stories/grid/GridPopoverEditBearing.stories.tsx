@@ -127,11 +127,9 @@ _GridPopoverEditBearing.play = async ({ canvasElement }) => {
   await waitForGridReady({ canvasElement });
   const canvas = within(canvasElement);
 
-  // Find and open the editor
-  const cell = await canvas.findByRole('gridcell', { name: /1.234/i });
+  const cell = await canvas.findByRole('gridcell', { name: /1° 23' 40"/i });
   await userEvent.dblClick(cell);
 
-  // Find the input, edit, and save
   const popover = await canvas.findByRole('presentation');
   const input = await within(popover).findByRole('textbox');
   await userEvent.clear(input);
