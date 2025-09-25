@@ -25,7 +25,6 @@ export interface GridContextType<TData extends GridBaseRow> {
   getColumnIds: (filter?: keyof ColDef | ((r: ColDef) => boolean | undefined | null | number | string)) => string[];
   setApis: (gridApi: GridApi | undefined, hasExternallySelectedItems: boolean, dataTestId?: string) => void;
   prePopupOps: () => void;
-  postPopupOps: () => void;
   setQuickFilter: (quickFilter: string) => void;
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
@@ -44,9 +43,9 @@ export interface GridContextType<TData extends GridBaseRow> {
   getFirstRowId: () => number;
   autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
-  cancelEdit: () => void;
   startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => Promise<void>;
-  stopEditing: () => void;
+  // Restores the previous focus after cell editing
+  afterCellEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
@@ -64,6 +63,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
+  onCellEditingComplete: () => void;
   setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
   showNoRowsOverlay: () => void;
 }
@@ -88,9 +88,6 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error('no context provider for setInvisibleColumnIds');
   },
   prePopupOps: () => {
-    console.error('no context provider for prePopupOps');
-  },
-  postPopupOps: () => {
     console.error('no context provider for prePopupOps');
   },
   externallySelectedItemsAreInSync: false,
@@ -164,14 +161,11 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error('no context provider for editingCells');
     return false;
   },
-  cancelEdit: () => {
-    console.error('no context provider for cancelEdit');
-  },
   // eslint-disable-next-line @typescript-eslint/require-await
   startCellEditing: async () => {
     console.error('no context provider for startCellEditing');
   },
-  stopEditing: () => {
+  afterCellEditing: () => {
     console.error('no context provider for stopEditing');
   },
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -205,6 +199,9 @@ export const GridContext = createContext<GridContextType<any>>({
   },
   downloadCsv: () => {
     console.error('no context provider for downloadCsv');
+  },
+  onCellEditingComplete: () => {
+    console.error('no context provider for onCellEditingComplete');
   },
   setOnCellEditingComplete: () => {
     console.error('no context provider for setOnCellEditingComplete');

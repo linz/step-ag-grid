@@ -1,4 +1,5 @@
-import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { GridContext } from 'contexts/GridContext';
+import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
@@ -20,6 +21,7 @@ export interface GridPopoverHookProps<TData> {
 }
 
 export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
+  const { onCellEditingComplete, afterCellEditing } = useContext(GridContext);
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -31,11 +33,12 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
   const triggerSave = useCallback(
     async (reason?: string) => {
       const closeMenuAndStopEditing = () => {
-        setOpen(false);
         stopEditing();
+        afterCellEditing();
       };
 
       if (reason == CloseReason.CANCEL) {
+        onCellEditingComplete();
         return closeMenuAndStopEditing();
       }
       if (props.invalid && props.invalid()) {
@@ -45,6 +48,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
 
       if (!props.save) {
         // No save method so just close
+        onCellEditingComplete();
         return closeMenuAndStopEditing();
       }
 
@@ -57,7 +61,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
         return closeMenuAndStopEditing();
       }
     },
-    [props, stopEditing, updateValue],
+    [afterCellEditing, onCellEditingComplete, props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(
@@ -74,7 +78,9 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
               menuClassName={'step-ag-grid-react-menu'}
               onClose={(event: MenuCloseEvent) => {
                 // Prevent menu from closing when modals are invoked
-                if (event.reason === CloseReason.BLUR) return;
+                if (event.reason === CloseReason.BLUR) {
+                  return;
+                }
                 void triggerSave(event.reason);
               }}
               viewScroll={'auto'}

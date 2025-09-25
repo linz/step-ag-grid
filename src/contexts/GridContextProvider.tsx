@@ -150,18 +150,6 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   }, [gridApi]);
 
   /**
-   * After a popup refocus the cell.
-   */
-  const postPopupOps = useCallback(() => {
-    if (!gridApi || gridApi.isDestroyed()) {
-      return;
-    }
-    if (prePopupFocusedCell.current) {
-      gridApi.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
-    }
-  }, [gridApi]);
-
-  /**
    * Get all row id's in grid.
    */
   const _getAllRowIds = useCallback(() => {
@@ -461,13 +449,13 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     }
   }, [gridApi]);
 
-  const stopEditing = useCallback((): void => {
+  const afterCellEditing = useCallback((): void => {
     if (!gridApi || gridApi.isDestroyed()) {
       return;
     }
-    gridApi.stopEditing();
     if (prePopupFocusedCell.current) {
       gridApi.setFocusedCell(prePopupFocusedCell.current.rowIndex, prePopupFocusedCell.current.column);
+      prePopupFocusedCell.current = undefined;
     }
   }, [gridApi]);
 
@@ -533,13 +521,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [checkUpdating, gridApi, prePopupOps, waitForExternallySelectedItemsToBeInSync],
   );
 
-  /**
-   * This differs from stopEdit in that it will also invoke cellEditingCompleteCallback
-   */
-  const cancelEdit = useCallback((): void => {
-    stopEditing();
+  const onCellEditingComplete = useCallback(() => {
     cellEditingCompleteCallbackRef.current?.();
-  }, [stopEditing]);
+  }, []);
 
   const cellEditingCompleteCallbackRef = useRef<() => void>();
   const setOnCellEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
@@ -804,7 +788,6 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         setInvisibleColumnIds,
         gridReady,
         prePopupOps,
-        postPopupOps,
         setApis,
         setQuickFilter,
         selectRowsById,
@@ -825,8 +808,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         sizeColumnsToFit,
         autoSizeColumns,
         startCellEditing,
-        stopEditing,
-        cancelEdit,
+        afterCellEditing,
         updatingCells,
         redrawRows,
         externallySelectedItemsAreInSync,
@@ -837,6 +819,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         isExternalFilterPresent,
         doesExternalFilterPass,
         downloadCsv,
+        onCellEditingComplete,
         setOnCellEditingComplete,
         showNoRowsOverlay,
       }}

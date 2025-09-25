@@ -53,8 +53,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
       <GridContext.Provider
         value={
           {
-            stopEditing: () => {},
-            cancelEdit: () => {},
+            onCellEditingComplete: () => {},
           } as any
         }
       >

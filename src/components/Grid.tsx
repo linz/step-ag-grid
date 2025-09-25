@@ -158,7 +158,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     getColDef,
     showNoRowsOverlay,
     prePopupOps,
-    stopEditing,
+    afterCellEditing,
   } = useContext(GridContext);
   const { startCellEditing } = useGridContext();
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
@@ -551,11 +551,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   useEffect(() => {
     const newLoading = !rowData || params.loading === true;
     if (newLoading && !prevLoading.current) {
-      stopEditing();
+      afterCellEditing();
       showNoRowsOverlay();
     }
     prevLoading.current = newLoading;
-  }, [params.loading, rowData, showNoRowsOverlay, stopEditing]);
+  }, [params.loading, rowData, showNoRowsOverlay, afterCellEditing]);
 
   /**
    * Resize columns to fit if required on window/container resize

@@ -26,8 +26,7 @@ const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps
       <GridContext.Provider
         value={
           {
-            stopEditing: () => {},
-            cancelEdit: () => {},
+            onCellEditingComplete: () => {},
           } as any
         }
       >
