@@ -32,6 +32,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
         value={
           {
             onCellEditingComplete: () => {},
+            afterCellEditing: () => {},
           } as any
         }
       >
@@ -48,6 +49,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
             selectedRows: [],
             data: { value: '' },
             field: 'value',
+            stopEditing: () => {},
           }}
         >
           <GridFormEditBearing {...props} {...GridPopoverEditBearingEditorParams} />

@@ -27,6 +27,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
         value={
           {
             onCellEditingComplete: () => {},
+            afterCellEditing: () => {},
           } as any
         }
       >
@@ -43,6 +44,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
             saving: false,
             setSaving: () => {},
             formatValue: (value) => value,
+            stopEditing: () => {},
           }}
         >
           <GridFormTextInput {...props} required={true} />

@@ -54,6 +54,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
         value={
           {
             onCellEditingComplete: () => {},
+            afterCellEditing: () => {},
           } as any
         }
       >
@@ -70,6 +71,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
             formatValue: () => '',
             saving: false,
             setSaving: () => {},
+            stopEditing: () => {},
           }}
         >
           <GridFormDropDown {...props} {...config} />
