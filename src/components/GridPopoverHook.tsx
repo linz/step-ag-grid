@@ -1,6 +1,5 @@
-import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { GridContext } from '../contexts/GridContext';
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
@@ -21,8 +20,7 @@ export interface GridPopoverHookProps<TData> {
 }
 
 export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
-  const { stopEditing, cancelEdit } = useContext(GridContext);
-  const { anchorRef, saving, updateValue } = useGridPopoverContext<TData>();
+  const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 
@@ -32,30 +30,34 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
 
   const triggerSave = useCallback(
     async (reason?: string) => {
+      const closeMenuAndStopEditing = () => {
+        setOpen(false);
+        stopEditing();
+      };
+
       if (reason == CloseReason.CANCEL) {
-        cancelEdit();
-        return;
+        return closeMenuAndStopEditing();
       }
       if (props.invalid && props.invalid()) {
+        // Don't close, don't do anything it's invalid
         return;
       }
 
       if (!props.save) {
-        cancelEdit();
-      } else if (props.save) {
-        // forms that don't provide an invalid fn must wait until they have saved to close
-        if (props.invalid) stopEditing();
-        if (
-          await updateValue(
-            props.save,
-            reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
-          )
-        ) {
-          if (!props.invalid) stopEditing();
-        }
+        // No save method so just close
+        return closeMenuAndStopEditing();
+      }
+
+      if (
+        await updateValue(
+          props.save,
+          reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+        )
+      ) {
+        return closeMenuAndStopEditing();
       }
     },
-    [cancelEdit, props, stopEditing, updateValue],
+    [props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

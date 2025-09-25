@@ -54,6 +54,7 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
         value: props.value,
         updateValue,
         formatValue: props.formatValue,
+        stopEditing: props.stopEditing,
       }}
     >
       {children}

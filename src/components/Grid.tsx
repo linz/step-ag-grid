@@ -5,6 +5,7 @@ import {
   CellClickedEvent,
   CellDoubleClickedEvent,
   CellEditingStartedEvent,
+  CellFocusedEvent,
   CellKeyDownEvent,
   ColDef,
   ColGroupDef,
@@ -35,36 +36,6 @@ import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-let timeOfLastSingleClick = 0;
-let lastClickColId: unknown;
-let lastClickRowIndex: unknown;
-
-const resetClickDebounce = () => {
-  timeOfLastSingleClick = 0;
-  lastClickColId = '';
-  lastClickRowIndex = -1;
-};
-
-/**
- * If click is more than 200ms since last click return true.
- */
-const clickDebounceSkipClick = (colId: unknown, rowIndex: unknown): boolean => {
-  const doubleClickMs = 200;
-
-  if (
-    Date.now() - timeOfLastSingleClick < doubleClickMs &&
-    lastClickColId === colId &&
-    lastClickRowIndex === rowIndex
-  ) {
-    // Skipping double click due to single click edit
-    return true;
-  }
-  timeOfLastSingleClick = Date.now();
-  lastClickColId = colId;
-  lastClickRowIndex = rowIndex;
-  return false;
-};
 
 export interface GridBaseRow {
   id: string | number;
@@ -99,6 +70,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   rowClassRules?: GridOptions['rowClassRules'];
   rowSelection?: 'single' | 'multiple';
   autoSelectFirstRow?: boolean;
+  onCellFocused?: (props: { colDef: ColDef<GridBaseRow>; data: TData }) => void;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
   onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
@@ -455,11 +427,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
-      if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
-        // the next click will be a single click, we want it to pass
-        resetClickDebounce();
-        return;
-      }
       const editable = fnOrVar(event.colDef?.editable, event);
       if (editable && !invokeEditAction(event)) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
@@ -475,9 +442,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     (event: CellClickedEvent) => {
       const editable = fnOrVar(event.colDef?.editable, event);
       if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
-        if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
-          return;
-        }
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },
@@ -664,6 +628,27 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [clearHighlightRowClasses],
   );
 
+  const onCellFocused = useCallback(
+    (event: CellFocusedEvent<TData>) => {
+      if (!params.onCellFocused || event.rowIndex == null) {
+        return;
+      }
+      const api = event.api;
+      const rowNode = api.getDisplayedRowAtIndex(event.rowIndex);
+      const data = rowNode?.data;
+      const column = event.column;
+      if (!data || !column || typeof column === 'string') {
+        return;
+      }
+      const colDef = column.getColDef();
+      if (!colDef || typeof colDef === 'string') {
+        return;
+      }
+      params.onCellFocused({ colDef, data });
+    },
+    [params],
+  );
+
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent<TData>) => {
       clearHighlightRowClasses();
@@ -732,6 +717,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
           onRowDataUpdated={onRowDataChanged}
+          onCellFocused={onCellFocused}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
