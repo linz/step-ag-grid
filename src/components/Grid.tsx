@@ -11,6 +11,7 @@ import {
   ColumnResizedEvent,
   EditableCallback,
   EditableCallbackParams,
+  GetRowIdParams,
   GridOptions,
   GridReadyEvent,
   ModelUpdatedEvent,
@@ -18,6 +19,7 @@ import {
   RowDragEndEvent,
   RowDragMoveEvent,
   SelectionChangedEvent,
+  SelectionColumnDef,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
@@ -667,8 +669,75 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnBulkEditingComplete(params.onBulkEditingComplete);
 
-  const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
-  const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
+  const getRowId = useCallback((params: GetRowIdParams<TData, unknown>) => `${params.data.id}`, []);
+  const defaultColDef = useMemo(
+    (): ColDef<TData, unknown> => ({
+      minWidth: 48,
+      ...omit(params.defaultColDef, ['editable', 'field', 'colId', 'tooltipField']),
+    }),
+    [params.defaultColDef],
+  );
+
+  const noRowsOverlayComponent = useCallback(
+    (event: AgGridEvent) => {
+      const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
+
+      let rowCount = 0;
+      event.api.forEachNode(() => rowCount++);
+      return (
+        <GridNoRowsOverlay
+          loading={!rowData || params.loading === true}
+          rowCount={rowCount}
+          headerRowHeight={headerRowCount * rowHeight}
+          filteredRowCount={event.api.getDisplayedRowCount()}
+          noRowsOverlayText={params.noRowsOverlayText}
+          noRowsMatchingOverlayText={params.noRowsMatchingOverlayText}
+        />
+      );
+    },
+    [columnDefs, params.loading, params.noRowsMatchingOverlayText, params.noRowsOverlayText, rowData, rowHeight],
+  );
+
+  const selectionColumnDef = useMemo((): SelectionColumnDef => {
+    const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
+    return {
+      suppressNavigable: params.hideSelectColumn,
+      rowDrag: !!params.onRowDragEnd,
+      minWidth: selectWidth,
+      maxWidth: selectWidth,
+      pinned: selectColumnPinned,
+      headerComponentParams: {
+        exportable: false,
+      },
+      headerClass: clsx('ag-header-hide-default-select', params.onRowDragEnd && 'ag-header-select-draggable'),
+      headerComponent: rowSelection == 'multiple' ? GridHeaderSelect : undefined,
+      suppressHeaderKeyboardEvent: (e) => {
+        if (!selectable) return false;
+        if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
+          if (isEmpty(e.api.getSelectedRows())) {
+            e.api.selectAll('filtered');
+          } else {
+            e.api.deselectAll();
+          }
+          return true;
+        }
+        return false;
+      },
+      onCellClicked:
+        params.enableSelectionWithoutKeys || params.enableClickSelection
+          ? undefined
+          : clickInputWhenContainingCellClicked,
+    };
+  }, [
+    params.enableClickSelection,
+    params.enableSelectionWithoutKeys,
+    params.hideSelectColumn,
+    params.onRowDragEnd,
+    rowSelection,
+    selectColumnPinned,
+    selectable,
+  ]);
+
   return (
     <div
       data-testid={dataTestId}
@@ -696,7 +765,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
-          getRowId={(params) => `${params.data.id}`}
+          getRowId={getRowId}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
@@ -708,33 +777,18 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           onCellDoubleClicked={onCellDoubleClick}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
-          defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ['editable']) }}
+          defaultColDef={defaultColDef}
           columnDefs={columnDefsAdjusted}
+          selectionColumnDef={selectionColumnDef}
           rowData={rowData}
-          noRowsOverlayComponent={(event: AgGridEvent) => {
-            let rowCount = 0;
-            event.api.forEachNode(() => rowCount++);
-            return (
-              <GridNoRowsOverlay
-                loading={!rowData || params.loading === true}
-                rowCount={rowCount}
-                headerRowHeight={headerRowCount * rowHeight}
-                filteredRowCount={event.api.getDisplayedRowCount()}
-                noRowsOverlayText={params.noRowsOverlayText}
-                noRowsMatchingOverlayText={params.noRowsMatchingOverlayText}
-              />
-            );
-          }}
-          quickFilterParser={(filterStr) => {
-            // filter is exact matches exactly groups separated by commas
-            return filterStr.split(',').map((str) => str.trim());
-          }}
+          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
+          quickFilterParser={quickFilterParser}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
+          noRowsOverlayComponent={noRowsOverlayComponent}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
@@ -748,36 +802,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
-          selectionColumnDef={{
-            suppressNavigable: params.hideSelectColumn,
-            rowDrag: !!params.onRowDragEnd,
-            minWidth: selectWidth,
-            maxWidth: selectWidth,
-            pinned: selectColumnPinned,
-            headerComponentParams: {
-              exportable: false,
-            },
-            headerClass: clsx('ag-header-hide-default-select', params.onRowDragEnd && 'ag-header-select-draggable'),
-            headerComponent: rowSelection == 'multiple' ? GridHeaderSelect : undefined,
-            suppressHeaderKeyboardEvent: (e) => {
-              if (!selectable) return false;
-              if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
-                if (isEmpty(e.api.getSelectedRows())) {
-                  e.api.selectAll('filtered');
-                } else {
-                  e.api.deselectAll();
-                }
-                return true;
-              }
-              return false;
-            },
-            onCellClicked:
-              params.enableSelectionWithoutKeys || params.enableClickSelection
-                ? undefined
-                : clickInputWhenContainingCellClicked,
-          }}
         />
       </div>
     </div>
   );
+};
+
+const quickFilterParser = (filterStr: string) => {
+  // filter is exact matches exactly groups separated by commas
+  return filterStr.split(',').map((str) => str.trim());
 };

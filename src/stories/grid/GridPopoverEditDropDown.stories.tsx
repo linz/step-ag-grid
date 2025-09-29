@@ -322,7 +322,7 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridPro
           console.log('onBulkEditingComplete()');
         }}
         onCellFocused={({ colDef, data }) => {
-          console.log({ colDef, data });
+          console.log('on focus', { colDef, data });
         }}
       />
     </GridWrapper>
