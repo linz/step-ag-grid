@@ -1,6 +1,6 @@
-import { GridContext } from 'contexts/GridContext';
 import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
+import { GridContext } from '../contexts/GridContext';
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
@@ -21,7 +21,7 @@ export interface GridPopoverHookProps<TData> {
 }
 
 export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
-  const { onCellEditingComplete, afterCellEditing } = useContext(GridContext);
+  const { onBulkEditingComplete } = useContext(GridContext);
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -32,14 +32,10 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
 
   const triggerSave = useCallback(
     async (reason?: string) => {
-      const closeMenuAndStopEditing = () => {
-        stopEditing();
-        afterCellEditing();
-      };
-
       if (reason == CloseReason.CANCEL) {
-        onCellEditingComplete();
-        return closeMenuAndStopEditing();
+        stopEditing();
+        onBulkEditingComplete();
+        return;
       }
       if (props.invalid && props.invalid()) {
         // Don't close, don't do anything it's invalid
@@ -48,8 +44,9 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
 
       if (!props.save) {
         // No save method so just close
-        onCellEditingComplete();
-        return closeMenuAndStopEditing();
+        stopEditing();
+        onBulkEditingComplete();
+        return;
       }
 
       if (
@@ -58,10 +55,10 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
           reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
         )
       ) {
-        return closeMenuAndStopEditing();
+        stopEditing();
       }
     },
-    [afterCellEditing, onCellEditingComplete, props, stopEditing, updateValue],
+    [onBulkEditingComplete, props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

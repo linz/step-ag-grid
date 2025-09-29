@@ -4,7 +4,6 @@ import {
   CellClassParams,
   CellClickedEvent,
   CellDoubleClickedEvent,
-  CellEditingStartedEvent,
   CellFocusedEvent,
   CellKeyDownEvent,
   ColDef,
@@ -70,7 +69,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   rowClassRules?: GridOptions['rowClassRules'];
   rowSelection?: 'single' | 'multiple';
   autoSelectFirstRow?: boolean;
-  onCellFocused?: (props: { colDef: ColDef<GridBaseRow>; data: TData }) => void;
+  onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
   onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
@@ -98,7 +97,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
    * When pressing tab whilst editing the grid will select and edit the next cell if available.
    * Once the last cell to edit closes this callback is called.
    */
-  onCellEditingComplete?: () => void;
+  onBulkEditingComplete?: () => void;
 
   /**
    * Context menu definition if required.
@@ -154,11 +153,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     setExternallySelectedItemsAreInSync,
     isExternalFilterPresent,
     doesExternalFilterPass,
-    setOnCellEditingComplete,
+    setOnBulkEditingComplete,
     getColDef,
     showNoRowsOverlay,
     prePopupOps,
-    afterCellEditing,
   } = useContext(GridContext);
   const { startCellEditing } = useGridContext();
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
@@ -411,18 +409,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, []);
 
   /**
-   * Force-refresh all selected rows to re-run class function, to update selection highlighting
-   */
-  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
-    // MATT Disabled I don't believe these are needed anymore
-    // I've left them here just in case they are
-    /*event.api.refreshCells({
-      force: true,
-      rowNodes: event.api.getSelectedNodes(),
-    });*/
-  }, []);
-
-  /**
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
@@ -551,11 +537,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   useEffect(() => {
     const newLoading = !rowData || params.loading === true;
     if (newLoading && !prevLoading.current) {
-      afterCellEditing();
       showNoRowsOverlay();
     }
     prevLoading.current = newLoading;
-  }, [params.loading, rowData, showNoRowsOverlay, afterCellEditing]);
+  }, [params.loading, rowData, showNoRowsOverlay]);
 
   /**
    * Resize columns to fit if required on window/container resize
@@ -680,7 +665,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, [params.setExternalSelectedItems, selectable]);
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
-  setOnCellEditingComplete(params.onCellEditingComplete);
+  setOnBulkEditingComplete(params.onBulkEditingComplete);
 
   const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
   const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
@@ -721,7 +706,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
-          onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
           defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ['editable']) }}

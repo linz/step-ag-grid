@@ -17,7 +17,7 @@ import { GridUpdatingContext } from './GridUpdatingContext';
  * Also, make sure the provider is created in a separate component, otherwise it won't be found.
  */
 export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithChildren): ReactElement => {
-  const { modifyUpdating, checkUpdating } = useContext(GridUpdatingContext);
+  const { modifyUpdating, anyUpdating } = useContext(GridUpdatingContext);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [gridReady, setGridReady] = useState(false);
   const [quickFilter, _setQuickFilter] = useState('');
@@ -449,8 +449,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     }
   }, [gridApi]);
 
+  /**
+   *
+   */
   const afterCellEditing = useCallback((): void => {
-    if (!gridApi || gridApi.isDestroyed()) {
+    if (!gridApi || gridApi.isDestroyed() || startCellEditingInProgressRef.current) {
       return;
     }
     if (prePopupFocusedCell.current) {
@@ -479,55 +482,64 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     }
   }, []);
 
+  const startCellEditingInProgressRef = useRef(false);
   const startCellEditing = useCallback(
     async ({ rowId, colId }: { rowId: number; colId: string }) => {
-      if (!gridApi) return;
-
-      const colDef = gridApi.getColumnDef(colId);
-      if (!colDef) {
+      if (!gridApi || startCellEditingInProgressRef.current) {
         return;
       }
+      startCellEditingInProgressRef.current = true;
 
-      const rowNode = gridApi.getRowNode(`${rowId}`);
-      if (!rowNode) {
-        return;
-      }
+      try {
+        // Edit in progress so don't edit until finished, timeout waiting after 5s
+        if (!(await waitForCondition(() => !anyUpdating(), 5000))) {
+          console.error("Could not start edit because previous edit hasn't finished after 5 seconds");
+          return;
+        }
 
-      prePopupOps();
-      const shouldSelectNode = !rowNode.isSelected();
-      if (shouldSelectNode) {
-        externallySelectedItemsAreInSyncRef.current = false;
-        setExternallySelectedItemsAreInSync(false);
-        rowNode.setSelected(true, true);
-        await waitForExternallySelectedItemsToBeInSync();
-      }
+        const colDef = gridApi.getColumnDef(colId);
+        if (!colDef) {
+          return;
+        }
 
-      // Cell already being edited, so don't re-edit until finished
-      if (checkUpdating([colDef.field ?? colDef.colId ?? ''], rowId)) {
-        return;
-      }
+        const rowNode = gridApi.getRowNode(`${rowId}`);
+        if (!rowNode) {
+          return;
+        }
 
-      const rowIndex = rowNode.rowIndex;
-      if (rowIndex != null) {
-        defer(() => {
-          !gridApi.isDestroyed() &&
-            gridApi.startEditingCell({
-              rowIndex,
-              colKey: colId,
-            });
-        });
+        prePopupOps();
+        const shouldSelectNode = !rowNode.isSelected();
+        if (shouldSelectNode) {
+          externallySelectedItemsAreInSyncRef.current = false;
+          setExternallySelectedItemsAreInSync(false);
+          rowNode.setSelected(true, true);
+          await waitForExternallySelectedItemsToBeInSync();
+        }
+
+        const rowIndex = rowNode.rowIndex;
+        if (rowIndex != null) {
+          defer(() => {
+            !gridApi.isDestroyed() &&
+              gridApi.startEditingCell({
+                rowIndex,
+                colKey: colId,
+              });
+          });
+        }
+      } finally {
+        startCellEditingInProgressRef.current = false;
       }
     },
-    [checkUpdating, gridApi, prePopupOps, waitForExternallySelectedItemsToBeInSync],
+    [anyUpdating, gridApi, prePopupOps, waitForExternallySelectedItemsToBeInSync],
   );
 
-  const onCellEditingComplete = useCallback(() => {
-    cellEditingCompleteCallbackRef.current?.();
+  const bulkEditingCompleteCallbackRef = useRef<() => void>();
+  const onBulkEditingComplete = useCallback(() => {
+    bulkEditingCompleteCallbackRef.current?.();
   }, []);
 
-  const cellEditingCompleteCallbackRef = useRef<() => void>();
-  const setOnCellEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
-    cellEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
+  const setOnBulkEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
+    bulkEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
   }, []);
 
   /**
@@ -580,18 +592,24 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         if (focusedCellIsEditable()) {
           const focusedCell = gridApi.getFocusedCell();
           if (focusedCell) {
-            prePopupOps();
-            gridApi.startEditingCell({
+            //prePopupOps();
+            /*gridApi.startEditingCell({
               rowIndex: focusedCell.rowIndex,
               colKey: focusedCell.column.getColId(),
-            });
+            });*/
+            const rowNode = gridApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
+            const rowId = rowNode?.data?.id;
+            if (rowId == null) {
+              return false;
+            }
+            await startCellEditing({ rowId, colId: focusedCell.column.getColId() });
             return true;
           }
         }
       }
       return false;
     },
-    [gridApi, prePopupOps],
+    [gridApi, startCellEditing],
   );
 
   const updatingCells = useCallback(
@@ -636,6 +654,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           if (cell && gridApi.getFocusedCell() == null) {
             !gridApi.isDestroyed && gridApi.setFocusedCell(cell.rowIndex, cell.column);
           }
+
           // This is needed to trigger postSortRowsHook
           gridApi.refreshClientSideRowModel();
         } else {
@@ -652,8 +671,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
           if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
-            cellEditingCompleteCallbackRef.current && cellEditingCompleteCallbackRef.current();
+            bulkEditingCompleteCallbackRef.current?.();
           }
+        } else {
+          bulkEditingCompleteCallbackRef.current?.();
         }
 
         return ok;
@@ -819,8 +840,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         isExternalFilterPresent,
         doesExternalFilterPass,
         downloadCsv,
-        onCellEditingComplete,
-        setOnCellEditingComplete,
+        onBulkEditingComplete,
+        setOnBulkEditingComplete,
         showNoRowsOverlay,
       }}
     >
@@ -876,4 +897,15 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   }
   // We add an extra encodeToString here just in case valueFormatter is returning non string values
   return encodeToString(result);
+};
+
+const waitForCondition = async (condition: () => boolean, timeoutMs: number): Promise<boolean> => {
+  const endTime = Date.now() + timeoutMs;
+  while (Date.now() < endTime) {
+    if (condition()) {
+      return true;
+    }
+    await wait(100);
+  }
+  return false;
 };

@@ -63,8 +63,8 @@ export interface GridContextType<TData extends GridBaseRow> {
   invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
-  onCellEditingComplete: () => void;
-  setOnCellEditingComplete: (callback: (() => void) | undefined) => void;
+  onBulkEditingComplete: () => void;
+  setOnBulkEditingComplete: (callback: (() => void) | undefined) => void;
   showNoRowsOverlay: () => void;
 }
 
@@ -200,11 +200,11 @@ export const GridContext = createContext<GridContextType<any>>({
   downloadCsv: () => {
     console.error('no context provider for downloadCsv');
   },
-  onCellEditingComplete: () => {
-    console.error('no context provider for onCellEditingComplete');
+  onBulkEditingComplete: () => {
+    console.error('no context provider for onBulkEditingComplete');
   },
-  setOnCellEditingComplete: () => {
-    console.error('no context provider for setOnCellEditingComplete');
+  setOnBulkEditingComplete: () => {
+    console.error('no context provider for setOnBulkEditingComplete');
   },
   showNoRowsOverlay: () => {
     console.error('no context provider for showLoadingOverlay');

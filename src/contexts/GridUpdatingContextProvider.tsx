@@ -1,5 +1,5 @@
-import { castArray, flatten, remove } from 'lodash-es';
-import { PropsWithChildren, useRef, useState } from 'react';
+import { castArray, flatten, isEmpty, remove } from 'lodash-es';
+import { PropsWithChildren, useCallback, useRef, useState } from 'react';
 
 import { GridUpdatingContext } from './GridUpdatingContext';
 
@@ -14,7 +14,7 @@ export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
   const updating = useRef<GridUpdatingContextStatus>({});
   const [updatedDep, setUpdatedDep] = useState(0);
 
-  const resetUpdating = () => {
+  const resetUpdating = useCallback(() => {
     const mergedUpdatingBlocks: GridUpdatingContextStatus = {};
     for (const key in updatingBlocks.current) {
       const arr = flatten(updatingBlocks.current[key]);
@@ -24,8 +24,9 @@ export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
     }
     updating.current = mergedUpdatingBlocks;
     setUpdatedDep((updatedDep) => updatedDep + 1);
-  };
-  const updatingCols = () => Object.keys(updating.current);
+  }, []);
+
+  const updatingCols = useCallback(() => Object.keys(updating.current), []);
 
   const modifyUpdating = async (
     fields: string | string[],
@@ -46,11 +47,18 @@ export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
     resetUpdating();
   };
 
-  const checkUpdating = (fields: string | string[], id: number | string): boolean =>
-    castArray(fields).some((f) => updating.current[f]?.includes(id));
+  const anyUpdating = useCallback((): boolean => {
+    return !isEmpty(updating.current);
+  }, []);
+
+  const checkUpdating = useCallback(
+    (fields: string | string[], id: number | string): boolean =>
+      castArray(fields).some((f) => updating.current[f]?.includes(id)),
+    [],
+  );
 
   return (
-    <GridUpdatingContext.Provider value={{ modifyUpdating, checkUpdating, updatingCols, updatedDep }}>
+    <GridUpdatingContext.Provider value={{ modifyUpdating, anyUpdating, checkUpdating, updatingCols, updatedDep }}>
       {props.children}
     </GridUpdatingContext.Provider>
   );
