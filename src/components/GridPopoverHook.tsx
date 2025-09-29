@@ -1,6 +1,6 @@
-import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { GridContext } from '../contexts/GridContext';
+import { useGridContext } from '../contexts/GridContext';
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
@@ -21,7 +21,7 @@ export interface GridPopoverHookProps<TData> {
 }
 
 export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
-  const { onBulkEditingComplete } = useContext(GridContext);
+  const { onBulkEditingComplete } = useGridContext<TData>();
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
         onBulkEditingComplete();
         return;
       }
-      if (props.invalid && props.invalid()) {
+      if (props?.invalid?.()) {
         // Don't close, don't do anything it's invalid
         return;
       }

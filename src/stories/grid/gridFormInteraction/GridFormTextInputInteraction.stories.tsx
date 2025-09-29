@@ -26,7 +26,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
       <GridContext.Provider
         value={
           {
-            onCellEditingComplete: () => {},
+            onBulkEditingComplete: () => {},
             resetFocusedCellAfterCellEditing: () => {},
           } as any
         }

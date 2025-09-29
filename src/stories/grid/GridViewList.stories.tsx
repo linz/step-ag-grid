@@ -49,7 +49,7 @@ interface ITestRow {
   dd: string;
 }
 
-const GridReadOnlyTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [

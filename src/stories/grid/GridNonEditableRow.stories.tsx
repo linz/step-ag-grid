@@ -52,7 +52,7 @@ interface ITestRow {
   desc: string;
 }
 
-const GridNonEditableRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridNonEditableRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [

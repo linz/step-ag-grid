@@ -42,7 +42,7 @@ interface ITestRow {
   desc: string;
 }
 
-const GridFilterButtonsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridFilterButtonsTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({

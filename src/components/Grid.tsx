@@ -25,7 +25,7 @@ import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { GridContext, useGridContext } from '../contexts/GridContext';
+import { useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
@@ -157,8 +157,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     getColDef,
     showNoRowsOverlay,
     prePopupOps,
-  } = useContext(GridContext);
-  const { startCellEditing } = useGridContext();
+    startCellEditing,
+  } = useGridContext<TData>();
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);

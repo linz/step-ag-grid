@@ -56,7 +56,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
       <GridContext.Provider
         value={
           {
-            onCellEditingComplete: () => {},
+            onBulkEditingComplete: () => {},
             resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
