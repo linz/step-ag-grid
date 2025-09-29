@@ -15,9 +15,7 @@ export default defineConfig((): UserConfig => {
     },
     css: {
       preprocessorOptions: {
-        scss: {
-          api: 'modern',
-        },
+        scss: {},
       },
     },
     base: '/',
