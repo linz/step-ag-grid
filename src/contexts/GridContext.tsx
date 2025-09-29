@@ -45,7 +45,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   sizeColumnsToFit: () => void;
   startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => Promise<void>;
   // Restores the previous focus after cell editing
-  afterCellEditing: () => void;
+  resetFocusedCellAfterCellEditing: () => void;
   updatingCells: (
     props: { selectedRows: GridBaseRow[]; field?: string },
     fnUpdate: (selectedRows: any[]) => Promise<boolean>,
@@ -165,8 +165,8 @@ export const GridContext = createContext<GridContextType<any>>({
   startCellEditing: async () => {
     console.error('no context provider for startCellEditing');
   },
-  afterCellEditing: () => {
-    console.error('no context provider for stopEditing');
+  resetFocusedCellAfterCellEditing: () => {
+    console.error('no context provider for resetFocusedCellAfterCellEditing');
   },
   // eslint-disable-next-line @typescript-eslint/require-await
   updatingCells: async () => {

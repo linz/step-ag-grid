@@ -27,7 +27,7 @@ const Template: StoryFn<typeof GridFormTextArea> = (props: GridFormTextAreaProps
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >

@@ -32,7 +32,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >

@@ -452,7 +452,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   /**
    *
    */
-  const afterCellEditing = useCallback((): void => {
+  const resetFocusedCellAfterCellEditing = useCallback((): void => {
     if (!gridApi || gridApi.isDestroyed() || startCellEditingInProgressRef.current) {
       return;
     }
@@ -535,8 +535,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
   const bulkEditingCompleteCallbackRef = useRef<() => void>();
   const onBulkEditingComplete = useCallback(() => {
+    resetFocusedCellAfterCellEditing();
     bulkEditingCompleteCallbackRef.current?.();
-  }, []);
+  }, [resetFocusedCellAfterCellEditing]);
 
   const setOnBulkEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
     bulkEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
@@ -671,16 +672,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
         ) {
           if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
-            bulkEditingCompleteCallbackRef.current?.();
+            onBulkEditingComplete();
           }
         } else {
-          bulkEditingCompleteCallbackRef.current?.();
+          onBulkEditingComplete();
         }
 
         return ok;
       });
     },
-    [gridApiOp, modifyUpdating, selectNextEditableCell],
+    [gridApiOp, modifyUpdating, onBulkEditingComplete, selectNextEditableCell],
   );
 
   const redrawRows: any = useMemo(
@@ -829,7 +830,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         sizeColumnsToFit,
         autoSizeColumns,
         startCellEditing,
-        afterCellEditing,
+        resetFocusedCellAfterCellEditing,
         updatingCells,
         redrawRows,
         externallySelectedItemsAreInSync,

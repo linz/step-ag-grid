@@ -27,7 +27,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >

@@ -41,7 +41,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >

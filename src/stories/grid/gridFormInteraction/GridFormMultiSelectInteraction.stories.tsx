@@ -57,7 +57,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >

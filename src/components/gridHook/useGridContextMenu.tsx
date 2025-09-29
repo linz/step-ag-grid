@@ -24,7 +24,7 @@ export const useGridContextMenu = <TData extends GridBaseRow>({
   contextMenuSelectRow: boolean;
   contextMenu?: GridContextMenuComponent<TData>;
 }) => {
-  const { redrawRows, prePopupOps, afterCellEditing, getSelectedRows } = useContext(GridContext);
+  const { redrawRows, prePopupOps, resetFocusedCellAfterCellEditing, getSelectedRows } = useContext(GridContext);
 
   const [isOpen, setOpen] = useState(false);
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -47,8 +47,8 @@ export const useGridContextMenu = <TData extends GridBaseRow>({
   const closeMenu = useCallback(() => {
     setOpen(false);
     redrawRows();
-    afterCellEditing();
-  }, [afterCellEditing, redrawRows]);
+    resetFocusedCellAfterCellEditing();
+  }, [resetFocusedCellAfterCellEditing, redrawRows]);
 
   const cellContextMenu = useCallback(
     (event: CellContextMenuEvent) => {

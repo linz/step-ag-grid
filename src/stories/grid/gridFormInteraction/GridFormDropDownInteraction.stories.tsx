@@ -54,7 +54,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
         value={
           {
             onCellEditingComplete: () => {},
-            afterCellEditing: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >
