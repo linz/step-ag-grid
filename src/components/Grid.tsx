@@ -161,6 +161,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     startCellEditing,
   } = useGridContext<TData>();
+
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);

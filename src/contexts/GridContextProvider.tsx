@@ -41,8 +41,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   /**
    * Make extra sure the GridCellFillerColId never gets added to invisibleColumnIds as it's dynamically determined
    */
-  const setInvisibleColumnIds = (invisibleColumnIds: string[]) =>
-    _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId));
+  const setInvisibleColumnIds = useCallback(
+    (invisibleColumnIds: string[]) => _setInvisibleColumnIds(pull(invisibleColumnIds, GridCellFillerColId)),
+    [],
+  );
 
   /**
    * Set quick filter directly on grid, based on previously save quickFilter state.
@@ -724,20 +726,28 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [gridApi],
   );
 
-  const addExternalFilter = (filter: GridFilterExternal<TData>) => {
-    externalFilters.current.push(filter);
-    void onFilterChanged();
-  };
+  const addExternalFilter = useCallback(
+    (filter: GridFilterExternal<TData>) => {
+      externalFilters.current.push(filter);
+      void onFilterChanged();
+    },
+    [onFilterChanged],
+  );
 
-  const removeExternalFilter = (filter: GridFilterExternal<TData>) => {
-    remove(externalFilters.current, (v) => v === filter);
-    void onFilterChanged();
-  };
+  const removeExternalFilter = useCallback(
+    (filter: GridFilterExternal<TData>) => {
+      remove(externalFilters.current, (v) => v === filter);
+      void onFilterChanged();
+    },
+    [onFilterChanged],
+  );
 
-  const isExternalFilterPresent = (): boolean => !isEmpty(externalFilters.current);
+  const isExternalFilterPresent = useCallback((): boolean => !isEmpty(externalFilters.current), []);
 
-  const doesExternalFilterPass = (node: IRowNode): boolean =>
-    externalFilters.current.every((filter) => filter(node.data, node));
+  const doesExternalFilterPass = useCallback(
+    (node: IRowNode): boolean => externalFilters.current.every((filter) => filter(node.data, node)),
+    [],
+  );
 
   const getColDef = useCallback(
     (colId?: string): ColDef | undefined => (!!colId && gridApi?.getColumnDef(colId)) || undefined,

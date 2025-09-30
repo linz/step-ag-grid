@@ -28,24 +28,23 @@ export const GridUpdatingContextProvider = (props: PropsWithChildren) => {
 
   const updatingCols = useCallback(() => Object.keys(updating.current), []);
 
-  const modifyUpdating = async (
-    fields: string | string[],
-    ids: (number | string)[],
-    fn: () => void | Promise<void>,
-  ) => {
-    const idRef = [...ids];
-    castArray(fields).forEach((field) => {
-      const fieldUpdatingIds = updatingBlocks.current[field] ?? (updatingBlocks.current[field] = []);
-      fieldUpdatingIds.push(idRef);
-    });
-    resetUpdating();
-    await fn();
-    castArray(fields).forEach((field) => {
-      const fieldUpdatingIds = updatingBlocks.current[field];
-      remove(fieldUpdatingIds, (idList) => idList === idRef);
-    });
-    resetUpdating();
-  };
+  const modifyUpdating = useCallback(
+    async (fields: string | string[], ids: (number | string)[], fn: () => void | Promise<void>) => {
+      const idRef = [...ids];
+      castArray(fields).forEach((field) => {
+        const fieldUpdatingIds = updatingBlocks.current[field] ?? (updatingBlocks.current[field] = []);
+        fieldUpdatingIds.push(idRef);
+      });
+      resetUpdating();
+      await fn();
+      castArray(fields).forEach((field) => {
+        const fieldUpdatingIds = updatingBlocks.current[field];
+        remove(fieldUpdatingIds, (idList) => idList === idRef);
+      });
+      resetUpdating();
+    },
+    [resetUpdating],
+  );
 
   const anyUpdating = useCallback((): boolean => {
     return !isEmpty(updating.current);
