@@ -20,6 +20,7 @@ import {
   RowDragMoveEvent,
   SelectionChangedEvent,
   SelectionColumnDef,
+  RowClickedEvent, RowDoubleClickedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
@@ -120,6 +121,8 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   suppressCellFocus?: boolean;
   pinnedTopRowData?: GridOptions['pinnedTopRowData'];
   pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
+  onRowClicked?: (event: RowClickedEvent) => void;
+  onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
 }
 
 /**
@@ -806,6 +809,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
+          onRowClicked={params.onRowClicked}
+          onRowDoubleClicked={params.onRowDoubleClicked}
         />
       </div>
     </div>
