@@ -16,11 +16,12 @@ import {
   GridReadyEvent,
   ModelUpdatedEvent,
   ModuleRegistry,
+  RowClickedEvent,
+  RowDoubleClickedEvent,
   RowDragEndEvent,
   RowDragMoveEvent,
   SelectionChangedEvent,
   SelectionColumnDef,
-  RowClickedEvent, RowDoubleClickedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
