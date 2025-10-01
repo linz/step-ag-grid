@@ -29,11 +29,15 @@ export const GridFormTextInput = <TData extends GridBaseRow>(props: GridFormText
 
   const save = useCallback(
     async (selectedRows: TData[]): Promise<boolean> => {
-      if (invalid()) return false;
+      if (invalid()) {
+        return false;
+      }
 
       const trimmedValue = value.trim();
       // No change, so don't save
-      if (initValue === trimmedValue) return true;
+      if (initValue === trimmedValue) {
+        return true;
+      }
 
       if (props.onSave) {
         return await props.onSave({ selectedRows, value: trimmedValue });

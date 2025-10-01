@@ -219,7 +219,7 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
         sizeColumns={'auto'}
         onBulkEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log('Cell editing complete');
+          console.log('onBulkEditingComplete()');
         }}
       />
       <ActionButton icon={'ic_add'} name={'Add new row'} inProgressName={'Adding...'} onClick={addRowAction} />
