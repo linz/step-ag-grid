@@ -75,7 +75,7 @@ const eAction = fn(() => {
   return true;
 });
 
-const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -223,7 +223,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid> = (props: GridProps
   );
 };
 
-export const GridKeyboardInteractions: StoryFn<typeof Grid> = GridKeyboardInteractionsTemplate.bind({});
+export const GridKeyboardInteractions: StoryFn<typeof Grid<ITestRow>> = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
   multiEditAction.mockClear();
   eAction.mockClear();

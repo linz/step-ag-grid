@@ -48,7 +48,7 @@ export default {
   ],
 } as Meta<typeof Grid>;
 
-const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props: GridProps<IFormTestRow>) => {
   const { selectRowsWithFlashDiff } = useContext(GridContext);
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const [rowData, setRowData] = useState([
@@ -217,7 +217,7 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) =
         domLayout={'autoHeight'}
         defaultColDef={{ minWidth: 70 }}
         sizeColumns={'auto'}
-        onCellEditingComplete={() => {
+        onBulkEditingComplete={() => {
           /* eslint-disable-next-line no-console */
           console.log('Cell editing complete');
         }}

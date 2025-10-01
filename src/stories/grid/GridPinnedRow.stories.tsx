@@ -57,7 +57,7 @@ interface ITestPinnedRow {
   age: number;
 }
 
-const PinnedRowTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const PinnedRowTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({

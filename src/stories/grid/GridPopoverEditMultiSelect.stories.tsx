@@ -116,6 +116,7 @@ const GridEditMultiSelectTemplate: StoryFn<typeof Grid> = (props: GridProps) => 
       ),
       GridPopoutEditMultiSelect<ITestRow, ITestRow['position']>(
         {
+          colId: 'position2',
           field: 'position',
           headerName: 'Parcel picker',
           valueFormatter: ({ value }) => {

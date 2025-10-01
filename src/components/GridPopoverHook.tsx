@@ -1,6 +1,6 @@
-import { ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { GridContext } from '../contexts/GridContext';
+import { useGridContext } from '../contexts/GridContext';
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
@@ -21,8 +21,8 @@ export interface GridPopoverHookProps<TData> {
 }
 
 export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
-  const { stopEditing, cancelEdit } = useContext(GridContext);
-  const { anchorRef, saving, updateValue } = useGridPopoverContext<TData>();
+  const { onBulkEditingComplete } = useGridContext<TData>();
+  const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
 
@@ -33,29 +33,32 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
   const triggerSave = useCallback(
     async (reason?: string) => {
       if (reason == CloseReason.CANCEL) {
-        cancelEdit();
+        stopEditing();
+        onBulkEditingComplete();
         return;
       }
-      if (props.invalid && props.invalid()) {
+      if (props?.invalid?.()) {
+        // Don't close, don't do anything it's invalid
         return;
       }
 
       if (!props.save) {
-        cancelEdit();
-      } else if (props.save) {
-        // forms that don't provide an invalid fn must wait until they have saved to close
-        if (props.invalid) stopEditing();
-        if (
-          await updateValue(
-            props.save,
-            reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
-          )
-        ) {
-          if (!props.invalid) stopEditing();
-        }
+        // No save method so just close
+        stopEditing();
+        onBulkEditingComplete();
+        return;
+      }
+
+      if (
+        await updateValue(
+          props.save,
+          reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+        )
+      ) {
+        stopEditing();
       }
     },
-    [cancelEdit, props, stopEditing, updateValue],
+    [onBulkEditingComplete, props, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(
@@ -72,7 +75,9 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
               menuClassName={'step-ag-grid-react-menu'}
               onClose={(event: MenuCloseEvent) => {
                 // Prevent menu from closing when modals are invoked
-                if (event.reason === CloseReason.BLUR) return;
+                if (event.reason === CloseReason.BLUR) {
+                  return;
+                }
                 void triggerSave(event.reason);
               }}
               viewScroll={'auto'}

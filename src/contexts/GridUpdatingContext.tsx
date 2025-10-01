@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 
 export type GridUpdatingContextType = {
+  anyUpdating: () => boolean;
   checkUpdating: (fields: string | string[], id: number | string) => boolean;
   modifyUpdating: (
     fields: string | string[],
@@ -12,6 +13,10 @@ export type GridUpdatingContextType = {
 };
 
 export const GridUpdatingContext = createContext<GridUpdatingContextType>({
+  anyUpdating: () => {
+    console.error('Missing GridUpdatingContext');
+    return false;
+  },
   checkUpdating: () => {
     console.error('Missing GridUpdatingContext');
     return false;

@@ -39,7 +39,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1024, height: 400 }}>
+      <div style={{ width: 1224, height: 400 }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -65,7 +65,7 @@ interface ICode {
   desc: string;
 }
 
-const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridEditDropDownTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
@@ -317,9 +317,13 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={'autoHeight'}
-        onCellEditingComplete={() => {
+        onBulkEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log('Cell editing complete');
+          console.log('onBulkEditingComplete()');
+        }}
+        onCellFocused={({ colDef, data }) => {
+          /* eslint-disable-next-line no-console */
+          console.log('on cell focused called', { colDef, data });
         }}
       />
     </GridWrapper>

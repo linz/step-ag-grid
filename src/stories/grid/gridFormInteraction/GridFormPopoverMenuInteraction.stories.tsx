@@ -40,8 +40,8 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
       <GridContext.Provider
         value={
           {
-            stopEditing: () => {},
-            cancelEdit: () => {},
+            onBulkEditingComplete: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >
@@ -58,6 +58,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
             saving: false,
             setSaving: () => {},
             formatValue: (value) => value,
+            stopEditing: () => {},
           }}
         >
           <GridFormPopoverMenu

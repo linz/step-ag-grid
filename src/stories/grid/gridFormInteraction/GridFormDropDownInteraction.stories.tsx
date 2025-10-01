@@ -11,6 +11,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import {
   GridBaseRow,
   GridContext,
+  GridContextType,
   GridFormDropDown,
   GridFormDropDownProps,
   GridFormSubComponentTextInput,
@@ -53,9 +54,9 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
       <GridContext.Provider
         value={
           {
-            stopEditing: () => {},
-            cancelEdit: () => {},
-          } as any
+            onBulkEditingComplete: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
+          } as unknown as GridContextType<GridBaseRow>
         }
       >
         <h6 ref={anchorRef}>Interaction test</h6>
@@ -71,6 +72,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
             formatValue: () => '',
             saving: false,
             setSaving: () => {},
+            stopEditing: () => {},
           }}
         >
           <GridFormDropDown {...props} {...config} />

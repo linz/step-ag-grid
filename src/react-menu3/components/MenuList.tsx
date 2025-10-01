@@ -370,6 +370,9 @@ export const MenuList = ({
     }
 
     const callback = debounce(() => {
+      if (!menuRef.current) {
+        return;
+      }
       const { width, height } = menuRef.current.ownerDocument.body.getBoundingClientRect();
       if (width === 0 || height === 0) return;
       if (

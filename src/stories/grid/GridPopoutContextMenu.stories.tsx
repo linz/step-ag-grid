@@ -63,7 +63,7 @@ const ContextMenu = ({ clickedRow, colDef, close }: GridContextMenuComponentProp
   );
 };
 
-const GridPopoutContextMenuTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridPopoutContextMenuTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props: GridProps<IFormTestRow>) => {
   const { selectRowsWithFlashDiff } = useContext(GridContext);
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const [rowData, setRowData] = useState([
@@ -125,9 +125,9 @@ const GridPopoutContextMenuTemplate: StoryFn<typeof Grid> = (props: GridProps) =
         domLayout={'autoHeight'}
         defaultColDef={{ minWidth: 70 }}
         sizeColumns={'auto'}
-        onCellEditingComplete={() => {
+        onBulkEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log('Cell editing complete');
+          console.log('onBulkEditingComplete');
         }}
         contextMenu={ContextMenu}
       />

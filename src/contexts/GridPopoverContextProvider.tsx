@@ -19,7 +19,7 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
   const hasSaved = useRef(false);
   const [saving, setSaving] = useState(false);
 
-  const { colDef } = props;
+  const { colDef, stopEditing, formatValue, data, value } = props;
   const { cellEditorParams } = colDef;
   const multiEdit = cellEditorParams?.multiEdit ?? false;
   // Then item that is clicked on will always be first in the list
@@ -34,7 +34,10 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {
-      if (hasSaved.current) return true;
+      if (hasSaved.current) {
+        // already called save so ignore
+        return true;
+      }
       hasSaved.current = true;
       return saving ? false : await updatingCells({ selectedRows, field }, saveFn, setSaving, tabDirection);
     },
@@ -50,10 +53,11 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
         selectedRows,
         colId,
         field,
-        data: props.data,
-        value: props.value,
+        data,
+        value,
         updateValue,
-        formatValue: props.formatValue,
+        formatValue,
+        stopEditing,
       }}
     >
       {children}

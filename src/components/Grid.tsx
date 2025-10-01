@@ -4,13 +4,14 @@ import {
   CellClassParams,
   CellClickedEvent,
   CellDoubleClickedEvent,
-  CellEditingStartedEvent,
+  CellFocusedEvent,
   CellKeyDownEvent,
   ColDef,
   ColGroupDef,
   ColumnResizedEvent,
   EditableCallback,
   EditableCallbackParams,
+  GetRowIdParams,
   GridOptions,
   GridReadyEvent,
   ModelUpdatedEvent,
@@ -18,6 +19,7 @@ import {
   RowDragEndEvent,
   RowDragMoveEvent,
   SelectionChangedEvent,
+  SelectionColumnDef,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
@@ -25,7 +27,7 @@ import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { GridContext, useGridContext } from '../contexts/GridContext';
+import { useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
@@ -35,36 +37,6 @@ import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-let timeOfLastSingleClick = 0;
-let lastClickColId: unknown;
-let lastClickRowIndex: unknown;
-
-const resetClickDebounce = () => {
-  timeOfLastSingleClick = 0;
-  lastClickColId = '';
-  lastClickRowIndex = -1;
-};
-
-/**
- * If click is more than 200ms since last click return true.
- */
-const clickDebounceSkipClick = (colId: unknown, rowIndex: unknown): boolean => {
-  const doubleClickMs = 200;
-
-  if (
-    Date.now() - timeOfLastSingleClick < doubleClickMs &&
-    lastClickColId === colId &&
-    lastClickRowIndex === rowIndex
-  ) {
-    // Skipping double click due to single click edit
-    return true;
-  }
-  timeOfLastSingleClick = Date.now();
-  lastClickColId = colId;
-  lastClickRowIndex = rowIndex;
-  return false;
-};
 
 export interface GridBaseRow {
   id: string | number;
@@ -99,6 +71,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   rowClassRules?: GridOptions['rowClassRules'];
   rowSelection?: 'single' | 'multiple';
   autoSelectFirstRow?: boolean;
+  onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
   onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
@@ -126,7 +99,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
    * When pressing tab whilst editing the grid will select and edit the next cell if available.
    * Once the last cell to edit closes this callback is called.
    */
-  onCellEditingComplete?: () => void;
+  onBulkEditingComplete?: () => void;
 
   /**
    * Context menu definition if required.
@@ -182,13 +155,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     setExternallySelectedItemsAreInSync,
     isExternalFilterPresent,
     doesExternalFilterPass,
-    setOnCellEditingComplete,
+    setOnBulkEditingComplete,
     getColDef,
     showNoRowsOverlay,
     prePopupOps,
-    stopEditing,
-  } = useContext(GridContext);
-  const { startCellEditing } = useGridContext();
+    startCellEditing,
+  } = useGridContext<TData>();
+
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
@@ -442,27 +415,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, []);
 
   /**
-   * Force-refresh all selected rows to re-run class function, to update selection highlighting
-   */
-  const refreshSelectedRows = useCallback((_event: CellEditingStartedEvent): void => {
-    // MATT Disabled I don't believe these are needed anymore
-    // I've left them here just in case they are
-    /*event.api.refreshCells({
-      force: true,
-      rowNodes: event.api.getSelectedNodes(),
-    });*/
-  }, []);
-
-  /**
    * Handle double click edit
    */
   const onCellDoubleClick = useCallback(
     (event: CellDoubleClickedEvent) => {
-      if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
-        // the next click will be a single click, we want it to pass
-        resetClickDebounce();
-        return;
-      }
       const editable = fnOrVar(event.colDef?.editable, event);
       if (editable && !invokeEditAction(event)) {
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
@@ -478,9 +434,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     (event: CellClickedEvent) => {
       const editable = fnOrVar(event.colDef?.editable, event);
       if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
-        if (clickDebounceSkipClick(event.colDef.colId, event.rowIndex)) {
-          return;
-        }
         void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
       }
     },
@@ -590,11 +543,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   useEffect(() => {
     const newLoading = !rowData || params.loading === true;
     if (newLoading && !prevLoading.current) {
-      stopEditing();
       showNoRowsOverlay();
     }
     prevLoading.current = newLoading;
-  }, [params.loading, rowData, showNoRowsOverlay, stopEditing]);
+  }, [params.loading, rowData, showNoRowsOverlay]);
 
   /**
    * Resize columns to fit if required on window/container resize
@@ -667,6 +619,27 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [clearHighlightRowClasses],
   );
 
+  const onCellFocused = useCallback(
+    (event: CellFocusedEvent<TData>) => {
+      if (!params.onCellFocused || event.rowIndex == null) {
+        return;
+      }
+      const api = event.api;
+      const rowNode = api.getDisplayedRowAtIndex(event.rowIndex);
+      const data = rowNode?.data;
+      const column = event.column;
+      if (!data || !column || typeof column === 'string') {
+        return;
+      }
+      const colDef = column.getColDef();
+      if (!colDef || typeof colDef === 'string') {
+        return;
+      }
+      params.onCellFocused({ colDef, data });
+    },
+    [params],
+  );
+
   const onRowDragEnd = useCallback(
     (event: RowDragEndEvent<TData>) => {
       clearHighlightRowClasses();
@@ -698,10 +671,77 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, [params.setExternalSelectedItems, selectable]);
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
-  setOnCellEditingComplete(params.onCellEditingComplete);
+  setOnBulkEditingComplete(params.onBulkEditingComplete);
 
-  const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
-  const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
+  const getRowId = useCallback((params: GetRowIdParams<TData, unknown>) => `${params.data.id}`, []);
+  const defaultColDef = useMemo(
+    (): ColDef<TData, unknown> => ({
+      minWidth: 48,
+      ...omit(params.defaultColDef, ['editable', 'field', 'colId', 'tooltipField']),
+    }),
+    [params.defaultColDef],
+  );
+
+  const noRowsOverlayComponent = useCallback(
+    (event: AgGridEvent) => {
+      const headerRowCount = columnDefs.some((c) => (c as any).children) ? 2 : 1;
+
+      let rowCount = 0;
+      event.api.forEachNode(() => rowCount++);
+      return (
+        <GridNoRowsOverlay
+          loading={!rowData || params.loading === true}
+          rowCount={rowCount}
+          headerRowHeight={headerRowCount * rowHeight}
+          filteredRowCount={event.api.getDisplayedRowCount()}
+          noRowsOverlayText={params.noRowsOverlayText}
+          noRowsMatchingOverlayText={params.noRowsMatchingOverlayText}
+        />
+      );
+    },
+    [columnDefs, params.loading, params.noRowsMatchingOverlayText, params.noRowsOverlayText, rowData, rowHeight],
+  );
+
+  const selectionColumnDef = useMemo((): SelectionColumnDef => {
+    const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
+    return {
+      suppressNavigable: params.hideSelectColumn,
+      rowDrag: !!params.onRowDragEnd,
+      minWidth: selectWidth,
+      maxWidth: selectWidth,
+      pinned: selectColumnPinned,
+      headerComponentParams: {
+        exportable: false,
+      },
+      headerClass: clsx('ag-header-hide-default-select', params.onRowDragEnd && 'ag-header-select-draggable'),
+      headerComponent: rowSelection == 'multiple' ? GridHeaderSelect : undefined,
+      suppressHeaderKeyboardEvent: (e) => {
+        if (!selectable) return false;
+        if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
+          if (isEmpty(e.api.getSelectedRows())) {
+            e.api.selectAll('filtered');
+          } else {
+            e.api.deselectAll();
+          }
+          return true;
+        }
+        return false;
+      },
+      onCellClicked:
+        params.enableSelectionWithoutKeys || params.enableClickSelection
+          ? undefined
+          : clickInputWhenContainingCellClicked,
+    };
+  }, [
+    params.enableClickSelection,
+    params.enableSelectionWithoutKeys,
+    params.hideSelectColumn,
+    params.onRowDragEnd,
+    rowSelection,
+    selectColumnPinned,
+    selectable,
+  ]);
+
   return (
     <div
       data-testid={dataTestId}
@@ -729,45 +769,30 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
-          getRowId={(params) => `${params.data.id}`}
+          getRowId={getRowId}
           onGridSizeChanged={onGridSizeChanged}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
           onRowDataUpdated={onRowDataChanged}
+          onCellFocused={onCellFocused}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
-          onCellEditingStarted={refreshSelectedRows}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
-          defaultColDef={{ minWidth: 48, ...omit(params.defaultColDef, ['editable']) }}
+          defaultColDef={defaultColDef}
           columnDefs={columnDefsAdjusted}
+          selectionColumnDef={selectionColumnDef}
           rowData={rowData}
-          noRowsOverlayComponent={(event: AgGridEvent) => {
-            let rowCount = 0;
-            event.api.forEachNode(() => rowCount++);
-            return (
-              <GridNoRowsOverlay
-                loading={!rowData || params.loading === true}
-                rowCount={rowCount}
-                headerRowHeight={headerRowCount * rowHeight}
-                filteredRowCount={event.api.getDisplayedRowCount()}
-                noRowsOverlayText={params.noRowsOverlayText}
-                noRowsMatchingOverlayText={params.noRowsMatchingOverlayText}
-              />
-            );
-          }}
-          quickFilterParser={(filterStr) => {
-            // filter is exact matches exactly groups separated by commas
-            return filterStr.split(',').map((str) => str.trim());
-          }}
+          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
           onSortChanged={ensureSelectedRowIsVisible}
-          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
+          quickFilterParser={quickFilterParser}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
           onColumnMoved={params.onColumnMoved}
+          noRowsOverlayComponent={noRowsOverlayComponent}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
           doesExternalFilterPass={doesExternalFilterPass}
@@ -781,36 +806,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
-          selectionColumnDef={{
-            suppressNavigable: params.hideSelectColumn,
-            rowDrag: !!params.onRowDragEnd,
-            minWidth: selectWidth,
-            maxWidth: selectWidth,
-            pinned: selectColumnPinned,
-            headerComponentParams: {
-              exportable: false,
-            },
-            headerClass: clsx('ag-header-hide-default-select', params.onRowDragEnd && 'ag-header-select-draggable'),
-            headerComponent: rowSelection == 'multiple' ? GridHeaderSelect : undefined,
-            suppressHeaderKeyboardEvent: (e) => {
-              if (!selectable) return false;
-              if ((e.event.key === 'Enter' || e.event.key === ' ') && !e.event.repeat) {
-                if (isEmpty(e.api.getSelectedRows())) {
-                  e.api.selectAll('filtered');
-                } else {
-                  e.api.deselectAll();
-                }
-                return true;
-              }
-              return false;
-            },
-            onCellClicked:
-              params.enableSelectionWithoutKeys || params.enableClickSelection
-                ? undefined
-                : clickInputWhenContainingCellClicked,
-          }}
         />
       </div>
     </div>
   );
+};
+
+const quickFilterParser = (filterStr: string) => {
+  // filter is exact matches exactly groups separated by commas
+  return filterStr.split(',').map((str) => str.trim());
 };

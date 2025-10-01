@@ -56,8 +56,8 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
       <GridContext.Provider
         value={
           {
-            stopEditing: () => {},
-            cancelEdit: () => {},
+            onBulkEditingComplete: () => {},
+            resetFocusedCellAfterCellEditing: () => {},
           } as any
         }
       >
@@ -74,6 +74,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
             saving: false,
             setSaving: () => {},
             formatValue: (value) => value,
+            stopEditing: () => {},
           }}
         >
           <GridFormMultiSelect {...props} {...config} />
