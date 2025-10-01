@@ -16,6 +16,8 @@ import {
   GridReadyEvent,
   ModelUpdatedEvent,
   ModuleRegistry,
+  RowClickedEvent,
+  RowDoubleClickedEvent,
   RowDragEndEvent,
   RowDragMoveEvent,
   SelectionChangedEvent,
@@ -120,6 +122,8 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   suppressCellFocus?: boolean;
   pinnedTopRowData?: GridOptions['pinnedTopRowData'];
   pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
+  onRowClicked?: (event: RowClickedEvent) => void;
+  onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
 }
 
 /**
@@ -806,6 +810,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressCellFocus={params.suppressCellFocus}
           pinnedTopRowData={params.pinnedTopRowData}
           pinnedBottomRowData={params.pinnedBottomRowData}
+          onRowClicked={params.onRowClicked}
+          onRowDoubleClicked={params.onRowDoubleClicked}
         />
       </div>
     </div>
