@@ -551,7 +551,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const selectNextEditableCell = useCallback(
     async (tabDirection: -1 | 1): Promise<boolean> => {
       // Pretend it succeeded to prevent unwanted cellEditingCompleteCallback
-      if (!gridApi) return true;
+      if (!gridApi) {
+        return true;
+      }
 
       const focusedCellIsEditable = () => {
         const focusedCell = gridApi.isDestroyed() ? null : gridApi.getFocusedCell();
@@ -571,16 +573,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         if (gridApi.isDestroyed()) {
           return true;
         }
+        // Prevent resetting focus to original editing cell
+        prePopupFocusedCell.current = undefined;
+
         const preRow = gridApi.getFocusedCell();
         if (tabDirection === 1) {
+          gridApi.stopEditing();
           gridApi.tabToNextCell();
         } else {
           gridApi.tabToPreviousCell();
         }
-
-        // If we don't wait the tab to next element won't work
-        // I think this is due to the grid resizing
-        await wait(150);
 
         if (gridApi.isDestroyed()) {
           return true;
@@ -595,11 +597,6 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         if (focusedCellIsEditable()) {
           const focusedCell = gridApi.getFocusedCell();
           if (focusedCell) {
-            //prePopupOps();
-            /*gridApi.startEditingCell({
-              rowIndex: focusedCell.rowIndex,
-              colKey: focusedCell.column.getColId(),
-            });*/
             const rowNode = gridApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
             const rowId = rowNode?.data?.id;
             if (rowId == null) {
@@ -622,66 +619,69 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       setSaving?: (saving: boolean) => void,
       tabDirection?: 1 | 0 | -1,
     ): Promise<boolean> => {
-      setSaving && setSaving(true);
-      return await gridApiOp(async (gridApi) => {
-        const selectedRows = props.selectedRows;
+      try {
+        setSaving?.(true);
+        return await gridApiOp(async (gridApi) => {
+          const selectedRows = props.selectedRows;
 
-        let ok = false;
+          let ok = false;
 
-        await modifyUpdating(
-          props.field ?? '',
-          selectedRows.map((data) => data.id),
-          async () => {
-            // MATT Disabled I don't believe these are needed anymore
-            // I've left them here just in case they are
-            // Need to refresh to get spinners to work on all rows
-            // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
-            ok = await fnUpdate(selectedRows).catch((ex) => {
-              console.error('Exception during modifyUpdating', ex);
-              return false;
-            });
-          },
-        );
+          await modifyUpdating(
+            props.field ?? '',
+            selectedRows.map((data) => data.id),
+            async () => {
+              // MATT Disabled I don't believe these are needed anymore
+              // I've left them here just in case they are
+              // Need to refresh to get spinners to work on all rows
+              // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+              ok = await fnUpdate(selectedRows).catch((ex) => {
+                console.error('Exception during modifyUpdating', ex);
+                return false;
+              });
+            },
+          );
 
-        // MATT Disabled I don't believe these are needed anymore
-        // I've left them here just in case they are
-        // async processes need to refresh their own rows
-        // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+          // MATT Disabled I don't believe these are needed anymore
+          // I've left them here just in case they are
+          // async processes need to refresh their own rows
+          // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
-        if (gridApi.isDestroyed()) {
+          if (gridApi.isDestroyed()) {
+            return ok;
+          }
+
+          if (ok) {
+            const cell = gridApi.getFocusedCell();
+            if (cell && gridApi.getFocusedCell() == null) {
+              !gridApi.isDestroyed && gridApi.setFocusedCell(cell.rowIndex, cell.column);
+            }
+
+            // This is needed to trigger postSortRowsHook
+            gridApi.refreshClientSideRowModel();
+          }
+
+          void (async () => {
+            // Only focus next cell if user hasn't already manually changed focus
+            const postPopupFocusedCell = gridApi.getFocusedCell();
+            if (
+              prePopupFocusedCell.current &&
+              postPopupFocusedCell &&
+              prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
+              prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
+            ) {
+              if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
+                onBulkEditingComplete();
+              }
+            } else {
+              onBulkEditingComplete();
+            }
+          })();
+
           return ok;
-        }
-
-        if (ok) {
-          const cell = gridApi.getFocusedCell();
-          if (cell && gridApi.getFocusedCell() == null) {
-            !gridApi.isDestroyed && gridApi.setFocusedCell(cell.rowIndex, cell.column);
-          }
-
-          // This is needed to trigger postSortRowsHook
-          gridApi.refreshClientSideRowModel();
-        } else {
-          // Don't set saving if ok as the form has already closed
-          setSaving?.(false);
-        }
-
-        // Only focus next cell if user hasn't already manually changed focus
-        const postPopupFocusedCell = gridApi.getFocusedCell();
-        if (
-          prePopupFocusedCell.current &&
-          postPopupFocusedCell &&
-          prePopupFocusedCell.current.rowIndex == postPopupFocusedCell.rowIndex &&
-          prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
-        ) {
-          if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
-            onBulkEditingComplete();
-          }
-        } else {
-          onBulkEditingComplete();
-        }
-
-        return ok;
-      });
+        });
+      } finally {
+        setSaving?.(false);
+      }
     },
     [gridApiOp, modifyUpdating, onBulkEditingComplete, selectNextEditableCell],
   );
@@ -918,5 +918,6 @@ const waitForCondition = async (condition: () => boolean, timeoutMs: number): Pr
     }
     await wait(100);
   }
+  console.warn('waitForCondition failed');
   return false;
 };

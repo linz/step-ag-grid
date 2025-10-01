@@ -34,7 +34,10 @@ export const GridPopoverContextProvider = (props2: PropsWithChildren<GridPopover
 
   const updateValue = useCallback(
     async (saveFn: (selectedRows: any[]) => Promise<boolean>, tabDirection: 1 | 0 | -1): Promise<boolean> => {
-      if (hasSaved.current) return true;
+      if (hasSaved.current) {
+        // already called save so ignore
+        return true;
+      }
       hasSaved.current = true;
       return saving ? false : await updatingCells({ selectedRows, field }, saveFn, setSaving, tabDirection);
     },

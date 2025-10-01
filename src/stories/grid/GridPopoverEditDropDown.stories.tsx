@@ -39,7 +39,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 1024, height: 400 }}>
+      <div style={{ width: 1224, height: 400 }}>
         <GridUpdatingContextProvider>
           <GridContextProvider>
             <Story />
@@ -322,7 +322,8 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridPro
           console.log('onBulkEditingComplete()');
         }}
         onCellFocused={({ colDef, data }) => {
-          console.log('on focus', { colDef, data });
+          /* eslint-disable-next-line no-console */
+          console.log('on cell focused called', { colDef, data });
         }}
       />
     </GridWrapper>
