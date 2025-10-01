@@ -127,7 +127,7 @@ const GridPopoutContextMenuTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
         sizeColumns={'auto'}
         onBulkEditingComplete={() => {
           /* eslint-disable-next-line no-console */
-          console.log('onBulkEditingComplete');
+          console.log('onBulkEditingComplete()');
         }}
         contextMenu={ContextMenu}
       />
