@@ -120,6 +120,11 @@ export const defaultValueFormatter = ({ value }: ValueFormatterParams) => {
     : JSON.stringify(value);
 };
 
+// ag-grid doesn't understand the custom editor, when it stops editing it thinks
+// that _it_ was editing and overwrites the user updated data
+// _but_, it only does this if the initial value of the cell was null!?
+const blockValueSetter = () => true;
+
 /*
  * All cells should use this.
  */
@@ -132,12 +137,10 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
     editorParams?: Props;
   },
 ): ColDefT<TData, TValue> => {
-  // props.field = ;
   // Generate a default filter value getter which uses the formatted value plus
   // the editable value if it's a string and different from the formatted value.
   // This is so that e.g. bearings can be searched for by DMS or raw number.
   const valueFormatter = props.valueFormatter ?? defaultValueFormatter;
-  // FIXME
   const filterValueGetter = props.filterValueGetter ?? generateFilterGetter(valueFormatter as any);
   const exportable = props.exportable;
   // Can't leave this here ag-grid will complain
@@ -149,6 +152,7 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
     headerTooltip: props.headerName,
     sortable: true,
     resizable: true,
+    valueSetter: custom?.editor ? blockValueSetter : undefined,
     editable: props.editable ?? false,
     ...(custom?.editor && {
       cellClassRules: GridCellMultiSelectClassRules,
