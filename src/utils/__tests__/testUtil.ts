@@ -15,7 +15,7 @@ export const setUpUserEvent = (customisedUserEvent: any) => {
 };
 
 export const countRows = (within?: HTMLElement): number => {
-  return getAllQuick({ tagName: `div[row-id]:not(:empty)` }, within).length;
+  return getAllQuick({ tagName: `.ag-center-cols-container div[row-id]:not(:empty)` }, within).length;
 };
 
 export const findRowByIndex = async (rowIndex: number | string, within?: HTMLElement): Promise<HTMLDivElement> => {
