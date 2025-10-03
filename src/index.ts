@@ -17,3 +17,4 @@ export * from './utils/deferredPromise';
 export * from './utils/textMatcher';
 export * from './utils/textValidator';
 export * from './utils/util';
+export * from './utils/waitForCondition';

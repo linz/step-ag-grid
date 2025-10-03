@@ -8,7 +8,7 @@ import { GridPopoverContext } from 'contexts/GridPopoverContext';
 import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-import { GridContext, GridFormTextInput, GridFormTextInputProps } from '../../..';
+import { GridContextProvider, GridFormTextInput, GridFormTextInputProps } from '../../..';
 
 export default {
   title: 'GridForm / Interactions',
@@ -23,14 +23,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as any
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -49,7 +42,7 @@ const Template: StoryFn<typeof GridFormTextInput> = (props: GridFormTextInputPro
         >
           <GridFormTextInput {...props} required={true} />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };

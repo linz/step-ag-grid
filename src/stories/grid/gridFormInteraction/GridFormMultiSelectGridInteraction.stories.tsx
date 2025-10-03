@@ -8,7 +8,12 @@ import { GridPopoverContext } from 'contexts/GridPopoverContext';
 import { useRef } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { GridContext, GridFormMultiSelectGrid, GridFormMultiSelectGridProps, MultiSelectGridOption } from '../../..';
+import {
+  GridContextProvider,
+  GridFormMultiSelectGrid,
+  GridFormMultiSelectGridProps,
+  MultiSelectGridOption,
+} from '../../..';
 
 export default {
   title: 'GridForm / Interactions',
@@ -42,14 +47,7 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as any
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -68,7 +66,7 @@ const Template: StoryFn<typeof GridFormMultiSelectGrid> = (props: GridFormMultiS
         >
           <GridFormMultiSelectGrid {...props} {...config} />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };

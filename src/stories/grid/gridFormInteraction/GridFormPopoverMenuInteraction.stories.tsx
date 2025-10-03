@@ -10,7 +10,7 @@ import * as test from 'storybook/test';
 import { expect, userEvent, within } from 'storybook/test';
 
 import {
-  GridContext,
+  GridContextProvider,
   GridFormPopoverMenu,
   GridFormPopoverMenuProps,
   GridFormSubComponentTextArea,
@@ -37,14 +37,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as any
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -85,7 +78,7 @@ const Template: StoryFn<typeof GridFormPopoverMenu> = (props: GridFormPopoverMen
             ]}
           />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };
