@@ -26,7 +26,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
   invalid,
   dontSaveOnExternalClick,
 }: GridPopoverHookProps<TData>) => {
-  const { onBulkEditingComplete, redrawRows } = useGridContext<TData>();
+  const { onBulkEditingComplete } = useGridContext<TData>();
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -40,7 +40,6 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
       if (reason == CloseReason.CANCEL) {
         stopEditing();
         onBulkEditingComplete();
-        redrawRows();
         return;
       }
       if (invalid?.()) {
@@ -52,7 +51,6 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
         // No save method so just close
         stopEditing();
         onBulkEditingComplete();
-        redrawRows();
         return;
       }
 
@@ -60,10 +58,9 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
         await updateValue(save, reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0)
       ) {
         stopEditing();
-        redrawRows();
       }
     },
-    [invalid, onBulkEditingComplete, redrawRows, save, stopEditing, updateValue],
+    [invalid, onBulkEditingComplete, save, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

@@ -638,10 +638,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
             props.field ?? '',
             selectedRows.map((data) => data.id),
             async () => {
-              // MATT Disabled I don't believe these are needed anymore
-              // I've left them here just in case they are
               // Need to refresh to get spinners to work on all rows
-              // gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
+              gridApi.refreshCells({ rowNodes: props.selectedRows as RowNode[], force: true });
               ok = await fnUpdate(selectedRows).catch((ex) => {
                 console.error('Exception during modifyUpdating', ex);
                 return false;
@@ -649,10 +647,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
             },
           );
 
-          // MATT Disabled I don't believe these are needed anymore
-          // I've left them here just in case they are
           // async processes need to refresh their own rows
-          // gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
+          gridApi.refreshCells({ rowNodes: selectedRows as RowNode[], force: true });
 
           if (gridApi.isDestroyed()) {
             return ok;
