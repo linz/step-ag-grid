@@ -20,8 +20,13 @@ export interface GridPopoverHookProps<TData> {
   dontSaveOnExternalClick?: boolean;
 }
 
-export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopoverHookProps<TData>) => {
-  const { onBulkEditingComplete } = useGridContext<TData>();
+export const useGridPopoverHook = <TData extends GridBaseRow>({
+  className,
+  save,
+  invalid,
+  dontSaveOnExternalClick,
+}: GridPopoverHookProps<TData>) => {
+  const { onBulkEditingComplete, redrawRows } = useGridContext<TData>();
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -35,30 +40,30 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
       if (reason == CloseReason.CANCEL) {
         stopEditing();
         onBulkEditingComplete();
+        redrawRows();
         return;
       }
-      if (props?.invalid?.()) {
+      if (invalid?.()) {
         // Don't close, don't do anything it's invalid
         return;
       }
 
-      if (!props.save) {
+      if (!save) {
         // No save method so just close
         stopEditing();
         onBulkEditingComplete();
+        redrawRows();
         return;
       }
 
       if (
-        await updateValue(
-          props.save,
-          reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
-        )
+        await updateValue(save, reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0)
       ) {
         stopEditing();
+        redrawRows();
       }
     },
-    [onBulkEditingComplete, props, stopEditing, updateValue],
+    [invalid, onBulkEditingComplete, redrawRows, save, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(
@@ -82,7 +87,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
               }}
               viewScroll={'auto'}
               dontShrinkIfDirectionIsTop={true}
-              className={props.className}
+              className={className}
             >
               {saving && ( // This is the overlay that prevents editing when the editor is saving
                 <div className={'ComponentLoadingWrapper-saveOverlay'} />
@@ -93,7 +98,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
                 data-reason={''}
                 onClick={(e) => {
                   let reason = e.currentTarget.getAttribute('data-reason') ?? undefined;
-                  if (props.dontSaveOnExternalClick && reason === CloseReason.BLUR) {
+                  if (dontSaveOnExternalClick && reason === CloseReason.BLUR) {
                     reason = CloseReason.CANCEL;
                   }
                   void triggerSave(reason);
@@ -105,7 +110,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>(props: GridPopover
         </>
       );
     },
-    [anchorRef, isOpen, props.className, props.dontSaveOnExternalClick, saving, triggerSave],
+    [anchorRef, isOpen, className, dontSaveOnExternalClick, saving, triggerSave],
   );
 
   return {
