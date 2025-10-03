@@ -9,7 +9,7 @@ import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
-  GridContext,
+  GridContextProvider,
   GridFormEditBearing,
   GridFormEditBearingProps,
   GridPopoverEditBearingCorrectionEditorParams,
@@ -28,14 +28,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as any
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction Test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -54,7 +47,7 @@ const Template: StoryFn<typeof GridFormEditBearing> = (props: GridFormEditBearin
         >
           <GridFormEditBearing {...props} {...GridPopoverEditBearingCorrectionEditorParams} />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };

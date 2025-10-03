@@ -1,5 +1,12 @@
-import { CellPosition, ColDef, GridApi, IRowNode, RowNode } from 'ag-grid-community';
-import { CsvExportParams, ProcessCellForExportParams } from 'ag-grid-community';
+import {
+  CellPosition,
+  ColDef,
+  CsvExportParams,
+  GridApi,
+  IRowNode,
+  ProcessCellForExportParams,
+  RowNode,
+} from 'ag-grid-community';
 import debounce from 'debounce-promise';
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from 'lodash-es';
 import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -8,6 +15,7 @@ import { ColDefT, GridBaseRow } from '../components';
 import { GridCellFillerColId, isGridCellFiller } from '../components/GridCellFiller';
 import { getColId, isFlexColumn } from '../components/gridUtil';
 import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from '../utils/util';
+import { waitForCondition } from '../utils/waitForCondition';
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from './GridContext';
 import { GridUpdatingContext } from './GridUpdatingContext';
 
@@ -908,16 +916,4 @@ export const downloadCsvUseValueFormattersProcessCellCallback = (params: Process
   }
   // We add an extra encodeToString here just in case valueFormatter is returning non string values
   return encodeToString(result);
-};
-
-const waitForCondition = async (condition: () => boolean, timeoutMs: number): Promise<boolean> => {
-  const endTime = Date.now() + timeoutMs;
-  while (Date.now() < endTime) {
-    if (condition()) {
-      return true;
-    }
-    await wait(100);
-  }
-  console.warn('waitForCondition failed');
-  return false;
 };

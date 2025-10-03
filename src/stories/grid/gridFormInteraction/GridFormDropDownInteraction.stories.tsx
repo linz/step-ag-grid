@@ -10,8 +10,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
   GridBaseRow,
-  GridContext,
-  GridContextType,
+  GridContextProvider,
   GridFormDropDown,
   GridFormDropDownProps,
   GridFormSubComponentTextInput,
@@ -51,14 +50,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as unknown as GridContextType<GridBaseRow>
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -77,7 +69,7 @@ const Template: StoryFn<typeof GridFormDropDown<GridBaseRow, number>> = (
         >
           <GridFormDropDown {...props} {...config} />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };

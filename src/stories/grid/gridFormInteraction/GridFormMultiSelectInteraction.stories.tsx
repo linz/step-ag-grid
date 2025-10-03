@@ -9,7 +9,7 @@ import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
-  GridContext,
+  GridContextProvider,
   GridFormMultiSelect,
   GridFormMultiSelectProps,
   GridFormSubComponentTextInput,
@@ -53,14 +53,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
 
   return (
     <div className={'react-menu-inline-test'}>
-      <GridContext.Provider
-        value={
-          {
-            onBulkEditingComplete: () => {},
-            resetFocusedCellAfterCellEditing: () => {},
-          } as any
-        }
-      >
+      <GridContextProvider>
         <h6 ref={anchorRef}>Interaction test</h6>
         <GridPopoverContext.Provider
           value={{
@@ -79,7 +72,7 @@ const Template: StoryFn<typeof GridFormMultiSelect> = (props: GridFormMultiSelec
         >
           <GridFormMultiSelect {...props} {...config} />
         </GridPopoverContext.Provider>
-      </GridContext.Provider>
+      </GridContextProvider>
     </div>
   );
 };
