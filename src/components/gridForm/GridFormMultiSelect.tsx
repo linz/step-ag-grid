@@ -98,10 +98,14 @@ export const GridFormMultiSelect = <TData extends GridBaseRow>(props: GridFormMu
 
   const save = useCallback(
     async (selectedRows: TData[]): Promise<boolean> => {
-      if (!options || !props.onSave) return true;
+      if (!options || !props.onSave) {
+        return true;
+      }
 
       // Any changes to save?
-      if (initialValues === JSON.stringify(options)) return true;
+      if (initialValues === JSON.stringify(options)) {
+        return true;
+      }
 
       return props.onSave({
         selectedRows,
@@ -278,7 +282,9 @@ const FilterInput = (props: {
   }, [filter, headerGroups, options, setOptions]);
 
   const addCustomFilterValue = useCallback(() => {
-    if (!options || !onSelectFilter) return;
+    if (!options || !onSelectFilter) {
+      return;
+    }
 
     const filterTrimmed = filter.trim();
     if (isEmpty(filterTrimmed)) {
@@ -289,7 +295,9 @@ const FilterInput = (props: {
     const preFilterOptions = JSON.stringify(options);
     onSelectFilter({ filter: filterTrimmed, options });
     // Detect if options list changed and update
-    if (preFilterOptions === JSON.stringify(options)) return;
+    if (preFilterOptions === JSON.stringify(options)) {
+      return;
+    }
 
     setOptions([...options]);
     setFilter('');

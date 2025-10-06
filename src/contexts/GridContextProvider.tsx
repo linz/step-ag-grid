@@ -502,8 +502,16 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
       try {
         // Edit in progress so don't edit until finished, timeout waiting after 5s
-        if (!(await waitForCondition(() => !anyUpdating(), 5000))) {
-          console.error("Could not start edit because previous edit hasn't finished after 5 seconds");
+        if (
+          !(await waitForCondition(
+            'startCellEditing failed as update still in progress, waited for 15 seconds',
+            () => {
+              console.log(anyUpdating());
+              return !anyUpdating();
+            },
+            15000,
+          ))
+        ) {
           return;
         }
 
@@ -529,11 +537,12 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         const rowIndex = rowNode.rowIndex;
         if (rowIndex != null) {
           defer(() => {
-            !gridApi.isDestroyed() &&
+            if (!gridApi.isDestroyed()) {
               gridApi.startEditingCell({
                 rowIndex,
                 colKey: colId,
               });
+            }
           });
         }
       } finally {
@@ -543,15 +552,18 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [anyUpdating, gridApi, prePopupOps, waitForExternallySelectedItemsToBeInSync],
   );
 
-  const bulkEditingCompleteCallbackRef = useRef<() => void>();
-  const onBulkEditingComplete = useCallback(() => {
+  const bulkEditingCompleteCallbackRef = useRef<() => Promise<void> | void>();
+  const onBulkEditingComplete = useCallback(async () => {
     resetFocusedCellAfterCellEditing();
-    bulkEditingCompleteCallbackRef.current?.();
+    await bulkEditingCompleteCallbackRef.current?.();
   }, [resetFocusedCellAfterCellEditing]);
 
-  const setOnBulkEditingComplete = useCallback((cellEditingCompleteCallback: (() => void) | undefined) => {
-    bulkEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
-  }, []);
+  const setOnBulkEditingComplete = useCallback(
+    (cellEditingCompleteCallback: (() => Promise<void> | void) | undefined) => {
+      bulkEditingCompleteCallbackRef.current = cellEditingCompleteCallback;
+    },
+    [],
+  );
 
   /**
    * Returns true if an editable cell on same row was selected, else false.
@@ -585,8 +597,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         prePopupFocusedCell.current = undefined;
 
         const preRow = gridApi.getFocusedCell();
+        // If we don't do this ag-grid will do its own continuation of an edit on tab, we don't want that as
+        // we are managing it ourselves
+        gridApi.stopEditing();
         if (tabDirection === 1) {
-          gridApi.stopEditing();
           gridApi.tabToNextCell();
         } else {
           gridApi.tabToPreviousCell();
@@ -629,6 +643,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     ): Promise<boolean> => {
       try {
         setSaving?.(true);
+
         return await gridApiOp(async (gridApi) => {
           const selectedRows = props.selectedRows;
 
@@ -655,13 +670,13 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
           }
 
           if (ok) {
-            const cell = gridApi.getFocusedCell();
-            if (cell && gridApi.getFocusedCell() == null) {
-              !gridApi.isDestroyed && gridApi.setFocusedCell(cell.rowIndex, cell.column);
-            }
+            //const cell = gridApi.getFocusedCell();
+            //if (cell && gridApi.getFocusedCell() == null) {
+            //  !gridApi.isDestroyed && gridApi.setFocusedCell(cell.rowIndex, cell.column);
+            // }
 
             // This is needed to trigger postSortRowsHook
-            gridApi.refreshClientSideRowModel();
+            !gridApi.isDestroyed && gridApi.refreshClientSideRowModel();
           }
 
           void (async () => {
@@ -674,10 +689,10 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
               prePopupFocusedCell.current.column.getColId() == postPopupFocusedCell.column.getColId()
             ) {
               if (!tabDirection || !(await selectNextEditableCell(tabDirection))) {
-                onBulkEditingComplete();
+                await onBulkEditingComplete();
               }
             } else {
-              onBulkEditingComplete();
+              await onBulkEditingComplete();
             }
           })();
 

@@ -15,6 +15,7 @@ export const GridPopoverMessage = <TData extends GridBaseRow, TValue = any>(
     },
     {
       editor: GridFormMessage,
+      preventAutoEdit: true,
       ...props,
     },
   );
