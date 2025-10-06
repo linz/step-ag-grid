@@ -32,7 +32,7 @@ interface FinalSelectOption<TOptionValue> {
 export const primitiveToSelectOption = <T,>(value: T): SelectOption<T> => {
   return {
     value: value,
-    label: value ? String(value) : '',
+    label: value ? String(value) : '-',
   };
 };
 
@@ -178,7 +178,14 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
     if (selectedItem === null) {
       if (props.onSelectFilter) {
         const { onSelectFilter } = props;
-        await onSelectFilter({ selectedRows, selectedRowIds: selectedRows.map((row) => row.id), value: filter as any });
+        if (!isEmpty(filter)) {
+          await onSelectFilter({
+            selectedRows,
+            selectedRowIds: selectedRows.map((row) => row.id),
+            value: filter as any,
+          });
+        }
+
         return true;
       } else {
         if (filteredValues && filteredValues.length === 1) {
@@ -230,7 +237,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
                     !props.onSelectFilter &&
                     !(filteredValues && filteredValues.length === 1 && !filteredValues[0].subComponent)
                   }
-                  onChange={(e) => setFilter(e.target.value)}
+                  onChange={(e) => setFilter(e.target.value.trim())}
                 />
                 {props.filterHelpText && isNotEmpty(filter) && (
                   <FormError error={null} helpText={props.filterHelpText} />

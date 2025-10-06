@@ -1,6 +1,5 @@
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
-import { useGridContext } from '../contexts/GridContext';
 import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
@@ -20,13 +19,14 @@ export interface GridPopoverHookProps<TData> {
   dontSaveOnExternalClick?: boolean;
 }
 
+export const CancelPromise = () => Promise.resolve(true);
+
 export const useGridPopoverHook = <TData extends GridBaseRow>({
   className,
   save,
   invalid,
   dontSaveOnExternalClick,
 }: GridPopoverHookProps<TData>) => {
-  const { onBulkEditingComplete, redrawRows } = useGridContext<TData>();
   const { anchorRef, saving, updateValue, stopEditing } = useGridPopoverContext<TData>();
   const saveButtonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -38,9 +38,9 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
   const triggerSave = useCallback(
     async (reason?: string) => {
       if (reason == CloseReason.CANCEL) {
+        await updateValue(CancelPromise, 0);
         stopEditing();
-        onBulkEditingComplete();
-        redrawRows();
+
         return;
       }
       if (invalid?.()) {
@@ -48,22 +48,16 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
         return;
       }
 
-      if (!save) {
-        // No save method so just close
-        stopEditing();
-        onBulkEditingComplete();
-        redrawRows();
-        return;
-      }
-
       if (
-        await updateValue(save, reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0)
+        await updateValue(
+          save ?? (() => Promise.resolve(true)),
+          reason === CloseReason.TAB_FORWARD ? 1 : reason === CloseReason.TAB_BACKWARD ? -1 : 0,
+        )
       ) {
         stopEditing();
-        redrawRows();
       }
     },
-    [invalid, onBulkEditingComplete, redrawRows, save, stopEditing, updateValue],
+    [invalid, save, stopEditing, updateValue],
   );
 
   const popoverWrapper = useCallback(

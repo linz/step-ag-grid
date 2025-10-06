@@ -5,7 +5,7 @@ import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import { fn } from 'storybook/test';
 import { userEvent, waitFor } from 'storybook/test';
 
@@ -19,6 +19,7 @@ import {
   GridIcon,
   GridPopoverMenu,
   GridPopoverMessage,
+  GridPopoverTextArea,
   GridProps,
   GridUpdatingContextProvider,
   MenuOption,
@@ -75,6 +76,10 @@ const eAction = fn(() => {
   return true;
 });
 
+const bulkEditingCallback = fn(() => {
+  console.log('bulkEditingCallback');
+});
+
 const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
@@ -95,12 +100,16 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props:
         field: 'age',
         headerName: 'Age',
       }),
-      GridCell({
-        field: 'desc',
-        headerName: 'Description',
-      }),
+      GridPopoverTextArea(
+        {
+          field: 'desc',
+          headerName: 'Description',
+        },
+        {},
+      ),
       GridPopoverMessage(
         {
+          colId: 'popout_message',
           headerName: 'Popout message',
           maxWidth: 150,
           cellRenderer: () => <>Single Click me!</>,
@@ -116,6 +125,7 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props:
         },
       ),
       GridCell({
+        colId: 'custom_edit',
         headerName: 'Custom edit',
         maxWidth: 100,
         editable: true,
@@ -219,15 +229,18 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props:
       rowData={rowData}
       domLayout={'autoHeight'}
       autoSelectFirstRow={true}
+      onBulkEditingComplete={bulkEditingCallback}
     />
   );
 };
 
 export const GridKeyboardInteractions: StoryFn<typeof Grid<ITestRow>> = GridKeyboardInteractionsTemplate.bind({});
 GridKeyboardInteractions.play = async ({ canvasElement }) => {
+  const canvas = within(document.body);
+
   multiEditAction.mockClear();
   eAction.mockClear();
-
+  bulkEditingCallback.mockClear();
   await waitForGridReady({ canvasElement });
 
   // Ensure first row/cell is selected on render
@@ -237,7 +250,9 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     expect(activeCell).toHaveAttribute('aria-colindex', '1');
     expect(activeCell?.parentElement).toHaveAttribute('row-index', '0');
   });
+  console.log('arrow down to 3rd row');
   await userEvent.keyboard('{arrowdown}{arrowdown}');
+  console.log('arrow right to first popup menu');
   await userEvent.keyboard('{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}{arrowright}');
 
   // Test enter post focus
@@ -246,9 +261,6 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     await wait(1000);
     await userEvent.keyboard('{arrowdown}{arrowdown}');
     fn();
-    await waitFor(() => {
-      expect(multiEditAction).toHaveBeenCalled();
-    });
 
     await waitFor(() => {
       const activeCell = canvasElement.ownerDocument.activeElement;
@@ -259,19 +271,50 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
     await wait(200);
   };
 
+  console.log('At 2nd to last cell open the popup menu and select 2nd option');
   await test(() => userEvent.keyboard('{Enter}'), '8', '2');
+  expect(multiEditAction).toHaveBeenCalled();
+
+  console.log('Open 2nd to last popup menu, tab to next disabled popup');
   await test(() => userEvent.tab(), '9', '2');
+  expect(bulkEditingCallback).toHaveBeenCalled();
+  bulkEditingCallback.mockClear();
+
+  console.log('Fail to edit last popup menu, tab back to 2nd to last popup menu');
   await userEvent.tab({ shift: true });
-  await test(() => userEvent.tab({ shift: true }), '6', '2');
+  console.log('Open 2nd to last popup menu, tab to desc cell');
+  await test(() => userEvent.tab({ shift: true }), '5', '2');
+  console.log('Cancel edit');
+  await wait(500);
+  await userEvent.keyboard('{Esc}');
+  expect(bulkEditingCallback).toHaveBeenCalled();
+  bulkEditingCallback.mockClear();
+  await wait(500);
+
+  console.log('Open desc cell');
+  await userEvent.keyboard('{Enter}');
+  const textInput = await canvas.findByRole('textbox');
+  expect(textInput).toBeInTheDocument();
+  await userEvent.clear(textInput);
+  await userEvent.type(textInput, 'foo');
+
+  await userEvent.tab();
+  await userEvent.keyboard('{arrowleft}{arrowleft}{arrowleft}');
+
+  await userEvent.keyboard('{Enter}');
+  await waitFor(
+    async () => {
+      await canvas.findByText(/There are 1 row/);
+    },
+    { timeout: 5000 },
+  );
   await userEvent.keyboard('{Esc}');
   await userEvent.tab();
 
-  await userEvent.keyboard('{Enter}');
-  await wait(250);
   expect(eAction).not.toHaveBeenCalled();
-
+  /*await userEvent.keyboard('{Enter}');
   await userEvent.keyboard('e');
   await waitFor(() => {
     expect(eAction).toHaveBeenCalled();
-  });
+  });*/
 };

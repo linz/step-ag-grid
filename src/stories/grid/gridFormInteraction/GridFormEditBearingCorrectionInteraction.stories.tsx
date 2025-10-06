@@ -9,6 +9,7 @@ import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
+  CancelPromise,
   GridContextProvider,
   GridFormEditBearing,
   GridFormEditBearingProps,
@@ -86,7 +87,7 @@ GridFormEditBearingCorrectionInteractions_.play = async ({ canvasElement }) => {
   // Test escape not to save
   updateValue.mockClear();
   await userEvent.type(inputField, '{Escape}');
-  expect(updateValue).not.toHaveBeenCalled();
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 0);
 
   // Test invalid value doesn't save
   updateValue.mockClear();

@@ -101,7 +101,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
    * When pressing tab whilst editing the grid will select and edit the next cell if available.
    * Once the last cell to edit closes this callback is called.
    */
-  onBulkEditingComplete?: () => void;
+  onBulkEditingComplete?: () => Promise<void> | void;
 
   /**
    * Context menu definition if required.

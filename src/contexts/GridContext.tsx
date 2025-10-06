@@ -63,8 +63,8 @@ export interface GridContextType<TData extends GridBaseRow> {
   invisibleColumnIds: string[] | undefined;
   setInvisibleColumnIds: (colIds: string[]) => void;
   downloadCsv: (csvExportParams?: CsvExportParams) => void;
-  onBulkEditingComplete: () => void;
-  setOnBulkEditingComplete: (callback: (() => void) | undefined) => void;
+  onBulkEditingComplete: () => Promise<void> | void;
+  setOnBulkEditingComplete: (callback: (() => Promise<void> | void) | undefined) => void;
   showNoRowsOverlay: () => void;
 }
 

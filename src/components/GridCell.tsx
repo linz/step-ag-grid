@@ -11,7 +11,8 @@ import {
   ValueFormatterParams,
   ValueGetterFunc,
 } from 'ag-grid-community';
-import { forwardRef, ReactElement, useContext } from 'react';
+import { defer } from 'lodash-es';
+import { forwardRef, ReactElement, useContext, useEffect } from 'react';
 
 import { GridPopoverContextProvider } from '../contexts/GridPopoverContextProvider';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
@@ -153,20 +154,25 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
     sortable: true,
     resizable: true,
     valueSetter: custom?.editor ? blockValueSetter : undefined,
-    editable: props.editable ?? false,
-    ...(custom?.editor && {
-      cellClassRules: GridCellMultiSelectClassRules,
-      editable: props.editable ?? true,
-      cellEditor: GenericCellEditorComponentWrapper(custom?.editor),
-    }),
+    editable: props.editable ?? !!custom?.editor,
+    ...(custom?.editor
+      ? {
+          cellClassRules: GridCellMultiSelectClassRules,
+          cellEditor: GenericCellEditorComponentWrapper(custom?.editor),
+        }
+      : {
+          cellEditor: CellEditorToBlockEditing,
+        }),
     suppressKeyboardEvent: suppressCellKeyboardEvents,
-    ...(custom?.editorParams && {
-      cellEditorParams: {
-        ...custom.editorParams,
-        multiEdit: custom.multiEdit,
-        preventAutoEdit: custom.preventAutoEdit ?? false,
-      },
-    }),
+    ...(custom?.editorParams
+      ? {
+          cellEditorParams: {
+            ...custom.editorParams,
+            multiEdit: custom.multiEdit,
+            preventAutoEdit: custom.preventAutoEdit ?? !custom?.editor,
+          },
+        }
+      : { cellEditorParams: { preventAutoEdit: !custom?.editor } }),
     // If there's a valueFormatter and no filterValueGetter then create a filterValueGetter
     getQuickFilterText: filterValueGetter as any,
     // Default value formatter, otherwise react freaks out on objects
@@ -182,6 +188,20 @@ export const GridCell = <TData extends GridBaseRow, TValue = any, Props extends 
       ...props.headerComponentParams,
     },
   };
+};
+
+/**
+ * Ag-grid will start its own editor if editable is true and there is no cell editor
+ * like in the case of a cell that is editable because it triggers a modal.
+ * This will block that editor.
+ */
+const CellEditorToBlockEditing = ({ stopEditing }: { stopEditing: () => void }) => {
+  useEffect(() => {
+    defer(() => {
+      stopEditing();
+    });
+  }, [stopEditing]);
+  return <></>;
 };
 
 export interface CellEditorCommon {
