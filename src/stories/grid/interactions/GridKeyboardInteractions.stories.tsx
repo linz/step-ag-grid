@@ -76,9 +76,8 @@ const eAction = fn(() => {
   return true;
 });
 
-const bulkEditingCallback = fn(async () => {
+const bulkEditingCallback = fn(() => {
   console.log('bulkEditingCallback');
-  await wait(5000);
 });
 
 const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {

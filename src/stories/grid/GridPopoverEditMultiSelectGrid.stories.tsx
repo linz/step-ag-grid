@@ -39,7 +39,7 @@ interface ITestRow {
   position2: string | null;
 }
 
-const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridEditMultiSelectGridTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(() => {

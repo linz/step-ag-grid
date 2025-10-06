@@ -505,10 +505,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         if (
           !(await waitForCondition(
             'startCellEditing failed as update still in progress, waited for 15 seconds',
-            () => {
-              console.log(anyUpdating());
-              return !anyUpdating();
-            },
+            () => !anyUpdating(),
             15000,
           ))
         ) {

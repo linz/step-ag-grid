@@ -123,7 +123,7 @@ GridFormDropDownInteractions_.play = async ({ canvasElement }) => {
   // Test escape to not save
   updateValue.mockClear();
   await userEvent.type(textInput, '{Escape}');
-  expect(updateValue).not.toHaveBeenCalled();
+  expect(updateValue).toHaveBeenCalledWith(expect.anything(), 0);
 
   // Test invalid value doesn't save
   updateValue.mockClear();

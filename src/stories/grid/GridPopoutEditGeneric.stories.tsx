@@ -30,7 +30,7 @@ export default {
   ],
 } as Meta<typeof Grid>;
 
-const GridPopoutEditGenericTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
+const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props: GridProps<IFormTestRow>) => {
   const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
   const columnDefs: ColDefT<IFormTestRow>[] = useMemo(
     () => [

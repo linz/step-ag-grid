@@ -19,6 +19,8 @@ export interface GridPopoverHookProps<TData> {
   dontSaveOnExternalClick?: boolean;
 }
 
+export const CancelPromise = () => Promise.resolve(true);
+
 export const useGridPopoverHook = <TData extends GridBaseRow>({
   className,
   save,
@@ -36,7 +38,7 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
   const triggerSave = useCallback(
     async (reason?: string) => {
       if (reason == CloseReason.CANCEL) {
-        await updateValue(() => Promise.resolve(true), 0);
+        await updateValue(CancelPromise, 0);
         stopEditing();
 
         return;
