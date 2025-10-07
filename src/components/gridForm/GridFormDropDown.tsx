@@ -1,5 +1,5 @@
 import debounce from 'debounce-promise';
-import { isEmpty } from 'lodash-es';
+import { compact, isEmpty } from 'lodash-es';
 import { Fragment, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
@@ -90,7 +90,9 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const [filter, setFilter] = useState(props.filterDefaultValue ?? '');
   const [filteredValues, setFilteredValues] = useState<any[]>();
-  const [options, setOptions] = useState<FinalSelectOption<TOptionValue>[] | null>(null);
+  const [options, setOptions] = useState<FinalSelectOption<TOptionValue>[] | null>(
+    !!propOptions && typeof propOptions !== 'function' ? propOptions : null,
+  );
   const subComponentIsValid = useRef(false);
   const subComponentInitialValue = useRef<string | null>(null);
   const [subSelectedValue, setSubSelectedValue] = useState<any>(null);
@@ -164,7 +166,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
     subSelectedValue,
   ]);
 
-  const { popoverWrapper, gridPopoverOpen } = useGridPopoverHook({
+  const { popoverWrapper } = useGridPopoverHook({
     className: props.className,
     invalid: () => !options || !!(selectedItem && !subComponentIsValid.current),
     save,
@@ -172,39 +174,49 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
   });
 
   // Load up options list if it's async function
-  const prevIsOpen = usePrevious(gridPopoverOpen);
-  const prevFilter = usePrevious(filter);
   useEffect(() => {
-    if ((gridPopoverOpen !== prevIsOpen || filter !== prevFilter) && gridPopoverOpen) {
-      let optionsConf = propOptions;
-
-      void (async () => {
-        if (typeof optionsConf === 'function') {
-          optionsConf = await optionsConf(selectedRows, filter);
-        }
-        if (optionsConf !== undefined) {
-          setOptions(optionsConf);
-        }
-      })();
+    // If options is null then we need to load/reload
+    // Options will be set to null during a reload based filter, or on open popup
+    if (options !== null) {
+      return;
     }
-  }, [filter, gridPopoverOpen, options, prevFilter, prevIsOpen, propOptions, selectedRows]);
+
+    // propOptions is a const list
+    if (typeof propOptions !== 'function') {
+      if (propOptions) {
+        setOptions(propOptions);
+      }
+      return;
+    }
+
+    // propOptions is function, probably loading from web
+    void (async () => {
+      const r = await propOptions(selectedRows, filter);
+      setOptions(r ?? []);
+    })();
+  }, [filter, options, propOptions, selectedRows]);
 
   // Local filtering.
   useEffect(() => {
-    if (props.filtered == 'local') {
-      if (options == null) return;
-      setFilteredValues(
-        options
-          .map((option) => {
-            if (option.label != null && typeof option.label !== 'string') {
-              console.error('Cannot filter non-string labels', option);
-              return undefined;
-            }
-            return textMatch((option.label as string) || '', filter) ? option : undefined;
-          })
-          .filter((r) => r !== undefined),
-      );
+    if (props.filtered !== 'local') {
+      return;
     }
+    if (options == null) {
+      setFilteredValues([]);
+      return;
+    }
+
+    setFilteredValues(
+      compact(
+        options.map((option) => {
+          if (option.label != null && typeof option.label !== 'string') {
+            console.warn('GridFormDropDown: Cannot filter non-string labels', option);
+            return undefined;
+          }
+          return textMatch((option.label as string) || '', filter) ? option : undefined;
+        }),
+      ),
+    );
   }, [props.filtered, filter, options]);
 
   const reSearchOnFilterChange = useMemo(
@@ -215,15 +227,12 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
     [],
   );
 
-  const previousFilter = useRef<string>(filter);
-
-  // Reload filtering.
+  const previousFilter = usePrevious(filter);
   useEffect(() => {
-    if (previousFilter.current != filter && props.filtered == 'reload') {
-      previousFilter.current = filter;
+    if (previousFilter != null && previousFilter != filter && props.filtered === 'reload') {
       void reSearchOnFilterChange();
     }
-  }, [filter, props, reSearchOnFilterChange]);
+  }, [filter, previousFilter, props.filtered, reSearchOnFilterChange]);
 
   let lastHeader: ReactElement | null = null;
   let showHeader: ReactElement | null = null;
