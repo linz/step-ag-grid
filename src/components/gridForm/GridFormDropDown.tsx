@@ -5,6 +5,7 @@ import { Fragment, ReactElement, useCallback, useEffect, useMemo, useRef, useSta
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
 import { FormError } from '../../lui/FormError';
+import { usePrevious } from '../../lui/reactUtils';
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
 import { textMatch } from '../../utils/textMatcher';
@@ -84,6 +85,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
   props: GridFormDropDownProps<TData, TOptionValue>,
 ) => {
   const { selectedRows, field, data } = useGridPopoverContext<TData>();
+  const { onSelectFilter, options: propOptions, onSelectedItem } = props;
 
   // Save triggers during async action processing which triggers another selectItem(), this ref blocks that
   const [filter, setFilter] = useState(props.filterDefaultValue ?? '');
@@ -101,8 +103,8 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
         selectedRows.some((row) => row[field] !== value) ||
         (subComponentValue !== undefined && subComponentInitialValue.current !== JSON.stringify(subComponentValue));
       if (hasChanged) {
-        if (props.onSelectedItem) {
-          await props.onSelectedItem({
+        if (onSelectedItem) {
+          await onSelectedItem({
             selectedRows,
             selectedRowIds: selectedRows.map((row) => row.id),
             value,
@@ -114,23 +116,78 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
       }
       return true;
     },
-    [field, props, selectedRows],
+    [field, onSelectedItem, selectedRows],
   );
 
-  // Load up options list if it's async function
-  useEffect(() => {
-    if (options) return;
-    let optionsConf = props.options;
+  /**
+   * Saves are wrapped in updateValue and triggered by blur events
+   */
+  const save = useCallback(async () => {
+    if (!options) {
+      return true;
+    }
 
-    void (async () => {
-      if (typeof optionsConf === 'function') {
-        optionsConf = await optionsConf(selectedRows, filter);
+    // Filter saved
+    if (selectedItem === null) {
+      if (onSelectFilter) {
+        if (!isEmpty(filter)) {
+          await onSelectFilter({
+            selectedRows,
+            selectedRowIds: selectedRows.map((row) => row.id),
+            value: filter as any,
+          });
+        }
+
+        return true;
+      } else {
+        if (filteredValues && filteredValues.length === 1) {
+          if (filteredValues[0].subComponent) return false;
+          return await selectItemHandler(filteredValues[0].value, null);
+        }
       }
-      if (optionsConf !== undefined) {
-        setOptions(optionsConf);
-      }
-    })();
-  }, [filter, options, props, selectedRows]);
+      return false;
+    }
+    if (selectedItem.subComponent && !subComponentIsValid.current) {
+      return false;
+    }
+    await selectItemHandler(selectedItem.value, subSelectedValue);
+
+    return true;
+  }, [
+    filter,
+    filteredValues,
+    onSelectFilter,
+    options,
+    selectItemHandler,
+    selectedItem,
+    selectedRows,
+    subSelectedValue,
+  ]);
+
+  const { popoverWrapper, gridPopoverOpen } = useGridPopoverHook({
+    className: props.className,
+    invalid: () => !options || !!(selectedItem && !subComponentIsValid.current),
+    save,
+    dontSaveOnExternalClick: true,
+  });
+
+  // Load up options list if it's async function
+  const prevIsOpen = usePrevious(gridPopoverOpen);
+  const prevFilter = usePrevious(filter);
+  useEffect(() => {
+    if ((gridPopoverOpen !== prevIsOpen || filter !== prevFilter) && gridPopoverOpen) {
+      let optionsConf = propOptions;
+
+      void (async () => {
+        if (typeof optionsConf === 'function') {
+          optionsConf = await optionsConf(selectedRows, filter);
+        }
+        if (optionsConf !== undefined) {
+          setOptions(optionsConf);
+        }
+      })();
+    }
+  }, [filter, gridPopoverOpen, options, prevFilter, prevIsOpen, propOptions, selectedRows]);
 
   // Local filtering.
   useEffect(() => {
@@ -167,46 +224,6 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
       void reSearchOnFilterChange();
     }
   }, [filter, props, reSearchOnFilterChange]);
-
-  /**
-   * Saves are wrapped in updateValue and triggered by blur events
-   */
-  const save = useCallback(async () => {
-    if (!options) return true;
-
-    // Filter saved
-    if (selectedItem === null) {
-      if (props.onSelectFilter) {
-        const { onSelectFilter } = props;
-        if (!isEmpty(filter)) {
-          await onSelectFilter({
-            selectedRows,
-            selectedRowIds: selectedRows.map((row) => row.id),
-            value: filter as any,
-          });
-        }
-
-        return true;
-      } else {
-        if (filteredValues && filteredValues.length === 1) {
-          if (filteredValues[0].subComponent) return false;
-          return await selectItemHandler(filteredValues[0].value, null);
-        }
-      }
-      return false;
-    }
-    if (selectedItem.subComponent && !subComponentIsValid.current) return false;
-    await selectItemHandler(selectedItem.value, subSelectedValue);
-
-    return true;
-  }, [filter, filteredValues, options, props, selectItemHandler, selectedItem, selectedRows, subSelectedValue]);
-
-  const { popoverWrapper } = useGridPopoverHook({
-    className: props.className,
-    invalid: () => !options || !!(selectedItem && !subComponentIsValid.current),
-    save,
-    dontSaveOnExternalClick: true,
-  });
 
   let lastHeader: ReactElement | null = null;
   let showHeader: ReactElement | null = null;
