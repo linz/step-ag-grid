@@ -110,6 +110,5 @@ export const useGridPopoverHook = <TData extends GridBaseRow>({
   return {
     popoverWrapper,
     triggerSave,
-    gridPopoverOpen: isOpen,
   };
 };

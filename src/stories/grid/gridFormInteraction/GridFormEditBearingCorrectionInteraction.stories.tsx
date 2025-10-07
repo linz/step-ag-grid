@@ -9,7 +9,6 @@ import { useRef } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import {
-  CancelPromise,
   GridContextProvider,
   GridFormEditBearing,
   GridFormEditBearingProps,
