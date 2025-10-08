@@ -424,7 +424,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    */
   const autoSizeColumns = useCallback(
     ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
-      if (!gridApi || !gridApi.getColumnState()) return null;
+      if (!gridApi || !gridApi.getColumnState()) {
+        return null;
+      }
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
       const colsToResize = gridApi.getColumnState()?.filter?.((colState) => {
         const colId = colState.colId;
