@@ -238,11 +238,29 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, [autoSizeColumns, gridRenderState, params, rowData, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
+  const wasVisibleRef = useRef(false);
 
   /**
    * Auto-size windows that had deferred auto-size
+   * Reset focus if panel went from invisible to visible.
    */
   useInterval(() => {
+    // If grid has become visible after previously being hidden, then refocus the last focused cell.
+    const visible = !!gridDivRef.current?.checkVisibility();
+    if (visible && !wasVisibleRef.current) {
+      wasVisibleRef.current = true;
+      const el = (window as any).__stepaggrid_lastfocuseventtarget;
+      if (el) {
+        // Setting this to null will cause a new refocus event
+        (window as any).__stepaggrid_lastfocuseventtarget = null;
+        // Check element is still part of document
+        if (el.checkVisibility()) {
+          el.focus();
+        }
+      }
+    }
+    wasVisibleRef.current = visible;
+
     // Check if window has been popped out and needs resize
     const currentDocument = gridDivRef.current?.ownerDocument;
     if (currentDocument !== lastOwnerDocumentRef.current) {
@@ -625,7 +643,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const onCellFocused = useCallback(
     (event: CellFocusedEvent<TData>) => {
-      if (!paramsOnCellFocused || event.rowIndex == null) {
+      if (event.rowIndex == null) {
         return;
       }
       const api = event.api;
@@ -639,15 +657,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!colDef || typeof colDef === 'string') {
         return;
       }
-      // Prevent repeated callbacks to cell focus when it focus didn't change
+      // Prevent repeated callbacks to cell focus when focus didn't change
       const { sourceEvent } = event;
       if (sourceEvent) {
-        if ((window as any).__stepaggrid_lastfocuseventtarget === sourceEvent.target) {
+        const cell = (sourceEvent.target as unknown as Element).closest('.ag-cell');
+        if ((window as any).__stepaggrid_lastfocuseventtarget === cell) {
           return;
         }
-        (window as any).__stepaggrid_lastfocuseventtarget = sourceEvent.target;
+        (window as any).__stepaggrid_lastfocuseventtarget = cell;
       }
-      paramsOnCellFocused({ colDef, data });
+
+      paramsOnCellFocused?.({ colDef, data });
     },
     [paramsOnCellFocused],
   );
