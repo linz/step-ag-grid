@@ -29,7 +29,7 @@ import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { StartCellEditingProps, useGridContext } from '../contexts/GridContext';
+import { useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
