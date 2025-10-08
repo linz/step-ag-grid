@@ -596,11 +596,9 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         const preRow = gridApi.getFocusedCell();
         // If we don't do this ag-grid will do its own continuation of an edit on tab, we don't want that as
         // we are managing it ourselves
-        gridApi.stopEditing();
-        if (tabDirection === 1) {
-          gridApi.tabToNextCell();
-        } else {
-          gridApi.tabToPreviousCell();
+        const didTab = tabDirection === 1 ? gridApi.tabToNextCell() : gridApi.tabToPreviousCell();
+        if (!didTab) {
+          break;
         }
 
         if (gridApi.isDestroyed()) {

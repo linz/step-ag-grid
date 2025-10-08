@@ -275,13 +275,11 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   await test(() => userEvent.keyboard('{Enter}'), '8', '2');
   expect(multiEditAction).toHaveBeenCalled();
 
-  console.log('Open 2nd to last popup menu, tab to next disabled popup');
-  await test(() => userEvent.tab(), '9', '2');
+  console.log('Open 2nd to last popup menu, tab to next disabled popup should fail');
+  await test(() => userEvent.tab(), '8', '2');
   expect(bulkEditingCallback).toHaveBeenCalled();
   bulkEditingCallback.mockClear();
 
-  console.log('Fail to edit last popup menu, tab back to 2nd to last popup menu');
-  await userEvent.tab({ shift: true });
   console.log('Open 2nd to last popup menu, tab to desc cell');
   await test(() => userEvent.tab({ shift: true }), '5', '2');
   console.log('Cancel edit');
@@ -312,9 +310,9 @@ GridKeyboardInteractions.play = async ({ canvasElement }) => {
   await userEvent.tab();
 
   expect(eAction).not.toHaveBeenCalled();
-  /*await userEvent.keyboard('{Enter}');
+  await userEvent.keyboard('{Enter}');
   await userEvent.keyboard('e');
   await waitFor(() => {
     expect(eAction).toHaveBeenCalled();
-  });*/
+  });
 };
