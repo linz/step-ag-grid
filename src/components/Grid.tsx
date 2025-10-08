@@ -29,7 +29,7 @@ import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { useGridContext } from '../contexts/GridContext';
+import { StartCellEditingProps, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
@@ -142,6 +142,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
   selectable,
+  onCellFocused: paramsOnCellFocused,
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
@@ -450,7 +451,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const invokeEditAction = (e: CellDoubleClickedEvent | CellKeyDownEvent): boolean => {
     const editAction = e.colDef?.cellRendererParams?.editAction;
     if (!editAction) return false;
-
     const editable = fnOrVar(e.colDef?.editable, e);
     if (editable) {
       if (!e.node.isSelected()) {
@@ -625,7 +625,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const onCellFocused = useCallback(
     (event: CellFocusedEvent<TData>) => {
-      if (!params.onCellFocused || event.rowIndex == null) {
+      if (!paramsOnCellFocused || event.rowIndex == null) {
         return;
       }
       const api = event.api;
@@ -639,9 +639,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (!colDef || typeof colDef === 'string') {
         return;
       }
-      params.onCellFocused({ colDef, data });
+      // Prevent repeated callbacks to cell focus when it focus didn't change
+      const { sourceEvent } = event;
+      if (sourceEvent) {
+        if ((window as any).__stepaggrid_lastfocuseventtarget === sourceEvent.target) {
+          return;
+        }
+        (window as any).__stepaggrid_lastfocuseventtarget = sourceEvent.target;
+      }
+      paramsOnCellFocused({ colDef, data });
     },
-    [params],
+    [paramsOnCellFocused],
   );
 
   const onRowDragEnd = useCallback(
@@ -812,6 +820,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           pinnedBottomRowData={params.pinnedBottomRowData}
           onRowClicked={params.onRowClicked}
           onRowDoubleClicked={params.onRowDoubleClicked}
+          suppressStartEditOnTab={true}
         />
       </div>
     </div>

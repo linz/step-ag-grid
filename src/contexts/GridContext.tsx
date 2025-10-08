@@ -15,6 +15,11 @@ export interface AutoSizeColumnsProps {
 
 export type AutoSizeColumnsResult = { width: number } | null;
 
+export interface StartCellEditingProps {
+  rowId: number;
+  colId: string;
+}
+
 export interface GridContextType<TData extends GridBaseRow> {
   gridReady: boolean;
   gridRenderState: () => null | 'empty' | 'rows-visible';
@@ -43,7 +48,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   getFirstRowId: () => number;
   autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
   sizeColumnsToFit: () => void;
-  startCellEditing: ({ rowId, colId }: { rowId: number; colId: string }) => Promise<void>;
+  startCellEditing: ({ rowId, colId }: StartCellEditingProps) => Promise<void>;
   // Restores the previous focus after cell editing
   resetFocusedCellAfterCellEditing: () => void;
   updatingCells: (
