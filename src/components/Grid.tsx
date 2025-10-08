@@ -660,7 +660,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       // Prevent repeated callbacks to cell focus when focus didn't change
       const { sourceEvent } = event;
       if (sourceEvent) {
-        const cell = (sourceEvent.target as unknown as Element).closest('.ag-cell');
+        const cell = (sourceEvent.target as Element | undefined)?.closest?.('.ag-cell') ?? null;
         if ((window as any).__stepaggrid_lastfocuseventtarget === cell) {
           return;
         }
