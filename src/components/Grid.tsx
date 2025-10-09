@@ -126,6 +126,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
   onRowClicked?: (event: RowClickedEvent) => void;
   onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
+  allowResizeInStorybook?: boolean;
 }
 
 /**
@@ -144,6 +145,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
   selectable,
+  allowResizeInStorybook,
   onCellFocused: paramsOnCellFocused,
   ...params
 }: GridProps<TData>): ReactElement => {
@@ -585,7 +587,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent<TData>) => {
-      if (sizeColumns !== 'none') {
+      if (sizeColumns !== 'none' && (!(window as any).__STORYBOOK_PREVIEW__ || allowResizeInStorybook)) {
         const columnLimits = [
           ...userSizedColIds.current.entries().map(
             ([c, w]): IColumnLimit => ({
@@ -597,7 +599,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         event.api.sizeColumnsToFit({ columnLimits });
       }
     },
-    [sizeColumns],
+    [allowResizeInStorybook, sizeColumns],
   );
 
   /**
@@ -610,7 +612,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onColumnResized = useCallback((e: ColumnResizedEvent) => {
     const colId = e.column?.getColId();
-    console.log('onColumnResized', colId, e.source);
     if (colId == null) {
       return;
     }

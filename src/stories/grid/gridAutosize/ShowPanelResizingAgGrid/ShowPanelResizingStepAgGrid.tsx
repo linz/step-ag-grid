@@ -161,7 +161,7 @@ export const PanelContentsWithResize = () => {
     <GridUpdatingContextProvider>
       <GridContextProvider>
         <GridWrapper>
-          <Grid columnDefs={columnDefs} rowData={rowData} onContentSize={resizePanel} />
+          <Grid columnDefs={columnDefs} rowData={rowData} onContentSize={resizePanel} allowResizeInStorybook={true} />
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
