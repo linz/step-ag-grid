@@ -252,7 +252,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   useInterval(() => {
     // If grid has become visible after previously being hidden, then refocus the last focused cell.
-    const visible = !!gridDivRef.current?.checkVisibility();
+    const visible = !!gridDivRef.current?.checkVisibility?.();
     if (visible && !wasVisibleRef.current) {
       wasVisibleRef.current = true;
       const el = (window as any).__stepaggrid_lastfocuseventtarget;
