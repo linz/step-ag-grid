@@ -14,6 +14,8 @@ import {
   GetRowIdParams,
   GridOptions,
   GridReadyEvent,
+  GridSizeChangedEvent,
+  IColumnLimit,
   ModelUpdatedEvent,
   ModuleRegistry,
   RowClickedEvent,
@@ -124,6 +126,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
   onRowClicked?: (event: RowClickedEvent) => void;
   onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
+  allowResizeInStorybook?: boolean;
 }
 
 /**
@@ -142,6 +145,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
   selectable,
+  allowResizeInStorybook,
   onCellFocused: paramsOnCellFocused,
   ...params
 }: GridProps<TData>): ReactElement => {
@@ -204,7 +208,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
     if (sizeColumns === 'auto' || skipHeader) {
-      const result = autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, includeFlex: true });
+      const result = autoSizeColumns({
+        skipHeader,
+        userSizedColIds: new Set(userSizedColIds.current.keys()),
+        includeFlex: true,
+      });
       if (!result) {
         needsAutoSize.current = true;
         return;
@@ -425,7 +433,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const skipHeader = sizeColumns === 'auto-skip-headers';
     if (hasSetContentSize.current) {
-      autoSizeColumns({ skipHeader, userSizedColIds: userSizedColIds.current, colIds: colIdsEdited.current });
+      autoSizeColumns({
+        skipHeader,
+        userSizedColIds: new Set(userSizedColIds.current.keys()),
+        colIds: colIdsEdited.current,
+      });
     }
     colIdsEdited.current.clear();
   }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
@@ -543,7 +555,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             if (hasSetContentSize.current) {
               autoSizeColumns({
                 skipHeader,
-                userSizedColIds: userSizedColIds.current,
+                userSizedColIds: new Set(userSizedColIds.current.keys()),
                 colIds: colIdsEdited.current,
               });
             }
@@ -573,26 +585,43 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Resize columns to fit if required on window/container resize
    */
-  const onGridSizeChanged = useCallback(() => {
-    if (sizeColumns !== 'none') {
-      sizeColumnsToFit();
-    }
-  }, [sizeColumns, sizeColumnsToFit]);
+  const onGridSizeChanged = useCallback(
+    (event: GridSizeChangedEvent<TData>) => {
+      if (sizeColumns !== 'none' && (!(window as any).__STORYBOOK_PREVIEW__ || allowResizeInStorybook)) {
+        const columnLimits = [
+          ...userSizedColIds.current.entries().map(
+            ([c, w]): IColumnLimit => ({
+              key: c,
+              minWidth: w,
+            }),
+          ),
+        ];
+        event.api.sizeColumnsToFit({ columnLimits });
+      }
+    },
+    [allowResizeInStorybook, sizeColumns],
+  );
 
   /**
    * Set of column I'd's that are prevented from auto-sizing as they are user set
    */
-  const userSizedColIds = useRef(new Set<string>());
+  const userSizedColIds = useRef(new Map<string, number>());
 
   /**
    * Lock/unlock column width on user edit/reset.
    */
   const onColumnResized = useCallback((e: ColumnResizedEvent) => {
     const colId = e.column?.getColId();
-    if (colId == null) return;
+    if (colId == null) {
+      return;
+    }
+    const width = e.column?.getActualWidth();
+    if (width == null) {
+      return;
+    }
     switch (e.source) {
-      case 'uiColumnDragged':
-        userSizedColIds.current.add(colId);
+      case 'uiColumnResized':
+        userSizedColIds.current.set(colId, width);
         break;
       case 'autosizeColumns':
         userSizedColIds.current.delete(colId);
@@ -660,7 +689,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       // Prevent repeated callbacks to cell focus when focus didn't change
       const { sourceEvent } = event;
       if (sourceEvent) {
-        const cell = (sourceEvent.target as unknown as Element).closest('.ag-cell');
+        const cell = (sourceEvent.target as Element | undefined)?.closest?.('.ag-cell') ?? null;
         if ((window as any).__stepaggrid_lastfocuseventtarget === cell) {
           return;
         }
