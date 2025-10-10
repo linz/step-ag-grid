@@ -1,4 +1,4 @@
-import { ColDef, GridApi, IRowNode } from 'ag-grid-community';
+import { ColDef, GridApi, IRowNode, ISizeColumnsToFitParams } from 'ag-grid-community';
 import { CsvExportParams } from 'ag-grid-community';
 import { createContext, useContext } from 'react';
 
@@ -47,7 +47,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
   autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
-  sizeColumnsToFit: () => void;
+  sizeColumnsToFit: (paramsOrGridWidth?: ISizeColumnsToFitParams) => void;
   startCellEditing: ({ rowId, colId }: StartCellEditingProps) => Promise<void>;
   // Restores the previous focus after cell editing
   resetFocusedCellAfterCellEditing: () => void;

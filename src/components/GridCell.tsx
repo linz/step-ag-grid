@@ -71,6 +71,7 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
   editable?: boolean | EditableCallback<TData, ValueType>;
   valueGetter?: string | ValueGetterFunc<TData, ValueType>;
   valueFormatter?: string | ValueFormatterFunc<TData, ValueType>;
+  maxInitialWidth?: number;
   cellRenderer?:
     | ((props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
     | string;

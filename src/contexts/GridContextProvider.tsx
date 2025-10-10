@@ -4,6 +4,7 @@ import {
   CsvExportParams,
   GridApi,
   IRowNode,
+  ISizeColumnsToFitParams,
   ProcessCellForExportParams,
   RowNode,
 } from 'ag-grid-community';
@@ -455,11 +456,14 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   /**
    * Resize columns to fit container
    */
-  const sizeColumnsToFit = useCallback((): void => {
-    if (gridApi && !gridApi?.isDestroyed()) {
-      gridApi.sizeColumnsToFit();
-    }
-  }, [gridApi]);
+  const sizeColumnsToFit = useCallback(
+    (paramsOrGridWidth?: ISizeColumnsToFitParams): void => {
+      if (gridApi && !gridApi?.isDestroyed()) {
+        gridApi.sizeColumnsToFit(paramsOrGridWidth);
+      }
+    },
+    [gridApi],
+  );
 
   /**
    *

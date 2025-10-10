@@ -27,7 +27,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, difference, isEmpty, last, omit, sum, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -35,6 +35,7 @@ import { useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
+import { ColDefT } from './GridCell';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
@@ -100,6 +101,10 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
    */
   sizeColumns?: 'fit' | 'auto' | 'auto-skip-headers' | 'none';
   /**
+   * On first don't return a content size larger than this.
+   */
+  maxInitialWidth?: number;
+  /**
    * When pressing tab whilst editing the grid will select and edit the next cell if available.
    * Once the last cell to edit closes this callback is called.
    */
@@ -145,6 +150,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
   selectable,
   onCellFocused: paramsOnCellFocused,
+  maxInitialWidth,
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
@@ -215,6 +221,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         needsAutoSize.current = true;
         return;
       }
+      // Default max intial width is 256x initial visible column count, max of 80% window width
+      const maxWidth =
+        maxInitialWidth ||
+        sum(params.columnDefs.map((c: ColDefT<TData>) => (!(c as any).hide ? c.maxInitialWidth || 128 : 0)));
+      result.width = Math.min(result.width, maxWidth);
       if (gridRendered === 'empty') {
         if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
@@ -241,7 +252,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     }
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, gridRenderState, params, rowData, sizeColumns, sizeColumnsToFit]);
+  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
   const wasVisibleRef = useRef(false);
