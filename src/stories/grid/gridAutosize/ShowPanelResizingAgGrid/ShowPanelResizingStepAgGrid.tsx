@@ -71,7 +71,7 @@ interface ITestRow {
 // Note: Resize can only be used from within the panel content.
 export const PanelContentsWithResize = () => {
   // This is the first important bit
-  const { resizePanel } = useContext(PanelContext);
+  const { initialResizePanel } = useContext(PanelContext);
 
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -151,7 +151,13 @@ export const PanelContentsWithResize = () => {
   const [rowData] = useState([
     /* Your grid row data */
     /* exclude */
-    { id: 1000, position: 'Tester', age: 30, desc: 'Tests application', dd: '1' },
+    {
+      id: 1000,
+      position: 'Tester',
+      age: 30,
+      desc: 'Tests application',
+      dd: '1',
+    },
     { id: 1001, position: 'Developer', age: 12, desc: 'Develops application', dd: '2' },
     { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
     /* exclude */
@@ -161,7 +167,12 @@ export const PanelContentsWithResize = () => {
     <GridUpdatingContextProvider>
       <GridContextProvider>
         <GridWrapper>
-          <Grid columnDefs={columnDefs} rowData={rowData} onContentSize={resizePanel} />
+          <Grid
+            columnDefs={columnDefs}
+            rowData={rowData}
+            onContentSize={initialResizePanel}
+            sizeColumns={'auto-skip-headers'}
+          />
         </GridWrapper>
       </GridContextProvider>
     </GridUpdatingContextProvider>
