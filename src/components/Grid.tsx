@@ -14,7 +14,6 @@ import {
   GetRowIdParams,
   GridOptions,
   GridReadyEvent,
-  GridSizeChangedEvent,
   IColumnLimit,
   ModelUpdatedEvent,
   ModuleRegistry,
@@ -27,15 +26,14 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, sum, xorBy } from 'lodash-es';
+import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { useGridContext } from '../contexts/GridContext';
+import { AutoSizeColumnsResult, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
-import { ColDefT } from './GridCell';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
@@ -196,6 +194,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const lastFullResize = useRef<number>();
 
+  const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
   const setInitialContentSize = useCallback(() => {
     if (!gridDivRef.current?.clientWidth || rowData == null) {
       // Don't resize grids if they are offscreen as it doesn't work.
@@ -210,36 +209,44 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       return;
     }
 
-    const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
-    if (sizeColumns === 'auto' || skipHeader) {
-      const result = autoSizeColumns({
-        skipHeader,
-        userSizedColIds: new Set(userSizedColIds.current.keys()),
-        includeFlex: true,
-      });
-      if (!result) {
+    // 1. First we autosize to get the size of the columns on an infinite grid.
+    if (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') {
+      // You can't skip headers until the grid has content
+      const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
+      const autoSizeResult =
+        autoSizeResultRef.current ??
+        autoSizeColumns({
+          skipHeader,
+          userSizedColIds: new Set(userSizedColIds.current.keys()),
+        });
+      // Auto-size failed retry later
+      if (!autoSizeResult) {
         needsAutoSize.current = true;
         return;
       }
-      // Default max intial width is 256x initial visible column count, max of 80% window width
-      const maxWidth =
-        maxInitialWidth ||
-        sum(params.columnDefs.map((c: ColDefT<TData>) => (!(c as any).hide ? c.maxInitialWidth || 128 : 0)));
-      result.width = Math.min(result.width, maxWidth);
+
+      autoSizeResultRef.current = autoSizeResult;
+      // Calculate the auto-sized width, limit it to maxInitialWidth
+      autoSizeResult.width = maxInitialWidth ? Math.min(autoSizeResult.width, maxInitialWidth) : autoSizeResult.width;
       if (gridRendered === 'empty') {
+        // If the grid is empty we still do an onContentSize callback, we will do another callback when grid has data
+        // We don't do this callback if we have previously had row data, or have already called back for empty
         if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
-          params.onContentSize?.(result);
+          params.onContentSize?.(autoSizeResult);
         }
       } else if (gridRendered === 'rows-visible') {
+        // we have rows now so callback grid size
         if (!hasSetContentSize.current) {
-          if (lastFullResize.current === result.width) {
+          // Only callback if grid size has settled
+          if (lastFullResize.current === autoSizeResult.width) {
             hasSetContentSize.current = true;
-            params.onContentSize?.(result);
+            params.onContentSize?.(autoSizeResult);
           } else {
-            needsAutoSize.current = true;
+            // Need to retry callback when size has settelled
+            lastFullResize.current = autoSizeResult.width;
+            return;
           }
-          lastFullResize.current = result.width;
         }
       } else {
         // It should be impossible to get here
@@ -247,6 +254,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
     }
 
+    // 2. Now we size columns to fit the grid width
     if (sizeColumns !== 'none') {
       sizeColumnsToFit();
     }
@@ -430,6 +438,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onRowDataChanged = useCallback(() => {
     const length = rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
+      // We need to autosize all cells again
+      autoSizeResultRef.current = null;
       setInitialContentSize();
       previousRowDataLength.current = length;
     }
@@ -594,14 +604,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Resize columns to fit if required on window/container resize
    */
-  const onGridSizeChanged = useCallback(
-    (event: GridSizeChangedEvent<TData>) => {
+  const onGridResize = useCallback(
+    (event: AgGridEvent<TData>) => {
       if (sizeColumns !== 'none') {
+        // Flex columns can expand to fit after resize, but they cannot shrink less than use resized value
+        // Double click column resize handle to reset this behaviour
         const columnLimits = [
           ...userSizedColIds.current.entries().map(
             ([c, w]): IColumnLimit => ({
               key: c,
               minWidth: w,
+              maxWidth: w,
             }),
           ),
         ];
@@ -619,24 +632,32 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Lock/unlock column width on user edit/reset.
    */
-  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
-    const colId = e.column?.getColId();
-    if (colId == null) {
-      return;
-    }
-    const width = e.column?.getActualWidth();
-    if (width == null) {
-      return;
-    }
-    switch (e.source) {
-      case 'uiColumnResized':
-        userSizedColIds.current.set(colId, width);
-        break;
-      case 'autosizeColumns':
-        userSizedColIds.current.delete(colId);
-        break;
-    }
-  }, []);
+  const onColumnResized = useCallback(
+    (e: ColumnResizedEvent) => {
+      const colId = e.column?.getColId();
+      if (colId == null) {
+        return;
+      }
+      const width = e.column?.getActualWidth();
+      if (width == null) {
+        return;
+      }
+      switch (e.source) {
+        case 'uiColumnResized':
+          userSizedColIds.current.set(colId, width);
+          const colDef = e.column?.getColDef();
+          if (!colDef?.flex) {
+            onGridResize(e);
+          }
+          break;
+        case 'autosizeColumns':
+          userSizedColIds.current.delete(colId);
+          onGridResize(e);
+          break;
+      }
+    },
+    [onGridResize],
+  );
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
@@ -773,6 +794,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   );
 
   const selectionColumnDef = useMemo((): SelectionColumnDef => {
+    // Note this has to be 1 for hidden otherwise ag-grid does crazy things whilst resizing
     const selectWidth = params.hideSelectColumn ? 0 : selectable && params.onRowDragEnd ? 76 : 48;
     return {
       suppressNavigable: params.hideSelectColumn,
@@ -840,7 +862,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
           getRowId={getRowId}
-          onGridSizeChanged={onGridSizeChanged}
+          onGridSizeChanged={onGridResize}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
