@@ -195,6 +195,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const lastFullResize = useRef<number>();
 
   const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
+  const prevRowsVisibleRef = useRef(false);
   const setInitialContentSize = useCallback(() => {
     if (!gridDivRef.current?.clientWidth || rowData == null) {
       // Don't resize grids if they are offscreen as it doesn't work.
@@ -212,7 +213,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     // 1. First we autosize to get the size of the columns on an infinite grid.
     if (sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') {
       // You can't skip headers until the grid has content
-      const skipHeader = sizeColumns === 'auto-skip-headers' && gridRendered === 'rows-visible';
+      const rowsVisible = gridRendered === 'rows-visible';
+      const skipHeader = sizeColumns === 'auto-skip-headers' && rowsVisible;
+      // If grid was empty and now has content we need to autosize
+      if (rowsVisible !== prevRowsVisibleRef.current && rowsVisible) {
+        prevRowsVisibleRef.current = rowsVisible;
+        autoSizeResultRef.current = null;
+      }
       const autoSizeResult =
         autoSizeResultRef.current ??
         autoSizeColumns({
