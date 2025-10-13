@@ -26,7 +26,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -191,7 +191,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const hasSetContentSizeEmpty = useRef(false);
   const needsAutoSize = useRef(true);
 
-  const requiresInitialSizeToFitRef = useRef(true);
+  const requiresInitialSizeToFitRef = useRef(false);
   const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
   const prevRowsVisibleRef = useRef(false);
   const setInitialContentSize = useCallback(() => {
@@ -253,11 +253,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // It should be impossible to get here
         console.error('Unknown value returned from hasGridRendered');
       }
+    } else {
+      sizeColumnsToFit();
     }
 
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns]);
+  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
   const wasVisibleRef = useRef(false);
@@ -603,7 +605,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onGridResize = useCallback(
     (event: AgGridEvent<TData>) => {
-      if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
+      if (sizeColumns === 'fit' || (!hasSetContentSizeEmpty.current && !hasSetContentSize.current)) {
         return;
       }
       if (sizeColumns !== 'none') {
@@ -863,7 +865,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             // This happens after an autosize event, if we don't wait for it size columns to fit doesn't work
             if (requiresInitialSizeToFitRef.current) {
               requiresInitialSizeToFitRef.current = false;
-              sizeColumnsToFit();
+              delay(() => {
+                sizeColumnsToFit();
+              }, 200);
             }
           }}
           rowHeight={rowHeight}
