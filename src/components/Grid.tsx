@@ -26,7 +26,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -172,7 +172,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     startCellEditing,
   } = useGridContext<TData>();
-  const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
+  const { updatedDep, anyUpdating, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
@@ -191,7 +191,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const hasSetContentSizeEmpty = useRef(false);
   const needsAutoSize = useRef(true);
 
-  const requiresInitialSizeToFitRef = useRef(true);
+  const requiresInitialSizeToFitRef = useRef(false);
   const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
   const prevRowsVisibleRef = useRef(false);
   const setInitialContentSize = useCallback(() => {
@@ -253,11 +253,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // It should be impossible to get here
         console.error('Unknown value returned from hasGridRendered');
       }
+    } else {
+      sizeColumnsToFit();
     }
 
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns]);
+  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns, sizeColumnsToFit]);
 
   const lastOwnerDocumentRef = useRef<Document>();
   const wasVisibleRef = useRef(false);
@@ -432,7 +434,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const previousRowDataLength = useRef(0);
 
-  const onRowDataChanged = useCallback(() => {
+  const onRowDataUpdated = useCallback(() => {
     const length = rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
       // We need to autosize all cells again
@@ -445,10 +447,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     lastUpdatedDep.current = updatedDep;
 
     // Don't update while there are spinners
-    if (!isEmpty(updatingCols())) return;
+    if (anyUpdating()) {
+      return;
+    }
 
     const skipHeader = sizeColumns === 'auto-skip-headers';
-    if (hasSetContentSize.current) {
+    if ((sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') && hasSetContentSize.current) {
       autoSizeColumns({
         skipHeader,
         userSizedColIds: new Set(userSizedColIds.current.keys()),
@@ -456,7 +460,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       });
     }
     colIdsEdited.current.clear();
-  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
+  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, anyUpdating]);
 
   /**
    * Show/hide no rows overlay when model changes.
@@ -489,6 +493,24 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
     },
     [singleClickEdit, startCellEditing],
+  );
+
+  const onCellEditingStopped = useCallback(
+    (event: AgGridEvent<TData>) => {
+      const api = event.api;
+      // We need to redraw on fit as the updated row heights aren't visible
+      if (sizeColumns === 'fit') {
+        delay(() => {
+          // Don't update if currently editing, that will stop the edit
+          if (!anyUpdating() && document.querySelectorAll('.szh-menu--state-open').length === 0) {
+            if (!api.isDestroyed()) {
+              api.redrawRows();
+            }
+          }
+        }, 500);
+      }
+    },
+    [anyUpdating, sizeColumns],
   );
 
   /**
@@ -603,7 +625,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onGridResize = useCallback(
     (event: AgGridEvent<TData>) => {
-      if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
+      if (sizeColumns === 'fit' || (!hasSetContentSizeEmpty.current && !hasSetContentSize.current)) {
         return;
       }
       if (sizeColumns !== 'none') {
@@ -863,7 +885,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             // This happens after an autosize event, if we don't wait for it size columns to fit doesn't work
             if (requiresInitialSizeToFitRef.current) {
               requiresInitialSizeToFitRef.current = false;
-              sizeColumnsToFit();
+              delay(() => {
+                sizeColumnsToFit();
+              }, 200);
             }
           }}
           rowHeight={rowHeight}
@@ -874,11 +898,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
-          onRowDataUpdated={onRowDataChanged}
+          onRowDataUpdated={onRowDataUpdated}
           onCellFocused={onCellFocused}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStopped={onCellEditingStopped}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
           defaultColDef={defaultColDef}
