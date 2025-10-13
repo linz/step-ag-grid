@@ -26,7 +26,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -172,7 +172,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     startCellEditing,
   } = useGridContext<TData>();
-
   const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
@@ -254,21 +253,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // It should be impossible to get here
         console.error('Unknown value returned from hasGridRendered');
       }
-
-      // If there's no contentSize callback there'll be on onGridResize callback
-      // which is required to run sizeColumnsToFit.
-      // There's also the possibility that the panel was already the right size so didn't trigger onGridResize.
-      delay(() => {
-        if (requiresInitialSizeToFitRef.current) {
-          requiresInitialSizeToFitRef.current = false;
-          sizeColumnsToFit();
-        }
-      }, 50);
     }
 
     setAutoSized(true);
     needsAutoSize.current = false;
-  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns, sizeColumnsToFit]);
+  }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns]);
 
   const lastOwnerDocumentRef = useRef<Document>();
   const wasVisibleRef = useRef(false);
@@ -614,6 +603,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const onGridResize = useCallback(
     (event: AgGridEvent<TData>) => {
+      if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
+        return;
+      }
       if (sizeColumns !== 'none') {
         // Flex columns can expand to fit after resize, but they cannot shrink less than use resized value
         // Double click column resize handle to reset this behaviour
@@ -626,7 +618,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             }),
           ),
         ];
-        requiresInitialSizeToFitRef.current = false;
         defer(() => event.api.sizeColumnsToFit({ columnLimits }));
       }
     },
@@ -651,6 +642,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (width == null) {
         return;
       }
+
       switch (e.source) {
         case 'uiColumnResized':
           userSizedColIds.current.set(colId, width);
@@ -863,10 +855,17 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               ? {
                   enableSelectionWithoutKeys: params.enableSelectionWithoutKeys ?? false,
                   enableClickSelection: params.enableClickSelection ?? false,
-                  mode: rowSelection == 'single' ? 'singleRow' : 'multiRow',
+                  mode: rowSelection === 'single' ? 'singleRow' : 'multiRow',
                 }
               : undefined
           }
+          onDisplayedColumnsChanged={() => {
+            // This happens after an autosize event, if we don't wait for it size columns to fit doesn't work
+            if (requiresInitialSizeToFitRef.current) {
+              requiresInitialSizeToFitRef.current = false;
+              sizeColumnsToFit();
+            }
+          }}
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
