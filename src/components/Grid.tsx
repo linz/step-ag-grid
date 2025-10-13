@@ -26,7 +26,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
@@ -192,8 +192,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const hasSetContentSizeEmpty = useRef(false);
   const needsAutoSize = useRef(true);
 
-  const lastFullResize = useRef<number>();
-
+  const requiresInitialSizeToFitRef = useRef(true);
   const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
   const prevRowsVisibleRef = useRef(false);
   const setInitialContentSize = useCallback(() => {
@@ -225,6 +224,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         autoSizeColumns({
           skipHeader,
           userSizedColIds: new Set(userSizedColIds.current.keys()),
+          includeFlex: true,
         });
       // Auto-size failed retry later
       if (!autoSizeResult) {
@@ -240,31 +240,32 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // We don't do this callback if we have previously had row data, or have already called back for empty
         if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
+          requiresInitialSizeToFitRef.current = true;
           params.onContentSize?.(autoSizeResult);
         }
       } else if (gridRendered === 'rows-visible') {
         // we have rows now so callback grid size
         if (!hasSetContentSize.current) {
-          // Only callback if grid size has settled
-          if (lastFullResize.current === autoSizeResult.width) {
-            hasSetContentSize.current = true;
-            params.onContentSize?.(autoSizeResult);
-          } else {
-            // Need to retry callback when size has settelled
-            lastFullResize.current = autoSizeResult.width;
-            return;
-          }
+          hasSetContentSize.current = true;
+          requiresInitialSizeToFitRef.current = true;
+          params.onContentSize?.(autoSizeResult);
         }
       } else {
         // It should be impossible to get here
         console.error('Unknown value returned from hasGridRendered');
       }
+
+      // If there's no contentSize callback there'll be on onGridResize callback
+      // which is required to run sizeColumnsToFit.
+      // There's also the possibility that the panel was already the right size so didn't trigger onGridResize.
+      delay(() => {
+        if (requiresInitialSizeToFitRef.current) {
+          requiresInitialSizeToFitRef.current = false;
+          sizeColumnsToFit();
+        }
+      }, 50);
     }
 
-    // 2. Now we size columns to fit the grid width
-    if (sizeColumns !== 'none') {
-      sizeColumnsToFit();
-    }
     setAutoSized(true);
     needsAutoSize.current = false;
   }, [autoSizeColumns, gridRenderState, maxInitialWidth, params, rowData, sizeColumns, sizeColumnsToFit]);
@@ -625,7 +626,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             }),
           ),
         ];
-        event.api.sizeColumnsToFit({ columnLimits });
+        requiresInitialSizeToFitRef.current = false;
+        defer(() => event.api.sizeColumnsToFit({ columnLimits }));
       }
     },
     [sizeColumns],

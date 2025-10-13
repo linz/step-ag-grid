@@ -12,7 +12,7 @@ const meta: Meta<typeof TestShowPanelResizingAgGrid> = {
   decorators: [
     (Story) => (
       <div>
-        <PanelsContextProvider baseZIndex={500}>
+        <PanelsContextProvider baseZIndex={500} panelStateOptions={null}>
           <Story />
         </PanelsContextProvider>
       </div>
