@@ -172,7 +172,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     prePopupOps,
     startCellEditing,
   } = useGridContext<TData>();
-  const { updatedDep, updatingCols } = useContext(GridUpdatingContext);
+  const { updatedDep, anyUpdating, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
   const lastSelectedIds = useRef<number[]>([]);
@@ -434,7 +434,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const previousRowDataLength = useRef(0);
 
-  const onRowDataChanged = useCallback(() => {
+  const onRowDataUpdated = useCallback(() => {
     const length = rowData?.length ?? 0;
     if (previousRowDataLength.current !== length) {
       // We need to autosize all cells again
@@ -447,10 +447,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     lastUpdatedDep.current = updatedDep;
 
     // Don't update while there are spinners
-    if (!isEmpty(updatingCols())) return;
+    if (anyUpdating()) {
+      return;
+    }
 
     const skipHeader = sizeColumns === 'auto-skip-headers';
-    if (hasSetContentSize.current) {
+    if ((sizeColumns === 'auto' || sizeColumns === 'auto-skip-headers') && hasSetContentSize.current) {
       autoSizeColumns({
         skipHeader,
         userSizedColIds: new Set(userSizedColIds.current.keys()),
@@ -458,7 +460,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       });
     }
     colIdsEdited.current.clear();
-  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, updatingCols]);
+  }, [autoSizeColumns, rowData?.length, setInitialContentSize, sizeColumns, updatedDep, anyUpdating]);
 
   /**
    * Show/hide no rows overlay when model changes.
@@ -491,6 +493,24 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
     },
     [singleClickEdit, startCellEditing],
+  );
+
+  const onCellEditingStopped = useCallback(
+    (event: AgGridEvent<TData>) => {
+      const api = event.api;
+      // We need to redraw on fit as the updated row heights aren't visible
+      if (sizeColumns === 'fit') {
+        delay(() => {
+          // Don't update if currently editing, that will stop the edit
+          if (!anyUpdating() && document.querySelectorAll('.szh-menu--state-open').length === 0) {
+            if (!api.isDestroyed()) {
+              api.redrawRows();
+            }
+          }
+        }, 500);
+      }
+    },
+    [anyUpdating, sizeColumns],
   );
 
   /**
@@ -878,11 +898,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
-          onRowDataUpdated={onRowDataChanged}
+          onRowDataUpdated={onRowDataUpdated}
           onCellFocused={onCellFocused}
           onCellKeyDown={onCellKeyPress}
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStopped={onCellEditingStopped}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
           defaultColDef={defaultColDef}
