@@ -30,7 +30,7 @@ import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es'
 import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-import { AutoSizeColumnsResult, useGridContext } from '../contexts/GridContext';
+import { AutoSizeColumnsResult, StartCellEditingProps, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
@@ -170,8 +170,18 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     getColDef,
     showNoRowsOverlay,
     prePopupOps,
-    startCellEditing,
+    startCellEditing: propStartCellEditing,
   } = useGridContext<TData>();
+  // CellEditingStop event happens too much for one edit
+  const startedEditRef = useRef(false);
+  const startCellEditing = useCallback(
+    (props: StartCellEditingProps) => {
+      startedEditRef.current = true;
+      return propStartCellEditing(props);
+    },
+    [propStartCellEditing],
+  );
+
   const { updatedDep, anyUpdating, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
@@ -497,6 +507,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const onCellEditingStopped = useCallback(
     (event: AgGridEvent<TData>) => {
+      if (!startedEditRef.current) {
+        return;
+      }
+      startedEditRef.current = false;
       const api = event.api;
       // We need to redraw on fit as the updated row heights aren't visible
       if (sizeColumns === 'fit') {
