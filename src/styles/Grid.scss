@@ -7,8 +7,8 @@
   margin-right: auto;
 }
 
-.ag-unselectable {
- user-select: text !important;
+.ag-unselectable .ag-cell:not([col-id="ag-Grid-SelectionColumn"]) {
+  user-select: text !important;
 }
 
 .LabelPreferencesPanelGridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
