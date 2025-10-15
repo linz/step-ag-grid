@@ -7,6 +7,10 @@
   margin-right: auto;
 }
 
+.ag-unselectable {
+ user-select: text !important;
+}
+
 .LabelPreferencesPanelGridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
   display: flex;
   justify-content: center;
