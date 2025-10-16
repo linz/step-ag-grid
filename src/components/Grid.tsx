@@ -423,8 +423,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           editable,
           cellClassRules: {
             ...colDef.cellClassRules,
-            'GridCell-readonly': (ccp: CellClassParams) =>
-              !suppressReadOnlyStyle && !editable(ccp as any as EditableCallbackParams),
+            'GridCell-readonly': (ccp: CellClassParams<TData>) =>
+              !suppressReadOnlyStyle && !editable(ccp as any as EditableCallbackParams<TData>),
           },
         };
       }
