@@ -275,7 +275,7 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
           <MenuDivider key={`$$divider_filter`} />
           {props.topComponent && (
             <div>
-              {props.topComponent()}
+              <props.topComponent />
               <MenuDivider key={`$$divider_filter`} />
             </div>
           )}
