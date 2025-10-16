@@ -75,6 +75,7 @@ export interface GridFormDropDownProps<TData extends GridBaseRow, TOptionValue> 
     | FinalSelectOption<TOptionValue>[]
     | ((selectedRows: TData[], filter?: string) => MaybePromise<FinalSelectOption<TOptionValue>[] | undefined>)
     | undefined;
+  topComponent?: () => ReactElement;
 }
 
 const fieldToString = (field: any) => {
@@ -272,6 +273,12 @@ export const GridFormDropDown = <TData extends GridBaseRow, TOptionValue>(
             )}
           </FocusableItem>
           <MenuDivider key={`$$divider_filter`} />
+          {props.topComponent && (
+            <div>
+              <props.topComponent />
+              <MenuDivider key={`$$divider_filter`} />
+            </div>
+          )}
         </div>
       )}
       <ComponentLoadingWrapper loading={!options} className={'GridFormDropDown-options'}>
