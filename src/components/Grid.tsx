@@ -64,7 +64,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   externalSelectedItems?: any[];
   setExternalSelectedItems?: (items: any[]) => void;
   defaultColDef?: GridOptions['defaultColDef'];
-  columnDefs: ColDef<TData>[];
+  columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
   rowData: GridOptions['rowData'];
   selectColumnPinned?: ColDef['pinned'];
   noRowsOverlayText?: string;
@@ -80,6 +80,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
+  suppressReadOnlyStyle?: boolean;
   /**
    * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
    * This allows you set the size of the panel to fit perfectly.
@@ -149,6 +150,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   selectable,
   onCellFocused: paramsOnCellFocused,
   maxInitialWidth,
+  suppressReadOnlyStyle = false,
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
@@ -402,27 +404,40 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   useEffect(synchroniseExternallySelectedItemsToGrid, [synchroniseExternallySelectedItemsToGrid]);
 
+  const mapColDef = useCallback(
+    (colDef: ColDef | ColGroupDef): ColDef | ColGroupDef => {
+      if ('children' in colDef) {
+        return {
+          ...colDef,
+          children: colDef.children.map(mapColDef),
+        };
+      } else {
+        const colDefEditable = colDef.editable;
+        const editable = combineEditables(
+          params.loading !== true && params.readOnly !== true,
+          params.defaultColDef?.editable,
+          colDefEditable,
+        );
+        return {
+          ...colDef,
+          editable,
+          cellClassRules: {
+            ...colDef.cellClassRules,
+            'GridCell-readonly': (ccp: CellClassParams) =>
+              !suppressReadOnlyStyle && !editable(ccp as any as EditableCallbackParams),
+          },
+        };
+      }
+    },
+    [params.defaultColDef?.editable, params.loading, params.readOnly, suppressReadOnlyStyle],
+  );
+
   /**
    * Add selectable column to colDefs.  Adjust column defs to block fit for auto sized columns.
    */
   const columnDefs = useMemo((): (ColDef | ColGroupDef)[] => {
-    return params.columnDefs.map((colDef) => {
-      const colDefEditable = colDef.editable;
-      const editable = combineEditables(
-        params.loading !== true && params.readOnly !== true,
-        params.defaultColDef?.editable,
-        colDefEditable,
-      );
-      return {
-        ...colDef,
-        editable,
-        cellClassRules: {
-          ...colDef.cellClassRules,
-          'GridCell-readonly': (ccp: CellClassParams) => !editable(ccp as any as EditableCallbackParams),
-        },
-      };
-    });
-  }, [params.columnDefs, params.loading, params.readOnly, params.defaultColDef?.editable]);
+    return params.columnDefs.map(mapColDef);
+  }, [params.columnDefs, mapColDef]);
 
   const hasExternallySelectedItems = !!params.setExternalSelectedItems;
 
