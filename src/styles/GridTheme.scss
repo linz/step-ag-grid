@@ -58,31 +58,30 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   )
 );
 
-// Don't hide the drag handle
-.ag-theme-step-default.theme-specific .ag-drag-handle.ag-row-drag, .ag-theme-step-compact.theme-specific div.ag-drag-handle.ag-row-drag {
-  opacity: 1 !important;
-}
-
-.ag-header-hide-default-select .ag-labeled {
-  display: none;
-}
-
-.ag-header-hide-default-select .ag-wrapper.ag-checkbox-input-wrapper {
-  margin-right: 9px;
-}
-
-div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] {
-  padding-left: 40px;
-}
-
-.ag-drag-handle.ag-row-drag {
-  .ag-icon.ag-icon-grip {
-    margin: auto;
-  }
-}
-
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
+  // Don't hide the drag handle
+  .ag-drag-handle.ag-row-drag {
+    opacity: 1 !important;
+  }
+
+  .ag-header-hide-default-select .ag-labeled {
+    display: none;
+  }
+
+  div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] {
+    padding-left: 40px;
+  }
+
+  div.ag-header-cell:not(.ag-header-select-draggable)[col-id='ag-Grid-SelectionColumn'] {
+    padding-left: 12px;
+  }
+
+  div.ag-cell-wrapper {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
   div.ag-center-cols-viewport {
     // when using domLayout={"autoHeight"}, ag grid has a default min-height
     // set to 150px so the !important is necessary here
@@ -158,6 +157,9 @@ div.ag-header-cell.ag-header-select-draggable[col-id='ag-Grid-SelectionColumn'] 
     }
   }
 
+  div.ag-cell-wrapper .ag-selection-checkbox {
+    margin: 0;
+  }
 
   .ag-cell {
     display: flex;
