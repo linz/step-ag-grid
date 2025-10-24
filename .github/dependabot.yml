@@ -10,7 +10,11 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: 'daily'
+    cooldown:
+      default-days: 15
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 15
