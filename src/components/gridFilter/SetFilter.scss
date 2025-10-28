@@ -1,0 +1,16 @@
+@use "@linzjs/lui/dist/scss/Core" as lui;
+
+.SetFilter {
+    &-selectAll.LuiCheckboxInput {
+        @include lui.font-regular();
+        margin: 0;
+        padding: lui.$unit-xs lui.$unit-sm;
+        font-size: 16px;
+    }
+
+    &-listBox {
+        li.LuiListBoxItem.LuiListBoxItem-selected {
+            background: transparent;
+        }
+    }
+}
