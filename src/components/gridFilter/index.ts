@@ -1,4 +1,5 @@
 export * from './GridFilterButtons';
+export * from './GridFilterColumnsMultiSelect';
 export * from './GridFilterColumnsToggle';
 export * from './GridFilterDownloadCsvButton';
 export * from './GridFilterHeaderIconButton';
