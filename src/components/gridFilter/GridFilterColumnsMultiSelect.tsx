@@ -72,24 +72,34 @@ export class GridFilterColumnsMultiSelect implements IFilterComp {
   private labelFormatter?: (value: string) => string;
   private reactRoot: Root | null = null;
 
+  private loadFieldValues(): string[] {
+    const field = this.params.colDef.field as string;
+    const values = new Set<string>();
+
+    this.params.api.forEachNode((node) => {
+      const data = node.data;
+      const cellValue = data?.[field];
+      if (
+        data &&
+        typeof data === 'object' &&
+        field in data &&
+        typeof cellValue === 'string' &&
+        cellValue !== undefined &&
+        cellValue !== null
+      ) {
+        values.add(cellValue);
+      }
+    });
+
+    return Array.from(values).sort();
+  }
+
   init(params: CheckboxMultiFilterParams): void {
     this.params = params;
     this.labels = { ...params.labels };
     this.labelFormatter = params.labelFormatter;
 
-    const field = params.colDef.field as string;
-    const values = new Set<string>();
-
-    params.api.forEachNode((node) => {
-      if (node.data && typeof node.data === 'object' && field in node.data) {
-        const val = (node.data as Record<string, unknown>)[field];
-        if (val !== undefined && val !== null && typeof val === 'string') {
-          values.add(val);
-        }
-      }
-    });
-
-    this.allValues = Array.from(values).sort();
+    this.allValues = this.loadFieldValues();
 
     this.gui = document.createElement('div');
     this.reactRoot = createRoot(this.gui);
@@ -141,13 +151,11 @@ export class GridFilterColumnsMultiSelect implements IFilterComp {
 
   doesFilterPass(params: IDoesFilterPassParams): boolean {
     const field = this.params.colDef.field as string;
-
     if (!params.data || typeof params.data !== 'object' || !(field in params.data)) {
       return false;
     }
 
     const cellValue = (params.data as Record<string, unknown>)[field];
-
     if (typeof cellValue !== 'string') {
       return false;
     }
