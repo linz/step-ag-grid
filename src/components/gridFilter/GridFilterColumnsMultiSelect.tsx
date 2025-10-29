@@ -1,18 +1,68 @@
-import { IDoesFilterPassParams, IFilterParams } from 'ag-grid-community';
+import type { IDoesFilterPassParams, IFilterComp, IFilterParams } from 'ag-grid-community';
+import React from 'react';
+import { createRoot, Root } from 'react-dom/client';
 
 export interface CheckboxMultiFilterParams extends IFilterParams {
   labels?: Record<string, string>;
   labelFormatter?: (value: string) => string;
 }
 
-export class GridFilterColumnsMultiSelect {
+export interface CheckboxMultiFilterModel {
+  values: string[];
+}
+
+interface FilterUIProps {
+  allValues: string[];
+  selected: Set<string>;
+  labels: Record<string, string>;
+  labelFormatter?: (value: string) => string;
+  onToggleAll: (checked: boolean) => void;
+  onToggleOne: (value: string, checked: boolean) => void;
+}
+
+const FilterUI: React.FC<FilterUIProps> = ({
+  allValues,
+  selected,
+  labels,
+  labelFormatter,
+  onToggleAll,
+  onToggleOne,
+}) => {
+  const allChecked = allValues.length > 0 && selected.size === allValues.length;
+
+  const getDisplayLabel = (raw: string): string => {
+    const mapped = labels[raw] ?? raw;
+    return labelFormatter ? labelFormatter(mapped) : mapped;
+  };
+
+  return (
+    <div style={{ padding: 4 }}>
+      <label style={{ display: 'block', marginBottom: 4 }}>
+        <input type="checkbox" checked={allChecked} onChange={(e) => onToggleAll(e.target.checked)} /> Select All
+      </label>
+      {allValues.map((val) => (
+        <label key={val} style={{ display: 'block', marginBottom: 2 }}>
+          <input
+            type="checkbox"
+            value={val}
+            checked={selected.has(val)}
+            onChange={(e) => onToggleOne(val, e.target.checked)}
+          />{' '}
+          {getDisplayLabel(val)}
+        </label>
+      ))}
+    </div>
+  );
+};
+
+export class GridFilterColumnsMultiSelect implements IFilterComp {
   private params!: CheckboxMultiFilterParams;
   private selectedValues = new Set<string>();
   private labels: Record<string, string> = {};
   private allValues: string[] = [];
-  private checkboxElements: Record<string, HTMLInputElement> = {};
   private gui!: HTMLElement;
   private labelFormatter?: (value: string) => string;
+  private reactRoot: Root | null = null;
 
   init(params: CheckboxMultiFilterParams): void {
     this.params = params;
@@ -21,6 +71,7 @@ export class GridFilterColumnsMultiSelect {
 
     const field = params.colDef.field as string;
     const values = new Set<string>();
+
     params.api.forEachNode((node) => {
       if (node.data && typeof node.data === 'object' && field in node.data) {
         const val = (node.data as Record<string, unknown>)[field];
@@ -31,61 +82,45 @@ export class GridFilterColumnsMultiSelect {
     });
 
     this.allValues = Array.from(values).sort();
+
     this.gui = document.createElement('div');
-    this.gui.style.padding = '4px';
-
-    // Select All
-    const selectAllLabel = document.createElement('label');
-    selectAllLabel.style.display = 'block';
-    const selectAllCheckbox = document.createElement('input');
-    selectAllCheckbox.type = 'checkbox';
-    selectAllCheckbox.addEventListener('change', () => {
-      if (selectAllCheckbox.checked) {
-        this.allValues.forEach((val) => this.selectedValues.add(val));
-      } else {
-        this.selectedValues.clear();
-      }
-      this.updateCheckboxes();
-      this.params.filterChangedCallback();
-    });
-    selectAllLabel.appendChild(selectAllCheckbox);
-    selectAllLabel.appendChild(document.createTextNode(' Select All'));
-    this.gui.appendChild(selectAllLabel);
-
-    // Individual checkboxes
-    this.allValues.forEach((val) => {
-      const label = document.createElement('label');
-      label.style.display = 'block';
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.value = val;
-
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          this.selectedValues.add(val);
-        } else {
-          this.selectedValues.delete(val);
-        }
-        selectAllCheckbox.checked = this.selectedValues.size === this.allValues.length;
-        this.params.filterChangedCallback();
-      });
-
-      this.checkboxElements[val] = checkbox;
-
-      label.appendChild(checkbox);
-      const rawLabel = this.labels[val] || val;
-      const displayLabel = this.labelFormatter ? this.labelFormatter(rawLabel) : rawLabel;
-      label.appendChild(document.createTextNode(' ' + displayLabel));
-      this.gui.appendChild(label);
-    });
+    this.reactRoot = createRoot(this.gui);
+    this.render();
   }
 
-  updateCheckboxes(): void {
-    for (const val of this.allValues) {
-      const checkbox = this.checkboxElements[val];
-      checkbox.checked = this.selectedValues.has(val);
+  private render(): void {
+    if (!this.reactRoot) return;
+
+    this.reactRoot.render(
+      <FilterUI
+        allValues={this.allValues}
+        selected={this.selectedValues}
+        labels={this.labels}
+        labelFormatter={this.labelFormatter}
+        onToggleAll={this.handleToggleAll.bind(this)}
+        onToggleOne={this.handleToggleOne.bind(this)}
+      />,
+    );
+  }
+
+  private handleToggleAll(checked: boolean): void {
+    if (checked) {
+      this.allValues.forEach((val) => this.selectedValues.add(val));
+    } else {
+      this.selectedValues.clear();
     }
+    this.render();
+    this.params.filterChangedCallback();
+  }
+
+  private handleToggleOne(value: string, checked: boolean): void {
+    if (checked) {
+      this.selectedValues.add(value);
+    } else {
+      this.selectedValues.delete(value);
+    }
+    this.render();
+    this.params.filterChangedCallback();
   }
 
   getGui(): HTMLElement {
@@ -98,23 +133,34 @@ export class GridFilterColumnsMultiSelect {
 
   doesFilterPass(params: IDoesFilterPassParams): boolean {
     const field = this.params.colDef.field as string;
+
     if (!params.data || typeof params.data !== 'object' || !(field in params.data)) {
       return false;
     }
+
     const cellValue = (params.data as Record<string, unknown>)[field];
+
     if (typeof cellValue !== 'string') {
       return false;
     }
+
     return this.selectedValues.has(cellValue);
   }
 
-  getModel(): { values: string[] } | null {
+  getModel(): CheckboxMultiFilterModel | null {
     return this.selectedValues.size > 0 ? { values: Array.from(this.selectedValues) } : null;
   }
 
-  setModel(model: { values: string[] } | null): void {
+  setModel(model: CheckboxMultiFilterModel | null): void {
     this.selectedValues = new Set(model?.values || []);
-    this.updateCheckboxes();
+    this.render();
+  }
+
+  destroy(): void {
+    if (this.reactRoot) {
+      this.reactRoot.unmount();
+      this.reactRoot = null;
+    }
   }
 }
 
