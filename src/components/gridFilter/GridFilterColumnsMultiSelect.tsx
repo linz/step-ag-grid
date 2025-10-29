@@ -1,3 +1,6 @@
+import './GridFilterColumnsMultiSelect.scss';
+
+import { LuiCheckboxInput } from '@linzjs/lui';
 import type { IDoesFilterPassParams, IFilterComp, IFilterParams } from 'ag-grid-community';
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
@@ -36,20 +39,25 @@ const FilterUI: React.FC<FilterUIProps> = ({
   };
 
   return (
-    <div style={{ padding: 4 }}>
-      <label style={{ display: 'block', marginBottom: 4 }}>
-        <input type="checkbox" checked={allChecked} onChange={(e) => onToggleAll(e.target.checked)} /> Select All
-      </label>
+    <div className="GridFilterColsMultiSelect">
+      <span className="LuiSelect-label-text">Filter column</span>
+
+      <LuiCheckboxInput
+        className="LuiCheckboxInput-selectAll"
+        label={'Select All'}
+        value="true"
+        isChecked={allChecked}
+        onChange={(e) => onToggleAll(e.target.checked)}
+      />
       {allValues.map((val) => (
-        <label key={val} style={{ display: 'block', marginBottom: 2 }}>
-          <input
-            type="checkbox"
-            value={val}
-            checked={selected.has(val)}
-            onChange={(e) => onToggleOne(val, e.target.checked)}
-          />{' '}
-          {getDisplayLabel(val)}
-        </label>
+        <LuiCheckboxInput
+          key={val}
+          className="LuiCheckboxInput-item"
+          label={getDisplayLabel(val)}
+          value={val}
+          isChecked={selected.has(val)}
+          onChange={(e) => onToggleOne(val, e.target.checked)}
+        />
       ))}
     </div>
   );
