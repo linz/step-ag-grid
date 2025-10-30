@@ -82,7 +82,7 @@ const GridFilterColumnsMultiSelectTemplate: StoryFn<typeof Grid<ITestRow>> = (pr
     { id: 1002, position: 'Manager', age: 65, desc: 'Technical Manager' },
     { id: 1003, position: 'Tester', age: 30, desc: 'E2E tester' },
     { id: 1004, position: 'Developer', age: 12, desc: 'Fullstack Developer' },
-    { id: 1005, position: 'Developer', age: 12, desc: 'Backend Developer' },
+    { id: 1005, position: 'Developer', age: 13, desc: 'Backend Developer' },
     { id: 1006, position: 'Architect', age: 30, desc: 'Architect' },
   ]);
 
