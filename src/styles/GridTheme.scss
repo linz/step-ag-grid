@@ -5,23 +5,17 @@
 $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
 // GridTheme that support ag-grid v29 new SASS API
-@include ag.grid-styles(
-  (
-    themes: (
-      'step-compact.theme-specific': (
-        extend-theme: alpine,
+@include ag.grid-styles((themes: ('step-compact.theme-specific': (extend-theme: alpine,
         row-height: 36px,
         header-height: 36px,
         font-size: calc($grid-base-font-size - 2px),
       ),
-      'step-default.theme-specific': (
-        extend-theme: alpine,
+      'step-default.theme-specific': (extend-theme: alpine,
         row-height: 40px,
         header-height: 40px,
         font-size: calc($grid-base-font-size),
       ),
-      'step-view-list-default.theme-specific': (
-        extend-theme: alpine,
+      'step-view-list-default.theme-specific': (extend-theme: alpine,
         row-height: 60px,
         header-height: 40px,
         font-size: calc($grid-base-font-size),
@@ -43,8 +37,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     cell-horizontal-padding: lui.$unit-sm,
     data-color: lui.$charcoal,
     foreground-color: lui.$charcoal,
-    font-family: (
-      "Open Sans",
+    font-family: ("Open Sans",
       system-ui,
       sans-serif,
     ),
@@ -55,11 +48,11 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     row-hover-color: lui.$hint,
     secondary-border-color: lui.$dew,
     selected-row-background-color: lui.$polar,
-  )
-);
+  ));
 
 .ag-theme-step-default.theme-specific,
 .ag-theme-step-compact.theme-specific {
+
   // Don't hide the drag handle
   .ag-drag-handle.ag-row-drag {
     opacity: 1 !important;
@@ -87,6 +80,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     // set to 150px so the !important is necessary here
     min-height: 40px !important;
   }
+
   // fix alignment of cell content when grabber is present
   .ag-header-cell-comp-wrapper {
     justify-content: center;
@@ -100,6 +94,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
       fill: lui.$surfie;
     }
   }
+
   .ag-text-area-input:focus {
     border-color: lui.$sea;
   }
@@ -141,6 +136,18 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   .ag-body-horizontal-scroll-viewport {
     // It's set to scroll by default, but this causes issues with selecting the last row
     overflow-x: auto;
+  }
+
+  .ag-icon-filter {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232A292C'%3E%3Cpath d='M6 12.984v-1.969h12v1.969zM3 6h18v2.016H3zm6.984 12v-2.016h4.031V18z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: transparent;
+
+    &::before {
+      content: none !important;
+    }
   }
 
   .ag-header-group-cell {
@@ -213,7 +220,8 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
     visibility: inherit;
   }
 
-  .ag-row-highlight-above::after, .ag-row-highlight-below::after {
+  .ag-row-highlight-above::after,
+  .ag-row-highlight-below::after {
     content: '';
     height: 3px;
     background-color: transparent;
@@ -238,7 +246,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
 
   .ag-pinned-left-header,
   .ag-pinned-left-cols-container {
-      clip-path: polygon(0% 0%, 120% 0%, 120% 100%, 0% 100%);
+    clip-path: polygon(0% 0%, 120% 0%, 120% 100%, 0% 100%);
   }
 
   .ag-pinned-right-header,
@@ -257,6 +265,7 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
       fill: lui.$surfie;
     }
   }
+
   .ag-header-group-cell {
     font-weight: normal;
     font-size: 22px;

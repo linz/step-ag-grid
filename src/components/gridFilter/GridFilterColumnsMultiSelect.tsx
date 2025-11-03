@@ -100,6 +100,7 @@ export class GridFilterColumnsMultiSelect implements IFilterComp {
     this.labelFormatter = params.labelFormatter;
 
     this.allValues = this.loadFieldValues();
+    this.selectedValues = new Set(this.allValues);
 
     this.gui = document.createElement('div');
     this.reactRoot = createRoot(this.gui);
