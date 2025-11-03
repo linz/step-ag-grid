@@ -5,13 +5,17 @@
     padding: 8px;
     @include lui.font-semibold();
 
+    .LuiSelect-label-text {
+        color: lui.$fuscous;
+        display: inline-block;
+    }
+
     .LuiCheckboxInput-selectAll,
     .LuiCheckboxInput-item {
         color: lui.$charcoal;
         line-height: 20px;
         margin-bottom: 0;
         font-weight: 600;
-        font-style: SemiBold;
         font-size: 16px;
         line-height: 24px;
         letter-spacing: 0%;
