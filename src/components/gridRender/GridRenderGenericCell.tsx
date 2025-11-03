@@ -13,6 +13,7 @@ export interface GenericCellRendererParams<TData extends GridBaseRow> {
   rightHoverElement?: ReactElement | undefined;
   editAction?: (selectedRows: TData[]) => void;
   shortcutKeys?: Record<string, ((params: SuppressKeyboardEventParams) => boolean | void) | undefined>;
+  error?: (props: ICellRendererParams<TData>) => string | string[] | boolean | null | undefined;
   warning?: (props: ICellRendererParams<TData>) => string | string[] | boolean | null | undefined;
   info?: (props: ICellRendererParams<TData>) => string | string[] | boolean | null | undefined;
 }

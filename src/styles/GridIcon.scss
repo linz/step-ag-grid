@@ -24,6 +24,16 @@
   fill: lui.$warning;
 }
 
+.AgGridGenericCellRenderer-ic_error_Icon {
+  margin-right: 4px;
+  fill: lui.$error;
+}
+
+.AgGridGenericCellRenderer-ic_error_outlineIcon {
+  margin-right: 4px;
+  fill: lui.$error;
+}
+
 .GridIcon-disabled {
   fill: lui.$silver !important;
 }
