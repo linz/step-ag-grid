@@ -33,10 +33,15 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
   const colDef = props.colDef as ColDef;
 
   const rendererParams = colDef.cellRendererParams as GenericCellRendererParams<any> | undefined;
+  const errorFn = rendererParams?.error;
+  let errorText = props.data !== undefined && errorFn ? errorFn(props) : undefined;
   const warningFn = rendererParams?.warning;
   let warningText = props.data !== undefined && warningFn ? warningFn(props) : undefined;
   const infoFn = rendererParams?.info;
   let infoText = props.data !== undefined && infoFn ? infoFn(props) : undefined;
+  if (Array.isArray(errorText)) {
+    errorText = errorText.join('\n');
+  }
   if (Array.isArray(warningText)) {
     warningText = warningText.join('\n');
   }
@@ -48,6 +53,9 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
     <GridLoadableCell />
   ) : (
     <>
+      {!!errorText && (
+        <GridIcon icon={'ic_error_outline'} title={typeof errorText === 'string' ? errorText : 'Error'} />
+      )}
       {!!warningText && (
         <GridIcon icon={'ic_warning_outline'} title={typeof warningText === 'string' ? warningText : 'Warning'} />
       )}
@@ -79,6 +87,7 @@ export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends Col
     originalCellRenderer?: any;
     editAction?: (selectedRows: TData[]) => void;
     shortcutKeys?: Record<string, () => void>;
+    error?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
     warning?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
     info?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
   };

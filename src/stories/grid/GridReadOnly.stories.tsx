@@ -83,6 +83,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<I
         field: 'position',
         headerName: 'Position',
         cellRendererParams: {
+          error: ({ value }) => value === 'Manager' && 'Managers need management',
           warning: ({ value }) => value === 'Tester' && 'Testers are testing',
           info: ({ value }) => value === 'Developer' && 'Developers are awesome',
         },
