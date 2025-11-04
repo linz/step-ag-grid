@@ -23,6 +23,9 @@ interface FilterUIProps {
   onToggleOne: (value: string, checked: boolean) => void;
 }
 
+const EMPTY_KEY = '__EMPTY__';
+const DEFAULT_EMPTY_LABEL = '-';
+
 const FilterUI: React.FC<FilterUIProps> = ({
   allValues,
   selected,
@@ -34,8 +37,8 @@ const FilterUI: React.FC<FilterUIProps> = ({
   const allChecked = allValues.length > 0 && selected.size === allValues.length;
 
   const getDisplayLabel = (raw: string): string => {
-    const mapped = labels[raw] ?? raw;
-    return labelFormatter ? labelFormatter(mapped) : mapped;
+    const base = raw === EMPTY_KEY ? (labels[EMPTY_KEY] ?? DEFAULT_EMPTY_LABEL) : (labels[raw] ?? raw);
+    return labelFormatter ? labelFormatter(base) : base;
   };
 
   return (
@@ -72,32 +75,37 @@ export class GridFilterColumnsMultiSelect implements IFilterComp {
   private labelFormatter?: (value: string) => string;
   private reactRoot: Root | null = null;
 
+  private normalizeCellValue(value: unknown): string {
+    if (typeof value === 'string') return value.trim() === '' ? EMPTY_KEY : value;
+    return EMPTY_KEY;
+  }
+
   private loadFieldValues(): string[] {
     const field = this.params.colDef.field as string;
     const values = new Set<string>();
 
     this.params.api.forEachNode((node) => {
-      const data = node.data;
-      const cellValue = data?.[field];
-      if (
-        data &&
-        typeof data === 'object' &&
-        field in data &&
-        typeof cellValue === 'string' &&
-        cellValue !== undefined &&
-        cellValue !== null
-      ) {
-        values.add(cellValue);
-      }
+      const data = node.data ?? {};
+      const raw = (data as Record<string, unknown>)[field];
+      const norm = this.normalizeCellValue(raw);
+      values.add(norm);
     });
 
-    return Array.from(values).sort();
+    return Array.from(values).sort((a, b) => {
+      if (a === EMPTY_KEY && b !== EMPTY_KEY) return -1;
+      if (b === EMPTY_KEY && a !== EMPTY_KEY) return 1;
+      return a.localeCompare(b);
+    });
   }
 
   init(params: CheckboxMultiFilterParams): void {
     this.params = params;
     this.labels = { ...params.labels };
     this.labelFormatter = params.labelFormatter;
+
+    if (!(EMPTY_KEY in this.labels)) {
+      this.labels[EMPTY_KEY] = DEFAULT_EMPTY_LABEL;
+    }
 
     this.allValues = this.loadFieldValues();
     this.selectedValues = new Set(this.allValues);
@@ -150,18 +158,15 @@ export class GridFilterColumnsMultiSelect implements IFilterComp {
     return this.selectedValues.size > 0;
   }
 
-  doesFilterPass(params: IDoesFilterPassParams): boolean {
+  doesFilterPass(p: IDoesFilterPassParams): boolean {
     const field = this.params.colDef.field as string;
-    if (!params.data || typeof params.data !== 'object' || !(field in params.data)) {
-      return false;
+    if (!p.data || typeof p.data !== 'object') {
+      return this.selectedValues.has(EMPTY_KEY);
     }
 
-    const cellValue = (params.data as Record<string, unknown>)[field];
-    if (typeof cellValue !== 'string') {
-      return false;
-    }
-
-    return this.selectedValues.has(cellValue);
+    const raw = (p.data as Record<string, unknown>)[field];
+    const norm = this.normalizeCellValue(raw);
+    return this.selectedValues.has(norm);
   }
 
   getModel(): CheckboxMultiFilterModel | null {
@@ -185,6 +190,6 @@ export const createCheckboxMultiFilterParams = (
   labels: Record<string, string> = {},
   labelFormatter?: (value: string) => string,
 ): Partial<CheckboxMultiFilterParams> => ({
-  labels,
+  labels: { [EMPTY_KEY]: DEFAULT_EMPTY_LABEL, ...labels },
   labelFormatter,
 });
