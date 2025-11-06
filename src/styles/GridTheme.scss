@@ -156,9 +156,9 @@ $grid-base-font-size: calc(#{lui.$base-font-size} - 1px);
   }
   
   .ag-header-cell-filter-button.ag-has-popup-positioned-under .ag-icon-filter {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M6 12.984v-1.969h12v1.969zM3 6h18v2.016H3zm6.984 12v-2.016h4.031V18z'/%3E%3C/svg%3E") !important;
     background-color: #007198;
     border-radius: 2px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M6 12.984v-1.969h12v1.969zM3 6h18v2.016H3zm6.984 12v-2.016h4.031V18z'/%3E%3C/svg%3E") !important;
   }
 
   .ag-header-group-cell {
