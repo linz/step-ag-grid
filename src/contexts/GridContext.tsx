@@ -10,7 +10,6 @@ export interface AutoSizeColumnsProps {
   skipHeader?: boolean;
   colIds?: Set<string> | string[];
   userSizedColIds?: Set<string>;
-  includeFlex?: boolean;
 }
 
 export type AutoSizeColumnsResult = { width: number } | null;

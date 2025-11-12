@@ -37,11 +37,13 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
       GridCell({
         field: 'id',
         headerName: 'Id',
+        flex: 2,
       }),
       GridCell(
         {
           field: 'name',
           headerName: 'Popout Generic Edit',
+          flex: 1,
         },
         {
           multiEdit: true,
