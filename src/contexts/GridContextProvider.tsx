@@ -1,6 +1,7 @@
 import {
   CellPosition,
   ColDef,
+  ColumnState,
   CsvExportParams,
   GridApi,
   IRowNode,
@@ -9,7 +10,20 @@ import {
   RowNode,
 } from 'ag-grid-community';
 import debounce from 'debounce-promise';
-import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from 'lodash-es';
+import {
+  compact,
+  defer,
+  delay,
+  difference,
+  filter,
+  isEmpty,
+  last,
+  partition,
+  pull,
+  remove,
+  sortBy,
+  sumBy,
+} from 'lodash-es';
 import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ColDefT, GridBaseRow } from '../components';
@@ -19,6 +33,9 @@ import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from '../utils/util';
 import { waitForCondition } from '../utils/waitForCondition';
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from './GridContext';
 import { GridUpdatingContext } from './GridUpdatingContext';
+
+const colStateId = (colState: ColumnState) => colState.colId;
+const colStateFlexed = (colState: ColumnState) => !!colState.flex;
 
 /**
  * Context for AgGrid operations.
@@ -422,26 +439,33 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
   /**
    * Resize columns to fit container
+   *
+   * This is used to calculate the preferred size of columns.
+   * It sizes the flex columns first and then clears the calculated width.
+   * If you don't clear flex column widths ag-grid gets confused and does random sizing's.
+   * Then we size the flexed columns.
    */
   const autoSizeColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds, includeFlex }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
       if (!gridApi || !gridApi.getColumnState()) {
         return null;
       }
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
-      const colsToResize = gridApi.getColumnState()?.filter?.((colState) => {
+      const colStates = gridApi.getColumnState();
+
+      const relevantCols = colStates?.filter((colState) => {
         const colId = colState.colId;
-        return (
-          (isEmpty(colIdsSet) || colIdsSet.has(colId)) &&
-          !userSizedColIds?.has(colId) &&
-          (includeFlex || !colState.flex)
-        );
+        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId);
       });
-      if (!isEmpty(colsToResize)) {
-        gridApi.autoSizeColumns(
-          colsToResize.map((colState) => colState.colId),
-          skipHeader,
-        );
+      const [flexColumns, nonFlexColumns] = partition(relevantCols, colStateFlexed);
+      // If we don't reset the flex columns auto size it causes issues with random resizing of flex columns
+      if (!isEmpty(flexColumns)) {
+        gridApi.autoSizeColumns(flexColumns.map(colStateId), skipHeader);
+        gridApi.resetColumnState();
+      }
+
+      if (!isEmpty(nonFlexColumns)) {
+        gridApi.autoSizeColumns(nonFlexColumns.map(colStateId), skipHeader);
       }
       return {
         width: sumBy(

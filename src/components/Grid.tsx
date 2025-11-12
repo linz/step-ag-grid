@@ -235,7 +235,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         autoSizeColumns({
           skipHeader,
           userSizedColIds: new Set(userSizedColIds.current.keys()),
-          includeFlex: true,
         });
       // Auto-size failed retry later
       if (!autoSizeResult) {
