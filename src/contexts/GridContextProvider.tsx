@@ -10,20 +10,7 @@ import {
   RowNode,
 } from 'ag-grid-community';
 import debounce from 'debounce-promise';
-import {
-  compact,
-  defer,
-  delay,
-  difference,
-  filter,
-  isEmpty,
-  last,
-  partition,
-  pull,
-  remove,
-  sortBy,
-  sumBy,
-} from 'lodash-es';
+import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from 'lodash-es';
 import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ColDefT, GridBaseRow } from '../components';
@@ -34,8 +21,9 @@ import { waitForCondition } from '../utils/waitForCondition';
 import { AutoSizeColumnsProps, AutoSizeColumnsResult, GridContext, GridFilterExternal } from './GridContext';
 import { GridUpdatingContext } from './GridUpdatingContext';
 
-const colStateId = (colState: ColumnState) => colState.colId;
-const colStateFlexed = (colState: ColumnState) => !!colState.flex;
+export const colStateId = (colState: ColumnState) => colState.colId;
+export const colStateFlexed = (colState: ColumnState) => !!colState.flex;
+export const colStateNotFlexed = (colState: ColumnState) => !colState.flex;
 
 /**
  * Context for AgGrid operations.
@@ -451,27 +439,44 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         return null;
       }
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
-      const colStates = gridApi.getColumnState();
 
-      const relevantCols = colStates?.filter((colState) => {
-        const colId = colState.colId;
-        return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId);
-      });
-      const [flexColumns, nonFlexColumns] = partition(relevantCols, colStateFlexed);
+      const getVisibleColStates = () => {
+        const colStates = gridApi.getColumnState();
+        return colStates.filter((colState) => {
+          const colId = colState.colId;
+          return (isEmpty(colIdsSet) || colIdsSet.has(colId)) && !userSizedColIds?.has(colId);
+        });
+      };
+      const getFlexColStates = () => getVisibleColStates().filter(colStateFlexed);
+      const getNonFlexColStates = () => getVisibleColStates().filter(colStateNotFlexed);
+
       // If we don't reset the flex columns auto size it causes issues with random resizing of flex columns
+      let flexColumns = getFlexColStates();
+      let width = 0;
       if (!isEmpty(flexColumns)) {
         gridApi.autoSizeColumns(flexColumns.map(colStateId), skipHeader);
+        const flexColumnIds = flexColumns.map(colStateId);
+        flexColumns = getVisibleColStates().filter((colState) => flexColumnIds.includes(colState.colId));
+        width += sumBy(
+          flexColumns.filter((col) => !col.hide),
+          'width',
+        );
         gridApi.resetColumnState();
       }
 
+      let nonFlexColumns = getNonFlexColStates();
       if (!isEmpty(nonFlexColumns)) {
         gridApi.autoSizeColumns(nonFlexColumns.map(colStateId), skipHeader);
-      }
-      return {
-        width: sumBy(
-          gridApi.getColumnState().filter((col) => !col.hide),
+        const nonFlexColumnIds = nonFlexColumns.map(colStateId);
+        nonFlexColumns = getVisibleColStates().filter((colState) => nonFlexColumnIds.includes(colState.colId));
+        width += sumBy(
+          nonFlexColumns.filter((col) => !col.hide),
           'width',
-        ),
+        );
+      }
+
+      return {
+        width,
       };
     },
     [gridApi],
