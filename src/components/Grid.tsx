@@ -14,6 +14,7 @@ import {
   GetRowIdParams,
   GridOptions,
   GridReadyEvent,
+  GridSizeChangedEvent,
   ModelUpdatedEvent,
   ModuleRegistry,
   RowClickedEvent,
@@ -261,7 +262,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         console.error('Unknown value returned from hasGridRendered');
       }
     } else {
-      console.log('sizeColumnsToFit 3');
       sizeColumnsToFit();
     }
 
@@ -853,6 +853,15 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     selectable,
   ]);
 
+  const onGridSizeChanged = useCallback(
+    (event: GridSizeChangedEvent<TData>) => {
+      if (sizeColumns === 'fit') {
+        event.api.sizeColumnsToFit();
+      }
+    },
+    [sizeColumns],
+  );
+
   return (
     <div
       data-testid={dataTestId}
@@ -883,6 +892,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           getRowId={getRowId}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
+          onGridSizeChanged={onGridSizeChanged}
           onColumnVisible={setInitialContentSize}
           onRowDataUpdated={onRowDataUpdated}
           onCellFocused={onCellFocused}
