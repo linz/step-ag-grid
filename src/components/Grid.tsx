@@ -14,7 +14,6 @@ import {
   GetRowIdParams,
   GridOptions,
   GridReadyEvent,
-  IColumnLimit,
   ModelUpdatedEvent,
   ModuleRegistry,
   RowClickedEvent,
@@ -203,7 +202,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const hasSetContentSizeEmpty = useRef(false);
   const needsAutoSize = useRef(true);
 
-  const requiresInitialSizeToFitRef = useRef(false);
   const autoSizeResultRef = useRef<AutoSizeColumnsResult | null>(null);
   const prevRowsVisibleRef = useRef(false);
   const setInitialContentSize = useCallback(() => {
@@ -250,14 +248,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // We don't do this callback if we have previously had row data, or have already called back for empty
         if (!hasSetContentSizeEmpty.current && !hasSetContentSize.current) {
           hasSetContentSizeEmpty.current = true;
-          requiresInitialSizeToFitRef.current = true;
           params.onContentSize?.(autoSizeResult);
         }
       } else if (gridRendered === 'rows-visible') {
         // we have rows now so callback grid size
         if (!hasSetContentSize.current) {
           hasSetContentSize.current = true;
-          requiresInitialSizeToFitRef.current = true;
           params.onContentSize?.(autoSizeResult);
         }
       } else {
@@ -265,6 +261,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         console.error('Unknown value returned from hasGridRendered');
       }
     } else {
+      console.log('sizeColumnsToFit 3');
       sizeColumnsToFit();
     }
 
@@ -607,9 +604,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    * When cell editing has completed the colId as needing auto-sizing
    */
   useEffect(() => {
-    if (lastUpdatedDep.current === updatedDep) return;
+    if (lastUpdatedDep.current === updatedDep) {
+      return;
+    }
     lastUpdatedDep.current = updatedDep;
-
     const colIds = updatingCols();
     // Updating possibly completed
     if (isEmpty(colIds)) {
@@ -649,32 +647,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   }, [params.loading, rowData, showNoRowsOverlay]);
 
   /**
-   * Resize columns to fit if required on window/container resize
-   */
-  const onGridResize = useCallback(
-    (event: AgGridEvent<TData>) => {
-      if (sizeColumns === 'fit' || (!hasSetContentSizeEmpty.current && !hasSetContentSize.current)) {
-        return;
-      }
-      if (sizeColumns !== 'none') {
-        // Flex columns can expand to fit after resize, but they cannot shrink less than use resized value
-        // Double click column resize handle to reset this behaviour
-        const columnLimits = [
-          ...userSizedColIds.current.entries().map(
-            ([c, w]): IColumnLimit => ({
-              key: c,
-              minWidth: w,
-              maxWidth: w,
-            }),
-          ),
-        ];
-        defer(() => event.api.sizeColumnsToFit({ columnLimits }));
-      }
-    },
-    [sizeColumns],
-  );
-
-  /**
    * Set of column I'd's that are prevented from auto-sizing as they are user set
    */
   const userSizedColIds = useRef(new Map<string, number>());
@@ -682,33 +654,29 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   /**
    * Lock/unlock column width on user edit/reset.
    */
-  const onColumnResized = useCallback(
-    (e: ColumnResizedEvent) => {
-      const colId = e.column?.getColId();
-      if (colId == null) {
-        return;
-      }
-      const width = e.column?.getActualWidth();
-      if (width == null) {
-        return;
-      }
-
-      switch (e.source) {
-        case 'uiColumnResized':
-          userSizedColIds.current.set(colId, width);
-          const colDef = e.column?.getColDef();
+  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
+    const colId = e.column?.getColId();
+    if (colId == null) {
+      return;
+    }
+    const width = e.column?.getActualWidth();
+    if (width == null) {
+      return;
+    }
+    switch (e.source) {
+      case 'uiColumnResized':
+        userSizedColIds.current.set(colId, width);
+        /*const colDef = e.column?.getColDef();
           if (!colDef?.flex) {
             onGridResize(e);
-          }
-          break;
-        case 'autosizeColumns':
-          userSizedColIds.current.delete(colId);
-          onGridResize(e);
-          break;
-      }
-    },
-    [onGridResize],
-  );
+          }*/
+        break;
+      case 'autosizeColumns':
+        userSizedColIds.current.delete(colId);
+        //onGridResize(e);
+        break;
+    }
+  }, []);
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
@@ -909,20 +877,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
                 }
               : undefined
           }
-          onDisplayedColumnsChanged={() => {
-            // This happens after an autosize event, if we don't wait for it size columns to fit doesn't work
-            if (requiresInitialSizeToFitRef.current) {
-              requiresInitialSizeToFitRef.current = false;
-              delay(() => {
-                sizeColumnsToFit();
-              }, 200);
-            }
-          }}
           rowHeight={rowHeight}
           animateRows={params.animateRows ?? false}
           rowClassRules={params.rowClassRules}
           getRowId={getRowId}
-          onGridSizeChanged={onGridResize}
           suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressClickEdit={true}
           onColumnVisible={setInitialContentSize}
