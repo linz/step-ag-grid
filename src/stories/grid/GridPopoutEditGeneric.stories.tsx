@@ -55,7 +55,13 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
 
   const [rowData] = useState([
     { id: 1000, name: 'IS IS DP12345', nameType: 'IS', numba: 'IX', plan: 'DP 12345' },
-    { id: 1001, name: 'PEG V SD523', nameType: 'PEG', numba: 'V', plan: 'SD 523' },
+    {
+      id: 1001,
+      name: 'PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523',
+      nameType: 'PEG',
+      numba: 'V',
+      plan: 'SD 523',
+    },
   ] as IFormTestRow[]);
 
   return (
@@ -64,6 +70,8 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
       externalSelectedItems={externalSelectedItems}
       setExternalSelectedItems={setExternalSelectedItems}
       columnDefs={columnDefs}
+      hideSelectColumn={true}
+      selectable={true}
       rowData={rowData}
       domLayout={'autoHeight'}
     />
