@@ -35,13 +35,11 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
       GridCell({
         field: 'id',
         headerName: 'Id',
-        flex: 2,
       }),
       GridCell(
         {
           field: 'name',
           headerName: 'Popout Generic Edit',
-          flex: 1,
         },
         {
           multiEdit: true,
@@ -57,7 +55,7 @@ const GridPopoutEditGenericTemplate: StoryFn<typeof Grid<IFormTestRow>> = (props
     { id: 1000, name: 'IS IS DP12345', nameType: 'IS', numba: 'IX', plan: 'DP 12345' },
     {
       id: 1001,
-      name: 'PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523PEG V SD523',
+      name: 'PEG V SD523',
       nameType: 'PEG',
       numba: 'V',
       plan: 'SD 523',
