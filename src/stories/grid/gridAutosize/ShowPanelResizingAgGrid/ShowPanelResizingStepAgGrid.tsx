@@ -10,13 +10,15 @@ import {
   PanelHeader,
   PanelsContextProvider,
 } from '@linzjs/windows';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 
 import {
   ColDefT,
   Grid,
   GridCell,
   GridContextProvider,
+  GridFilterColumnsToggle,
+  GridFilters,
   GridIcon,
   GridPopoverMenu,
   GridPopoverMessage,
@@ -93,11 +95,13 @@ export const PanelContentsWithResize = () => {
       GridCell({
         field: 'age',
         headerName: 'Age',
+        width: 80,
+        flex: 1,
       }),
       GridCell({
         field: 'desc',
         headerName: 'Description',
-        flex: 1,
+        flex: 2,
       }),
       GridPopoverMessage(
         {
@@ -148,28 +152,57 @@ export const PanelContentsWithResize = () => {
     [],
   );
 
-  const [rowData] = useState([
-    /* Your grid row data */
-    /* exclude */
-    {
-      id: 1000,
-      position: 'Tester',
-      age: 30,
-      desc: 'Tests application',
-      dd: '1',
-    },
-    { id: 1001, position: 'Developer', age: 12, desc: 'Develops application', dd: '2' },
-    { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
-    /* exclude */
-  ]);
+  const [rowData, setRowData] = useState<ITestRow[] | null>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setRowData([
+        {
+          id: 1000,
+          position: 'Tester',
+          age: 30,
+          desc: 'Tests application',
+          dd: '1',
+        },
+        { id: 1001, position: 'Developer', age: 12, desc: 'Develops application', dd: '2' },
+        { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
+        /* exclude */
+      ]);
+    }, 2000);
+    setTimeout(() => {
+      setRowData([
+        {
+          id: 1000,
+          position: 'Tester',
+          age: 30,
+          desc: 'Tests application',
+          dd: '1',
+        },
+        {
+          id: 1001,
+          position: 'Developer DeveloperDeveloper DeveloperDeveloper DeveloperDeveloper DeveloperDeveloper Developer',
+          age: 12,
+          desc: 'Develops application',
+          dd: '2',
+        },
+        { id: 1002, position: 'Manager', age: 65, desc: 'Manages', dd: '3' },
+        /* exclude */
+      ]);
+    }, 5000);
+  }, []);
 
   return (
     <GridUpdatingContextProvider>
       <GridContextProvider>
         <GridWrapper>
+          <GridFilters>
+            <GridFilterColumnsToggle />
+          </GridFilters>
           <Grid
             columnDefs={columnDefs}
             rowData={rowData}
+            selectable={true}
+            hideSelectColumn={true}
             onContentSize={initialResizePanel}
             sizeColumns={'auto-skip-headers'}
           />

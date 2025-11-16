@@ -434,10 +434,11 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Then we size the flexed columns.
    */
   const autoSizeColumns = useCallback(
-    ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): AutoSizeColumnsResult => {
+    async ({ skipHeader, colIds, userSizedColIds }: AutoSizeColumnsProps = {}): Promise<AutoSizeColumnsResult> => {
       if (!gridApi || !gridApi.getColumnState()) {
         return null;
       }
+
       const colIdsSet = colIds instanceof Set ? colIds : new Set(colIds);
 
       const getVisibleColStates = () => {
@@ -450,31 +451,44 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
       const getFlexColStates = () => getVisibleColStates().filter(colStateFlexed);
       const getNonFlexColStates = () => getVisibleColStates().filter(colStateNotFlexed);
 
-      // If we don't reset the flex columns auto size it causes issues with random resizing of flex columns
-      let flexColumns = getFlexColStates();
+      // You cannot autosize flex columns it will break layout randomly
+      // So, a flex column is assumed to be 150 wide, unless width is provided
+      const flexColumns = getFlexColStates().map(colStateId);
       let width = 0;
-      if (!isEmpty(flexColumns)) {
-        gridApi.autoSizeColumns(flexColumns.map(colStateId), skipHeader);
-        const flexColumnIds = flexColumns.map(colStateId);
-        flexColumns = getVisibleColStates().filter((colState) => flexColumnIds.includes(colState.colId));
-        width += sumBy(
-          flexColumns.filter((col) => !col.hide),
+      flexColumns.forEach((colId) => {
+        const colDef = gridApi.getColumnDef(colId) as { flexAutoSizeWidth?: number } | undefined;
+        width += colDef?.flexAutoSizeWidth ?? 200;
+      });
+
+      const nonFlexColumns = getNonFlexColStates();
+      const nonFlexColumnIds = nonFlexColumns.map(colStateId);
+      gridApi.autoSizeColumns({ colIds: nonFlexColumnIds, skipHeader });
+
+      const calcSubWidth = () => {
+        const updatedFlexColumns = getVisibleColStates().filter((colState) =>
+          nonFlexColumnIds.includes(colState.colId),
+        );
+        return sumBy(
+          updatedFlexColumns.filter((col) => !col.hide),
           'width',
         );
-        gridApi.resetColumnState();
+      };
+
+      // ag-grid updates widths asynchronously, so we wait here for the default calculated width to change
+      let lastSubWidth = calcSubWidth();
+      const endTime = Date.now() + 1000;
+      while (Date.now() < endTime) {
+        await wait(40);
+        const newSubWidth = calcSubWidth();
+        if (lastSubWidth !== newSubWidth) {
+          lastSubWidth = newSubWidth;
+          break;
+        }
       }
 
-      let nonFlexColumns = getNonFlexColStates();
-      if (!isEmpty(nonFlexColumns)) {
-        gridApi.autoSizeColumns(nonFlexColumns.map(colStateId), skipHeader);
-        const nonFlexColumnIds = nonFlexColumns.map(colStateId);
-        nonFlexColumns = getVisibleColStates().filter((colState) => nonFlexColumnIds.includes(colState.colId));
-        width += sumBy(
-          nonFlexColumns.filter((col) => !col.hide),
-          'width',
-        );
-      }
+      width += lastSubWidth;
 
+      gridApi.sizeColumnsToFit();
       return {
         width,
       };

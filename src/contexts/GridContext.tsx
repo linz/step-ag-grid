@@ -45,7 +45,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   ensureRowVisible: (id: number | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
   getFirstRowId: () => number;
-  autoSizeColumns: (props?: AutoSizeColumnsProps) => AutoSizeColumnsResult;
+  autoSizeColumns: (props?: AutoSizeColumnsProps) => Promise<AutoSizeColumnsResult>;
   sizeColumnsToFit: (paramsOrGridWidth?: ISizeColumnsToFitParams) => void;
   startCellEditing: ({ rowId, colId }: StartCellEditingProps) => Promise<void>;
   // Restores the previous focus after cell editing
@@ -153,9 +153,9 @@ export const GridContext = createContext<GridContextType<any>>({
     console.error('no context provider for getFirstRowId');
     return -1;
   },
-  autoSizeColumns: () => {
+  autoSizeColumns: async () => {
     console.error('no context provider for autoSizeColumns');
-    return null;
+    return Promise.resolve(null);
   },
   sizeColumnsToFit: () => {
     console.error('no context provider for autoSizeAllColumns');
