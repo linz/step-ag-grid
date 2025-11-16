@@ -598,8 +598,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       children: colDef.children.map((colDef) => adjustColDefOrGroup(colDef)),
     });
 
-    const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> =>
-      ({
+    const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => {
+      const flex = colDef.flex ?? (sizeColumns === 'fit' ? 1 : undefined);
+      return {
         ...colDef,
         // You cannot pass a width to a flex
         width: !!colDef.flex ? undefined : colDef.width,
@@ -607,12 +608,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         // If this is allowed flex columns don't size based on flex
         suppressSizeToFit: true,
         // Auto-sizing flex columns breaks everything
-        suppressAutoSize: !!colDef.flex,
+        flex,
+        suppressAutoSize: !!flex,
         sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
-      }) as ColDef<TData> & { flexAutoSizeWidth?: number };
+      } as ColDef<TData> & { flexAutoSizeWidth?: number };
+    };
 
     return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
-  }, [columnDefs, params.defaultColDef?.sortable]);
+  }, [columnDefs, params.defaultColDef?.sortable, sizeColumns]);
 
   /**
    * Set of colIds that need auto-sizing.
