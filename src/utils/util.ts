@@ -1,4 +1,5 @@
 import { isEmpty, negate } from 'lodash-es';
+import natsort from 'natsort';
 
 export const isNotEmpty = negate(isEmpty);
 
@@ -57,4 +58,22 @@ export const sanitiseFileName = (filename: string): string => {
   // Arbitrary max filename length of 64 chars + extension
   if (!fileExt) return valid.slice().slice(0, 64);
   return valid.slice(0, -fileExt.length - 1).slice(0, 64) + '.' + fileExt;
+};
+
+const naturalSortInsensitive = natsort({ insensitive: true });
+const santitizeNaturalValue = (v: string | number | null | undefined): string => {
+  if (v === '–' || v === '-' || v == null) {
+    return '';
+  }
+  return String(v);
+};
+export const compareNaturalInsensitive = (
+  a?: object | string | number | null,
+  b?: object | string | number | null,
+): number => {
+  if ((a !== null && typeof a === 'object') || (b !== null && typeof b === 'object')) {
+    // We can't compare objects
+    return 0;
+  }
+  return naturalSortInsensitive(santitizeNaturalValue(a), santitizeNaturalValue(b));
 };

@@ -25,6 +25,7 @@ export interface IQueryQuick {
   role?: string;
   classes?: string;
   child?: IQueryQuick;
+  selector?: string;
 }
 
 const escapeSelectorParam = (param: string): string => param.replace(/["\\]/g, '\\$&');
@@ -51,6 +52,7 @@ const quickSelector = <T extends HTMLElement>(
   let lastIQueryQuick = props;
   for (let loop: IQueryQuick | undefined = props; loop; loop = loop.child) {
     lastIQueryQuick = loop;
+    loop.selector && (selector += loop.selector);
     loop.tagName && (selector += loop.tagName);
     loop.ariaLabel && (selector += `[aria-label='${escapeSelectorParam(loop.ariaLabel)}']`);
     loop.role && (selector += `[role="${escapeSelectorParam(loop.role)}"]`);
