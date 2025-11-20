@@ -71,7 +71,7 @@ interface ITestRow {
 }
 
 const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
-  const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
+  const [externalSelectedIds, setExternalSelectedIds] = useState<number[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
@@ -248,8 +248,8 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<I
         enableClickSelection={true}
         enableSelectionWithoutKeys={true}
         autoSelectFirstRow={true}
-        externalSelectedItems={externalSelectedItems}
-        setExternalSelectedItems={setExternalSelectedItems}
+        externalSelectedIds={externalSelectedIds}
+        setExternalSelectedIds={setExternalSelectedIds}
         columnDefs={columnDefs}
         rowData={rowData}
       />
