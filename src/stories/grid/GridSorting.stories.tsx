@@ -9,7 +9,7 @@ import { expect } from 'storybook/test';
 
 import {
   ColDefT,
-  genericLocaleCompare,
+  compareNaturalInsensitive,
   Grid,
   GridCell,
   GridContextProvider,
@@ -82,14 +82,14 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<I
         colId: 'customComparatorText',
         headerName: 'Cust. comp. id as text',
         valueFormatter: ({ data }) => data?.text ?? '',
-        comparator: (_v1, _v2, n1, n2) => genericLocaleCompare(String(n1.data?.id), String(n2.data?.id)) ?? 0,
+        comparator: (_v1, _v2, n1, n2) => compareNaturalInsensitive(String(n1.data?.id), String(n2.data?.id)) ?? 0,
       }),
       GridCell({
         colId: 'customComparatorNumeric',
         headerName: 'Cust. comp. abs number',
         valueFormatter: ({ data }) => String(data?.numeric ?? ''),
         comparator: (_v1, _v2, n1, n2) => {
-          return genericLocaleCompare(n1.data?.numeric, n2.data?.numeric) ?? 0;
+          return compareNaturalInsensitive(n1.data?.numeric, n2.data?.numeric) ?? 0;
         },
       }),
     ],

@@ -33,7 +33,7 @@ import { useInterval } from 'usehooks-ts';
 
 import { AutoSizeColumnsResult, StartCellEditingProps, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
-import { compareNaturalInsensitive, fnOrVar, genericLocaleCompare, isNotEmpty } from '../utils/util';
+import { compareNaturalInsensitive, fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
@@ -606,8 +606,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       let comparator = colDef.comparator;
       if (sortable && !comparator) {
         comparator = (value1, value2, node1, node2) => {
-          let r = genericLocaleCompare(value1, value2);
-          if (r === null && typeof valueFormatter === 'function') {
+          let r = 0;
+          if (typeof valueFormatter === 'function') {
             r = compareNaturalInsensitive(
               valueFormatter({
                 data: node1.data,
@@ -624,12 +624,11 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
                 ...NotAGridValueFormatterCall,
               } as ValueFormatterParams<TData>),
             );
+          } else {
+            r = compareNaturalInsensitive(value1, value2);
           }
-          if (r === 0 || r === null) {
-            // secondary compare as primary sort column rows are equal
-            r = genericLocaleCompare(node1.data?.id, node2.data?.id);
-          }
-          return r ?? 0;
+          // secondary compare as primary sort column rows are equal
+          return r === 0 ? compareNaturalInsensitive(node1.data?.id, node2.data?.id) : r;
         };
       }
       const adjustedColDef = {

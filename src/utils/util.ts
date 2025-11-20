@@ -60,27 +60,20 @@ export const sanitiseFileName = (filename: string): string => {
   return valid.slice(0, -fileExt.length - 1).slice(0, 64) + '.' + fileExt;
 };
 
-export const genericLocaleCompare = (value1: unknown, value2: unknown): number | null => {
-  if (value1 == null && value2 == null) {
+const naturalSortInsensitive = natsort({ insensitive: true });
+const santitizeNaturalValue = (v: string | number | null | undefined): string => {
+  if (v === '–' || v === '-' || v == null) {
+    return '';
+  }
+  return String(v);
+};
+export const compareNaturalInsensitive = (
+  a?: object | string | number | null,
+  b?: object | string | number | null,
+): number => {
+  if ((a !== null && typeof a === 'object') || (b !== null && typeof b === 'object')) {
+    // We can't compare objects
     return 0;
   }
-  if (value1 != null && value2 == null) {
-    return 1;
-  }
-  if (value1 == null && value2 != null) {
-    return -1;
-  }
-
-  if (typeof value1 === 'number' && typeof value2 === 'number') {
-    return value1 - value2;
-  }
-  if (typeof value1 === 'string' && typeof value2 === 'string') {
-    return compareNaturalInsensitive(value1, value2);
-  }
-
-  return null;
+  return naturalSortInsensitive(santitizeNaturalValue(a), santitizeNaturalValue(b));
 };
-
-const naturalSortInsensitive = natsort({ insensitive: true });
-export const compareNaturalInsensitive = (a?: string | null, b?: string | null): number =>
-  naturalSortInsensitive(a ?? '', b ?? '');
