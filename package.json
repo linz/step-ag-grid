@@ -38,6 +38,7 @@
     "clsx": "^2.1.1",
     "debounce-promise": "^3.1.2",
     "matcher": "^5.0.0",
+    "natsort": "^2.0.3",
     "react-transition-state": "^2.3.1",
     "usehooks-ts": "^3.1.1",
     "uuid": "^13.0.0"

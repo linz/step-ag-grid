@@ -23,6 +23,7 @@ import {
   RowDragMoveEvent,
   SelectionChangedEvent,
   SelectionColumnDef,
+  ValueFormatterParams,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
@@ -32,7 +33,7 @@ import { useInterval } from 'usehooks-ts';
 
 import { AutoSizeColumnsResult, StartCellEditingProps, useGridContext } from '../contexts/GridContext';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
-import { fnOrVar, isNotEmpty } from '../utils/util';
+import { compareNaturalInsensitive, fnOrVar, genericLocaleCompare, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
@@ -600,18 +601,52 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
     const adjustColDef = (colDef: ColDef<TData>): ColDef<TData> => {
       const flex = colDef.flex ?? (sizeColumns === 'fit' ? 1 : undefined);
-      return {
+      const valueFormatter = colDef.valueFormatter;
+      const sortable = colDef.sortable && params.defaultColDef?.sortable !== false;
+      let comparator = colDef.comparator;
+      if (sortable && !comparator) {
+        comparator = (value1, value2, node1, node2) => {
+          let r = genericLocaleCompare(value1, value2);
+          if (r === null && typeof valueFormatter === 'function') {
+            r = compareNaturalInsensitive(
+              valueFormatter({
+                data: node1.data,
+                value: value1,
+                node: node1,
+                colDef: adjustedColDef,
+                ...NotAGridValueFormatterCall,
+              } as ValueFormatterParams<TData>),
+              valueFormatter({
+                data: node2.data,
+                value: value2,
+                node: node2,
+                colDef: adjustedColDef,
+                ...NotAGridValueFormatterCall,
+              } as ValueFormatterParams<TData>),
+            );
+          }
+          if (r === 0 || r === null) {
+            // secondary compare are primary column equal
+            r = genericLocaleCompare(node1.data?.id, node2.data?.id);
+          }
+          return r ?? 0;
+        };
+      }
+      const adjustedColDef = {
         ...colDef,
         // You cannot pass a width to a flex
         width: !!colDef.flex ? undefined : colDef.width,
-        flexAutoSizeWidth: colDef.width,
+        ...(!!colDef.flex && { flexAutoSizeWidth: colDef.width }),
         // If this is allowed flex columns don't size based on flex
         suppressSizeToFit: true,
         // Auto-sizing flex columns breaks everything
         flex,
         suppressAutoSize: !!flex,
-        sortable: colDef.sortable && params.defaultColDef?.sortable !== false,
+        sortable,
+        comparator,
       } as ColDef<TData> & { flexAutoSizeWidth?: number };
+
+      return adjustedColDef;
     };
 
     return columnDefs.map((colDef) => adjustColDefOrGroup(colDef));
@@ -968,4 +1003,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 const quickFilterParser = (filterStr: string) => {
   // filter is exact matches exactly groups separated by commas
   return filterStr.split(',').map((str) => str.trim());
+};
+
+/**
+ * Columns to indicate to user when they debug why things are broken in the default comparator if their valueFormatter
+ * is too complicated.
+ */
+const NotAGridValueFormatterCall = {
+  column: 'Default comparator has no access to column, write your own comparator' as unknown,
+  api: 'Default comparator has no access to api, write your own comparator' as unknown,
+  context: 'Default comparator has no access to context, write your own comparator' as unknown,
 };
