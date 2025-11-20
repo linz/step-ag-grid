@@ -74,7 +74,7 @@ export interface GridContextType<TData extends GridBaseRow> {
 }
 
 const NoContext = <T,>(): T => {
-  console.error('no GridContextProvider for getColDef');
+  console.error('Missing GridContextProvider');
   return null as T;
 };
 
