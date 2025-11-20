@@ -626,7 +626,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
             );
           }
           if (r === 0 || r === null) {
-            // secondary compare are primary column equal
+            // secondary compare as primary sort column rows are equal
             r = genericLocaleCompare(node1.data?.id, node2.data?.id);
           }
           return r ?? 0;
