@@ -62,9 +62,9 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
   domLayout?: GridOptions['domLayout'];
-  externalSelectedItems?: any[];
+  externalSelectedItems?: TData[];
   externalSelectedIds?: TData['id'][];
-  setExternalSelectedItems?: (items: any[]) => void;
+  setExternalSelectedItems?: (items: TData[]) => void;
   setExternalSelectedIds?: (ids: TData['id'][]) => void;
   defaultColDef?: GridOptions['defaultColDef'];
   columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
@@ -115,7 +115,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   /**
    * Context menu definition if required.
    */
-  contextMenu?: GridContextMenuComponent<any>;
+  contextMenu?: GridContextMenuComponent<TData>;
 
   /**
    * Whether to select row on context menu.
@@ -454,7 +454,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           cellClassRules: {
             ...colDef.cellClassRules,
             'GridCell-readonly': (ccp: CellClassParams<TData>) =>
-              !suppressReadOnlyStyle && !editable(ccp as any as EditableCallbackParams<TData>),
+              !suppressReadOnlyStyle && !editable(ccp as unknown as EditableCallbackParams<TData>),
           },
         };
       }
