@@ -5,10 +5,10 @@ import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { MenuItem } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { GridIcon } from '../GridIcon';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface MultiSelectGridOption {
   value: any;

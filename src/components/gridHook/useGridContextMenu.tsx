@@ -4,7 +4,7 @@ import { ReactElement, useCallback, useContext, useRef, useState } from 'react';
 
 import { GridContext } from '../../contexts/GridContext';
 import { ControlledMenu } from '../../react-menu3';
-import { GridBaseRow } from '../Grid';
+import { GridBaseRow } from '../types';
 
 export interface GridContextMenuComponentProps<TData extends GridBaseRow> {
   selectedRows: TData[];

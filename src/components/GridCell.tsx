@@ -1,26 +1,22 @@
 import {
   ColDef,
-  EditableCallback,
   GetQuickFilterTextParams,
   ICellEditorParams,
   ICellRendererParams,
-} from 'ag-grid-community';
-import {
   SuppressKeyboardEventParams,
   ValueFormatterFunc,
   ValueFormatterParams,
-  ValueGetterFunc,
 } from 'ag-grid-community';
 import { forwardRef, ReactElement, useContext } from 'react';
 
 import { GridPopoverContextProvider } from '../contexts/GridPopoverContextProvider';
 import { GridUpdatingContext } from '../contexts/GridUpdatingContext';
 import { fnOrVar } from '../utils/util';
-import { GridBaseRow } from './Grid';
 import { GridCellMultiSelectClassRules } from './GridCellMultiSelectClassRules';
 import { GridIcon } from './GridIcon';
 import { GridLoadableCell } from './GridLoadableCell';
 import { GenericCellColDef, GenericCellRendererParams } from './gridRender';
+import { ColDefT, GridBaseRow } from './types';
 
 export interface GenericCellEditorProps<E> {
   multiEdit?: boolean;
@@ -73,26 +69,6 @@ export const GridCellRenderer = (props: ICellRendererParams) => {
     </>
   );
 };
-
-// This is so that typescript retains the row type to pass to the GridCells
-export interface ColDefT<TData extends GridBaseRow, ValueType = any> extends ColDef<TData, ValueType> {
-  editable?: boolean | EditableCallback<TData, ValueType>;
-  valueGetter?: string | ValueGetterFunc<TData, ValueType>;
-  valueFormatter?: string | ValueFormatterFunc<TData, ValueType>;
-  cellRenderer?:
-    | ((props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined)
-    | string;
-  cellRendererParams?: {
-    rightHoverElement?: ReactElement;
-    originalCellRenderer?: any;
-    editAction?: (selectedRows: TData[]) => void;
-    shortcutKeys?: Record<string, () => void>;
-    error?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
-    warning?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
-    info?: (props: ICellRendererParams<TData, ValueType>) => ReactElement | string | false | null | undefined;
-  };
-  editor?: (editorProps: any) => ReactElement;
-}
 
 export const suppressCellKeyboardEvents = (e: SuppressKeyboardEventParams) => {
   const shortcutKeys = e.colDef.cellRendererParams?.shortcutKeys ?? {};

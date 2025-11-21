@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 
-import { GridBaseRow } from '../components/Grid';
+import { GridBaseRow } from '../components/types';
 import { isFloat, stringByteLengthIsInvalid } from './util';
 
 export interface TextInputValidatorProps<TData extends GridBaseRow> {

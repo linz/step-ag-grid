@@ -11,9 +11,9 @@ import { ClickEvent } from '../../react-menu3/types';
 import { textMatch } from '../../utils/textMatcher';
 import { isNotEmpty } from '../../utils/util';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface GridPopoutEditDropDownSelectedItem<TData extends GridBaseRow, TOption> {
   // Note the row that was clicked on will be first

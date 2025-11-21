@@ -1,6 +1,6 @@
 import { ColDef } from 'ag-grid-community';
 
-import { GridBaseRow } from './Grid';
+import { GridBaseRow } from './types';
 
 export const GridCellFillerColId = 'gridCellFiller';
 

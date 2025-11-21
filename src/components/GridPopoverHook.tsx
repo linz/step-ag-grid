@@ -4,7 +4,7 @@ import { useGridPopoverContext } from '../contexts/GridPopoverContext';
 import { ControlledMenu } from '../react-menu3';
 import { MenuCloseEvent } from '../react-menu3/types';
 import { CloseReason } from '../react-menu3/utils';
-import { GridBaseRow } from './Grid';
+import { GridBaseRow } from './types';
 
 export interface GridPopoverHookProps<TData> {
   className: string | undefined;

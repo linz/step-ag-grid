@@ -38,7 +38,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   const [invisibleColumnIds, _setInvisibleColumnIds] = useState<string[]>();
   const testId = useRef<string | undefined>();
   const hasExternallySelectedItemsRef = useRef(false);
-  const idsBeforeUpdate = useRef<number[]>([]);
+  const idsBeforeUpdate = useRef<TData['id'][]>([]);
   const prePopupFocusedCell = useRef<CellPosition>();
   const [externallySelectedItemsAreInSync, setExternallySelectedItemsAreInSync] = useState(false);
   const externalFilters = useRef<GridFilterExternal<TData>[]>([]);
@@ -169,7 +169,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * Get all row id's in grid.
    */
   const _getAllRowIds = useCallback(() => {
-    const result: number[] = [];
+    const result: TData['id'][] = [];
     return gridApiOp(
       (gridApi) => {
         gridApi.forEachNode((node) => result.push(node.data.id));
@@ -205,7 +205,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
    * @param rowIds Row ids to get from grid.
    */
   const _rowIdsToNodes = useCallback(
-    (rowIds: number[]): IRowNode[] => {
+    (rowIds: TData['id'][]): IRowNode[] => {
       return gridApiOp(
         (gridApi) => compact(rowIds.map((rowId) => gridApi.getRowNode('' + rowId))),
         () => [] as RowNode[],
@@ -248,7 +248,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         ifNoCellFocused = false,
         retryCount = 15,
       }: {
-        rowIds: number[] | undefined;
+        rowIds: TData['id'][] | undefined;
         select: boolean;
         flash: boolean;
         ifNoCellFocused?: boolean;
@@ -333,17 +333,17 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   );
 
   const selectRowsById = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: false }),
+    (rowIds?: TData['id'][]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: false }),
     [_selectRowsWithOptionalFlash],
   );
 
   const selectRowsByIdWithFlash = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: true }),
+    (rowIds?: TData['id'][]) => _selectRowsWithOptionalFlash({ rowIds, select: true, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
   const flashRows = useCallback(
-    (rowIds?: number[]) => _selectRowsWithOptionalFlash({ rowIds, select: false, flash: true }),
+    (rowIds?: TData['id'][]) => _selectRowsWithOptionalFlash({ rowIds, select: false, flash: true }),
     [_selectRowsWithOptionalFlash],
   );
 
@@ -375,7 +375,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   );
 
   const focusByRowById = useCallback(
-    (rowId: number, ifNoCellFocused?: boolean) =>
+    (rowId: TData['id'], ifNoCellFocused?: boolean) =>
       _selectRowsWithOptionalFlash({ rowIds: [rowId], select: false, flash: false, ifNoCellFocused }),
     [_selectRowsWithOptionalFlash],
   );
@@ -398,12 +398,12 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
   }, [gridApiOp]);
 
   const getSelectedRowIds = useCallback(
-    (): number[] => getSelectedRows().map((row) => (row as any).id as number),
+    (): TData['id'][] => getSelectedRows().map((row) => (row as any).id as number),
     [getSelectedRows],
   );
 
   const getFilteredSelectedRowIds = useCallback(
-    (): number[] => getFilteredSelectedRows().map((row) => (row as any).id as number),
+    (): TData['id'][] => getFilteredSelectedRows().map((row) => (row as any).id as number),
     [getFilteredSelectedRows],
   );
 
@@ -548,7 +548,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
 
   const startCellEditingInProgressRef = useRef(false);
   const startCellEditing = useCallback(
-    async ({ rowId, colId }: { rowId: number; colId: string }) => {
+    async ({ rowId, colId }: { rowId: TData['id']; colId: string }) => {
       if (!gridApi || startCellEditingInProgressRef.current) {
         return;
       }

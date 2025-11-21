@@ -66,7 +66,7 @@ interface ICode {
 }
 
 const GridEditDropDownTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
-  const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
+  const [externalSelectedIds, setExternalSelectedIds] = useState<number[]>([]);
 
   const optionsFn = useCallback(async (selectedRows: ITestRow[], filter?: string) => {
     // eslint-disable-next-line no-console
@@ -312,8 +312,8 @@ const GridEditDropDownTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridPro
       </GridFilters>
       <Grid
         {...props}
-        externalSelectedItems={externalSelectedItems}
-        setExternalSelectedItems={setExternalSelectedItems}
+        externalSelectedIds={externalSelectedIds}
+        setExternalSelectedIds={setExternalSelectedIds}
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={'autoHeight'}

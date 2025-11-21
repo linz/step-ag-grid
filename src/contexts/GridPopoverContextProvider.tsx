@@ -2,7 +2,7 @@ import { ICellEditorParams } from 'ag-grid-community';
 import { sortBy } from 'lodash-es';
 import { PropsWithChildren, RefObject, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import { GridBaseRow } from '../components/Grid';
+import { GridBaseRow } from '../components/types';
 import { GridContext } from './GridContext';
 import { GridPopoverContext } from './GridPopoverContext';
 

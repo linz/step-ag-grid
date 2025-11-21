@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 
-import { GridBaseRow } from '../Grid';
-import { ColDefT, GenericCellEditorProps, GridCell } from '../GridCell';
+import { GenericCellEditorProps, GridCell } from '../GridCell';
 import { GridFormDropDown, GridFormDropDownProps } from '../gridForm/GridFormDropDown';
 import { GenericCellColDef } from '../gridRender/GridRenderGenericCell';
+import { ColDefT, GridBaseRow } from '../types';
 
 export const GridPopoverEditDropDown = <TData extends GridBaseRow, TValue = any, TOptionValue = any>(
   colDef: GenericCellColDef<TData, TValue>,

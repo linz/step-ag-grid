@@ -2,7 +2,7 @@ import { ColDef, GridApi, IRowNode, ISizeColumnsToFitParams } from 'ag-grid-comm
 import { CsvExportParams } from 'ag-grid-community';
 import { createContext, useContext } from 'react';
 
-import { ColDefT, GridBaseRow } from '../components';
+import { ColDefT, GridBaseRow } from '../components/types';
 
 export type GridFilterExternal<TData extends GridBaseRow> = (data: TData, rowNode: IRowNode) => boolean;
 
@@ -14,8 +14,8 @@ export interface AutoSizeColumnsProps {
 
 export type AutoSizeColumnsResult = { width: number } | null;
 
-export interface StartCellEditingProps {
-  rowId: number;
+export interface StartCellEditingProps<TData extends GridBaseRow> {
+  rowId: TData['id'];
   colId: string;
 }
 
@@ -33,21 +33,21 @@ export interface GridContextType<TData extends GridBaseRow> {
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
   getFilteredSelectedRows: <T extends GridBaseRow>() => T[];
-  getSelectedRowIds: () => number[];
-  getFilteredSelectedRowIds: () => number[];
+  getSelectedRowIds: () => TData['id'][];
+  getFilteredSelectedRowIds: () => TData['id'][];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  selectRowsById: (rowIds?: number[]) => void;
-  selectRowsByIdWithFlash: (rowIds?: number[]) => void;
-  flashRows: (rowIds?: number[]) => void;
+  selectRowsById: (rowIds?: TData['id'][]) => void;
+  selectRowsByIdWithFlash: (rowIds?: TData['id'][]) => void;
+  flashRows: (rowIds?: TData['id'][]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  focusByRowById: (rowId: number, ifNoCellFocused?: boolean) => void;
-  ensureRowVisible: (id: number | string) => boolean;
+  focusByRowById: (rowId: TData['id'], ifNoCellFocused?: boolean) => void;
+  ensureRowVisible: (id: TData['id'] | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
-  getFirstRowId: () => number;
+  getFirstRowId: () => TData['id'];
   autoSizeColumns: (props?: AutoSizeColumnsProps) => Promise<AutoSizeColumnsResult>;
   sizeColumnsToFit: (paramsOrGridWidth?: ISizeColumnsToFitParams) => void;
-  startCellEditing: ({ rowId, colId }: StartCellEditingProps) => Promise<void>;
+  startCellEditing: ({ rowId, colId }: StartCellEditingProps<TData>) => Promise<void>;
   // Restores the previous focus after cell editing
   resetFocusedCellAfterCellEditing: () => void;
   updatingCells: (
@@ -72,147 +72,54 @@ export interface GridContextType<TData extends GridBaseRow> {
   showNoRowsOverlay: () => void;
 }
 
+const NoContext = <T,>(): T => {
+  console.error('Missing GridContextProvider');
+  return null as T;
+};
+
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
   gridRenderState: () => null,
-  getColDef: () => {
-    console.error('no context provider for getColDef');
-    return undefined;
-  },
-  getColumns: () => {
-    console.error('no context provider for getColumns');
-    return [];
-  },
-  getColumnIds: () => {
-    console.error('no context provider for getColumnIds');
-    return [];
-  },
+  getColDef: NoContext,
+  getColumns: NoContext,
+  getColumnIds: NoContext,
   invisibleColumnIds: undefined,
-  setInvisibleColumnIds: () => {
-    console.error('no context provider for setInvisibleColumnIds');
-  },
-  prePopupOps: () => {
-    console.error('no context provider for prePopupOps');
-  },
+  setInvisibleColumnIds: NoContext,
+  prePopupOps: NoContext,
   externallySelectedItemsAreInSync: false,
-  setApis: () => {
-    console.error('no context provider for setApis');
-  },
-  setQuickFilter: () => {
-    console.error('no context provider for setQuickFilter');
-  },
-  selectRowsById: () => {
-    console.error('no context provider for selectRows');
-  },
-  getSelectedRows: <T,>(): T[] => {
-    console.error('no context provider for getSelectedRows');
-    return [];
-  },
-  getFilteredSelectedRows: <T,>(): T[] => {
-    console.error('no context provider for getFilteredSelectedRows');
-    return [];
-  },
-  getSelectedRowIds: () => {
-    console.error('no context provider for getSelectedRowIds');
-    return [];
-  },
-  getFilteredSelectedRowIds: () => {
-    console.error('no context provider for getFilteredSelectedRowIds');
-    return [];
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  selectRowsDiff: async () => {
-    console.error('no context provider for selectRowsDiff');
-  },
-  selectRowsByIdWithFlash: () => {
-    console.error('no context provider for selectRowsWithFlash');
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  selectRowsWithFlashDiff: async () => {
-    console.error('no context provider for selectRowsWithFlashDiff');
-  },
-  flashRows: () => {
-    console.error('no context provider for flashRows');
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  flashRowsDiff: async () => {
-    console.error('no context provider for flashRows');
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await,@typescript-eslint/no-misused-promises
-  focusByRowById: async () => {
-    console.error('no context provider for focusByRowById');
-  },
-  ensureRowVisible: () => {
-    console.error('no context provider for ensureRowVisible');
-    return true;
-  },
-  ensureSelectedRowIsVisible: () => {
-    console.error('no context provider for ensureSelectedRowIsVisible');
-  },
-  getFirstRowId: () => {
-    console.error('no context provider for getFirstRowId');
-    return -1;
-  },
-  autoSizeColumns: async () => {
-    console.error('no context provider for autoSizeColumns');
-    return Promise.resolve(null);
-  },
-  sizeColumnsToFit: () => {
-    console.error('no context provider for autoSizeAllColumns');
-    return null;
-  },
-  editingCells: () => {
-    console.error('no context provider for editingCells');
-    return false;
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  startCellEditing: async () => {
-    console.error('no context provider for startCellEditing');
-  },
-  resetFocusedCellAfterCellEditing: () => {
-    console.error('no context provider for resetFocusedCellAfterCellEditing');
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  updatingCells: async () => {
-    console.error('no context provider for modifyUpdating');
-    return false;
-  },
-  redrawRows: () => {
-    console.error('no context provider for redrawRows');
-  },
-  setExternallySelectedItemsAreInSync: () => {
-    console.error('no context provider for setExternallySelectedItemsAreInSync');
-  },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  waitForExternallySelectedItemsToBeInSync: async () => {
-    console.error('no context provider for waitForExternallySelectedItemsToBeInSync');
-  },
-  addExternalFilter: () => {
-    console.error('no context provider for addExternalFilter');
-  },
-  removeExternalFilter: () => {
-    console.error('no context provider for removeExternalFilter');
-  },
-  isExternalFilterPresent: () => {
-    console.error('no context provider for isExternalFilterPresent');
-    return false;
-  },
-  doesExternalFilterPass: () => {
-    console.error('no context provider for doesExternalFilterPass');
-    return true;
-  },
-  downloadCsv: () => {
-    console.error('no context provider for downloadCsv');
-  },
-  onBulkEditingComplete: () => {
-    console.error('no context provider for onBulkEditingComplete');
-  },
-  setOnBulkEditingComplete: () => {
-    console.error('no context provider for setOnBulkEditingComplete');
-  },
-  showNoRowsOverlay: () => {
-    console.error('no context provider for showLoadingOverlay');
-  },
+  setApis: NoContext,
+  setQuickFilter: NoContext,
+  selectRowsById: NoContext,
+  getSelectedRows: NoContext,
+  getFilteredSelectedRows: NoContext,
+  getSelectedRowIds: NoContext,
+  getFilteredSelectedRowIds: NoContext,
+  selectRowsDiff: NoContext,
+  selectRowsByIdWithFlash: NoContext,
+  selectRowsWithFlashDiff: NoContext,
+  flashRows: NoContext,
+  flashRowsDiff: NoContext,
+  focusByRowById: NoContext,
+  ensureRowVisible: NoContext,
+  ensureSelectedRowIsVisible: NoContext,
+  getFirstRowId: NoContext,
+  autoSizeColumns: NoContext,
+  sizeColumnsToFit: NoContext,
+  editingCells: NoContext,
+  startCellEditing: NoContext,
+  resetFocusedCellAfterCellEditing: NoContext,
+  updatingCells: NoContext,
+  redrawRows: NoContext,
+  setExternallySelectedItemsAreInSync: NoContext,
+  waitForExternallySelectedItemsToBeInSync: NoContext,
+  addExternalFilter: NoContext,
+  removeExternalFilter: NoContext,
+  isExternalFilterPresent: NoContext,
+  doesExternalFilterPass: NoContext,
+  downloadCsv: NoContext,
+  onBulkEditingComplete: NoContext,
+  setOnBulkEditingComplete: NoContext,
+  showNoRowsOverlay: NoContext,
 });
 
 export const useGridContext = <TData extends GridBaseRow>() => useContext<GridContextType<TData>>(GridContext);

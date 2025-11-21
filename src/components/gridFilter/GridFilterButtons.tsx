@@ -4,7 +4,7 @@ import clsx, { ClassValue } from 'clsx';
 import { ReactElement, useMemo, useState } from 'react';
 
 import { GridFilterExternal } from '../../contexts/GridContext';
-import { GridBaseRow } from '../Grid';
+import { GridBaseRow } from '../types';
 import { useGridFilter } from './useGridFilter';
 
 export interface GridFilterButtonsOption<TData extends GridBaseRow> {

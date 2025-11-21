@@ -3,8 +3,8 @@ import { ReactElement, useCallback, useContext, useEffect } from 'react';
 import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
 import { TextInputFormatted } from '../../lui/TextInputFormatted';
 import { TextInputValidator, TextInputValidatorProps } from '../../utils/textValidator';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
+import { GridBaseRow } from '../types';
 
 export interface GridFormSubComponentTextInputProps<TData extends GridBaseRow>
   extends TextInputValidatorProps<TData>,

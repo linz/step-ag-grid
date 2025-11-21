@@ -39,18 +39,9 @@ import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
+import { GridBaseRow, GridOnRowDragEndProps } from './types';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-export interface GridBaseRow {
-  id: string | number;
-}
-
-export interface GridOnRowDragEndProps<TData extends GridBaseRow> {
-  movedRow: TData;
-  targetRow: TData;
-  direction: -1 | 1;
-}
 
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
@@ -62,8 +53,10 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
   domLayout?: GridOptions['domLayout'];
-  externalSelectedItems?: any[];
-  setExternalSelectedItems?: (items: any[]) => void;
+  externalSelectedItems?: TData[];
+  externalSelectedIds?: TData['id'][];
+  setExternalSelectedItems?: (items: TData[]) => void;
+  setExternalSelectedIds?: (ids: TData['id'][]) => void;
   defaultColDef?: GridOptions['defaultColDef'];
   columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
   rowData: GridOptions['rowData'];
@@ -113,7 +106,7 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   /**
    * Context menu definition if required.
    */
-  contextMenu?: GridContextMenuComponent<any>;
+  contextMenu?: GridContextMenuComponent<TData>;
 
   /**
    * Whether to select row on context menu.
@@ -149,9 +142,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
   selectable,
+  autoSelectFirstRow,
   onCellFocused: paramsOnCellFocused,
   maxInitialWidth,
   suppressReadOnlyStyle = false,
+  externalSelectedItems,
+  setExternalSelectedItems,
+  externalSelectedIds,
+  setExternalSelectedIds,
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
@@ -178,7 +176,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   // CellEditingStop event happens too much for one edit
   const startedEditRef = useRef(false);
   const startCellEditing = useCallback(
-    (props: StartCellEditingProps) => {
+    (props: StartCellEditingProps<TData>) => {
       startedEditRef.current = true;
       return propStartCellEditing(props);
     },
@@ -188,7 +186,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const { updatedDep, anyUpdating, updatingCols } = useContext(GridUpdatingContext);
 
   const gridDivRef = useRef<HTMLDivElement>(null);
-  const lastSelectedIds = useRef<number[]>([]);
+  const lastSelectedIds = useRef<TData['id'][] | undefined>();
 
   const [staleGrid, setStaleGrid] = useState(false);
   const [autoSized, setAutoSized] = useState(false);
@@ -326,11 +324,13 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const hasSelectedFirstItem = useRef(false);
   useEffect(() => {
-    if (!gridReady || hasSelectedFirstItem.current || !rowData || !externallySelectedItemsAreInSync) return;
+    if (!gridReady || hasSelectedFirstItem.current || !rowData || !externallySelectedItemsAreInSync) {
+      return;
+    }
     hasSelectedFirstItem.current = true;
-    if (isNotEmpty(rowData) && isEmpty(params.externalSelectedItems)) {
+    if (isNotEmpty(rowData) && isEmpty(externalSelectedItems)) {
       const firstRowId = getFirstRowId();
-      if (params.autoSelectFirstRow) {
+      if (autoSelectFirstRow && selectable) {
         selectRowsById([firstRowId]);
       } else {
         focusByRowById(firstRowId, true);
@@ -340,11 +340,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     externallySelectedItemsAreInSync,
     focusByRowById,
     gridReady,
-    params.externalSelectedItems,
-    params.autoSelectFirstRow,
+    externalSelectedItems,
+    autoSelectFirstRow,
     rowData,
     selectRowsById,
     getFirstRowId,
+    selectable,
   ]);
 
   /**
@@ -352,24 +353,43 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const synchroniseExternalStateToGridSelection = useCallback(
     ({ api }: SelectionChangedEvent) => {
-      if (!params.externalSelectedItems || !params.setExternalSelectedItems) {
-        setExternallySelectedItemsAreInSync(true);
-        return;
-      }
+      if (externalSelectedIds && setExternalSelectedIds) {
+        const selectedRowsIds = api.getSelectedRows().map((row: TData) => row.id);
 
-      const selectedRows = api.getSelectedRows();
-      // We don't want to update selected Items if it hasn't changed to prevent excess renders
-      if (
-        params.externalSelectedItems.length !== selectedRows.length ||
-        isNotEmpty(xorBy(selectedRows, params.externalSelectedItems, (row) => row.id))
-      ) {
-        setExternallySelectedItemsAreInSync(false);
-        params.setExternalSelectedItems([...selectedRows]);
+        // We don't want to update selected Items if it hasn't changed to prevent excess renders
+        if (
+          externalSelectedIds.length !== selectedRowsIds.length ||
+          isNotEmpty(xorBy(selectedRowsIds, externalSelectedIds))
+        ) {
+          setExternallySelectedItemsAreInSync(false);
+          setExternalSelectedIds([...selectedRowsIds]);
+        } else {
+          setExternallySelectedItemsAreInSync(true);
+        }
+      } else if (externalSelectedItems && setExternalSelectedItems) {
+        const selectedRows = api.getSelectedRows();
+
+        // We don't want to update selected Items if it hasn't changed to prevent excess renders
+        if (
+          externalSelectedItems.length !== selectedRows.length ||
+          isNotEmpty(xorBy(selectedRows, externalSelectedItems, (row) => row.id))
+        ) {
+          setExternallySelectedItemsAreInSync(false);
+          setExternalSelectedItems([...selectedRows]);
+        } else {
+          setExternallySelectedItemsAreInSync(true);
+        }
       } else {
         setExternallySelectedItemsAreInSync(true);
       }
     },
-    [params, setExternallySelectedItemsAreInSync],
+    [
+      externalSelectedIds,
+      externalSelectedItems,
+      setExternalSelectedIds,
+      setExternalSelectedItems,
+      setExternallySelectedItemsAreInSync,
+    ],
   );
 
   /**
@@ -378,20 +398,27 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
    */
   const synchroniseExternallySelectedItemsToGrid = useCallback(() => {
     if (!gridReady) return;
-    if (!params.externalSelectedItems) {
+    if (!externalSelectedItems && !externalSelectedIds) {
       setExternallySelectedItemsAreInSync(true);
       return;
     }
 
-    const selectedIds = params.externalSelectedItems.map((row) => row.id) as number[];
-    const lastNewId = last(difference(selectedIds, lastSelectedIds.current));
+    const selectedIds = externalSelectedIds ?? externalSelectedItems?.map((row) => row.id);
+    const lastNewId = last(difference(selectedIds, lastSelectedIds.current ?? []));
     if (lastNewId != null) {
       ensureRowVisible(lastNewId);
     }
     lastSelectedIds.current = selectedIds;
     selectRowsById(selectedIds);
     setExternallySelectedItemsAreInSync(true);
-  }, [gridReady, params.externalSelectedItems, ensureRowVisible, selectRowsById, setExternallySelectedItemsAreInSync]);
+  }, [
+    gridReady,
+    externalSelectedItems,
+    externalSelectedIds,
+    selectRowsById,
+    setExternallySelectedItemsAreInSync,
+    ensureRowVisible,
+  ]);
 
   /**
    * Combine grid and cell editable into one function
@@ -431,7 +458,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           cellClassRules: {
             ...colDef.cellClassRules,
             'GridCell-readonly': (ccp: CellClassParams<TData>) =>
-              !suppressReadOnlyStyle && !editable(ccp as any as EditableCallbackParams<TData>),
+              !suppressReadOnlyStyle && !editable(ccp as unknown as EditableCallbackParams<TData>),
           },
         };
       }
@@ -446,7 +473,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     return params.columnDefs.map(mapColDef);
   }, [params.columnDefs, mapColDef]);
 
-  const hasExternallySelectedItems = !!params.setExternalSelectedItems;
+  const hasExternallySelectedItems = !!setExternalSelectedItems || !!setExternalSelectedIds;
 
   /**
    * When grid is ready set the apis to the grid context and sync selected items to grid.
@@ -606,7 +633,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       let comparator = colDef.comparator;
       if (sortable && !comparator) {
         comparator = (value1, value2, node1, node2) => {
-          let r = 0;
+          let r;
           if (typeof valueFormatter === 'function') {
             r = compareNaturalInsensitive(
               valueFormatter({
@@ -828,14 +855,19 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [params, clearHighlightRowClasses],
   );
 
-  useEffect(() => {
-    if (params.setExternalSelectedItems && selectable == null) {
-      console.warn(
-        '<Grid/> has setExternalSelectedItems parameter, but is missing selectable parameter,' +
-          'this will cause weird delays in editing.\nIf you need to hide selection column use hideSelectColumn=true',
-      );
-    }
-  }, [params.setExternalSelectedItems, selectable]);
+  useEffect(
+    () => {
+      if ((setExternalSelectedItems || setExternalSelectedIds) && selectable == null) {
+        console.warn(
+          '<Grid/> has setExternalSelectedItems/setExternalSelectedIds parameter, but is missing selectable parameter,' +
+            'this will cause weird delays in editing.\nIf you need to hide selection column use hideSelectColumn=true',
+        );
+      }
+    },
+    // Only needs to run on startup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectable],
+  );
 
   // This is setting a ref in the GridContext so won't be triggering an update loop
   setOnBulkEditingComplete(params.onBulkEditingComplete);
@@ -897,20 +929,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         }
         return false;
       },
-      onCellClicked:
-        params.enableSelectionWithoutKeys || params.enableClickSelection
-          ? undefined
-          : clickInputWhenContainingCellClicked,
+      onCellClicked: clickInputWhenContainingCellClicked,
     };
-  }, [
-    params.enableClickSelection,
-    params.enableSelectionWithoutKeys,
-    params.hideSelectColumn,
-    params.onRowDragEnd,
-    rowSelection,
-    selectColumnPinned,
-    selectable,
-  ]);
+  }, [params.hideSelectColumn, params.onRowDragEnd, rowSelection, selectColumnPinned, selectable]);
 
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent<TData>) => {
