@@ -3,9 +3,9 @@ import { ReactElement, useEffect, useState } from 'react';
 
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface GridFormMessageProps<TData extends GridBaseRow> extends CellEditorCommon {
   message: (selectedRows: TData[]) => Promise<string | ReactElement> | string | ReactElement;

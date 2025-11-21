@@ -6,9 +6,9 @@ import { GridSubComponentContext } from '../../contexts/GridSubComponentContext'
 import { FocusableItem, MenuDivider, MenuItem, SubMenu } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface GridFormPopoverMenuProps<TData extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]> | MenuOption<TData>[];

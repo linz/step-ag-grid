@@ -3,9 +3,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { TextInputFormatted } from '../../lui/TextInputFormatted';
 import { bearingNumberParser, bearingStringValidator } from '../../utils/bearing';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface GridFormEditBearingProps<TData extends GridBaseRow> extends CellEditorCommon {
   formatValue?: (value: any) => string;

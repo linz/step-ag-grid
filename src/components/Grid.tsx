@@ -39,18 +39,9 @@ import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
+import { GridBaseRow, GridOnRowDragEndProps } from './types';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-export interface GridBaseRow {
-  id: string | number;
-}
-
-export interface GridOnRowDragEndProps<TData extends GridBaseRow> {
-  movedRow: TData;
-  targetRow: TData;
-  direction: -1 | 1;
-}
 
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable

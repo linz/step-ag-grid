@@ -5,9 +5,9 @@ import { useEffect, useRef } from 'react';
 
 import { fnOrVar } from '../../utils/util';
 import { clickInputWhenContainingCellClicked } from '../clickInputWhenContainingCellClicked';
-import { GridBaseRow } from '../Grid';
-import { CellEditorCommon, ColDefT, GridCell } from '../GridCell';
+import { CellEditorCommon, GridCell } from '../GridCell';
 import { GenericCellColDef } from '../gridRender';
+import { ColDefT, GridBaseRow } from '../types';
 
 const BooleanCellRenderer = (props: CustomCellEditorProps) => {
   const { onValueChange, value, api, node, column, colDef, data } = props;

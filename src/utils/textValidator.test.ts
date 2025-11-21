@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import { GridBaseRow } from '../components/Grid';
+import { GridBaseRow } from '../components/types';
 import { TextInputValidator, TextInputValidatorProps } from './textValidator';
 
 describe('TextInputValidator', () => {

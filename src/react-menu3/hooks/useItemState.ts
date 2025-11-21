@@ -2,7 +2,7 @@ import { FocusEvent, MutableRefObject, useContext, useEffect, useRef } from 'rea
 
 import { ItemSettingsContext } from '../contexts/ItemSettingsContext';
 import { MenuListItemContext } from '../contexts/MenuListItemContext';
-import { HoverActionTypes } from '../utils';
+import { HoverActionTypes } from '../utils/constants';
 import { useItemEffect } from './useItemEffect';
 
 // This hook includes some common stateful logic in MenuItem and FocusableItem

@@ -3,9 +3,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { TextInputFormatted } from '../../lui/TextInputFormatted';
 import { TextInputValidator, TextInputValidatorProps } from '../../utils/textValidator';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 
 export interface GridFormTextInputProps<TData extends GridBaseRow>
   extends TextInputValidatorProps<TData>,

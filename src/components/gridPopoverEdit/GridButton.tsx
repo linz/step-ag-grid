@@ -2,9 +2,9 @@ import { LuiButton, LuiIcon } from '@linzjs/lui';
 import { CellFocusedEvent, ICellEditorParams, ICellRendererParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
 
-import { GridBaseRow } from '../Grid';
-import { ColDefT, GridCell } from '../GridCell';
+import { GridCell } from '../GridCell';
 import { GenericCellColDef } from '../gridRender';
+import { ColDefT, GridBaseRow } from '../types';
 
 const ButtonCellRenderer = <TData extends GridBaseRow>(props: ICellRendererParams<TData>) => {
   const { data, node, column, colDef, api } = props;

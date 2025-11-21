@@ -21,10 +21,10 @@ import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from '../../react-me
 import { ClickEvent } from '../../react-menu3/types';
 import { textMatch } from '../../utils/textMatcher';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
-import { GridBaseRow } from '../Grid';
 import { CellEditorCommon } from '../GridCell';
 import { GridIcon } from '../GridIcon';
 import { useGridPopoverHook } from '../GridPopoverHook';
+import { GridBaseRow } from '../types';
 import { MenuSeparatorString } from './GridFormDropDown';
 
 type HeaderGroupType = Record<string, MultiSelectOption[]> | undefined;

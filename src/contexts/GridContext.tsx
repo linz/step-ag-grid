@@ -2,7 +2,7 @@ import { ColDef, GridApi, IRowNode, ISizeColumnsToFitParams } from 'ag-grid-comm
 import { CsvExportParams } from 'ag-grid-community';
 import { createContext, useContext } from 'react';
 
-import { ColDefT, GridBaseRow } from '../components';
+import { ColDefT, GridBaseRow } from '../components/types';
 
 export type GridIdType = GridBaseRow['id'];
 export type GridFilterExternal<TData extends GridBaseRow> = (data: TData, rowNode: IRowNode) => boolean;

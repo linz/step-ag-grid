@@ -1,6 +1,6 @@
 import { createContext, RefObject, useContext } from 'react';
 
-import { GridBaseRow } from '../components/Grid';
+import { GridBaseRow } from '../components/types';
 
 export interface GridPopoverContextType<TData extends GridBaseRow> {
   anchorRef: RefObject<Element>;

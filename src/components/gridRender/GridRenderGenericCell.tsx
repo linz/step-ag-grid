@@ -2,8 +2,7 @@ import { ICellRendererParams } from 'ag-grid-community';
 import { SuppressKeyboardEventParams } from 'ag-grid-community';
 import { ReactElement } from 'react';
 
-import { GridBaseRow } from '../Grid';
-import { ColDefT } from '../GridCell';
+import { ColDefT, GridBaseRow } from '../types';
 
 export interface GenericCellColDef<TData extends GridBaseRow, TValue = any> extends ColDefT<TData, TValue> {
   exportable?: boolean;
