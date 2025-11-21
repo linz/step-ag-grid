@@ -4,7 +4,6 @@ import { createContext, useContext } from 'react';
 
 import { ColDefT, GridBaseRow } from '../components/types';
 
-export type GridIdType = GridBaseRow['id'];
 export type GridFilterExternal<TData extends GridBaseRow> = (data: TData, rowNode: IRowNode) => boolean;
 
 export interface AutoSizeColumnsProps {
@@ -15,8 +14,8 @@ export interface AutoSizeColumnsProps {
 
 export type AutoSizeColumnsResult = { width: number } | null;
 
-export interface StartCellEditingProps {
-  rowId: GridIdType;
+export interface StartCellEditingProps<TData extends GridBaseRow> {
+  rowId: TData['id'];
   colId: string;
 }
 
@@ -34,21 +33,21 @@ export interface GridContextType<TData extends GridBaseRow> {
   editingCells: () => boolean;
   getSelectedRows: <T extends GridBaseRow>() => T[];
   getFilteredSelectedRows: <T extends GridBaseRow>() => T[];
-  getSelectedRowIds: () => GridIdType[];
-  getFilteredSelectedRowIds: () => GridIdType[];
+  getSelectedRowIds: () => TData['id'][];
+  getFilteredSelectedRowIds: () => TData['id'][];
   selectRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
   selectRowsWithFlashDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  selectRowsById: (rowIds?: GridIdType[]) => void;
-  selectRowsByIdWithFlash: (rowIds?: GridIdType[]) => void;
-  flashRows: (rowIds?: GridIdType[]) => void;
+  selectRowsById: (rowIds?: TData['id'][]) => void;
+  selectRowsByIdWithFlash: (rowIds?: TData['id'][]) => void;
+  flashRows: (rowIds?: TData['id'][]) => void;
   flashRowsDiff: (updateFn: () => Promise<any>) => Promise<void>;
-  focusByRowById: (rowId: GridIdType, ifNoCellFocused?: boolean) => void;
-  ensureRowVisible: (id: GridIdType | string) => boolean;
+  focusByRowById: (rowId: TData['id'], ifNoCellFocused?: boolean) => void;
+  ensureRowVisible: (id: TData['id'] | string) => boolean;
   ensureSelectedRowIsVisible: () => void;
-  getFirstRowId: () => GridIdType;
+  getFirstRowId: () => TData['id'];
   autoSizeColumns: (props?: AutoSizeColumnsProps) => Promise<AutoSizeColumnsResult>;
   sizeColumnsToFit: (paramsOrGridWidth?: ISizeColumnsToFitParams) => void;
-  startCellEditing: ({ rowId, colId }: StartCellEditingProps) => Promise<void>;
+  startCellEditing: ({ rowId, colId }: StartCellEditingProps<TData>) => Promise<void>;
   // Restores the previous focus after cell editing
   resetFocusedCellAfterCellEditing: () => void;
   updatingCells: (

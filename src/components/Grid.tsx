@@ -176,7 +176,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   // CellEditingStop event happens too much for one edit
   const startedEditRef = useRef(false);
   const startCellEditing = useCallback(
-    (props: StartCellEditingProps) => {
+    (props: StartCellEditingProps<TData>) => {
       startedEditRef.current = true;
       return propStartCellEditing(props);
     },
