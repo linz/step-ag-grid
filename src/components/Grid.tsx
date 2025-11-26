@@ -10,11 +10,11 @@ import {
   CellMouseOverEvent,
   ColDef,
   ColGroupDef,
+  ColumnMovedEvent,
   ColumnResizedEvent,
   EditableCallback,
   EditableCallbackParams,
   GetRowIdParams,
-  GridApi,
   GridOptions,
   GridReadyEvent,
   GridSizeChangedEvent,
@@ -177,6 +177,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   setExternalSelectedItems,
   externalSelectedIds,
   setExternalSelectedIds,
+  onColumnMoved,
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
@@ -640,7 +641,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [prePopupOps, startCellEditing],
   );
 
-  // TODO  reset ranges on edit
+  // ===================== BEGIN Range selection ==========================
+
   const rangeStartRef = useRef<CellLocation | null>(null);
   const rangeEndRef = useRef<CellLocation | null>(null);
   const rangeSortedRowIdsRef = useRef<TData['id'][] | null>(null);
@@ -705,40 +707,54 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       return [...leftHeaders, ...centerHeaders, ...rightHeaders].map((el, i) => el.getAttribute('col-id') ?? String(i));
     };
 
-    console.assert(rangeSortedRowIdsRef.current !== null);
-
     const sortedColIds = getSortedColIds();
 
+    const startColIndex = sortedColIds.indexOf(rangeStart.colId);
+    const endColIndex = sortedColIds.indexOf(rangeEnd.colId);
     const selectedColIds = sortedColIds.slice(
-      sortedColIds.indexOf(rangeStart.colId),
-      sortedColIds.indexOf(rangeEnd.colId) + 1,
+      Math.min(startColIndex, endColIndex),
+      Math.max(startColIndex, endColIndex) + 1,
     );
 
     const startRowIndex = rangeSortedRowIds.indexOf(rangeStart.rowId);
-    const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId) + 1;
-    const selectedRowsIds = rangeSortedRowIds.slice(startRowIndex, endRowIndex);
+    const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId);
+    const minRowIndex = Math.min(startRowIndex, endRowIndex);
+    const maxRowIndex = Math.max(startRowIndex, endRowIndex) + 1;
+    const selectedRowsIds = rangeSortedRowIds.slice(minRowIndex, maxRowIndex);
 
-    for (const colId of selectedColIds) {
-      for (const rowId of selectedRowsIds) {
+    selectedColIds.forEach((colId, colIndex) => {
+      selectedRowsIds.forEach((rowId, rowIndex) => {
         const cell = gridElement.querySelector(
           `.ag-row[row-id=${JSON.stringify(String(rowId))}] .ag-cell[col-id=${JSON.stringify(colId)}`,
         );
         cell?.classList.add('rangeSelect');
-        if (colId === rangeStart.colId) {
+        if (colIndex === 0) {
           cell?.classList.add('rangeSelectLeft');
         }
-        if (colId === rangeEnd.colId) {
+        if (colIndex === selectedColIds.length - 1) {
           cell?.classList.add('rangeSelectRight');
         }
-        if (rowId === rangeStart.rowId) {
+        if (rowIndex === 0) {
           cell?.classList.add('rangeSelectTop');
         }
-        if (rowId === rangeEnd.rowId) {
+        if (rowIndex === selectedRowsIds.length - 1) {
           cell?.classList.add('rangeSelectBottom');
         }
-      }
-    }
+      });
+    });
   }, []);
+
+  const clearRangeSelection = useCallback(() => {
+    rangeStartRef.current = null;
+    rangeEndRef.current = null;
+
+    updateRangeSelectionCellClasses();
+  }, [updateRangeSelectionCellClasses]);
+
+  const onSortChanged = useCallback(() => {
+    clearRangeSelection();
+    ensureSelectedRowIsVisible();
+  }, [clearRangeSelection, ensureSelectedRowIsVisible]);
 
   const onCellMouseDown = useCallback(
     (e: CellMouseDownEvent) => {
@@ -778,6 +794,43 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       updateRangeSelectionCellClasses();
     },
     [enableRangeSelection, updateRangeSelectionCellClasses],
+  );
+
+  // ===================== END Range selection ==========================
+
+  /**
+   * Set of column I'd's that are prevented from auto-sizing as they are user set
+   */
+  const userSizedColIds = useRef(new Map<string, number>());
+
+  /**
+   * Lock/unlock column width on user edit/reset.
+   */
+  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
+    const colId = e.column?.getColId();
+    if (colId == null) {
+      return;
+    }
+    const width = e.column?.getActualWidth();
+    if (width == null) {
+      return;
+    }
+    switch (e.source) {
+      case 'uiColumnResized':
+        userSizedColIds.current.set(colId, width);
+        break;
+      case 'autosizeColumns':
+        userSizedColIds.current.delete(colId);
+        break;
+    }
+  }, []);
+
+  const columnMoved = useCallback(
+    (e: ColumnMovedEvent<TData>) => {
+      clearRangeSelection();
+      onColumnMoved?.(e);
+    },
+    [clearRangeSelection, onColumnMoved],
   );
 
   /**
@@ -896,38 +949,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     }
     prevLoading.current = newLoading;
   }, [params.loading, rowData, showNoRowsOverlay]);
-
-  /**
-   * Set of column I'd's that are prevented from auto-sizing as they are user set
-   */
-  const userSizedColIds = useRef(new Map<string, number>());
-
-  /**
-   * Lock/unlock column width on user edit/reset.
-   */
-  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
-    const colId = e.column?.getColId();
-    if (colId == null) {
-      return;
-    }
-    const width = e.column?.getActualWidth();
-    if (width == null) {
-      return;
-    }
-    switch (e.source) {
-      case 'uiColumnResized':
-        userSizedColIds.current.set(colId, width);
-        /*const colDef = e.column?.getColDef();
-          if (!colDef?.flex) {
-            onGridResize(e);
-          }*/
-        break;
-      case 'autosizeColumns':
-        userSizedColIds.current.delete(colId);
-        //onGridResize(e);
-        break;
-    }
-  }, []);
 
   const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
@@ -1162,10 +1183,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
           onModelUpdated={onModelUpdated}
           onGridReady={onGridReady}
-          onSortChanged={ensureSelectedRowIsVisible}
+          onSortChanged={onSortChanged}
           quickFilterParser={quickFilterParser}
           onSelectionChanged={synchroniseExternalStateToGridSelection}
-          onColumnMoved={params.onColumnMoved}
+          onColumnMoved={columnMoved}
           noRowsOverlayComponent={noRowsOverlayComponent}
           alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
           isExternalFilterPresent={isExternalFilterPresent}
