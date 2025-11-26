@@ -6,12 +6,15 @@ import {
   CellDoubleClickedEvent,
   CellFocusedEvent,
   CellKeyDownEvent,
+  CellMouseDownEvent,
+  CellMouseOverEvent,
   ColDef,
   ColGroupDef,
   ColumnResizedEvent,
   EditableCallback,
   EditableCallbackParams,
   GetRowIdParams,
+  GridApi,
   GridOptions,
   GridReadyEvent,
   GridSizeChangedEvent,
@@ -44,42 +47,86 @@ import { GridBaseRow, GridOnRowDragEndProps } from './types';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
-  readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
-  defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
-  selectable?: boolean;
-  enableClickSelection?: boolean;
-  enableSelectionWithoutKeys?: boolean;
-  hideSelectColumn?: boolean;
-  theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
+
+  // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
+  readOnly?: boolean;
+  // If the whole grid is readonly, suppress the read-only grey text style
+  suppressReadOnlyStyle?: boolean;
+
+  // Auto-selects first row when rowData is set
+  autoSelectFirstRow?: boolean;
+
+  // Select cells for copy. default: false
+  enableRangeSelection?: boolean;
+
+  // should have prefix ag-theme-
+  theme?: string;
+
   domLayout?: GridOptions['domLayout'];
-  externalSelectedItems?: TData[];
-  externalSelectedIds?: TData['id'][];
-  setExternalSelectedItems?: (items: TData[]) => void;
-  setExternalSelectedIds?: (ids: TData['id'][]) => void;
+
   defaultColDef?: GridOptions['defaultColDef'];
   columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
   rowData: GridOptions['rowData'];
-  selectColumnPinned?: ColDef['pinned'];
+  rowSelection?: 'single' | 'multiple';
+
   noRowsOverlayText?: string;
   noRowsMatchingOverlayText?: string;
+
+  // Retain sort order after edit, Defaults to true.
+  defaultPostSort?: boolean;
+
+  externalSelectedIds?: TData['id'][];
+  setExternalSelectedIds?: (ids: TData['id'][]) => void;
+
+  externalSelectedItems?: TData[];
+  setExternalSelectedItems?: (items: TData[]) => void;
+
+  // Adds the selection column pinned on left hand side.
+  // Make sure you add `[externalSelectedIds/setExternalSelectedIds]`
+  // or `[externalSelectedItems, setExternalSelectedItems]`
+  selectable?: boolean;
+  selectColumnPinned?: ColDef['pinned'];
+
+  // Click on any cell to select row.  You would use this on a read only grid.
+  enableClickSelection?: boolean;
+
+  // If you set selection to true you get a select column, but if you have enableClickSelection=true you may no want to see the checkboxes
+  hideSelectColumn?: boolean;
+
+  // Allows users to select rows with a simple mouse click, without needing to hold down modifier keys (like Ctrl or Shift)
+  enableSelectionWithoutKeys?: boolean;
+
+  // No need to double-click for editing cells.  default: false
+  singleClickEdit?: boolean;
+
+  // Whether to select row on context menu.
+  contextMenuSelectRow?: boolean;
+
+  // Context menu definition if required.
+  contextMenu?: GridContextMenuComponent<TData>;
+
+  // When pressing tab whilst editing, the grid will select and edit the next cell if available.
+  // Once the last cell to edit closes within the same row this callback is called.
+  onBulkEditingComplete?: () => Promise<void> | void;
+
   animateRows?: boolean;
   rowHeight?: number;
   rowClassRules?: GridOptions['rowClassRules'];
-  rowSelection?: 'single' | 'multiple';
-  autoSelectFirstRow?: boolean;
+
   onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
   onColumnMoved?: GridOptions['onColumnMoved'];
   rowDragText?: GridOptions['rowDragText'];
   onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
   alwaysShowVerticalScroll?: boolean;
   suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
-  suppressReadOnlyStyle?: boolean;
+
   /**
    * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
-   * This allows you set the size of the panel to fit perfectly.
+   * This allows you set the size of the panel to fit perfectly.  This can take a couple of seconds plus whatever your data load time is.
    */
   onContentSize?: (props: { width: number }) => void;
+
   /**
    * <ul>
    * <li>"none" to use aggrid defaults.</li>
@@ -93,30 +140,9 @@ export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
    * If you want to stretch to container width if width is greater than the container add a flex column.
    */
   sizeColumns?: 'fit' | 'auto' | 'auto-skip-headers' | 'none';
-  /**
-   * On first don't return a content size larger than this.
-   */
+
+  // On first don't return a content size larger than this.
   maxInitialWidth?: number;
-  /**
-   * When pressing tab whilst editing the grid will select and edit the next cell if available.
-   * Once the last cell to edit closes this callback is called.
-   */
-  onBulkEditingComplete?: () => Promise<void> | void;
-
-  /**
-   * Context menu definition if required.
-   */
-  contextMenu?: GridContextMenuComponent<TData>;
-
-  /**
-   * Whether to select row on context menu.
-   */
-  contextMenuSelectRow?: boolean;
-
-  /**
-   * Defaults to false.
-   */
-  singleClickEdit?: boolean;
 
   loading?: boolean;
   suppressCellFocus?: boolean;
@@ -133,6 +159,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   'data-testid': dataTestId,
   defaultPostSort = true,
   rowSelection = 'multiple',
+  enableRangeSelection,
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
   sizeColumns = 'auto',
@@ -613,6 +640,146 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [prePopupOps, startCellEditing],
   );
 
+  // TODO  reset ranges on edit
+  const rangeStartRef = useRef<CellLocation | null>(null);
+  const rangeEndRef = useRef<CellLocation | null>(null);
+  const rangeSortedRowIdsRef = useRef<TData['id'][] | null>(null);
+
+  const updateRangeSelectionCellClasses = useCallback(() => {
+    //
+    // Get all grid cols, sort by pinned, then style: left
+    const gridElement = gridDivRef.current;
+    if (!gridElement) {
+      return;
+    }
+
+    // Clear all selections
+    gridElement
+      .querySelectorAll('.rangeSelect,.rangeSelectLeft,.rangeSelectTop,.rangeSelectRight,.rangeSelectBottom')
+      .forEach((el) => {
+        el.classList.remove(
+          'rangeSelect',
+          'rangeSelectLeft',
+          'rangeSelectTop',
+          'rangeSelectRight',
+          'rangeSelectBottom',
+        );
+      });
+
+    // if range selection multiple add .Grid-container.rangeSelectingMultiple
+    const rangeStart = rangeStartRef.current;
+    const rangeEnd = rangeEndRef.current;
+    if (
+      rangeStart !== null &&
+      rangeEnd !== null &&
+      (rangeStart.colId !== rangeEnd.colId || rangeStart.rowId !== rangeEnd.rowId)
+    ) {
+      gridElement.classList.add('rangeSelectingMultiple');
+      gridElement.querySelectorAll('.ag-cell-focus').forEach((el) => {
+        el.classList.remove('ag-cell-focus');
+      });
+    } else {
+      gridElement.classList.remove('rangeSelectingMultiple');
+      return;
+    }
+    const rangeSortedRowIds = rangeSortedRowIdsRef.current;
+    if (!rangeSortedRowIds) {
+      return;
+    }
+
+    const elStyleLeftComparator = (el1: Element, el2: Element) => elStyleLeft(el1) - elStyleLeft(el2);
+    const elStyleLeft = (el: Element): number => parseFloat((el as HTMLElement).style.left) ?? 0;
+
+    const getSortedColIds = (): string[] => {
+      //
+      const leftHeaders = [...gridElement.querySelectorAll('.ag-pinned-left-header .ag-header-cell')].sort(
+        elStyleLeftComparator,
+      );
+      const centerHeaders = [...gridElement.querySelectorAll('.ag-header-viewport .ag-header-cell')].sort(
+        elStyleLeftComparator,
+      );
+      const rightHeaders = [...gridElement.querySelectorAll('.ag-pinned-right-header .ag-header-cell')].sort(
+        elStyleLeftComparator,
+      );
+
+      return [...leftHeaders, ...centerHeaders, ...rightHeaders].map((el, i) => el.getAttribute('col-id') ?? String(i));
+    };
+
+    console.assert(rangeSortedRowIdsRef.current !== null);
+
+    const sortedColIds = getSortedColIds();
+
+    const selectedColIds = sortedColIds.slice(
+      sortedColIds.indexOf(rangeStart.colId),
+      sortedColIds.indexOf(rangeEnd.colId) + 1,
+    );
+
+    const startRowIndex = rangeSortedRowIds.indexOf(rangeStart.rowId);
+    const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId) + 1;
+    const selectedRowsIds = rangeSortedRowIds.slice(startRowIndex, endRowIndex);
+
+    for (const colId of selectedColIds) {
+      for (const rowId of selectedRowsIds) {
+        const cell = gridElement.querySelector(
+          `.ag-row[row-id=${JSON.stringify(String(rowId))}] .ag-cell[col-id=${JSON.stringify(colId)}`,
+        );
+        cell?.classList.add('rangeSelect');
+        if (colId === rangeStart.colId) {
+          cell?.classList.add('rangeSelectLeft');
+        }
+        if (colId === rangeEnd.colId) {
+          cell?.classList.add('rangeSelectRight');
+        }
+        if (rowId === rangeStart.rowId) {
+          cell?.classList.add('rangeSelectTop');
+        }
+        if (rowId === rangeEnd.rowId) {
+          cell?.classList.add('rangeSelectBottom');
+        }
+      }
+    }
+  }, []);
+
+  const onCellMouseDown = useCallback(
+    (e: CellMouseDownEvent) => {
+      if (!enableRangeSelection) {
+        return;
+      }
+      rangeStartRef.current = {
+        rowId: e.node.data.id,
+        colId: e.column.getColId(),
+      };
+      rangeEndRef.current = null;
+
+      updateRangeSelectionCellClasses();
+
+      const sortedRowIds: (string | number)[] = [];
+      e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
+      rangeSortedRowIdsRef.current = sortedRowIds;
+    },
+    [enableRangeSelection, updateRangeSelectionCellClasses],
+  );
+
+  const onCellMouseOver = useCallback(
+    (e: CellMouseOverEvent) => {
+      if (!enableRangeSelection) {
+        return;
+      }
+      const button = (e.event as { buttons?: number }).buttons;
+      if (button !== 1) {
+        rangeSortedRowIdsRef.current = null;
+        return;
+      }
+      rangeEndRef.current = {
+        rowId: e.node.data.id,
+        colId: e.column.getColId(),
+      };
+
+      updateRangeSelectionCellClasses();
+    },
+    [enableRangeSelection, updateRangeSelectionCellClasses],
+  );
+
   /**
    * Once the grid has auto-sized we want to run fit to fit the grid in its container,
    * but we don't want the non-flex auto-sized columns to "fit" size, so suppressSizeToFit is set to true.
@@ -985,6 +1152,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
           onCellClicked={onCellClicked}
           onCellDoubleClicked={onCellDoubleClick}
           onCellEditingStopped={onCellEditingStopped}
+          onCellMouseDown={onCellMouseDown}
+          onCellMouseOver={onCellMouseOver}
           domLayout={params.domLayout}
           onColumnResized={onColumnResized}
           defaultColDef={defaultColDef}
@@ -1034,3 +1203,8 @@ const NotAGridValueFormatterCall = {
   api: 'Default comparator has no access to api, write your own comparator' as unknown,
   context: 'Default comparator has no access to context, write your own comparator' as unknown,
 };
+
+interface CellLocation {
+  rowId: string;
+  colId: string;
+}

@@ -244,6 +244,7 @@ const GridReadOnlyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<I
       <Grid
         data-testid={'readonly'}
         {...props}
+        enableRangeSelection={true}
         selectable={true}
         enableClickSelection={true}
         enableSelectionWithoutKeys={true}
