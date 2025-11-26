@@ -83,6 +83,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     [gridApi],
   );
 
+  const getCellValue = useCallback<GridApi['getCellValue']>((...props) => gridApi?.getCellValue(...props), [gridApi]);
+
   /**
    * Scroll row into view by Id.
    *
@@ -902,6 +904,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         getSelectedRowIds,
         getFilteredSelectedRowIds,
         getFirstRowId,
+        getCellValue,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,

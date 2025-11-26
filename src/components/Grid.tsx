@@ -18,6 +18,7 @@ import {
   GridOptions,
   GridReadyEvent,
   GridSizeChangedEvent,
+  IRowNode,
   ModelUpdatedEvent,
   ModuleRegistry,
   RowClickedEvent,
@@ -30,7 +31,7 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { compact, defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
 import {
   ClipboardEvent as ReactClipboardEvent,
   ReactElement,
@@ -168,7 +169,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   'data-testid': dataTestId,
   defaultPostSort = true,
   rowSelection = 'multiple',
-  enableRangeSelection,
+  enableRangeSelection = true,
   suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
   sizeColumns = 'auto',
@@ -206,6 +207,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     doesExternalFilterPass,
     setOnBulkEditingComplete,
     getColDef,
+    getCellValue,
     showNoRowsOverlay,
     prePopupOps,
     startCellEditing: propStartCellEditing,
@@ -641,14 +643,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   const rangeStartRef = useRef<CellLocation | null>(null);
   const rangeEndRef = useRef<CellLocation | null>(null);
-  const rangeSortedRowIdsRef = useRef<TData['id'][] | null>(null);
+  const rangeSortedNodesRef = useRef<IRowNode<TData>[] | null>(null);
 
   const ranges = useCallback(
     (
       gridElement: HTMLDivElement,
       rangeStart: CellLocation,
       rangeEnd: CellLocation,
-      rangeSortedRowIds: TData['id'][],
+      rangeSortedNodes: IRowNode<TData>[],
     ) => {
       const elStyleLeftComparator = (el1: Element, el2: Element) => elStyleLeft(el1) - elStyleLeft(el2);
       const elStyleLeft = (el: Element): number => parseFloat((el as HTMLElement).style.left) ?? 0;
@@ -679,14 +681,14 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         Math.max(startColIndex, endColIndex) + 1,
       );
 
-      const startRowIndex = rangeSortedRowIds.indexOf(rangeStart.rowId);
-      const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId);
-      const selectedRowIds = rangeSortedRowIds.slice(
+      const startRowIndex = rangeSortedNodes.findIndex((node) => node.data!.id === rangeStart.rowId);
+      const endRowIndex = rangeSortedNodes.findIndex((node) => node.data!.id === rangeEnd.rowId);
+      const selectedNodes = rangeSortedNodes.slice(
         Math.min(startRowIndex, endRowIndex),
         Math.max(startRowIndex, endRowIndex) + 1,
       );
 
-      return { selectedColIds, selectedRowIds };
+      return { selectedColIds, selectedNodes };
     },
     [],
   );
@@ -728,15 +730,16 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       gridElement.classList.remove('rangeSelectingMultiple');
       return;
     }
-    const rangeSortedRowIds = rangeSortedRowIdsRef.current;
-    if (!rangeSortedRowIds) {
+    const rangeSortedNodes = rangeSortedNodesRef.current;
+    if (!rangeSortedNodes) {
       return;
     }
 
-    const { selectedColIds, selectedRowIds } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedRowIds);
+    const { selectedColIds, selectedNodes } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedNodes);
 
     selectedColIds.forEach((colId, colIndex) => {
-      selectedRowIds.forEach((rowId, rowIndex) => {
+      selectedNodes.forEach((node, rowIndex) => {
+        const rowId = node.data!.id;
         const cell = gridElement.querySelector(
           `.ag-row[row-id=${JSON.stringify(String(rowId))}] .ag-cell[col-id=${JSON.stringify(colId)}`,
         );
@@ -750,7 +753,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         if (rowIndex === 0) {
           cell?.classList.add('rangeSelectTop');
         }
-        if (rowIndex === selectedRowIds.length - 1) {
+        if (rowIndex === selectedNodes.length - 1) {
           cell?.classList.add('rangeSelectBottom');
         }
       });
@@ -776,7 +779,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
       const button = (e.event as { buttons?: number }).buttons;
       if (button !== 1) {
-        rangeSortedRowIdsRef.current = null;
+        rangeSortedNodesRef.current = null;
         return;
       }
       rangeEndRef.current = {
@@ -787,9 +790,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (mouseDown) {
         window.getSelection()?.removeAllRanges();
 
-        const sortedRowIds: (string | number)[] = [];
-        e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
-        rangeSortedRowIdsRef.current = sortedRowIds;
+        const sortedNodes: IRowNode<TData>[] = [];
+        e.api.forEachNodeAfterFilterAndSort((node: IRowNode<TData>) => sortedNodes.push(node));
+        rangeSortedNodesRef.current = sortedNodes;
         rangeStartRef.current = rangeEndRef.current;
       }
 
@@ -799,23 +802,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   );
 
   const onCellMouseDown = useCallback(
-    (e: CellMouseDownEvent) => {
-      return onCellMouseOver(e as unknown as CellMouseOverEvent, true);
-      /*      if (!enableRangeSelection || e.column.getColId() === 'ag-Grid-SelectionColumn') {
-        return;
-      }
-      rangeStartRef.current = {
-        rowId: e.node.data.id,
-        colId: e.column.getColId(),
-      };
-      rangeEndRef.current = null;
-
-      updateRangeSelectionCellClasses();
-
-      const sortedRowIds: (string | number)[] = [];
-      e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
-      rangeSortedRowIdsRef.current = sortedRowIds;*/
-    },
+    (e: CellMouseDownEvent) => onCellMouseOver(e as unknown as CellMouseOverEvent, true),
     [onCellMouseOver],
   );
 
@@ -838,17 +825,36 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       e.preventDefault();
 
       const gridElement = gridDivRef.current;
-      const rangeSortedRowIds = rangeSortedRowIdsRef.current;
-      if (!gridElement || !rangeSortedRowIds) {
+      const rangeSortedNodes = rangeSortedNodesRef.current;
+      if (!gridElement || !rangeSortedNodes) {
         return;
       }
 
-      const { selectedColIds, selectedRowIds } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedRowIds);
+      const { selectedColIds, selectedNodes } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedNodes);
       const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
 
-      console.log('copy', filteredSelectedColIds, selectedRowIds);
+      const formatters = compact(
+        filteredSelectedColIds.map((colKey) => {
+          return (rowNode: IRowNode) => {
+            const v = getCellValue({ rowNode, colKey });
+            const f = getCellValue({ rowNode, colKey, useFormatter: true });
+            if (v == f) return v;
+            return f;
+          };
+        }),
+      );
+
+      let result = '';
+      selectedNodes.forEach((node) => {
+        formatters.forEach((formatter, i) => {
+          const value = formatter(node);
+          result += (i !== 0 ? ',' : '') + value;
+        });
+        result += '\n';
+      });
+      e.clipboardData.setData('text/plain', result);
     },
-    [ranges],
+    [getCellValue, ranges],
   );
 
   // ===================== End Copy range ==========================
