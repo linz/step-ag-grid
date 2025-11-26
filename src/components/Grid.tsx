@@ -31,7 +31,16 @@ import {
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
 import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
-import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ClipboardEvent as ReactClipboardEvent,
+  ReactElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useInterval } from 'usehooks-ts';
 
 import { AutoSizeColumnsResult, StartCellEditingProps, useGridContext } from '../contexts/GridContext';
@@ -572,19 +581,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [startCellEditing],
   );
 
-  /**
-   * Handle single click edits
-   */
-  const onCellClicked = useCallback(
-    (event: CellClickedEvent) => {
-      const editable = fnOrVar(event.colDef?.editable, event);
-      if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
-        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
-      }
-    },
-    [singleClickEdit, startCellEditing],
-  );
-
   const onCellEditingStopped = useCallback(
     (event: AgGridEvent<TData>) => {
       if (!startedEditRef.current) {
@@ -647,6 +643,54 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const rangeEndRef = useRef<CellLocation | null>(null);
   const rangeSortedRowIdsRef = useRef<TData['id'][] | null>(null);
 
+  const ranges = useCallback(
+    (
+      gridElement: HTMLDivElement,
+      rangeStart: CellLocation,
+      rangeEnd: CellLocation,
+      rangeSortedRowIds: TData['id'][],
+    ) => {
+      const elStyleLeftComparator = (el1: Element, el2: Element) => elStyleLeft(el1) - elStyleLeft(el2);
+      const elStyleLeft = (el: Element): number => parseFloat((el as HTMLElement).style.left) ?? 0;
+
+      const getSortedColIds = (): string[] => {
+        //
+        const leftHeaders = [...gridElement.querySelectorAll('.ag-pinned-left-header .ag-header-cell')].sort(
+          elStyleLeftComparator,
+        );
+        const centerHeaders = [...gridElement.querySelectorAll('.ag-header-viewport .ag-header-cell')].sort(
+          elStyleLeftComparator,
+        );
+        const rightHeaders = [...gridElement.querySelectorAll('.ag-pinned-right-header .ag-header-cell')].sort(
+          elStyleLeftComparator,
+        );
+
+        return [...leftHeaders, ...centerHeaders, ...rightHeaders].map(
+          (el, i) => el.getAttribute('col-id') ?? String(i),
+        );
+      };
+
+      const sortedColIds = getSortedColIds();
+
+      const startColIndex = sortedColIds.indexOf(rangeStart.colId);
+      const endColIndex = sortedColIds.indexOf(rangeEnd.colId);
+      const selectedColIds = sortedColIds.slice(
+        Math.min(startColIndex, endColIndex),
+        Math.max(startColIndex, endColIndex) + 1,
+      );
+
+      const startRowIndex = rangeSortedRowIds.indexOf(rangeStart.rowId);
+      const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId);
+      const selectedRowIds = rangeSortedRowIds.slice(
+        Math.min(startRowIndex, endRowIndex),
+        Math.max(startRowIndex, endRowIndex) + 1,
+      );
+
+      return { selectedColIds, selectedRowIds };
+    },
+    [],
+  );
+
   const updateRangeSelectionCellClasses = useCallback(() => {
     //
     // Get all grid cols, sort by pinned, then style: left
@@ -689,41 +733,10 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       return;
     }
 
-    const elStyleLeftComparator = (el1: Element, el2: Element) => elStyleLeft(el1) - elStyleLeft(el2);
-    const elStyleLeft = (el: Element): number => parseFloat((el as HTMLElement).style.left) ?? 0;
-
-    const getSortedColIds = (): string[] => {
-      //
-      const leftHeaders = [...gridElement.querySelectorAll('.ag-pinned-left-header .ag-header-cell')].sort(
-        elStyleLeftComparator,
-      );
-      const centerHeaders = [...gridElement.querySelectorAll('.ag-header-viewport .ag-header-cell')].sort(
-        elStyleLeftComparator,
-      );
-      const rightHeaders = [...gridElement.querySelectorAll('.ag-pinned-right-header .ag-header-cell')].sort(
-        elStyleLeftComparator,
-      );
-
-      return [...leftHeaders, ...centerHeaders, ...rightHeaders].map((el, i) => el.getAttribute('col-id') ?? String(i));
-    };
-
-    const sortedColIds = getSortedColIds();
-
-    const startColIndex = sortedColIds.indexOf(rangeStart.colId);
-    const endColIndex = sortedColIds.indexOf(rangeEnd.colId);
-    const selectedColIds = sortedColIds.slice(
-      Math.min(startColIndex, endColIndex),
-      Math.max(startColIndex, endColIndex) + 1,
-    );
-
-    const startRowIndex = rangeSortedRowIds.indexOf(rangeStart.rowId);
-    const endRowIndex = rangeSortedRowIds.indexOf(rangeEnd.rowId);
-    const minRowIndex = Math.min(startRowIndex, endRowIndex);
-    const maxRowIndex = Math.max(startRowIndex, endRowIndex) + 1;
-    const selectedRowsIds = rangeSortedRowIds.slice(minRowIndex, maxRowIndex);
+    const { selectedColIds, selectedRowIds } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedRowIds);
 
     selectedColIds.forEach((colId, colIndex) => {
-      selectedRowsIds.forEach((rowId, rowIndex) => {
+      selectedRowIds.forEach((rowId, rowIndex) => {
         const cell = gridElement.querySelector(
           `.ag-row[row-id=${JSON.stringify(String(rowId))}] .ag-cell[col-id=${JSON.stringify(colId)}`,
         );
@@ -737,12 +750,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         if (rowIndex === 0) {
           cell?.classList.add('rangeSelectTop');
         }
-        if (rowIndex === selectedRowsIds.length - 1) {
+        if (rowIndex === selectedRowIds.length - 1) {
           cell?.classList.add('rangeSelectBottom');
         }
       });
     });
-  }, []);
+  }, [ranges]);
 
   const clearRangeSelection = useCallback(() => {
     rangeStartRef.current = null;
@@ -756,28 +769,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     ensureSelectedRowIsVisible();
   }, [clearRangeSelection, ensureSelectedRowIsVisible]);
 
-  const onCellMouseDown = useCallback(
-    (e: CellMouseDownEvent) => {
-      if (!enableRangeSelection) {
-        return;
-      }
-      rangeStartRef.current = {
-        rowId: e.node.data.id,
-        colId: e.column.getColId(),
-      };
-      rangeEndRef.current = null;
-
-      updateRangeSelectionCellClasses();
-
-      const sortedRowIds: (string | number)[] = [];
-      e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
-      rangeSortedRowIdsRef.current = sortedRowIds;
-    },
-    [enableRangeSelection, updateRangeSelectionCellClasses],
-  );
-
   const onCellMouseOver = useCallback(
-    (e: CellMouseOverEvent) => {
+    (e: CellMouseOverEvent, mouseDown?: boolean) => {
       if (!enableRangeSelection) {
         return;
       }
@@ -791,12 +784,93 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         colId: e.column.getColId(),
       };
 
+      if (mouseDown) {
+        window.getSelection()?.removeAllRanges();
+
+        const sortedRowIds: (string | number)[] = [];
+        e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
+        rangeSortedRowIdsRef.current = sortedRowIds;
+        rangeStartRef.current = rangeEndRef.current;
+      }
+
       updateRangeSelectionCellClasses();
     },
     [enableRangeSelection, updateRangeSelectionCellClasses],
   );
 
+  const onCellMouseDown = useCallback(
+    (e: CellMouseDownEvent) => {
+      return onCellMouseOver(e as unknown as CellMouseOverEvent, true);
+      /*      if (!enableRangeSelection || e.column.getColId() === 'ag-Grid-SelectionColumn') {
+        return;
+      }
+      rangeStartRef.current = {
+        rowId: e.node.data.id,
+        colId: e.column.getColId(),
+      };
+      rangeEndRef.current = null;
+
+      updateRangeSelectionCellClasses();
+
+      const sortedRowIds: (string | number)[] = [];
+      e.api.forEachNodeAfterFilterAndSort((row) => sortedRowIds.push(row.data.id));
+      rangeSortedRowIdsRef.current = sortedRowIds;*/
+    },
+    [onCellMouseOver],
+  );
+
   // ===================== END Range selection ==========================
+
+  // ===================== BEGIN Copy range ==========================
+
+  const onCopy = useCallback(
+    (e: ReactClipboardEvent<HTMLDivElement>) => {
+      const rangeStart = rangeStartRef.current;
+      const rangeEnd = rangeEndRef.current;
+      if (
+        rangeStart === null ||
+        rangeEnd === null ||
+        (rangeStart.colId === rangeEnd.colId && rangeStart.rowId === rangeEnd.rowId)
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+
+      const gridElement = gridDivRef.current;
+      const rangeSortedRowIds = rangeSortedRowIdsRef.current;
+      if (!gridElement || !rangeSortedRowIds) {
+        return;
+      }
+
+      const { selectedColIds, selectedRowIds } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedRowIds);
+      const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
+
+      console.log('copy', filteredSelectedColIds, selectedRowIds);
+    },
+    [ranges],
+  );
+
+  // ===================== End Copy range ==========================
+
+  /**
+   * Handle single click edits
+   */
+  const onCellClicked = useCallback(
+    (event: CellClickedEvent) => {
+      if (rangeStartRef.current && rangeEndRef.current) {
+        rangeStartRef.current = null;
+        rangeEndRef.current = null;
+        clearRangeSelection();
+        return;
+      }
+      const editable = fnOrVar(event.colDef?.editable, event);
+      if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
+        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
+      }
+    },
+    [clearRangeSelection, singleClickEdit, startCellEditing],
+  );
 
   /**
    * Set of column I'd's that are prevented from auto-sizing as they are user set
@@ -1142,7 +1216,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       )}
     >
       {gridContextMenu.component}
-      <div style={{ flex: 1 }} ref={gridDivRef}>
+      <div style={{ flex: 1 }} ref={gridDivRef} onCopy={onCopy}>
         <AgGridReact
           theme={'legacy'}
           rowSelection={
