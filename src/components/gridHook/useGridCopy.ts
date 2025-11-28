@@ -13,11 +13,13 @@ export const useGridCopy = <TData extends GridBaseRow>({
   ranges,
   rangeStartRef,
   rangeEndRef,
+  hasSelectedMoreThanOneCellRef,
   cellContextMenu,
 }: {
   ranges: () => GridRanges<TData>;
   rangeStartRef: MutableRefObject<CellLocation | null>;
   rangeEndRef: MutableRefObject<CellLocation | null>;
+  hasSelectedMoreThanOneCellRef: MutableRefObject<boolean>;
   cellContextMenu: (event: CellContextMenuEvent) => void;
 }) => {
   const { getColDef, getCellValue } = useGridContext<TData>();
@@ -27,12 +29,12 @@ export const useGridCopy = <TData extends GridBaseRow>({
     (type = copyType) => {
       const rangeStart = rangeStartRef.current;
       const rangeEnd = rangeEndRef.current;
-      if (
-        rangeStart === null ||
-        rangeEnd === null ||
-        (rangeStart.colId === rangeEnd.colId && rangeStart.rowId === rangeEnd.rowId)
-      ) {
+      if (rangeStart === null || rangeEnd === null || !hasSelectedMoreThanOneCellRef.current) {
         return;
+      }
+
+      if (rangeStart.rowId === rangeEnd.rowId && rangeStart.colId === rangeEnd.colId) {
+        type = 'plain_text';
       }
 
       const { selectedColIds, selectedNodes } = ranges();
@@ -92,7 +94,6 @@ export const useGridCopy = <TData extends GridBaseRow>({
         });
       });
 
-      console.log(maxCellLength);
       let result = '';
       rows.forEach((row, i) => {
         if (i === 1 && type === 'markdown') {
@@ -128,7 +129,6 @@ export const useGridCopy = <TData extends GridBaseRow>({
         result += '\n';
       });
 
-      console.log(result);
       navigator.clipboard.writeText(result).catch((err) => console.error('Failed to copy: ', err));
     },
     [getCellValue, ranges, copyType],
@@ -141,7 +141,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
       if (
         rangeStart === null ||
         rangeEnd === null ||
-        (rangeStart.colId === rangeEnd.colId && rangeStart.rowId === rangeEnd.rowId)
+        (rangeStart.colId === rangeEnd.colId &&
+          rangeStart.rowId === rangeEnd.rowId &&
+          !hasSelectedMoreThanOneCellRef.current)
       ) {
         return;
       }

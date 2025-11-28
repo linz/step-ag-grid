@@ -622,6 +622,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     contextMenuSelectRow,
   });
 
+  const hasSelectedMoreThanOneCellRef = useRef(false);
   const rangeStartRef = useRef<CellLocation | null>(null);
   const rangeEndRef = useRef<CellLocation | null>(null);
   const rangeSortedNodesRef = useRef<IRowNode<TData>[] | null>(null);
@@ -631,6 +632,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     gridDivRef,
     rangeStartRef,
     rangeEndRef,
+    hasSelectedMoreThanOneCellRef,
     rangeSortedNodesRef,
   });
 
@@ -638,6 +640,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     ranges,
     rangeStartRef,
     rangeEndRef,
+    hasSelectedMoreThanOneCellRef,
     cellContextMenu,
   });
 
@@ -652,9 +655,12 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
   const onCellClicked = useCallback(
     (event: CellClickedEvent) => {
       if (rangeStartRef.current && rangeEndRef.current) {
-        rangeStartRef.current = null;
-        rangeEndRef.current = null;
-        clearRangeSelection();
+        // This is to detect difference between a single click and a click drag return to cell.
+        if (rangeEndRef.current.timestamp - rangeStartRef.current.timestamp < 100) {
+          rangeStartRef.current = null;
+          rangeEndRef.current = null;
+          clearRangeSelection();
+        }
         return;
       }
       const editable = fnOrVar(event.colDef?.editable, event);

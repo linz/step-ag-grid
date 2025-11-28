@@ -7,6 +7,7 @@ import { GridBaseRow } from '../types';
 export interface CellLocation {
   rowId: string;
   colId: string;
+  timestamp: number;
 }
 
 export interface GridRanges<TData extends GridBaseRow> {
@@ -19,12 +20,14 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
   gridDivRef,
   rangeStartRef,
   rangeEndRef,
+  hasSelectedMoreThanOneCellRef,
   rangeSortedNodesRef,
 }: {
   enableRangeSelection: boolean;
   gridDivRef: RefObject<HTMLDivElement>;
   rangeStartRef: MutableRefObject<CellLocation | null>;
   rangeEndRef: MutableRefObject<CellLocation | null>;
+  hasSelectedMoreThanOneCellRef: MutableRefObject<boolean>;
   rangeSortedNodesRef: MutableRefObject<IRowNode<TData>[] | null>;
 }) => {
   const [refreshIntervalEnabled, setRefreshIntervalEnabled] = useState(false);
@@ -136,7 +139,9 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
       if (
         rangeStart !== null &&
         rangeEnd !== null &&
-        (rangeStart.colId !== rangeEnd.colId || rangeStart.rowId !== rangeEnd.rowId)
+        (hasSelectedMoreThanOneCellRef.current ||
+          rangeStart.colId !== rangeEnd.colId ||
+          rangeStart.rowId !== rangeEnd.rowId)
       ) {
         gridElement.classList.add('rangeSelectingMultiple');
         gridElement.querySelectorAll('.ag-cell-focus').forEach((el) => {
@@ -165,6 +170,7 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
   );
 
   const clearRangeSelection = useCallback(() => {
+    hasSelectedMoreThanOneCellRef.current = false;
     setRefreshIntervalEnabled(false);
 
     rangeStartRef.current = null;
@@ -187,6 +193,7 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
       rangeEndRef.current = {
         rowId: e.node.data.id,
         colId: e.column.getColId(),
+        timestamp: Date.now(),
       };
 
       if (mouseDown) {
@@ -194,7 +201,7 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
         e.api.forEachNodeAfterFilterAndSort((node: IRowNode<TData>) => sortedNodes.push(node));
         rangeSortedNodesRef.current = sortedNodes;
         setRefreshIntervalEnabled(true);
-        rangeStartRef.current = rangeEndRef.current;
+        rangeStartRef.current = { ...rangeEndRef.current };
       }
 
       if (
@@ -203,6 +210,7 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
         (rangeStartRef.current.rowId !== rangeEndRef.current.rowId ||
           rangeStartRef.current.colId !== rangeEndRef.current.colId)
       ) {
+        hasSelectedMoreThanOneCellRef.current = true;
         window.getSelection()?.removeAllRanges();
       }
 
