@@ -17,7 +17,6 @@ export const useGridCopySettings = () => {
 
   const setCopyType = useCallback((key: CopyOptionsKey) => {
     window.localStorage.setItem(CopyOptionsStorageKey, key);
-    console.log('set copy type', key);
     _setCopyType(key);
   }, []);
 

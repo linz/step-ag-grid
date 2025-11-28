@@ -190,13 +190,20 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
       };
 
       if (mouseDown) {
-        window.getSelection()?.removeAllRanges();
-
         const sortedNodes: IRowNode<TData>[] = [];
         e.api.forEachNodeAfterFilterAndSort((node: IRowNode<TData>) => sortedNodes.push(node));
         rangeSortedNodesRef.current = sortedNodes;
         setRefreshIntervalEnabled(true);
         rangeStartRef.current = rangeEndRef.current;
+      }
+
+      if (
+        rangeStartRef.current &&
+        rangeEndRef.current &&
+        (rangeStartRef.current.rowId !== rangeEndRef.current.rowId ||
+          rangeStartRef.current.colId !== rangeEndRef.current.colId)
+      ) {
+        window.getSelection()?.removeAllRanges();
       }
 
       updateRangeSelectionCellClasses();
