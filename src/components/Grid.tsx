@@ -988,9 +988,16 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         }
         return false;
       },
-      onCellClicked: clickInputWhenContainingCellClicked,
+      onCellClicked: params.enableClickSelection ? undefined : clickInputWhenContainingCellClicked,
     };
-  }, [params.hideSelectColumn, params.onRowDragEnd, rowSelection, selectColumnPinned, selectable]);
+  }, [
+    params.hideSelectColumn,
+    params.onRowDragEnd,
+    rowSelection,
+    selectColumnPinned,
+    selectable,
+    params.enableClickSelection,
+  ]);
 
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent<TData>) => {
