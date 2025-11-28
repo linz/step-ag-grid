@@ -9,6 +9,7 @@ import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
 import { GridBaseRow } from '../types';
+import { MaybePromise } from './GridFormDropDown';
 
 export interface GridFormPopoverMenuProps<TData extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]> | MenuOption<TData>[];
@@ -33,7 +34,7 @@ export interface SelectedMenuOptionResult<TData extends GridBaseRow> extends Men
 export interface MenuOption<TData extends GridBaseRow> {
   label: ReactElement | string | MenuSeparatorType;
   subMenu?: () => ReactElement;
-  action?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => Promise<void>;
+  action?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => MaybePromise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
   subComponent?: (props: any) => ReactElement;

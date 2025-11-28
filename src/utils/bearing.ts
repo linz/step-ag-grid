@@ -1,6 +1,6 @@
 export const bearingValueFormatter = (value: any): string => {
   const safeValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (safeValue == null) {
+  if (safeValue == null || Number.isNaN(safeValue)) {
     return '–';
   }
   return convertDDToDMS(safeValue, false);
@@ -8,7 +8,7 @@ export const bearingValueFormatter = (value: any): string => {
 
 export const bearingCorrectionValueFormatter = (value: any): string => {
   const safeValue = value;
-  if (safeValue == null) {
+  if (safeValue == null || Number.isNaN(safeValue)) {
     return '–';
   }
   if (typeof safeValue === 'string') {
@@ -56,6 +56,7 @@ export const convertDDToDMS = (dd: number | null, showPositiveSymbol = true, tra
   if (dd == null) return '–';
 
   // toFixed rounds parts up greater than 60, which has to be corrected below
+  console.log({ dd });
   const [bearingWholeString, bearingDecimalString] = dd.toFixed(5).split('.');
 
   let bearingWhole = Math.abs(parseInt(bearingWholeString));

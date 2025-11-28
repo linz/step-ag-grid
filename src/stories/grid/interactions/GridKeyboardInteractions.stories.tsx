@@ -234,8 +234,8 @@ const GridKeyboardInteractionsTemplate: StoryFn<typeof Grid<ITestRow>> = (props:
   );
 };
 
-export const GridKeyboardInteractions: StoryFn<typeof Grid<ITestRow>> = GridKeyboardInteractionsTemplate.bind({});
-GridKeyboardInteractions.play = async ({ canvasElement }) => {
+export const KeyboardInteractions: StoryFn<typeof Grid<ITestRow>> = GridKeyboardInteractionsTemplate.bind({});
+KeyboardInteractions.play = async ({ canvasElement }) => {
   const canvas = within(document.body);
 
   multiEditAction.mockClear();

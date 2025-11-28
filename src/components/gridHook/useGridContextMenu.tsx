@@ -1,3 +1,5 @@
+import '../../styles/ContextMenu.scss';
+
 import { ColDef } from 'ag-grid-community';
 import { CellContextMenuEvent } from 'ag-grid-community';
 import { ReactElement, useCallback, useContext, useRef, useState } from 'react';
@@ -6,24 +8,29 @@ import { GridContext } from '../../contexts/GridContext';
 import { ControlledMenu } from '../../react-menu3';
 import { GridBaseRow } from '../types';
 
-export interface GridContextMenuComponentProps<TData extends GridBaseRow> {
+export interface GridContextMenuComponentProps<TData extends GridBaseRow, Context extends object> {
   selectedRows: TData[];
   clickedRow: TData;
   colDef: ColDef;
   close: () => void;
+  context?: Context;
 }
 
-export type GridContextMenuComponent<TData extends GridBaseRow> = (
-  props: GridContextMenuComponentProps<TData>,
+export type GridContextMenuComponent<TData extends GridBaseRow, Context extends object = object> = (
+  props: GridContextMenuComponentProps<TData, Context>,
 ) => ReactElement | null;
 
-export const useGridContextMenu = <TData extends GridBaseRow>({
+export interface useGridContextMenuProps<TData extends GridBaseRow, Context extends object = object> {
+  contextMenuSelectRow?: boolean;
+  contextMenu?: GridContextMenuComponent<TData, Context>;
+  context?: Context;
+}
+
+export const useGridContextMenu = <TData extends GridBaseRow, Context extends object = object>({
   contextMenuSelectRow,
   contextMenu: ContextMenu,
-}: {
-  contextMenuSelectRow: boolean;
-  contextMenu?: GridContextMenuComponent<TData>;
-}) => {
+  context,
+}: useGridContextMenuProps<TData, Context>) => {
   const { redrawRows, prePopupOps, resetFocusedCellAfterCellEditing, getSelectedRows } = useContext(GridContext);
 
   const [isOpen, setOpen] = useState(false);
@@ -69,9 +76,10 @@ export const useGridContextMenu = <TData extends GridBaseRow>({
   return {
     openMenu,
     cellContextMenu,
-    component: ContextMenu ? (
+    contextMenuComponent: ContextMenu ? (
       <>
         <ControlledMenu
+          className={'GridContextMenu'}
           anchorPoint={anchorPoint}
           state={isOpen ? 'open' : 'closed'}
           direction="right"
@@ -83,6 +91,7 @@ export const useGridContextMenu = <TData extends GridBaseRow>({
               clickedRow={clickedRowRef.current}
               colDef={clickedColDefRef.current}
               close={closeMenu}
+              context={context}
             />
           )}
         </ControlledMenu>

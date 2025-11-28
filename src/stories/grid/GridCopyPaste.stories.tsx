@@ -1,0 +1,211 @@
+import '../../styles/GridTheme.scss';
+import '../../styles/index.scss';
+import '@linzjs/lui/dist/scss/base.scss';
+import '@linzjs/lui/dist/fonts';
+
+import { Meta, StoryFn } from '@storybook/react-vite';
+import { ReactElement, useCallback, useMemo, useState } from 'react';
+
+import {
+  ColDefT,
+  Grid,
+  GridCell,
+  GridCellBearingValueFormatter,
+  GridContextProvider,
+  GridFilterButtons,
+  GridFilterQuick,
+  GridFilters,
+  GridPopoverMenu,
+  GridProps,
+  GridUpdatingContextProvider,
+  GridWrapper,
+  useGridFilter,
+} from '../..';
+import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from '../../components';
+import { GridCellFiller } from '../../components/GridCellFiller';
+import { SeededRandomForTests } from '../../utils/__tests__/random';
+import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
+
+export default {
+  title: 'Components / Grids',
+  component: Grid,
+  args: {
+    quickFilter: true,
+    quickFilterValue: '',
+    quickFilterPlaceholder: 'Quick filter...',
+    selectable: false,
+    rowSelection: 'single',
+  }, // Storybook hangs otherwise
+  parameters: {
+    docs: {
+      source: {
+        type: 'code',
+      },
+    },
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
+        <GridUpdatingContextProvider>
+          <GridContextProvider>
+            <Story />
+          </GridContextProvider>
+        </GridUpdatingContextProvider>
+      </div>
+    ),
+  ],
+} as Meta<typeof Grid>;
+
+interface ITestRow {
+  id: number;
+  position: string;
+  age: number;
+  height: string;
+  bearing: string | number | null;
+}
+
+const GridCopyPasteTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
+  const [externalSelectedIds, setExternalSelectedIds] = useState<number[]>([]);
+  const columnDefs: ColDefT<ITestRow>[] = useMemo(
+    () => [
+      GridCell({
+        field: 'id',
+        headerName: 'Id',
+        lockVisible: true,
+      }),
+      GridCell<ITestRow, ITestRow['position']>({
+        field: 'position',
+        headerName: 'Position',
+        cellRendererParams: {
+          error: ({ value }) => value === 'Manager' && 'Managers need management',
+          warning: ({ value }) => value === 'Tester' && 'Testers are testing',
+          info: ({ value }) => value === 'Developer' && 'Developers are awesome',
+        },
+      }),
+      {
+        headerName: 'Metrics',
+        marryChildren: true,
+        children: [
+          GridCell<ITestRow, ITestRow['age']>({
+            field: 'age',
+            headerName: 'Age',
+          }),
+          GridCell<ITestRow, ITestRow['height']>({
+            field: 'height',
+            headerName: 'Height',
+          }),
+        ],
+      },
+      GridCell({
+        field: 'bearing',
+        headerName: 'Bearing',
+        valueFormatter: GridCellBearingValueFormatter,
+      }),
+      GridCellFiller(),
+      GridPopoverMenu(
+        {},
+        {
+          editorParams: {
+            options: () => [
+              {
+                label: 'Test menu',
+                action: () => {},
+              },
+            ],
+          },
+        },
+      ),
+    ],
+    [],
+  );
+
+  const [rowData] = useState<ITestRow[]>(() => {
+    const random = new SeededRandomForTests(1000);
+    let id = 1000;
+    const positions = ['Tester', 'Developer', 'Lawyer', 'Barrista', 'Manager', 'CEO', 'CTO', 'Architect'];
+    const result: ITestRow[] = [];
+    for (let i = 0; i < 1000; i++) {
+      result.push({
+        id: id++,
+        position: random.fromArray(positions),
+        age: 30,
+        height: `6'4"`,
+        bearing: '',
+      });
+    }
+    return result;
+  });
+
+  return (
+    <GridWrapper maxHeight={400}>
+      <GridFilters>
+        <GridFilterQuick />
+        <GridFilterLessThan text="Age <" field={'age'} />
+        <GridFilterButtons<ITestRow>
+          luiButtonProps={{ style: { whiteSpace: 'nowrap' } }}
+          options={[
+            {
+              label: 'All',
+            },
+            {
+              label: '< 30',
+              filter: (row) => row.age < 30,
+            },
+          ]}
+        />
+        <GridFilterColumnsToggle />
+        <GridFilterDownloadCsvButton fileName={'readOnlyGrid'} />
+      </GridFilters>
+      <Grid
+        data-testid={'readonly'}
+        {...props}
+        enableRangeSelection={true}
+        selectable={true}
+        enableClickSelection={true}
+        enableSelectionWithoutKeys={true}
+        autoSelectFirstRow={true}
+        externalSelectedIds={externalSelectedIds}
+        setExternalSelectedIds={setExternalSelectedIds}
+        columnDefs={columnDefs}
+        rowData={rowData}
+      />
+    </GridWrapper>
+  );
+};
+
+type KeysOfType<TObject, TValue> = {
+  [K in keyof TObject]: TObject[K] extends TValue ? K : never;
+}[keyof TObject];
+
+const GridFilterLessThan = (props: {
+  field: KeysOfType<ITestRow, number | null | undefined>;
+  text: string;
+}): ReactElement => {
+  const [value, setValue] = useState<number>();
+
+  const filter = useCallback(
+    (data: ITestRow): boolean => value == null || data[props.field] < value,
+    [props.field, value],
+  );
+
+  useGridFilter(filter);
+
+  const updateValue = (newValue: string) => {
+    try {
+      setValue(newValue.trim() == '' ? undefined : parseInt(newValue));
+    } catch {
+      // ignore number parse exception
+    }
+  };
+
+  return (
+    <div className={'GridFilter-container flex-row-center'}>
+      <div style={{ whiteSpace: 'nowrap' }}>{props.text}</div>
+      &#160;
+      <input type={'text'} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
+    </div>
+  );
+};
+
+export const CopyPaste = GridCopyPasteTemplate.bind({});
+CopyPaste.play = waitForGridReady;

@@ -6,8 +6,6 @@ import {
   CellDoubleClickedEvent,
   CellFocusedEvent,
   CellKeyDownEvent,
-  CellMouseDownEvent,
-  CellMouseOverEvent,
   ColDef,
   ColGroupDef,
   ColumnMovedEvent,
@@ -31,17 +29,8 @@ import {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import clsx from 'clsx';
-import { compact, defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
-import {
-  ClipboardEvent as ReactClipboardEvent,
-  ReactElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { defer, delay, difference, isEmpty, last, omit, xorBy } from 'lodash-es';
+import { ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
 import { AutoSizeColumnsResult, StartCellEditingProps, useGridContext } from '../contexts/GridContext';
@@ -50,6 +39,8 @@ import { compareNaturalInsensitive, fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
+import { useGridCopy } from './gridHook/useGridCopy';
+import { CellLocation, useGridRangeSelection } from './gridHook/useGridRangeSelection';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
 import { GridBaseRow, GridOnRowDragEndProps } from './types';
@@ -58,160 +49,147 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
   ['data-testid']?: string;
-
-  // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
-  readOnly?: boolean;
-  // If the whole grid is readonly, suppress the read-only grey text style
-  suppressReadOnlyStyle?: boolean;
-
-  // Auto-selects first row when rowData is set
-  autoSelectFirstRow?: boolean;
-
-  // Select cells for copy. default: false
-  enableRangeSelection?: boolean;
-
-  // should have prefix ag-theme-
   theme?: string;
 
-  domLayout?: GridOptions['domLayout'];
+  // ─── Grid State ────────────────────────────────────────────────
+  loading?: boolean;
+  readOnly?: boolean;
+  suppressReadOnlyStyle?: boolean;
 
-  defaultColDef?: GridOptions['defaultColDef'];
+  // ─── Data & Columns ────────────────────────────────────────────
   columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
-  rowData: GridOptions['rowData'];
-  rowSelection?: 'single' | 'multiple';
-
-  noRowsOverlayText?: string;
-  noRowsMatchingOverlayText?: string;
-
-  // Retain sort order after edit, Defaults to true.
+  defaultColDef?: GridOptions['defaultColDef'];
   defaultPostSort?: boolean;
+  domLayout?: GridOptions['domLayout'];
+  pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
+  pinnedTopRowData?: GridOptions['pinnedTopRowData'];
+  rowData: GridOptions['rowData'];
+  rowClassRules?: GridOptions['rowClassRules'];
+  rowHeight?: number;
+  rowSelection?: 'single' | 'multiple';
+  sizeColumns?: 'fit' | 'auto' | 'auto-skip-headers' | 'none';
 
+  // ─── Selection ────────────────────────────────────────────────
+  autoSelectFirstRow?: boolean;
+  enableClickSelection?: boolean;
+  enableRangeSelection?: boolean;
+  enableSelectionWithoutKeys?: boolean;
   externalSelectedIds?: TData['id'][];
-  setExternalSelectedIds?: (ids: TData['id'][]) => void;
-
   externalSelectedItems?: TData[];
+  hideSelectColumn?: boolean;
+  selectColumnPinned?: ColDef['pinned'];
+  selectable?: boolean;
+  setExternalSelectedIds?: (ids: TData['id'][]) => void;
   setExternalSelectedItems?: (items: TData[]) => void;
 
-  // Adds the selection column pinned on left hand side.
-  // Make sure you add `[externalSelectedIds/setExternalSelectedIds]`
-  // or `[externalSelectedItems, setExternalSelectedItems]`
-  selectable?: boolean;
-  selectColumnPinned?: ColDef['pinned'];
-
-  // Click on any cell to select row.  You would use this on a read only grid.
-  enableClickSelection?: boolean;
-
-  // If you set selection to true you get a select column, but if you have enableClickSelection=true you may no want to see the checkboxes
-  hideSelectColumn?: boolean;
-
-  // Allows users to select rows with a simple mouse click, without needing to hold down modifier keys (like Ctrl or Shift)
-  enableSelectionWithoutKeys?: boolean;
-
-  // No need to double-click for editing cells.  default: false
+  // ─── Editing ──────────────────────────────────────────────────
+  onBulkEditingComplete?: () => Promise<void> | void;
   singleClickEdit?: boolean;
 
-  // Whether to select row on context menu.
+  // ─── Context Menu ─────────────────────────────────────────────
+  contextMenu?: GridContextMenuComponent<TData>;
   contextMenuSelectRow?: boolean;
 
-  // Context menu definition if required.
-  contextMenu?: GridContextMenuComponent<TData>;
-
-  // When pressing tab whilst editing, the grid will select and edit the next cell if available.
-  // Once the last cell to edit closes within the same row this callback is called.
-  onBulkEditingComplete?: () => Promise<void> | void;
-
-  animateRows?: boolean;
-  rowHeight?: number;
-  rowClassRules?: GridOptions['rowClassRules'];
-
+  // ─── Callbacks / Events ───────────────────────────────────────
   onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
   onColumnMoved?: GridOptions['onColumnMoved'];
-  rowDragText?: GridOptions['rowDragText'];
-  onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
-  alwaysShowVerticalScroll?: boolean;
-  suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
-
-  /**
-   * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
-   * This allows you set the size of the panel to fit perfectly.  This can take a couple of seconds plus whatever your data load time is.
-   */
   onContentSize?: (props: { width: number }) => void;
 
   /**
-   * <ul>
-   * <li>"none" to use aggrid defaults.</li>
-   * <li>"fit" will adjust columns to fit within panel via min/max/initial sizing.
-   * <b>Note:</b> This is only really needed if you have auto-height columns which prevents "auto" from working.
-   * </li>
-   * <li>"auto" will size columns based on their content but still obeying min/max sizing.</li>
-   * <li>"auto-skip-headers" (default) same as auto but does not take headers into account.</li>
-   * </ul>
-   *
-   * If you want to stretch to container width if width is greater than the container add a flex column.
+   * @deprecated You should drive your app off selection states. This will be deleted.
    */
-  sizeColumns?: 'fit' | 'auto' | 'auto-skip-headers' | 'none';
-
-  // On first don't return a content size larger than this.
-  maxInitialWidth?: number;
-
-  loading?: boolean;
-  suppressCellFocus?: boolean;
-  pinnedTopRowData?: GridOptions['pinnedTopRowData'];
-  pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
   onRowClicked?: (event: RowClickedEvent) => void;
+  /**
+   * @deprecated You should drive your app off selection states. This will be deleted.
+   */
   onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
+  onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
+
+  // ─── Row Behavior ─────────────────────────────────────────────
+  animateRows?: boolean;
+  alwaysShowVerticalScroll?: boolean;
+  rowDragText?: GridOptions['rowDragText'];
+
+  // ─── Overlays / Messages ──────────────────────────────────────
+  noRowsOverlayText?: string;
+  noRowsMatchingOverlayText?: string;
+
+  // ─── Miscellaneous ────────────────────────────────────────────
+  maxInitialWidth?: number;
+  suppressCellFocus?: boolean;
+  suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
 }
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
 export const Grid = <TData extends GridBaseRow = GridBaseRow>({
-  'data-testid': dataTestId,
-  defaultPostSort = true,
-  rowSelection = 'multiple',
-  enableRangeSelection = true,
-  suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
-  sizeColumns = 'auto',
-  selectColumnPinned = 'left',
-  contextMenuSelectRow = false,
-  singleClickEdit = false,
+  'data-testid': dataTestId,
+
+  // ─── Grid State ───────────────────────────────
+  suppressReadOnlyStyle = false,
+
+  // ─── Data & Columns ───────────────────────────
+  defaultPostSort = true,
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
-  selectable,
+  rowSelection = 'multiple',
+  sizeColumns = 'auto',
+
+  // ─── Selection ────────────────────────────────
   autoSelectFirstRow,
-  onCellFocused: paramsOnCellFocused,
-  maxInitialWidth,
-  suppressReadOnlyStyle = false,
-  externalSelectedItems,
-  setExternalSelectedItems,
+  enableRangeSelection = true,
   externalSelectedIds,
+  externalSelectedItems,
+  selectColumnPinned = 'left',
+  selectable,
   setExternalSelectedIds,
+  setExternalSelectedItems,
+
+  // ─── Editing ──────────────────────────────────
+  singleClickEdit = false,
+
+  // ─── Context Menu ─────────────────────────────
+  contextMenuSelectRow = false,
+  contextMenu,
+
+  // ─── Callbacks / Events ───────────────────────
+  onCellFocused: paramsOnCellFocused,
   onColumnMoved,
+
+  // ─── Row Behavior ─────────────────────────────
+  suppressColumnVirtualization = true,
+
+  // ─── Miscellaneous ────────────────────────────
+  maxInitialWidth,
+
+  // ─── Spread Remaining Params ──────────────────
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
+    setApis,
+    setExternallySelectedItemsAreInSync,
+    setOnBulkEditingComplete,
     gridReady,
     gridRenderState,
-    setApis,
-    ensureRowVisible,
-    getFirstRowId,
-    selectRowsById,
-    focusByRowById,
-    ensureSelectedRowIsVisible,
+    externallySelectedItemsAreInSync,
+    showNoRowsOverlay,
     autoSizeColumns,
     sizeColumnsToFit,
-    externallySelectedItemsAreInSync,
-    setExternallySelectedItemsAreInSync,
-    isExternalFilterPresent,
     doesExternalFilterPass,
-    setOnBulkEditingComplete,
+    ensureRowVisible,
+    ensureSelectedRowIsVisible,
+    focusByRowById,
     getColDef,
-    getCellValue,
-    showNoRowsOverlay,
+    getFirstRowId,
+    isExternalFilterPresent,
     prePopupOps,
+    selectRowsById,
+
     startCellEditing: propStartCellEditing,
   } = useGridContext<TData>();
+
   // CellEditingStop event happens too much for one edit
   const startedEditRef = useRef(false);
   const startCellEditing = useCallback(
@@ -639,225 +617,34 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [prePopupOps, startCellEditing],
   );
 
-  // ===================== BEGIN Range selection ==========================
+  const { cellContextMenu, contextMenuComponent } = useGridContextMenu({
+    contextMenu,
+    contextMenuSelectRow,
+  });
 
   const rangeStartRef = useRef<CellLocation | null>(null);
   const rangeEndRef = useRef<CellLocation | null>(null);
   const rangeSortedNodesRef = useRef<IRowNode<TData>[] | null>(null);
 
-  const ranges = useCallback(
-    (
-      gridElement: HTMLDivElement,
-      rangeStart: CellLocation,
-      rangeEnd: CellLocation,
-      rangeSortedNodes: IRowNode<TData>[],
-    ) => {
-      const elStyleLeftComparator = (el1: Element, el2: Element) => elStyleLeft(el1) - elStyleLeft(el2);
-      const elStyleLeft = (el: Element): number => parseFloat((el as HTMLElement).style.left) ?? 0;
+  const { clearRangeSelection, ranges, onCellMouseDown, onCellMouseOver } = useGridRangeSelection({
+    enableRangeSelection,
+    gridDivRef,
+    rangeStartRef,
+    rangeEndRef,
+    rangeSortedNodesRef,
+  });
 
-      const getSortedColIds = (): string[] => {
-        //
-        const leftHeaders = [...gridElement.querySelectorAll('.ag-pinned-left-header .ag-header-cell')].sort(
-          elStyleLeftComparator,
-        );
-        const centerHeaders = [...gridElement.querySelectorAll('.ag-header-viewport .ag-header-cell')].sort(
-          elStyleLeftComparator,
-        );
-        const rightHeaders = [...gridElement.querySelectorAll('.ag-pinned-right-header .ag-header-cell')].sort(
-          elStyleLeftComparator,
-        );
-
-        return [...leftHeaders, ...centerHeaders, ...rightHeaders].map(
-          (el, i) => el.getAttribute('col-id') ?? String(i),
-        );
-      };
-
-      const sortedColIds = getSortedColIds();
-
-      const startColIndex = sortedColIds.indexOf(rangeStart.colId);
-      const endColIndex = sortedColIds.indexOf(rangeEnd.colId);
-      const selectedColIds = sortedColIds.slice(
-        Math.min(startColIndex, endColIndex),
-        Math.max(startColIndex, endColIndex) + 1,
-      );
-
-      const startRowIndex = rangeSortedNodes.findIndex((node) => node.data!.id === rangeStart.rowId);
-      const endRowIndex = rangeSortedNodes.findIndex((node) => node.data!.id === rangeEnd.rowId);
-      const selectedNodes = rangeSortedNodes.slice(
-        Math.min(startRowIndex, endRowIndex),
-        Math.max(startRowIndex, endRowIndex) + 1,
-      );
-
-      return { selectedColIds, selectedNodes };
-    },
-    [],
-  );
-
-  const updateRangeSelectionCellClasses = useCallback(() => {
-    //
-    // Get all grid cols, sort by pinned, then style: left
-    const gridElement = gridDivRef.current;
-    if (!gridElement) {
-      return;
-    }
-
-    // Clear all selections
-    gridElement
-      .querySelectorAll('.rangeSelect,.rangeSelectLeft,.rangeSelectTop,.rangeSelectRight,.rangeSelectBottom')
-      .forEach((el) => {
-        el.classList.remove(
-          'rangeSelect',
-          'rangeSelectLeft',
-          'rangeSelectTop',
-          'rangeSelectRight',
-          'rangeSelectBottom',
-        );
-      });
-
-    // if range selection multiple add .Grid-container.rangeSelectingMultiple
-    const rangeStart = rangeStartRef.current;
-    const rangeEnd = rangeEndRef.current;
-    if (
-      rangeStart !== null &&
-      rangeEnd !== null &&
-      (rangeStart.colId !== rangeEnd.colId || rangeStart.rowId !== rangeEnd.rowId)
-    ) {
-      gridElement.classList.add('rangeSelectingMultiple');
-      gridElement.querySelectorAll('.ag-cell-focus').forEach((el) => {
-        el.classList.remove('ag-cell-focus');
-      });
-    } else {
-      gridElement.classList.remove('rangeSelectingMultiple');
-      return;
-    }
-    const rangeSortedNodes = rangeSortedNodesRef.current;
-    if (!rangeSortedNodes) {
-      return;
-    }
-
-    const { selectedColIds, selectedNodes } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedNodes);
-
-    selectedColIds.forEach((colId, colIndex) => {
-      selectedNodes.forEach((node, rowIndex) => {
-        const rowId = node.data!.id;
-        const cell = gridElement.querySelector(
-          `.ag-row[row-id=${JSON.stringify(String(rowId))}] .ag-cell[col-id=${JSON.stringify(colId)}`,
-        );
-        cell?.classList.add('rangeSelect');
-        if (colIndex === 0) {
-          cell?.classList.add('rangeSelectLeft');
-        }
-        if (colIndex === selectedColIds.length - 1) {
-          cell?.classList.add('rangeSelectRight');
-        }
-        if (rowIndex === 0) {
-          cell?.classList.add('rangeSelectTop');
-        }
-        if (rowIndex === selectedNodes.length - 1) {
-          cell?.classList.add('rangeSelectBottom');
-        }
-      });
-    });
-  }, [ranges]);
-
-  const clearRangeSelection = useCallback(() => {
-    rangeStartRef.current = null;
-    rangeEndRef.current = null;
-
-    updateRangeSelectionCellClasses();
-  }, [updateRangeSelectionCellClasses]);
+  const { onCopyEvent, rangeSelectInterceptContextMenu, rangeSelectContextMenuComponent } = useGridCopy({
+    ranges,
+    rangeStartRef,
+    rangeEndRef,
+    cellContextMenu,
+  });
 
   const onSortChanged = useCallback(() => {
     clearRangeSelection();
     ensureSelectedRowIsVisible();
   }, [clearRangeSelection, ensureSelectedRowIsVisible]);
-
-  const onCellMouseOver = useCallback(
-    (e: CellMouseOverEvent, mouseDown?: boolean) => {
-      if (!enableRangeSelection) {
-        return;
-      }
-      const button = (e.event as { buttons?: number }).buttons;
-      if (button !== 1) {
-        rangeSortedNodesRef.current = null;
-        return;
-      }
-      rangeEndRef.current = {
-        rowId: e.node.data.id,
-        colId: e.column.getColId(),
-      };
-
-      if (mouseDown) {
-        window.getSelection()?.removeAllRanges();
-
-        const sortedNodes: IRowNode<TData>[] = [];
-        e.api.forEachNodeAfterFilterAndSort((node: IRowNode<TData>) => sortedNodes.push(node));
-        rangeSortedNodesRef.current = sortedNodes;
-        rangeStartRef.current = rangeEndRef.current;
-      }
-
-      updateRangeSelectionCellClasses();
-    },
-    [enableRangeSelection, updateRangeSelectionCellClasses],
-  );
-
-  const onCellMouseDown = useCallback(
-    (e: CellMouseDownEvent) => onCellMouseOver(e as unknown as CellMouseOverEvent, true),
-    [onCellMouseOver],
-  );
-
-  // ===================== END Range selection ==========================
-
-  // ===================== BEGIN Copy range ==========================
-
-  const onCopy = useCallback(
-    (e: ReactClipboardEvent<HTMLDivElement>) => {
-      const rangeStart = rangeStartRef.current;
-      const rangeEnd = rangeEndRef.current;
-      if (
-        rangeStart === null ||
-        rangeEnd === null ||
-        (rangeStart.colId === rangeEnd.colId && rangeStart.rowId === rangeEnd.rowId)
-      ) {
-        return;
-      }
-
-      e.preventDefault();
-
-      const gridElement = gridDivRef.current;
-      const rangeSortedNodes = rangeSortedNodesRef.current;
-      if (!gridElement || !rangeSortedNodes) {
-        return;
-      }
-
-      const { selectedColIds, selectedNodes } = ranges(gridElement, rangeStart, rangeEnd, rangeSortedNodes);
-      const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
-
-      const formatters = compact(
-        filteredSelectedColIds.map((colKey) => {
-          return (rowNode: IRowNode) => {
-            const v = getCellValue({ rowNode, colKey });
-            const f = getCellValue({ rowNode, colKey, useFormatter: true });
-            if (v == f) return v;
-            return f;
-          };
-        }),
-      );
-
-      let result = '';
-      selectedNodes.forEach((node) => {
-        formatters.forEach((formatter, i) => {
-          const value = formatter(node);
-          result += (i !== 0 ? ',' : '') + value;
-        });
-        result += '\n';
-      });
-      e.clipboardData.setData('text/plain', result);
-    },
-    [getCellValue, ranges],
-  );
-
-  // ===================== End Copy range ==========================
 
   /**
    * Handle single click edits
@@ -1029,8 +816,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     }
     prevLoading.current = newLoading;
   }, [params.loading, rowData, showNoRowsOverlay]);
-
-  const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
   const startDragYRef = useRef<number | null>(null);
 
@@ -1221,10 +1006,52 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         gridReady && rowData && autoSized && 'Grid-ready',
       )}
     >
-      {gridContextMenu.component}
-      <div style={{ flex: 1 }} ref={gridDivRef} onCopy={onCopy}>
+      {contextMenuComponent}
+      {rangeSelectContextMenuComponent}
+      <div style={{ flex: 1 }} ref={gridDivRef} onCopy={onCopyEvent}>
         <AgGridReact
           theme={'legacy'}
+          domLayout={params.domLayout}
+          defaultColDef={defaultColDef}
+          columnDefs={columnDefsAdjusted}
+          getRowId={getRowId}
+          rowData={rowData}
+          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
+          animateRows={params.animateRows ?? false}
+          doesExternalFilterPass={doesExternalFilterPass}
+          isExternalFilterPresent={isExternalFilterPresent}
+          maintainColumnOrder={true}
+          noRowsOverlayComponent={noRowsOverlayComponent}
+          onCellClicked={onCellClicked}
+          onCellContextMenu={rangeSelectInterceptContextMenu}
+          onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStopped={onCellEditingStopped}
+          onCellFocused={onCellFocused}
+          onCellKeyDown={onCellKeyPress}
+          onCellMouseDown={onCellMouseDown}
+          onCellMouseOver={onCellMouseOver}
+          onColumnMoved={columnMoved}
+          onColumnResized={onColumnResized}
+          onColumnVisible={() => void setInitialContentSize()}
+          onGridReady={onGridReady}
+          onGridSizeChanged={onGridSizeChanged}
+          onModelUpdated={onModelUpdated}
+          onRowClicked={params.onRowClicked}
+          onRowDataUpdated={onRowDataUpdated}
+          onRowDoubleClicked={params.onRowDoubleClicked}
+          onRowDragCancel={clearHighlightRowClasses}
+          onRowDragEnd={onRowDragEnd}
+          onRowDragMove={onRowDragMove}
+          onSelectionChanged={synchroniseExternalStateToGridSelection}
+          onSortChanged={onSortChanged}
+          pinnedBottomRowData={params.pinnedBottomRowData}
+          pinnedTopRowData={params.pinnedTopRowData}
+          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
+          preventDefaultOnContextMenu={true}
+          quickFilterParser={quickFilterParser}
+          rowClassRules={params.rowClassRules}
+          rowDragText={params.rowDragText}
+          rowHeight={rowHeight}
           rowSelection={
             selectable
               ? {
@@ -1239,50 +1066,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               : undefined
           }
           selectionColumnDef={selectionColumnDef}
-          rowHeight={rowHeight}
-          animateRows={params.animateRows ?? false}
-          rowClassRules={params.rowClassRules}
-          getRowId={getRowId}
-          suppressColumnVirtualisation={suppressColumnVirtualization}
-          suppressClickEdit={true}
-          onGridSizeChanged={onGridSizeChanged}
-          onColumnVisible={() => void setInitialContentSize()}
-          onRowDataUpdated={onRowDataUpdated}
-          onCellFocused={onCellFocused}
-          onCellKeyDown={onCellKeyPress}
-          onCellClicked={onCellClicked}
-          onCellDoubleClicked={onCellDoubleClick}
-          onCellEditingStopped={onCellEditingStopped}
-          onCellMouseDown={onCellMouseDown}
-          onCellMouseOver={onCellMouseOver}
-          domLayout={params.domLayout}
-          onColumnResized={onColumnResized}
-          defaultColDef={defaultColDef}
-          columnDefs={columnDefsAdjusted}
-          rowData={rowData}
-          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
-          onModelUpdated={onModelUpdated}
-          onGridReady={onGridReady}
-          onSortChanged={onSortChanged}
-          quickFilterParser={quickFilterParser}
-          onSelectionChanged={synchroniseExternalStateToGridSelection}
-          onColumnMoved={columnMoved}
-          noRowsOverlayComponent={noRowsOverlayComponent}
-          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
-          isExternalFilterPresent={isExternalFilterPresent}
-          doesExternalFilterPass={doesExternalFilterPass}
-          maintainColumnOrder={true}
-          preventDefaultOnContextMenu={true}
-          onCellContextMenu={gridContextMenu.cellContextMenu}
-          rowDragText={params.rowDragText}
-          onRowDragCancel={clearHighlightRowClasses}
-          onRowDragMove={onRowDragMove}
-          onRowDragEnd={onRowDragEnd}
           suppressCellFocus={params.suppressCellFocus}
-          pinnedTopRowData={params.pinnedTopRowData}
-          pinnedBottomRowData={params.pinnedBottomRowData}
-          onRowClicked={params.onRowClicked}
-          onRowDoubleClicked={params.onRowDoubleClicked}
+          suppressClickEdit={true}
+          suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressStartEditOnTab={true}
         />
       </div>
@@ -1304,8 +1090,3 @@ const NotAGridValueFormatterCall = {
   api: 'Default comparator has no access to api, write your own comparator' as unknown,
   context: 'Default comparator has no access to context, write your own comparator' as unknown,
 };
-
-interface CellLocation {
-  rowId: string;
-  colId: string;
-}
