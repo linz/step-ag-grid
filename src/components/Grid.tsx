@@ -988,6 +988,8 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         }
         return false;
       },
+      // enableClickSelection = true means ag-grid auto selects row if you click outside the checkbox
+      // if it's false we have to do it.
       onCellClicked: params.enableClickSelection ? undefined : clickInputWhenContainingCellClicked,
     };
   }, [
