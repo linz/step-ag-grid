@@ -22,6 +22,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
   hasSelectedMoreThanOneCellRef: MutableRefObject<boolean>;
   cellContextMenu: (event: CellContextMenuEvent) => void;
 }) => {
+  const { getSelectedRowIds } = useGridContext<TData>();
   const { getColDef, getCellValue } = useGridContext<TData>();
   const { copyType, setCopyType } = useGridCopySettings();
 
@@ -40,13 +41,18 @@ export const useGridCopy = <TData extends GridBaseRow>({
       const { selectedColIds, selectedNodes } = ranges();
       const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
 
+      const selectedRowIds = getSelectedRowIds();
       const formatters = compact(
         filteredSelectedColIds.map((colKey) => {
           return (rowNode: IRowNode): string | number | null | undefined => {
-            const v = getCellValue({ rowNode, colKey });
-            const f = getCellValue({ rowNode, colKey, useFormatter: true });
-            if (v == f) return v;
-            return f;
+            if (colKey === 'ag-Grid-SelectionColumn') {
+              return selectedRowIds.includes(rowNode.data.id) ? 'Y' : 'N';
+            } else {
+              const v = getCellValue({ rowNode, colKey });
+              const f = getCellValue({ rowNode, colKey, useFormatter: true });
+              // If it's a number, and it matches value return the original type
+              return v == f ? v : f;
+            }
           };
         }),
       );
