@@ -23,6 +23,7 @@ import {
 } from '../..';
 import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from '../../components';
 import { GridCellFiller } from '../../components/GridCellFiller';
+import { KeysOfType } from '../../lui/tsUtils';
 import { SeededRandomForTests } from '../../utils/__tests__/random';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
@@ -172,10 +173,6 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
     </GridWrapper>
   );
 };
-
-type KeysOfType<TObject, TValue> = {
-  [K in keyof TObject]: TObject[K] extends TValue ? K : never;
-}[keyof TObject];
 
 const GridFilterLessThan = (props: {
   field: KeysOfType<ITestRow, number | null | undefined>;

@@ -1,3 +1,7 @@
+export type KeysOfType<TObject, TValue> = {
+  [K in keyof TObject]: TObject[K] extends TValue ? K : never;
+}[keyof TObject];
+
 export const typedKeys = <T extends object>(obj: T): (keyof T)[] => Object.keys(obj) as (keyof T)[];
 
 export const typedEntries = <T extends object>(obj: T): { [K in keyof T]-?: [K, T[K]] }[keyof T][] =>
