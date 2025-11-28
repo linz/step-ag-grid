@@ -10,7 +10,7 @@ export class SeededRandomForTests {
     if (maxInc == null) {
       return result;
     }
-    return ((result * maxInc) | 0) % (maxInc + 1);
+    return ((result * (maxInc + 1)) | 0) % (maxInc + 1);
   }
 
   fromArray<T>(arr: T[]): T {

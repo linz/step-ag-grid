@@ -8,7 +8,7 @@ import { GridContext } from '../../contexts/GridContext';
 import { ControlledMenu } from '../../react-menu3';
 import { GridBaseRow } from '../types';
 
-export interface GridContextMenuComponentProps<TData extends GridBaseRow, Context extends object> {
+export interface GridContextMenuComponentProps<TData extends GridBaseRow, Context extends object = object> {
   selectedRows: TData[];
   clickedRow: TData;
   colDef: ColDef;

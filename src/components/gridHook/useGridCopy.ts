@@ -50,7 +50,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
       );
 
       // Get and apply headers
-      const headers = selectedColIds.map((colId) => getColDef(colId)?.headerName ?? '?');
+      const headers = selectedColIds.map((colId) =>
+        colId === 'ag-Grid-SelectionColumn' ? 'Selected' : (getColDef(colId)?.headerName ?? '?'),
+      );
       const maxCellLength: Record<string, number> = {};
       headers.forEach((headerName, i) => {
         const colId = filteredSelectedColIds[i];
@@ -112,8 +114,6 @@ export const useGridCopy = <TData extends GridBaseRow>({
                 result += '|';
               }
               const colId = filteredSelectedColIds[i];
-              // TODO we can't use cell length here as it will be encoded
-              console.log(cell, maxCellLength[colId], cell.length);
               result += ' ' + cell.padEnd(maxCellLength[colId], ' ') + ' ';
               result += '|';
               break;

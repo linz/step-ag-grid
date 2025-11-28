@@ -64,7 +64,7 @@ interface ITestRow {
   bearing: string | number | null;
 }
 
-const GridCopyPasteTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
+const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
   const [externalSelectedIds, setExternalSelectedIds] = useState<number[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
@@ -122,14 +122,14 @@ const GridCopyPasteTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<
   const [rowData] = useState<ITestRow[]>(() => {
     const random = new SeededRandomForTests(1000);
     let id = 1000;
-    const positions = ['Tester', 'Developer', 'Lawyer', 'Barrista', 'Manager', 'CEO', 'CTO', 'Architect'];
+    const positions = ['Tester', 'Developer', 'Lawyer', 'Barrista """', 'Manager', 'CEO', 'CTO', 'Architect'];
     const result: ITestRow[] = [];
     for (let i = 0; i < 1000; i++) {
       result.push({
         id: id++,
         position: random.fromArray(positions),
         age: 30,
-        height: `6'4"`,
+        height: `${random.next(3) + 3}'${random.next(12)}"`,
         bearing: '',
       });
     }
@@ -207,5 +207,5 @@ const GridFilterLessThan = (props: {
   );
 };
 
-export const CopyPaste = GridCopyPasteTemplate.bind({});
-CopyPaste.play = waitForGridReady;
+export const GridCopy = GridCopyTemplate.bind({});
+GridCopy.play = waitForGridReady;

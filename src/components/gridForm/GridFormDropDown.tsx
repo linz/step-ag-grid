@@ -9,7 +9,7 @@ import { usePrevious } from '../../lui/reactUtils';
 import { FocusableItem, MenuDivider, MenuHeader, MenuItem } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
 import { textMatch } from '../../utils/textMatcher';
-import { isNotEmpty } from '../../utils/util';
+import { isNotEmpty, MaybePromise } from '../../utils/util';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
@@ -46,8 +46,6 @@ export const MenuHeaderItem = (title: string) => {
 };
 
 export type SelectOption<TOptionValue = any> = FinalSelectOption<TOptionValue>;
-
-export type MaybePromise<T> = T | Promise<T>;
 
 export interface GridFormDropDownProps<TData extends GridBaseRow, TOptionValue> extends CellEditorCommon {
   // This overrides CellEditorCommon to provide some common class options

@@ -5,11 +5,11 @@ import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
 import { FocusableItem, MenuDivider, MenuItem, SubMenu } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
+import { MaybePromise } from '../../utils/util';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
 import { GridBaseRow } from '../types';
-import { MaybePromise } from './GridFormDropDown';
 
 export interface GridFormPopoverMenuProps<TData extends GridBaseRow> extends CellEditorCommon {
   options: (selectedRows: TData[]) => Promise<MenuOption<TData>[]> | MenuOption<TData>[];
