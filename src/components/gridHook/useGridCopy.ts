@@ -104,9 +104,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
       rows.forEach((row, i) => {
         if (i === 1 && type === 'markdown') {
           Object.values(maxCellLength).forEach((maxLength) => {
-            result += '-'.repeat(maxLength + 3);
+            result += '|' + '-'.repeat(maxLength + 2);
           });
-          result += '-\n';
+          result += '|\n';
         }
         row.forEach((cell, i) => {
           switch (type) {
