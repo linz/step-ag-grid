@@ -41,7 +41,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
       const json = type === 'json';
       const { selectedColIds, selectedNodes } = ranges();
       const filteredSelectedColIds = selectedColIds.filter(
-        (colId) => colId !== 'gridCellFiller' && getColDef(colId)?.headerComponentParams?.exportable !== false,
+        (colId) =>
+          colId === 'ag-Grid-SelectionColumn' ||
+          (colId !== 'gridCellFiller' && getColDef(colId)?.headerComponentParams?.exportable !== false),
       );
 
       const selectedRowIds = getSelectedRowIds();
@@ -49,11 +51,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
         filteredSelectedColIds.map((colKey) => {
           return (rowNode: IRowNode): string | number | boolean | null | undefined => {
             if (colKey === 'ag-Grid-SelectionColumn') {
-              const selected = selectedRowIds.includes(rowNode.data.id);
-              if (type === 'json') {
-                return selected;
-              }
-              return selected ? 'Y' : 'N';
+              return selectedRowIds.includes(rowNode.data.id);
             } else {
               const v = getCellValue({ rowNode, colKey });
               if (json && v !== undefined) {
