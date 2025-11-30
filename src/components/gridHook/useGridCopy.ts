@@ -89,6 +89,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
         formatters.forEach((formatter, i) => {
           const colId = filteredSelectedColIds[i];
           let value = formatter(node);
+          if (typeof value === 'string') {
+            value = value.replaceAll('\xa0', ' ');
+          }
           if (!json) {
             if (value === '-' || value === '–' || value == null) {
               value = '';
