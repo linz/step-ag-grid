@@ -38,17 +38,25 @@ export const useGridCopy = <TData extends GridBaseRow>({
         type = 'plain_text';
       }
 
+      const json = type === 'json';
       const { selectedColIds, selectedNodes } = ranges();
       const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
 
       const selectedRowIds = getSelectedRowIds();
       const formatters = compact(
         filteredSelectedColIds.map((colKey) => {
-          return (rowNode: IRowNode): string | number | null | undefined => {
+          return (rowNode: IRowNode): string | number | boolean | null | undefined => {
             if (colKey === 'ag-Grid-SelectionColumn') {
-              return selectedRowIds.includes(rowNode.data.id) ? 'Y' : 'N';
+              const selected = selectedRowIds.includes(rowNode.data.id);
+              if (type === 'json') {
+                return selected;
+              }
+              return selected ? 'Y' : 'N';
             } else {
               const v = getCellValue({ rowNode, colKey });
+              if (json && v !== undefined) {
+                return v;
+              }
               const f = getCellValue({ rowNode, colKey, useFormatter: true });
               // If it's a number, and it matches value return the original type
               return v == f ? v : f;
@@ -58,9 +66,13 @@ export const useGridCopy = <TData extends GridBaseRow>({
       );
 
       // Get and apply headers
-      const headers = selectedColIds.map((colId) =>
-        colId === 'ag-Grid-SelectionColumn' ? 'Selected' : (getColDef(colId)?.headerName ?? '?'),
-      );
+      const headers = selectedColIds.map((colId) => {
+        if (colId === 'ag-Grid-SelectionColumn') return type === 'json' ? 'selected' : 'Selected';
+        if (json) {
+          return colId;
+        }
+        return getColDef(colId)?.headerName ?? '?';
+      });
       const maxCellLength: Record<string, number> = {};
       headers.forEach((headerName, i) => {
         const colId = filteredSelectedColIds[i];
@@ -77,23 +89,31 @@ export const useGridCopy = <TData extends GridBaseRow>({
         formatters.forEach((formatter, i) => {
           const colId = filteredSelectedColIds[i];
           let value = formatter(node);
-          if (value === '-' || value === '–' || value == null) {
-            value = '';
+          if (!json) {
+            if (value === '-' || value === '–' || value == null) {
+              value = '';
+            }
+            value = String(value);
+            if (value === '-' || value === '–') {
+              value = '';
+            }
+            maxCellLength[colId] = Math.max(maxCellLength[colId], value.length);
           }
-          value = String(value);
-          if (value === '-' || value === '–') {
-            value = '';
-          }
-          maxCellLength[colId] = Math.max(maxCellLength[colId], value.length);
 
           switch (type) {
             case 'plain_text':
               break;
+            case 'json':
+              value =
+                value === 'undefined' || (value !== null && typeof value === 'object') || typeof value === 'string'
+                  ? JSON.stringify(value)
+                  : value;
+              break;
             case 'markdown':
-              value = encodeMarkdownValue(value);
+              value = encodeMarkdownValue(value as string);
               break;
             case 'csv':
-              value = encodeCSVValue(value);
+              value = encodeCSVValue(value as string);
               break;
           }
           row.push(String(value));
@@ -101,7 +121,13 @@ export const useGridCopy = <TData extends GridBaseRow>({
       });
 
       let result = '';
+      if (json) {
+        result += '[\n';
+      }
       rows.forEach((row, i) => {
+        if (json) {
+          result += '  { ';
+        }
         if (i === 1 && type === 'markdown') {
           Object.values(maxCellLength).forEach((maxLength) => {
             result += '|' + '-'.repeat(maxLength + 2);
@@ -111,6 +137,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
         row.forEach((cell, i) => {
           switch (type) {
             case 'plain_text':
+            case 'csv':
               if (i !== 0) {
                 result += ', ';
               }
@@ -124,16 +151,22 @@ export const useGridCopy = <TData extends GridBaseRow>({
               result += ' ' + cell.padEnd(maxCellLength[colId], ' ') + ' ';
               result += '|';
               break;
-            case 'csv':
+            case 'json':
               if (i !== 0) {
                 result += ', ';
               }
-              result += cell;
+              result += JSON.stringify(headers[i]) + ': ' + cell;
               break;
           }
         });
+        if (json) {
+          result += ' }';
+        }
         result += '\n';
       });
+      if (json) {
+        result += ']\n';
+      }
 
       navigator.clipboard.writeText(result).catch((err) => console.error('Failed to copy: ', err));
     },

@@ -15,8 +15,10 @@ export interface CopyOptionsContext {
 }
 
 export const GridRangeSelectContextMenu = <TData extends GridBaseRow>({
+  event,
   context,
 }: GridContextMenuComponentProps<TData, CopyOptionsContext>): ReactElement => {
+  const developerContextMenu: boolean = !!(event?.event as { ctrlKey?: boolean })?.ctrlKey;
   const onCopy = useMemo(() => context?.onCopy, [context?.onCopy]);
   const onClick = useCallback(
     (type: CopyOptionsKey) => {
@@ -28,37 +30,41 @@ export const GridRangeSelectContextMenu = <TData extends GridBaseRow>({
   return (
     <>
       <MenuHeader>Copy as</MenuHeader>
-      {typedEntries(gridCopyOptions).map(([key, [text, icon]]) => {
+      {typedEntries(gridCopyOptions).map(([key, { icon, text, developer }]) => {
         return (
-          <MenuItem key={key} onClick={() => void onClick(key)}>
-            <div className={'copyMenuMenuItem'}>
-              <LuiIcon name={icon} alt={text} size={'md'} />
-              <div className={'copyMenuMenuItem__text'}>{text}</div>
-            </div>
-          </MenuItem>
+          (!developer || developerContextMenu) && (
+            <MenuItem key={key} onClick={() => void onClick(key)}>
+              <div className={'copyMenuMenuItem'}>
+                <LuiIcon name={icon} alt={text} size={'md'} />
+                <div className={'copyMenuMenuItem__text'}>{text}</div>
+              </div>
+            </MenuItem>
+          )
         );
       })}
       <MenuDivider />
       <MenuHeader>Set copy default</MenuHeader>
-      {typedEntries(gridCopyOptions).map(([key, [text]]) => {
+      {typedEntries(gridCopyOptions).map(([key, { text, developer }]) => {
         return (
-          <MenuItem
-            key={'x' + key}
-            onClick={(e) => {
-              context?.setCopyType(key);
-              e.keepOpen = true;
-            }}
-          >
-            <div
-              className={clsx(
-                'copyMenuMenuItem',
-                context?.copyType === key ? '' : 'copyMenuMenuItem__buttonDefault--hidden',
-              )}
+          !developer && (
+            <MenuItem
+              key={'default_' + key}
+              onClick={(e) => {
+                context?.setCopyType(key);
+                e.keepOpen = true;
+              }}
             >
-              <LuiIcon name={'ic_tick'} alt={'CSV'} size={'sm'} />
-              <div className={'copyMenuMenuItem__text'}>{text}</div>
-            </div>
-          </MenuItem>
+              <div
+                className={clsx(
+                  'copyMenuMenuItem',
+                  context?.copyType === key ? '' : 'copyMenuMenuItem__buttonDefault--hidden',
+                )}
+              >
+                <LuiIcon name={'ic_tick'} alt={'CSV'} size={'sm'} />
+                <div className={'copyMenuMenuItem__text'}>{text}</div>
+              </div>
+            </MenuItem>
+          )
         );
       })}
     </>

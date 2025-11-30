@@ -139,7 +139,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
 
   // ─── Selection ────────────────────────────────
   autoSelectFirstRow,
-  enableRangeSelection = false,
+  enableRangeSelection = true,
   externalSelectedIds,
   externalSelectedItems,
   selectColumnPinned = 'left',

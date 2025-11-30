@@ -13,6 +13,7 @@ export interface GridContextMenuComponentProps<TData extends GridBaseRow, Contex
   clickedRow: TData;
   colDef: ColDef;
   close: () => void;
+  event?: CellContextMenuEvent;
   context?: Context;
 }
 
@@ -40,6 +41,7 @@ export const useGridContextMenu = <TData extends GridBaseRow, Context extends ob
   const clickedColDefRef = useRef<ColDef>(null!);
   const selectedRowsRef = useRef<any[]>([]);
   const clickedRowRef = useRef<any>(null);
+  const eventRef = useRef<CellContextMenuEvent | undefined>(undefined);
 
   const openMenu = useCallback(
     (e: PointerEvent | null | undefined) => {
@@ -66,6 +68,7 @@ export const useGridContextMenu = <TData extends GridBaseRow, Context extends ob
       clickedColDefRef.current = event.colDef;
       selectedRowsRef.current = getSelectedRows();
       clickedRowRef.current = event.data;
+      eventRef.current = event;
 
       // This is actually a pointer event
       openMenu(event.event as PointerEvent);
@@ -90,6 +93,7 @@ export const useGridContextMenu = <TData extends GridBaseRow, Context extends ob
               selectedRows={selectedRowsRef.current}
               clickedRow={clickedRowRef.current}
               colDef={clickedColDefRef.current}
+              event={eventRef.current}
               close={closeMenu}
               context={context}
             />
