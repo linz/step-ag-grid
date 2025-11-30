@@ -1,6 +1,8 @@
 import { ColDef, EditableCallback, ICellRendererParams, ValueFormatterFunc, ValueGetterFunc } from 'ag-grid-community';
 import { ReactElement } from 'react';
 
+export const agGridSelectRowColId = 'ag-Grid-SelectionColumn';
+
 export interface GridBaseRow {
   id: string | number;
 }

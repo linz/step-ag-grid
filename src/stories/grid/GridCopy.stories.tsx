@@ -4,7 +4,7 @@ import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
 import { Meta, StoryFn } from '@storybook/react-vite';
-import { ReactElement, useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   ColDefT,
@@ -12,18 +12,15 @@ import {
   GridCell,
   GridCellBearingValueFormatter,
   GridContextProvider,
-  GridFilterButtons,
   GridFilterQuick,
   GridFilters,
   GridPopoverMenu,
   GridProps,
   GridUpdatingContextProvider,
   GridWrapper,
-  useGridFilter,
 } from '../..';
 import { GridFilterColumnsToggle, GridFilterDownloadCsvButton } from '../../components';
 import { GridCellFiller } from '../../components/GridCellFiller';
-import { KeysOfType } from '../../lui/tsUtils';
 import { SeededRandomForTests } from '../../utils/__tests__/random';
 import { waitForGridReady } from '../../utils/__tests__/storybookTestUtil';
 
@@ -59,7 +56,7 @@ export default {
 
 interface ITestRow {
   id: number;
-  position: string;
+  position?: string;
   age: number;
   height: string;
   bearing: string | number | null;
@@ -123,7 +120,17 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
   const [rowData] = useState<ITestRow[]>(() => {
     const random = new SeededRandomForTests(1000);
     let id = 1000;
-    const positions = ['Tester', 'Developer', 'Lawyer', 'Barrista """', 'Manager', 'CEO', 'CTO', 'Architect'];
+    const positions = [
+      undefined,
+      'Tester',
+      'Developer',
+      'Lawyer',
+      'Barrista """',
+      'Manager',
+      'CEO',
+      'CTO',
+      'Architect',
+    ];
     const result: ITestRow[] = [];
     for (let i = 0; i < 1000; i++) {
       result.push({
@@ -141,19 +148,6 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
     <GridWrapper maxHeight={400}>
       <GridFilters>
         <GridFilterQuick />
-        <GridFilterLessThan text="Age <" field={'age'} />
-        <GridFilterButtons<ITestRow>
-          luiButtonProps={{ style: { whiteSpace: 'nowrap' } }}
-          options={[
-            {
-              label: 'All',
-            },
-            {
-              label: '< 30',
-              filter: (row) => row.age < 30,
-            },
-          ]}
-        />
         <GridFilterColumnsToggle />
         <GridFilterDownloadCsvButton fileName={'readOnlyGrid'} />
       </GridFilters>
@@ -171,36 +165,6 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
         rowData={rowData}
       />
     </GridWrapper>
-  );
-};
-
-const GridFilterLessThan = (props: {
-  field: KeysOfType<ITestRow, number | null | undefined>;
-  text: string;
-}): ReactElement => {
-  const [value, setValue] = useState<number>();
-
-  const filter = useCallback(
-    (data: ITestRow): boolean => value == null || data[props.field] < value,
-    [props.field, value],
-  );
-
-  useGridFilter(filter);
-
-  const updateValue = (newValue: string) => {
-    try {
-      setValue(newValue.trim() == '' ? undefined : parseInt(newValue));
-    } catch {
-      // ignore number parse exception
-    }
-  };
-
-  return (
-    <div className={'GridFilter-container flex-row-center'}>
-      <div style={{ whiteSpace: 'nowrap' }}>{props.text}</div>
-      &#160;
-      <input type={'text'} defaultValue={value} onChange={(e) => updateValue(e.target.value)} style={{ width: 64 }} />
-    </div>
   );
 };
 

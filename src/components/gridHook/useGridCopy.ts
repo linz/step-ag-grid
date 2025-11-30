@@ -4,7 +4,7 @@ import { ClipboardEvent as ReactClipboardEvent, MutableRefObject, useCallback } 
 
 import { useGridContext } from '../../contexts/GridContext';
 import { CopyOptionsContext, GridRangeSelectContextMenu } from '../GridRangeSelectContextMenu';
-import { GridBaseRow } from '../types';
+import { agGridSelectRowColId, GridBaseRow } from '../types';
 import { useGridContextMenu } from './useGridContextMenu';
 import { useGridCopySettings } from './useGridCopySettings';
 import { CellLocation, GridRanges } from './useGridRangeSelection';
@@ -42,7 +42,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
       const { selectedColIds, selectedNodes } = ranges();
       const filteredSelectedColIds = selectedColIds.filter(
         (colId) =>
-          colId === 'ag-Grid-SelectionColumn' ||
+          colId === agGridSelectRowColId ||
           (colId !== 'gridCellFiller' && getColDef(colId)?.headerComponentParams?.exportable !== false),
       );
 
@@ -50,7 +50,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
       const formatters = compact(
         filteredSelectedColIds.map((colKey) => {
           return (rowNode: IRowNode): string | number | boolean | null | undefined => {
-            if (colKey === 'ag-Grid-SelectionColumn') {
+            if (colKey === agGridSelectRowColId) {
               return selectedRowIds.includes(rowNode.data.id);
             } else {
               const v = getCellValue({ rowNode, colKey });
@@ -67,7 +67,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
 
       // Get and apply headers
       const headers = filteredSelectedColIds.map((colId) => {
-        if (colId === 'ag-Grid-SelectionColumn') return type === 'json' ? 'selected' : 'Selected';
+        if (colId === agGridSelectRowColId) return type === 'json' ? 'selected' : 'Selected';
         if (json) {
           return colId;
         }

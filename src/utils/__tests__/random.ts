@@ -14,6 +14,6 @@ export class SeededRandomForTests {
   }
 
   fromArray<T>(arr: T[]): T {
-    return arr == null ? arr : arr[this.next(arr.length)];
+    return arr[this.next(arr.length - 1)];
   }
 }
