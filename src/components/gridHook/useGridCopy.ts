@@ -40,7 +40,9 @@ export const useGridCopy = <TData extends GridBaseRow>({
 
       const json = type === 'json';
       const { selectedColIds, selectedNodes } = ranges();
-      const filteredSelectedColIds = selectedColIds.filter((colId) => colId !== 'gridCellFiller');
+      const filteredSelectedColIds = selectedColIds.filter(
+        (colId) => colId !== 'gridCellFiller' && getColDef(colId)?.headerComponentParams?.exportable !== false,
+      );
 
       const selectedRowIds = getSelectedRowIds();
       const formatters = compact(
@@ -66,7 +68,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
       );
 
       // Get and apply headers
-      const headers = selectedColIds.map((colId) => {
+      const headers = filteredSelectedColIds.map((colId) => {
         if (colId === 'ag-Grid-SelectionColumn') return type === 'json' ? 'selected' : 'Selected';
         if (json) {
           return colId;
