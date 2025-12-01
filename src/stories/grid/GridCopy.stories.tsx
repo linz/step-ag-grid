@@ -32,7 +32,7 @@ export default {
     quickFilterValue: '',
     quickFilterPlaceholder: 'Quick filter...',
     selectable: false,
-    rowSelection: 'single',
+    rowSelection: 'multiple',
   }, // Storybook hangs otherwise
   parameters: {
     docs: {

@@ -657,8 +657,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       if (rangeStartRef.current && rangeEndRef.current) {
         // This is to detect difference between a single click and a click drag return to cell.
         if (rangeEndRef.current.timestamp - rangeStartRef.current.timestamp < 100) {
-          rangeStartRef.current = null;
-          rangeEndRef.current = null;
           clearRangeSelection();
         }
         return;
