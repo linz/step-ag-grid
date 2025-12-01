@@ -7,7 +7,7 @@ import { useGridContext } from '../../contexts/GridContext';
 import { CopyOptionsContext, GridRangeSelectContextMenu } from '../GridRangeSelectContextMenu';
 import { agGridSelectRowColId, GridBaseRow } from '../types';
 import { useGridContextMenu } from './useGridContextMenu';
-import { gridCopyOptions, useGridCopySettings } from './useGridCopySettings';
+import { CopyOptionsKey, gridCopyOptions, useGridCopySettings } from './useGridCopySettings';
 import { CellLocation, GridRanges } from './useGridRangeSelection';
 
 export const useGridCopy = <TData extends GridBaseRow>({
@@ -29,7 +29,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
   const { copyType, setCopyType } = useGridCopySettings();
 
   const onCopy = useCallback(
-    (type = copyType) => {
+    (type: CopyOptionsKey = copyType) => {
       const rangeStart = rangeStartRef.current;
       const rangeEnd = rangeEndRef.current;
       if (rangeStart === null || rangeEnd === null || !hasSelectedMoreThanOneCellRef.current) {
@@ -37,7 +37,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
       }
 
       if (rangeStart.rowId === rangeEnd.rowId && rangeStart.colId === rangeEnd.colId) {
-        type = 'plain_text';
+        type = 'html';
       }
 
       const json = type === 'json';
@@ -82,7 +82,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
       });
 
       const rows: string[][] = [];
-      if (type === 'csv' || type === 'markdown') {
+      if (type === 'csv' || type === 'html') {
         rows.push(headers);
       }
       selectedNodes.forEach((node) => {
@@ -106,8 +106,6 @@ export const useGridCopy = <TData extends GridBaseRow>({
           }
 
           switch (type) {
-            case 'plain_text':
-              break;
             case 'json':
               value =
                 value === 'undefined' || (value !== null && typeof value === 'object') || typeof value === 'string'
@@ -126,14 +124,32 @@ export const useGridCopy = <TData extends GridBaseRow>({
       });
 
       let result = '';
+      let html = `<table style="
+            font-family: 'Open Sans', system-ui, sans-serif;
+            font-size: 10px;
+            line-height: 10px;
+            border: 1px solid #d1d9e0;
+            border-collapse: collapse;
+          ">`;
       if (json) {
         result += '[\n';
       }
-      rows.forEach((row, i) => {
+      rows.forEach((row, rowIndex) => {
         if (json) {
           result += '  { ';
         }
-        if (i === 1 && type === 'markdown') {
+        if (rowIndex == 1) {
+          html += '<tbody style="font-weight: 400;">';
+        }
+        if (rowIndex == 0) {
+          html += '<thead style="font-weight: 600;">';
+        }
+        if (rowIndex === 0 || (rowIndex & 1) === 1) {
+          html += '<tr>';
+        } else {
+          html += '<tr style="background-color: #f6f8fa;">';
+        }
+        if (rowIndex === 1 && type === 'html') {
           Object.values(maxCellLength).forEach((maxLength) => {
             result += '|' + '-'.repeat(maxLength + 2);
           });
@@ -141,20 +157,25 @@ export const useGridCopy = <TData extends GridBaseRow>({
         }
         row.forEach((cell, i) => {
           switch (type) {
-            case 'plain_text':
             case 'csv':
               if (i !== 0) {
                 result += ', ';
               }
               result += cell;
               break;
-            case 'markdown':
+            case 'html':
               if (i === 0) {
                 result += '|';
               }
               const colId = filteredSelectedColIds[i];
               result += ' ' + cell.padEnd(maxCellLength[colId], ' ') + ' ';
               result += '|';
+              html +=
+                rowIndex === 0
+                  ? '<th style="border: 1px solid #d1d9e0; padding:6px 13px; text-align: left;">'
+                  : '<td style="border: 1px solid #d1d9e0; padding:6px 13px;">';
+              html += cell;
+              html += rowIndex === 0 ? '</th>' : '</td>';
               break;
             case 'json':
               if (i !== 0) {
@@ -164,6 +185,13 @@ export const useGridCopy = <TData extends GridBaseRow>({
               break;
           }
         });
+        html += '</tr>';
+        if (rowIndex == 0) {
+          html += '</thead>';
+        }
+        if (rowIndex == rows.length - 1) {
+          html += '</tbody>';
+        }
         if (json) {
           result += ' }';
         }
@@ -172,13 +200,24 @@ export const useGridCopy = <TData extends GridBaseRow>({
       if (json) {
         result += ']\n';
       }
+      html += '</table>';
 
       showToast({
         message: `${gridCopyOptions[type].text} copied`,
         messageType: 'toast',
         messageLevel: 'info',
       });
-      navigator.clipboard.writeText(result).catch((err) => console.error('Failed to copy: ', err));
+      console.log({ html, result });
+      if (type === 'html') {
+        const clipboardItem = new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([result], { type: 'text/plain' }), // fallback
+        });
+
+        void navigator.clipboard.write([clipboardItem]).catch((err) => console.error('Failed to copy: ', err));
+      } else {
+        void navigator.clipboard.writeText(result).catch((err) => console.error('Failed to copy: ', err));
+      }
     },
     [getCellValue, ranges, copyType],
   );

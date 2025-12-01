@@ -173,6 +173,7 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
     hasSelectedMoreThanOneCellRef.current = false;
     setRefreshIntervalEnabled(false);
 
+    hasSelectedMoreThanOneCellRef.current = false;
     rangeStartRef.current = null;
     rangeEndRef.current = null;
 
@@ -220,7 +221,13 @@ export const useGridRangeSelection = <TData extends GridBaseRow>({
   );
 
   const onCellMouseDown = useCallback(
-    (e: CellMouseDownEvent) => onCellMouseOver(e as unknown as CellMouseOverEvent, true),
+    (e: CellMouseDownEvent) => {
+      const button = (e.event as { buttons?: number }).buttons;
+      if (button === 1) {
+        clearRangeSelection();
+      }
+      onCellMouseOver(e as unknown as CellMouseOverEvent, true);
+    },
     [onCellMouseOver],
   );
 
