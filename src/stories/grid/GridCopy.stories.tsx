@@ -3,6 +3,7 @@ import '../../styles/index.scss';
 import '@linzjs/lui/dist/scss/base.scss';
 import '@linzjs/lui/dist/fonts';
 
+import { LuiMessagingContextProvider } from '@linzjs/lui';
 import { Meta, StoryFn } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
 
@@ -43,13 +44,15 @@ export default {
   },
   decorators: [
     (Story) => (
-      <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
-        <GridUpdatingContextProvider>
-          <GridContextProvider>
-            <Story />
-          </GridContextProvider>
-        </GridUpdatingContextProvider>
-      </div>
+      <LuiMessagingContextProvider version="v2">
+        <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
+          <GridUpdatingContextProvider>
+            <GridContextProvider>
+              <Story />
+            </GridContextProvider>
+          </GridUpdatingContextProvider>
+        </div>
+      </LuiMessagingContextProvider>
     ),
   ],
 } as Meta<typeof Grid>;

@@ -1,3 +1,4 @@
+import { useShowLUIMessage } from '@linzjs/lui';
 import { CellContextMenuEvent, IRowNode } from 'ag-grid-community';
 import { compact } from 'lodash-es';
 import { ClipboardEvent as ReactClipboardEvent, MutableRefObject, useCallback } from 'react';
@@ -6,7 +7,7 @@ import { useGridContext } from '../../contexts/GridContext';
 import { CopyOptionsContext, GridRangeSelectContextMenu } from '../GridRangeSelectContextMenu';
 import { agGridSelectRowColId, GridBaseRow } from '../types';
 import { useGridContextMenu } from './useGridContextMenu';
-import { useGridCopySettings } from './useGridCopySettings';
+import { gridCopyOptions, useGridCopySettings } from './useGridCopySettings';
 import { CellLocation, GridRanges } from './useGridRangeSelection';
 
 export const useGridCopy = <TData extends GridBaseRow>({
@@ -22,6 +23,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
   hasSelectedMoreThanOneCellRef: MutableRefObject<boolean>;
   cellContextMenu: (event: CellContextMenuEvent) => void;
 }) => {
+  const showToast = useShowLUIMessage();
   const { getSelectedRowIds } = useGridContext<TData>();
   const { getColDef, getCellValue } = useGridContext<TData>();
   const { copyType, setCopyType } = useGridCopySettings();
@@ -171,6 +173,11 @@ export const useGridCopy = <TData extends GridBaseRow>({
         result += ']\n';
       }
 
+      showToast({
+        message: `${gridCopyOptions[type].text} copied`,
+        messageType: 'toast',
+        messageLevel: 'info',
+      });
       navigator.clipboard.writeText(result).catch((err) => console.error('Failed to copy: ', err));
     },
     [getCellValue, ranges, copyType],
