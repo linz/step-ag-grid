@@ -13,7 +13,7 @@ import debounce from 'debounce-promise';
 import { compact, defer, delay, difference, filter, isEmpty, last, pull, remove, sortBy, sumBy } from 'lodash-es';
 import { PropsWithChildren, ReactElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { ColDefT, GridBaseRow } from '../components';
+import { agGridSelectRowColId, ColDefT, GridBaseRow } from '../components';
 import { GridCellFillerColId, isGridCellFiller } from '../components/GridCellFiller';
 import { getColId, isFlexColumn } from '../components/gridUtil';
 import { fnOrVar, isNotEmpty, sanitiseFileName, wait } from '../utils/util';
@@ -82,6 +82,8 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
     },
     [gridApi],
   );
+
+  const getCellValue = useCallback<GridApi['getCellValue']>((...props) => gridApi?.getCellValue(...props), [gridApi]);
 
   /**
    * Scroll row into view by Id.
@@ -302,7 +304,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
                     // It may be that the first cell is the selection cell, this doesn't exist as a colDef
                     // so instead, I just try and select it.  If it doesn't exist selection will stay on the
                     // previously focused cell
-                    gridApi.setFocusedCell(rowIndex, 'ag-Grid-SelectionColumn');
+                    gridApi.setFocusedCell(rowIndex, agGridSelectRowColId);
                   }
                 }, 100);
             }
@@ -902,6 +904,7 @@ export const GridContextProvider = <TData extends GridBaseRow>(props: PropsWithC
         getSelectedRowIds,
         getFilteredSelectedRowIds,
         getFirstRowId,
+        getCellValue,
         editingCells,
         ensureRowVisible,
         ensureSelectedRowIsVisible,

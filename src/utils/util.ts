@@ -1,6 +1,8 @@
 import { isEmpty, negate } from 'lodash-es';
 import natsort from 'natsort';
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export const isNotEmpty = negate(isEmpty);
 
 export const wait = (timeoutMs: number) =>

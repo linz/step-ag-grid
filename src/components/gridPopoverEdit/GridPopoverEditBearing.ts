@@ -11,6 +11,9 @@ import { GridFormEditBearing, GridFormEditBearingProps } from '../gridForm/GridF
 import { GenericCellColDef } from '../gridRender/GridRenderGenericCell';
 import { ColDefT, GridBaseRow } from '../types';
 
+export const GridCellBearingValueFormatter = (params: ValueFormatterParams) =>
+  bearingValueFormatter(params.value) ?? '';
+
 const GridPopoverEditBearingLike = <TData extends GridBaseRow, TValue = any>(
   colDef: GenericCellColDef<TData, TValue>,
   props: GenericCellEditorProps<GridFormEditBearingProps<TData>> & {

@@ -7,8 +7,12 @@
   margin-right: auto;
 }
 
-.ag-unselectable .ag-cell:not([col-id="ag-Grid-SelectionColumn"]) {
-  user-select: text !important;
+.ag-cell:not([col-id="ag-Grid-SelectionColumn"]) {
+  user-select: text;
+}
+
+.rangeSelectingMultiple .ag-cell {
+  user-select: none;
 }
 
 .LabelPreferencesPanelGridCellAlignCenter .ag-cell-wrapper, .LabelPreferencesPanelGridCellAlignCenter .GridCell-container {
@@ -156,4 +160,24 @@ div.ag-ltr div.ag-header-cell-resize {
   color: lui.$fuscous;
   font-size: lui.$base-font-size;
   @include lui.font-regular();
+}
+
+div.ag-row div.ag-cell.rangeSelect {
+  background-color: rgba(72, 160, 244, 0.2);
+}
+
+div.ag-row div.ag-cell.rangeSelectLeft {
+  border-left: 3px solid #48a0f4;
+}
+
+div.ag-row div.ag-cell.rangeSelectRight {
+  border-right: 3px solid #48a0f4;
+}
+
+div.ag-row div.ag-cell.rangeSelectTop {
+  border-top: 3px solid #48a0f4;
+}
+
+div.ag-row div.ag-cell.rangeSelectBottom {
+  border-bottom: 3px solid #48a0f4;
 }

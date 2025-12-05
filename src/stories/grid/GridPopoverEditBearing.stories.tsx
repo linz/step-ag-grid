@@ -51,8 +51,8 @@ interface ITestRow {
   bearing: string | number | null;
 }
 
-const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) => {
-  const [externalSelectedItems, setExternalSelectedItems] = useState<any[]>([]);
+const GridPopoverEditBearingTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITestRow>) => {
+  const [externalSelectedIds, setExternalSelectedIds] = useState<number[]>([]);
   const columnDefs: ColDefT<ITestRow>[] = useMemo(
     () => [
       GridCell({
@@ -111,8 +111,8 @@ const GridPopoverEditBearingTemplate: StoryFn<typeof Grid> = (props: GridProps) 
         data-testid={'bearingsTestTable'}
         {...props}
         readOnly={false}
-        externalSelectedItems={externalSelectedItems}
-        setExternalSelectedItems={setExternalSelectedItems}
+        externalSelectedIds={externalSelectedIds}
+        setExternalSelectedIds={setExternalSelectedIds}
         columnDefs={columnDefs}
         rowData={rowData}
         domLayout={'autoHeight'}

@@ -1,0 +1,61 @@
+@use '../../node_modules/@linzjs/lui/dist/scss/Core' as lui;
+
+.GridContextMenu {
+  li.szh-menu__header {
+    color: lui.$fuscous;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  li.szh-menu__item {
+    padding-left: 16px;
+    padding-right: 16px;
+
+    .copyMenuMenuItem {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copyMenuMenuItem__text {
+      color: lui.$charcoal;
+      font-size: 16px;
+      font-weight: 400;
+      width: 80px;
+    }
+
+    .copyMenuMenuItem__buttonDefault {
+      display: flex;
+      background: none;
+      padding: 6px 6px;
+      border: 2px solid transparent;
+
+      &.copyMenuMenuItem__buttonDefault--hidden:hover {
+        border: 2px solid lui.$charcoal;
+      }
+    }
+
+    .copyMenuMenuItem__buttonDefault--hidden .LuiIcon {
+      fill: transparent;
+    }
+    .copyMenuMenuItem__buttonDefault--hidden:hover .LuiIcon {
+      fill: lui.$fuscous;
+    }
+
+    .LuiIcon {
+      fill: lui.$fuscous;
+    }
+
+    .LuiIcon[data-icon="ic_tick"] {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+  }
+
+  li.szh-menu__item--hover {
+    background-color: lui.$polar;
+  }
+}

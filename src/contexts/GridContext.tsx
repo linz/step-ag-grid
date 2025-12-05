@@ -70,6 +70,7 @@ export interface GridContextType<TData extends GridBaseRow> {
   onBulkEditingComplete: () => Promise<void> | void;
   setOnBulkEditingComplete: (callback: (() => Promise<void> | void) | undefined) => void;
   showNoRowsOverlay: () => void;
+  getCellValue: GridApi['getCellValue'];
 }
 
 const NoContext = <T,>(): T => {
@@ -80,6 +81,7 @@ const NoContext = <T,>(): T => {
 export const GridContext = createContext<GridContextType<any>>({
   gridReady: false,
   gridRenderState: () => null,
+  getCellValue: NoContext,
   getColDef: NoContext,
   getColumns: NoContext,
   getColumnIds: NoContext,

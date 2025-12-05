@@ -1,6 +1,6 @@
 export const bearingValueFormatter = (value: any): string => {
   const safeValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (safeValue == null) {
+  if (safeValue == null || Number.isNaN(safeValue)) {
     return '–';
   }
   return convertDDToDMS(safeValue, false);
@@ -8,7 +8,7 @@ export const bearingValueFormatter = (value: any): string => {
 
 export const bearingCorrectionValueFormatter = (value: any): string => {
   const safeValue = value;
-  if (safeValue == null) {
+  if (safeValue == null || Number.isNaN(safeValue)) {
     return '–';
   }
   if (typeof safeValue === 'string') {

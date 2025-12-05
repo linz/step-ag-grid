@@ -5,6 +5,7 @@ import { useGridPopoverContext } from '../../contexts/GridPopoverContext';
 import { GridSubComponentContext } from '../../contexts/GridSubComponentContext';
 import { FocusableItem, MenuDivider, MenuItem, SubMenu } from '../../react-menu3';
 import { ClickEvent } from '../../react-menu3/types';
+import { MaybePromise } from '../../utils/util';
 import { ComponentLoadingWrapper } from '../ComponentLoadingWrapper';
 import { CellEditorCommon } from '../GridCell';
 import { useGridPopoverHook } from '../GridPopoverHook';
@@ -33,7 +34,7 @@ export interface SelectedMenuOptionResult<TData extends GridBaseRow> extends Men
 export interface MenuOption<TData extends GridBaseRow> {
   label: ReactElement | string | MenuSeparatorType;
   subMenu?: () => ReactElement;
-  action?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => Promise<void>;
+  action?: (props: { selectedRows: TData[]; menuOption: SelectedMenuOptionResult<TData> }) => MaybePromise<void>;
   disabled?: string | boolean;
   hidden?: boolean;
   subComponent?: (props: any) => ReactElement;

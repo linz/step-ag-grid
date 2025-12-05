@@ -8,6 +8,7 @@ import {
   CellKeyDownEvent,
   ColDef,
   ColGroupDef,
+  ColumnMovedEvent,
   ColumnResizedEvent,
   EditableCallback,
   EditableCallbackParams,
@@ -15,6 +16,7 @@ import {
   GridOptions,
   GridReadyEvent,
   GridSizeChangedEvent,
+  IRowNode,
   ModelUpdatedEvent,
   ModuleRegistry,
   RowClickedEvent,
@@ -37,6 +39,8 @@ import { compareNaturalInsensitive, fnOrVar, isNotEmpty } from '../utils/util';
 import { clickInputWhenContainingCellClicked } from './clickInputWhenContainingCellClicked';
 import { GridHeaderSelect } from './gridHeader';
 import { GridContextMenuComponent, useGridContextMenu } from './gridHook';
+import { useGridCopy } from './gridHook/useGridCopy';
+import { CellLocation, useGridRangeSelection } from './gridHook/useGridRangeSelection';
 import { GridNoRowsOverlay } from './GridNoRowsOverlay';
 import { usePostSortRowsHook } from './PostSortRowsHook';
 import { GridBaseRow, GridOnRowDragEndProps } from './types';
@@ -44,135 +48,148 @@ import { GridBaseRow, GridOnRowDragEndProps } from './types';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export interface GridProps<TData extends GridBaseRow = GridBaseRow> {
-  readOnly?: boolean; // set all editables to false when read only, make all styles black, otherwise style is gray for not editable
-  defaultPostSort?: boolean; // Retain sort order after edit, Defaults to true.
-  selectable?: boolean;
-  enableClickSelection?: boolean;
-  enableSelectionWithoutKeys?: boolean;
-  hideSelectColumn?: boolean;
-  theme?: string; // should have prefix ag-theme-
   ['data-testid']?: string;
-  domLayout?: GridOptions['domLayout'];
-  externalSelectedItems?: TData[];
-  externalSelectedIds?: TData['id'][];
-  setExternalSelectedItems?: (items: TData[]) => void;
-  setExternalSelectedIds?: (ids: TData['id'][]) => void;
-  defaultColDef?: GridOptions['defaultColDef'];
-  columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
-  rowData: GridOptions['rowData'];
-  selectColumnPinned?: ColDef['pinned'];
-  noRowsOverlayText?: string;
-  noRowsMatchingOverlayText?: string;
-  animateRows?: boolean;
-  rowHeight?: number;
-  rowClassRules?: GridOptions['rowClassRules'];
-  rowSelection?: 'single' | 'multiple';
-  autoSelectFirstRow?: boolean;
-  onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
-  onColumnMoved?: GridOptions['onColumnMoved'];
-  rowDragText?: GridOptions['rowDragText'];
-  onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
-  alwaysShowVerticalScroll?: boolean;
-  suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
+  theme?: string;
+
+  // ─── Grid State ────────────────────────────────────────────────
+  loading?: boolean;
+  readOnly?: boolean;
   suppressReadOnlyStyle?: boolean;
-  /**
-   * When the grid is rendered using sizeColumns=="auto" this is called initially with the required container size to fit all content.
-   * This allows you set the size of the panel to fit perfectly.
-   */
-  onContentSize?: (props: { width: number }) => void;
-  /**
-   * <ul>
-   * <li>"none" to use aggrid defaults.</li>
-   * <li>"fit" will adjust columns to fit within panel via min/max/initial sizing.
-   * <b>Note:</b> This is only really needed if you have auto-height columns which prevents "auto" from working.
-   * </li>
-   * <li>"auto" will size columns based on their content but still obeying min/max sizing.</li>
-   * <li>"auto-skip-headers" (default) same as auto but does not take headers into account.</li>
-   * </ul>
-   *
-   * If you want to stretch to container width if width is greater than the container add a flex column.
-   */
+
+  // ─── Data & Columns ────────────────────────────────────────────
+  columnDefs: ColDef<TData>[] | ColGroupDef<TData>[];
+  defaultColDef?: GridOptions['defaultColDef'];
+  defaultPostSort?: boolean;
+  domLayout?: GridOptions['domLayout'];
+  pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
+  pinnedTopRowData?: GridOptions['pinnedTopRowData'];
+  rowData: GridOptions['rowData'];
+  rowClassRules?: GridOptions['rowClassRules'];
+  rowHeight?: number;
+  rowSelection?: 'single' | 'multiple';
   sizeColumns?: 'fit' | 'auto' | 'auto-skip-headers' | 'none';
-  /**
-   * On first don't return a content size larger than this.
-   */
-  maxInitialWidth?: number;
-  /**
-   * When pressing tab whilst editing the grid will select and edit the next cell if available.
-   * Once the last cell to edit closes this callback is called.
-   */
+
+  // ─── Selection ────────────────────────────────────────────────
+  autoSelectFirstRow?: boolean;
+  enableClickSelection?: boolean;
+  enableRangeSelection?: boolean;
+  enableSelectionWithoutKeys?: boolean;
+  externalSelectedIds?: TData['id'][];
+  externalSelectedItems?: TData[];
+  hideSelectColumn?: boolean;
+  selectColumnPinned?: ColDef['pinned'];
+  selectable?: boolean;
+  setExternalSelectedIds?: (ids: TData['id'][]) => void;
+  setExternalSelectedItems?: (items: TData[]) => void;
+
+  // ─── Editing ──────────────────────────────────────────────────
   onBulkEditingComplete?: () => Promise<void> | void;
-
-  /**
-   * Context menu definition if required.
-   */
-  contextMenu?: GridContextMenuComponent<TData>;
-
-  /**
-   * Whether to select row on context menu.
-   */
-  contextMenuSelectRow?: boolean;
-
-  /**
-   * Defaults to false.
-   */
   singleClickEdit?: boolean;
 
-  loading?: boolean;
-  suppressCellFocus?: boolean;
-  pinnedTopRowData?: GridOptions['pinnedTopRowData'];
-  pinnedBottomRowData?: GridOptions['pinnedBottomRowData'];
+  // ─── Context Menu ─────────────────────────────────────────────
+  contextMenu?: GridContextMenuComponent<TData>;
+  contextMenuSelectRow?: boolean;
+
+  // ─── Callbacks / Events ───────────────────────────────────────
+  onCellFocused?: (props: { colDef: ColDef<TData>; data: TData }) => void;
+  onColumnMoved?: GridOptions['onColumnMoved'];
+  onContentSize?: (props: { width: number }) => void;
+
+  /**
+   * @deprecated You should drive your app off selection states. This will be deleted.
+   */
   onRowClicked?: (event: RowClickedEvent) => void;
+  /**
+   * @deprecated You should drive your app off selection states. This will be deleted.
+   */
   onRowDoubleClicked?: (event: RowDoubleClickedEvent) => void;
+  onRowDragEnd?: (props: GridOnRowDragEndProps<TData>) => Promise<void> | void;
+
+  // ─── Row Behavior ─────────────────────────────────────────────
+  animateRows?: boolean;
+  alwaysShowVerticalScroll?: boolean;
+  rowDragText?: GridOptions['rowDragText'];
+
+  // ─── Overlays / Messages ──────────────────────────────────────
+  noRowsOverlayText?: string;
+  noRowsMatchingOverlayText?: string;
+
+  // ─── Miscellaneous ────────────────────────────────────────────
+  maxInitialWidth?: number;
+  suppressCellFocus?: boolean;
+  suppressColumnVirtualization?: GridOptions['suppressColumnVirtualisation'];
 }
 
 /**
  * Wrapper for AgGrid to add commonly used functionality.
  */
 export const Grid = <TData extends GridBaseRow = GridBaseRow>({
-  'data-testid': dataTestId,
-  defaultPostSort = true,
-  rowSelection = 'multiple',
-  suppressColumnVirtualization = true,
   theme = 'ag-theme-step-default',
-  sizeColumns = 'auto',
-  selectColumnPinned = 'left',
-  contextMenuSelectRow = false,
-  singleClickEdit = false,
+  'data-testid': dataTestId,
+
+  // ─── Grid State ───────────────────────────────
+  suppressReadOnlyStyle = false,
+
+  // ─── Data & Columns ───────────────────────────
+  defaultPostSort = true,
   rowData,
   rowHeight = theme === 'ag-theme-step-default' ? 40 : theme === 'ag-theme-step-compact' ? 36 : 40,
-  selectable,
+  rowSelection = 'multiple',
+  sizeColumns = 'auto',
+
+  // ─── Selection ────────────────────────────────
   autoSelectFirstRow,
-  onCellFocused: paramsOnCellFocused,
-  maxInitialWidth,
-  suppressReadOnlyStyle = false,
-  externalSelectedItems,
-  setExternalSelectedItems,
+  enableRangeSelection = true,
   externalSelectedIds,
+  externalSelectedItems,
+  selectColumnPinned = 'left',
+  selectable,
   setExternalSelectedIds,
+  setExternalSelectedItems,
+
+  // ─── Editing ──────────────────────────────────
+  singleClickEdit = false,
+
+  // ─── Context Menu ─────────────────────────────
+  contextMenuSelectRow = false,
+  contextMenu,
+
+  // ─── Callbacks / Events ───────────────────────
+  onCellFocused: paramsOnCellFocused,
+  onColumnMoved,
+
+  // ─── Row Behavior ─────────────────────────────
+  suppressColumnVirtualization = true,
+
+  // ─── Miscellaneous ────────────────────────────
+  maxInitialWidth,
+
+  // ─── Spread Remaining Params ──────────────────
   ...params
 }: GridProps<TData>): ReactElement => {
   const {
+    setApis,
+    setExternallySelectedItemsAreInSync,
+    setOnBulkEditingComplete,
     gridReady,
     gridRenderState,
-    setApis,
-    ensureRowVisible,
-    getFirstRowId,
-    selectRowsById,
-    focusByRowById,
-    ensureSelectedRowIsVisible,
+    externallySelectedItemsAreInSync,
+    showNoRowsOverlay,
     autoSizeColumns,
     sizeColumnsToFit,
-    externallySelectedItemsAreInSync,
-    setExternallySelectedItemsAreInSync,
-    isExternalFilterPresent,
     doesExternalFilterPass,
-    setOnBulkEditingComplete,
+    ensureRowVisible,
+    ensureSelectedRowIsVisible,
+    focusByRowById,
     getColDef,
-    showNoRowsOverlay,
+    getFirstRowId,
+    isExternalFilterPresent,
     prePopupOps,
+    selectRowsById,
+
     startCellEditing: propStartCellEditing,
   } = useGridContext<TData>();
+
   // CellEditingStop event happens too much for one edit
   const startedEditRef = useRef(false);
   const startCellEditing = useCallback(
@@ -328,7 +345,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       return;
     }
     hasSelectedFirstItem.current = true;
-    if (isNotEmpty(rowData) && isEmpty(externalSelectedItems)) {
+    if (isNotEmpty(rowData) && isEmpty(externalSelectedItems) && isEmpty(externalSelectedIds)) {
       const firstRowId = getFirstRowId();
       if (autoSelectFirstRow && selectable) {
         selectRowsById([firstRowId]);
@@ -346,6 +363,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     selectRowsById,
     getFirstRowId,
     selectable,
+    externalSelectedIds,
   ]);
 
   /**
@@ -544,19 +562,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     [startCellEditing],
   );
 
-  /**
-   * Handle single click edits
-   */
-  const onCellClicked = useCallback(
-    (event: CellClickedEvent) => {
-      const editable = fnOrVar(event.colDef?.editable, event);
-      if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
-        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
-      }
-    },
-    [singleClickEdit, startCellEditing],
-  );
-
   const onCellEditingStopped = useCallback(
     (event: AgGridEvent<TData>) => {
       if (!startedEditRef.current) {
@@ -611,6 +616,93 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       }
     },
     [prePopupOps, startCellEditing],
+  );
+
+  const { cellContextMenu, contextMenuComponent } = useGridContextMenu({
+    contextMenu,
+    contextMenuSelectRow,
+  });
+
+  const hasSelectedMoreThanOneCellRef = useRef(false);
+  const rangeStartRef = useRef<CellLocation | null>(null);
+  const rangeEndRef = useRef<CellLocation | null>(null);
+  const rangeSortedNodesRef = useRef<IRowNode<TData>[] | null>(null);
+
+  const { clearRangeSelection, ranges, onCellMouseDown, onCellMouseOver } = useGridRangeSelection({
+    enableRangeSelection,
+    gridDivRef,
+    rangeStartRef,
+    rangeEndRef,
+    hasSelectedMoreThanOneCellRef,
+    rangeSortedNodesRef,
+  });
+
+  const { onCopyEvent, rangeSelectInterceptContextMenu, rangeSelectContextMenuComponent } = useGridCopy({
+    ranges,
+    rangeStartRef,
+    rangeEndRef,
+    hasSelectedMoreThanOneCellRef,
+    cellContextMenu,
+  });
+
+  const onSortChanged = useCallback(() => {
+    clearRangeSelection();
+    ensureSelectedRowIsVisible();
+  }, [clearRangeSelection, ensureSelectedRowIsVisible]);
+
+  /**
+   * Handle single click edits
+   */
+  const onCellClicked = useCallback(
+    (event: CellClickedEvent) => {
+      if (rangeStartRef.current && rangeEndRef.current) {
+        // This is to detect difference between a single click and a click drag return to cell.
+        if (rangeEndRef.current.timestamp - rangeStartRef.current.timestamp < 100) {
+          clearRangeSelection();
+        }
+        return;
+      }
+      const editable = fnOrVar(event.colDef?.editable, event);
+      if ((editable && event.colDef.singleClickEdit) ?? singleClickEdit) {
+        void startCellEditing({ rowId: event.data.id, colId: event.column.getColId() });
+      }
+    },
+    [clearRangeSelection, singleClickEdit, startCellEditing],
+  );
+
+  /**
+   * Set of column I'd's that are prevented from auto-sizing as they are user set
+   */
+  const userSizedColIds = useRef(new Map<string, number>());
+
+  /**
+   * Lock/unlock column width on user edit/reset.
+   */
+  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
+    const colId = e.column?.getColId();
+    if (colId == null) {
+      return;
+    }
+    const width = e.column?.getActualWidth();
+    if (width == null) {
+      return;
+    }
+    switch (e.source) {
+      case 'uiColumnResized':
+        userSizedColIds.current.set(colId, width);
+        break;
+      case 'autosizeColumns':
+        userSizedColIds.current.delete(colId);
+        break;
+    }
+  }, []);
+
+  const columnMoved = useCallback(
+    (e: ColumnMovedEvent<TData>) => {
+      clearRangeSelection();
+      onColumnMoved?.(e);
+    },
+    [clearRangeSelection, onColumnMoved],
   );
 
   /**
@@ -729,40 +821,6 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     }
     prevLoading.current = newLoading;
   }, [params.loading, rowData, showNoRowsOverlay]);
-
-  /**
-   * Set of column I'd's that are prevented from auto-sizing as they are user set
-   */
-  const userSizedColIds = useRef(new Map<string, number>());
-
-  /**
-   * Lock/unlock column width on user edit/reset.
-   */
-  const onColumnResized = useCallback((e: ColumnResizedEvent) => {
-    const colId = e.column?.getColId();
-    if (colId == null) {
-      return;
-    }
-    const width = e.column?.getActualWidth();
-    if (width == null) {
-      return;
-    }
-    switch (e.source) {
-      case 'uiColumnResized':
-        userSizedColIds.current.set(colId, width);
-        /*const colDef = e.column?.getColDef();
-          if (!colDef?.flex) {
-            onGridResize(e);
-          }*/
-        break;
-      case 'autosizeColumns':
-        userSizedColIds.current.delete(colId);
-        //onGridResize(e);
-        break;
-    }
-  }, []);
-
-  const gridContextMenu = useGridContextMenu({ contextMenu: params.contextMenu, contextMenuSelectRow });
 
   const startDragYRef = useRef<number | null>(null);
 
@@ -929,9 +987,18 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         }
         return false;
       },
-      onCellClicked: clickInputWhenContainingCellClicked,
+      // enableClickSelection = true means ag-grid auto selects row if you click outside the checkbox
+      // if it's false we have to do it.
+      onCellClicked: params.enableClickSelection ? undefined : clickInputWhenContainingCellClicked,
     };
-  }, [params.hideSelectColumn, params.onRowDragEnd, rowSelection, selectColumnPinned, selectable]);
+  }, [
+    params.hideSelectColumn,
+    params.onRowDragEnd,
+    rowSelection,
+    selectColumnPinned,
+    selectable,
+    params.enableClickSelection,
+  ]);
 
   const onGridSizeChanged = useCallback(
     (event: GridSizeChangedEvent<TData>) => {
@@ -953,10 +1020,52 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
         gridReady && rowData && autoSized && 'Grid-ready',
       )}
     >
-      {gridContextMenu.component}
-      <div style={{ flex: 1 }} ref={gridDivRef}>
+      {contextMenuComponent}
+      {rangeSelectContextMenuComponent}
+      <div style={{ flex: 1 }} ref={gridDivRef} onCopy={onCopyEvent}>
         <AgGridReact
           theme={'legacy'}
+          domLayout={params.domLayout}
+          defaultColDef={defaultColDef}
+          columnDefs={columnDefsAdjusted}
+          getRowId={getRowId}
+          rowData={rowData}
+          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
+          animateRows={params.animateRows ?? false}
+          doesExternalFilterPass={doesExternalFilterPass}
+          isExternalFilterPresent={isExternalFilterPresent}
+          maintainColumnOrder={true}
+          noRowsOverlayComponent={noRowsOverlayComponent}
+          onCellClicked={onCellClicked}
+          onCellContextMenu={rangeSelectInterceptContextMenu}
+          onCellDoubleClicked={onCellDoubleClick}
+          onCellEditingStopped={onCellEditingStopped}
+          onCellFocused={onCellFocused}
+          onCellKeyDown={onCellKeyPress}
+          onCellMouseDown={onCellMouseDown}
+          onCellMouseOver={onCellMouseOver}
+          onColumnMoved={columnMoved}
+          onColumnResized={onColumnResized}
+          onColumnVisible={() => void setInitialContentSize()}
+          onGridReady={onGridReady}
+          onGridSizeChanged={onGridSizeChanged}
+          onModelUpdated={onModelUpdated}
+          onRowClicked={params.onRowClicked}
+          onRowDataUpdated={onRowDataUpdated}
+          onRowDoubleClicked={params.onRowDoubleClicked}
+          onRowDragCancel={clearHighlightRowClasses}
+          onRowDragEnd={onRowDragEnd}
+          onRowDragMove={onRowDragMove}
+          onSelectionChanged={synchroniseExternalStateToGridSelection}
+          onSortChanged={onSortChanged}
+          pinnedBottomRowData={params.pinnedBottomRowData}
+          pinnedTopRowData={params.pinnedTopRowData}
+          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
+          preventDefaultOnContextMenu={true}
+          quickFilterParser={quickFilterParser}
+          rowClassRules={params.rowClassRules}
+          rowDragText={params.rowDragText}
+          rowHeight={rowHeight}
           rowSelection={
             selectable
               ? {
@@ -971,48 +1080,9 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
               : undefined
           }
           selectionColumnDef={selectionColumnDef}
-          rowHeight={rowHeight}
-          animateRows={params.animateRows ?? false}
-          rowClassRules={params.rowClassRules}
-          getRowId={getRowId}
-          suppressColumnVirtualisation={suppressColumnVirtualization}
-          suppressClickEdit={true}
-          onGridSizeChanged={onGridSizeChanged}
-          onColumnVisible={() => void setInitialContentSize()}
-          onRowDataUpdated={onRowDataUpdated}
-          onCellFocused={onCellFocused}
-          onCellKeyDown={onCellKeyPress}
-          onCellClicked={onCellClicked}
-          onCellDoubleClicked={onCellDoubleClick}
-          onCellEditingStopped={onCellEditingStopped}
-          domLayout={params.domLayout}
-          onColumnResized={onColumnResized}
-          defaultColDef={defaultColDef}
-          columnDefs={columnDefsAdjusted}
-          rowData={rowData}
-          postSortRows={params.onRowDragEnd || !defaultPostSort ? undefined : postSortRows}
-          onModelUpdated={onModelUpdated}
-          onGridReady={onGridReady}
-          onSortChanged={ensureSelectedRowIsVisible}
-          quickFilterParser={quickFilterParser}
-          onSelectionChanged={synchroniseExternalStateToGridSelection}
-          onColumnMoved={params.onColumnMoved}
-          noRowsOverlayComponent={noRowsOverlayComponent}
-          alwaysShowVerticalScroll={params.alwaysShowVerticalScroll}
-          isExternalFilterPresent={isExternalFilterPresent}
-          doesExternalFilterPass={doesExternalFilterPass}
-          maintainColumnOrder={true}
-          preventDefaultOnContextMenu={true}
-          onCellContextMenu={gridContextMenu.cellContextMenu}
-          rowDragText={params.rowDragText}
-          onRowDragCancel={clearHighlightRowClasses}
-          onRowDragMove={onRowDragMove}
-          onRowDragEnd={onRowDragEnd}
           suppressCellFocus={params.suppressCellFocus}
-          pinnedTopRowData={params.pinnedTopRowData}
-          pinnedBottomRowData={params.pinnedBottomRowData}
-          onRowClicked={params.onRowClicked}
-          onRowDoubleClicked={params.onRowDoubleClicked}
+          suppressClickEdit={true}
+          suppressColumnVirtualisation={suppressColumnVirtualization}
           suppressStartEditOnTab={true}
         />
       </div>
