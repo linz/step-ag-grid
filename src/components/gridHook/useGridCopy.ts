@@ -207,7 +207,7 @@ export const useGridCopy = <TData extends GridBaseRow>({
         messageType: 'toast',
         messageLevel: 'info',
       });
-      console.log({ html, result });
+
       if (type === 'html') {
         const clipboardItem = new ClipboardItem({
           'text/html': new Blob([html], { type: 'text/html' }),

@@ -2,7 +2,7 @@ import { IconName } from '@linzjs/lui/dist/components/LuiIcon/LuiIcon';
 import { useCallback, useState } from 'react';
 
 export const gridCopyOptions: Record<string, { text: string; icon: IconName; developer?: boolean }> = {
-  html: { text: 'Text/HTML', icon: 'ic_dealings' },
+  html: { text: 'Text\xa0/\xa0HTML', icon: 'ic_product_list' },
   csv: { text: 'CSV', icon: 'ic_csv_file' },
   json: { text: 'Json', icon: 'ic_file_attached_outline', developer: true },
 };

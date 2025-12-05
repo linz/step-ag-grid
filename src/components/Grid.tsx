@@ -345,7 +345,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
       return;
     }
     hasSelectedFirstItem.current = true;
-    if (isNotEmpty(rowData) && isEmpty(externalSelectedItems)) {
+    if (isNotEmpty(rowData) && isEmpty(externalSelectedItems) && isEmpty(externalSelectedIds)) {
       const firstRowId = getFirstRowId();
       if (autoSelectFirstRow && selectable) {
         selectRowsById([firstRowId]);
@@ -363,6 +363,7 @@ export const Grid = <TData extends GridBaseRow = GridBaseRow>({
     selectRowsById,
     getFirstRowId,
     selectable,
+    externalSelectedIds,
   ]);
 
   /**

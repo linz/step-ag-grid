@@ -45,7 +45,7 @@ export default {
   decorators: [
     (Story) => (
       <LuiMessagingContextProvider version="v2">
-        <div style={{ maxWidth: 1024, height: 400, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ maxWidth: 1024, height: '80vh', display: 'flex', flexDirection: 'column' }}>
           <GridUpdatingContextProvider>
             <GridContextProvider>
               <Story />
@@ -148,7 +148,7 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
   });
 
   return (
-    <GridWrapper maxHeight={400}>
+    <GridWrapper>
       <GridFilters>
         <GridFilterQuick />
         <GridFilterColumnsToggle />

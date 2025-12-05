@@ -18,7 +18,8 @@ export const GridRangeSelectContextMenu = <TData extends GridBaseRow>({
   event,
   context,
 }: GridContextMenuComponentProps<TData, CopyOptionsContext>): ReactElement => {
-  const developerContextMenu: boolean = !!(event?.event as { ctrlKey?: boolean })?.ctrlKey;
+  const developerContextMenu: boolean =
+    !!(event?.event as { ctrlKey?: boolean })?.ctrlKey && !!(event?.event as { shiftKey?: boolean })?.shiftKey;
   const onCopy = useMemo(() => context?.onCopy, [context?.onCopy]);
   const onClick = useCallback(
     (type: CopyOptionsKey) => {
