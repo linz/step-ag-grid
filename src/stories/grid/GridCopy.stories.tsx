@@ -141,7 +141,7 @@ const GridCopyTemplate: StoryFn<typeof Grid<ITestRow>> = (props: GridProps<ITest
         position: random.fromArray(positions),
         age: 30,
         height: `${random.next(3) + 3}'${random.next(12)}"`,
-        bearing: Math.random() * 360,
+        bearing: random.next(360000) / 1000,
       });
     }
     return result;
